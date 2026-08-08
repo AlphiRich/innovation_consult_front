@@ -1,5 +1,14 @@
 # innovation_consult_front
 LegalOS1_1_UserManual
+
+## Election Campaign OS
+
+`ecos-app/` holds the Election Campaign OS build — a multi-tenant,
+offline-first PWA for South African political campaign field operations,
+built against `IC-ECOS-BUILD-2026-V2`. See
+[`ecos-app/BUILD-STATUS.md`](./ecos-app/BUILD-STATUS.md) for what's shipped,
+what's a placeholder pending real screen assets, and what's blocked on
+infra/legal input.
 <!DOCTYPE html>
 <html lang="en">
 <head>

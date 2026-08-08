@@ -1,0 +1,35 @@
+{
+  "//": "Election Campaign OS — ecos-app Firebase config. IC-ECOS-BUILD-2026-V2 §1. Region is africa-south1 everywhere per rule 1 in §0 — set at resource-creation time in the console/CLI, not expressible in this file for Firestore/Storage location, but Cloud Functions region is pinned in functions/src/index.ts per-function.",
+  "hosting": {
+    "public": "dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      { "source": "/api/**", "function": "api" },
+      { "source": "**", "destination": "/index.html" }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "runtime": "nodejs20",
+      "ignore": ["node_modules", ".git", "*.log"]
+    }
+  ],
+  "emulators": {
+    "auth": { "port": 9099 },
+    "firestore": { "port": 8080 },
+    "storage": { "port": 9199 },
+    "functions": { "port": 5001 },
+    "hosting": { "port": 5000 },
+    "ui": { "enabled": true },
+    "singleProject": true
+  }
+}

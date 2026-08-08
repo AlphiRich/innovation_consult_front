@@ -1,0 +1,46 @@
+name: ecos-app CI
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'ecos-app/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'ecos-app/**'
+
+defaults:
+  run:
+    working-directory: ecos-app
+
+jobs:
+  verify:
+    name: lint, typecheck, boundary checks, tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: ecos-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (includes DAL/Firestore import boundary, §2.2)
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: No raw hex colours outside design/tokens.ts (§2.2, §3.3)
+        run: npm run check:hex
+
+      - name: Unit tests (capability model, DAL contract, seat calculator, Auth minimal-footprint)
+        run: npm run test
+
+      - name: Build
+        run: npm run build

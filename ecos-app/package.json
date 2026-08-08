@@ -1,0 +1,45 @@
+{
+  "name": "ecos-app",
+  "private": true,
+  "version": "1.0.0-dev",
+  "type": "module",
+  "description": "Election Campaign OS — application shell (ecos-app). IC-ECOS-BUILD-2026-V2.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check:hex": "node scripts/check-no-hex.mjs",
+    "check:all": "npm run lint && npm run typecheck && npm run check:hex && npm run test"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.59.0",
+    "dexie": "^4.0.8",
+    "firebase": "^10.13.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.5.0",
+    "@typescript-eslint/parser": "^8.5.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.11",
+    "fake-indexeddb": "^6.0.0",
+    "fast-check": "^3.22.0",
+    "jsdom": "^25.0.0",
+    "postcss": "^8.4.45",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.3",
+    "vitest": "^2.0.5"
+  }
+}
