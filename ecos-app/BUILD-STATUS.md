@@ -6,10 +6,11 @@
 against the spec's ordering.
 **Session 2 (8 Aug 2026, later):** received `02-commercial-rewrite-brief`,
 `03-implementation-rollout-plan`, `04-legal-compliance-workstream`,
-`05-project-schedule` for the first time, plus **duplicate copies of 00 and
-01 — but labelled V1, not V2.** See "Version conflict found in session 2"
-below before trusting anything from that batch other than what's already
-been folded in here.
+`05-project-schedule` for the first time, plus duplicate copies of 00 and
+01 labelled V1, not V2, with a PPFA-removal instruction buried in that
+batch. Flagged to the human; answer received: **PPFA stays in scope, as
+V2 already has it.** See "Version conflict found in session 2 — RESOLVED"
+below.
 **Verified green in this session:** `npm run check:all` (lint, typecheck,
 `check:hex`, 59 unit tests) and `npm run build`, in `ecos-app/`. Cloud
 Functions (`functions/`) compile clean via `npm run build`.
@@ -20,45 +21,32 @@ can unblock.
 
 ---
 
-## Version conflict found in session 2 — unresolved, needs a human call
+## Version conflict found in session 2 — RESOLVED
 
 Session 2 supplied `02`/`03`/`04`/`05` for the first time (useful — see
 below) but also re-supplied `00` and `01` as **`IC-ECOS-MASTER-2026-V1`**
 and **`IC-ECOS-BUILD-2026-V1`** — the version the governing V2 build spec
-(§ header) explicitly says to discard: *"Supersedes: IC-ECOS-BUILD-2026-V1
-entirely... Do not reconcile this against remembered content."* This
-codebase was built from V2. It still is. Nothing described below changed
-that on its own authority — but two things need a human decision:
+(§ header) explicitly says to discard. Some of that V1-labelled batch (a
+Compliance Claims Register entry in `04`, action **LG8 "Verify PPFA
+excision"**, and `05`'s task **1.5 "PPFA & gatherings excision verification
+sweep"** with no PPFA line anywhere in its Phase 5) reads as if PPFA had
+been removed — directly contradicting both the governing V2 spec's rule 4
+and this same V1 bundle's own 00/01 text, which describes PPFA as fully
+"REINCORPORATED."
 
-1. **The V1 bundle is internally self-contradictory about PPFA scope.**
-   `01-claude-code-build-spec.md` (V1) and `00-master-index...` (V1) both
-   describe PPFA as fully in scope and "REINCORPORATED." But
-   `04-legal-compliance-workstream.md`'s Compliance Claims Register says
-   *"'Automated PPFA compliance' ❌ Module removed"* and action item
-   **LG8 ("Verify PPFA excision")** is assigned to Claude Code, and
-   `05-project-schedule.xlsx` has a task **1.5 "PPFA & gatherings excision
-   verification sweep"** and — tellingly — **no PPFA line item anywhere in
-   its Phase 5**. These read like artefacts from the same PPFA-removed
-   draft that the V2 master index says was an error ("V1 had removed it in
-   error"), mixed into a bundle that otherwise already shows PPFA
-   reinstated. I have **not** removed any PPFA code on the strength of
-   this — LG8/task 1.5 directly contradict the governing V2 spec's rule 4
-   ("The Funding & Disclosure (PPFA) module IS in scope"), and undoing the
-   already-built, tested donor/donation/escalation/threshold-config work
-   on the basis of a self-contradicting document would be the expensive
-   kind of wrong guess. **If you want PPFA actually removed, say so
-   explicitly** — that's a one-line instruction and a very different, much
-   smaller build than what exists now.
-2. **The V1 PPFA data model shape differs from V2's** where V1 does
-   describe it (e.g. `Donor.donorType` is
-   `'INDIVIDUAL'|'CORPORATE'|'ENTITY'` in V1 vs
-   `'NATURAL_PERSON'|'JURISTIC_PERSON'|'FOREIGN'|'ANONYMOUS'` in V2;
-   `DonationAlert` has a different status/level shape; V1 has no
-   append-only/evidential `configIdApplied` requirement and no §6.8.1
-   "hold the aggregator pending Q1–Q3" caveat — V1's rollout plan and
-   legal workstream both assume the aggregation function is already built
-   and tested). I kept V2's model (richer, and the explicit last governing
-   instruction). Not changed.
+**Human decision, received:** *"PPFA compliance SHOULD REMAIN IN SCOPE as
+set out by V2."* This matches what was already built — no code changed as
+a result. Confirmed and closing this out:
+
+- V2 remains the governing spec for 00/01. The V1 copies and any
+  PPFA-removal instructions inside the V1-labelled batch (LG8, schedule
+  task 1.5, the "Module removed" claims-register row) are **disregarded**.
+- The PPFA data model, capability wiring, escalation ladder, and seed
+  roles stay exactly as built (V2's shape — `donorType`
+  `NATURAL_PERSON`/`JURISTIC_PERSON`/`FOREIGN`/`ANONYMOUS`, append-only
+  effective-dated `PPFAConfig` with evidential `configIdApplied`, §6.8.1's
+  "hold the aggregator pending Q1–Q3" still in force). V1's differing PPFA
+  shapes (from `01`'s V1 copy) were never adopted.
 
 **What I did fold in from the V1-batch, because it's genuinely new,
 additive, and doesn't conflict with anything:** the infrastructure/DNS/
