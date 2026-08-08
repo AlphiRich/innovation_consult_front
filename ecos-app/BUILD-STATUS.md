@@ -11,6 +11,28 @@ against the spec's ordering.
 batch. Flagged to the human; answer received: **PPFA stays in scope, as
 V2 already has it.** See "Version conflict found in session 2 — RESOLVED"
 below.
+**Session 3 (9 Aug 2026):** received `CLAUDEHANDOFF.md`, a memory-dump from
+a *separate* claude.ai Project conversation (its own header says so — "no
+live sync between claude.ai Projects and Claude Code"). It describes a
+different, older architecture: PostgreSQL+RLS as primary with AWS
+`af-south-1` hosting, a Google ADK compliance agent
+(`google_adk_campaign_agent.py`), and 5-role RBAC (`HQ_ADMIN`,
+`LOCAL_HEAD`, `WARD_LEAD`, `VD_CAPTAIN`, `VOLUNTEER`) — all three
+explicitly superseded by V2 (PostgreSQL is Phase-8-conditional behind
+Firestore/GCP `africa-south1`; the ADK agent is on the master index's
+Retired list; RBAC is the capability-grants model, 7 seed roles, already
+built and tested). Flagged to the human; answer received: **stale — V2
+governs, disregard the conflicting architecture.** Not dropped into the
+repo or `CLAUDE.md` as the document itself instructs, since that would
+plant contradictory guidance for a future session. Several of its
+"corrections" (LWW conflict handling, the MMP seat-calculator overhang
+bug, brand colour, PPFA thresholds) turned out to already be fixed
+correctly in this codebase — good confirmation, no action taken. Its
+Stitch-extraction status (229 screens, 47 usable, 178 outstanding
+re-export, Mac salvaging screenshots in parallel) is kept as background
+context only — it explains the delay, it doesn't supply the screens, so
+blocker #1 below stands.
+
 **Verified green in this session:** `npm run check:all` (lint, typecheck,
 `check:hex`, 59 unit tests) and `npm run build`, in `ecos-app/`. Cloud
 Functions (`functions/`) compile clean via `npm run build`.
