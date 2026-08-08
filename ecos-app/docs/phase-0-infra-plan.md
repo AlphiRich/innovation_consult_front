@@ -11,8 +11,19 @@ leaving them to re-derive later.
 - **Firestore database location:** `africa-south1` (Johannesburg). Verify in
   the console before the first write — this cannot be changed after data
   exists.
-- **GCP project IDs:** `innovation-consult-ecos-prod` and
-  `innovation-consult-ecos-dev`.
+- **GCP project IDs — planned vs. actual, unreconciled.** `03`'s plan says
+  `innovation-consult-ecos-prod` / `-dev`. A screenshot supplied later shows
+  a GCP project that actually exists: name **`Election2026-CampaignMSv7`**,
+  project ID **`election2026-campaignms7-0`**, project number
+  `549685402486`. Nobody has told me these are the same environment under a
+  different chosen name, so treat that as open, not assumed — update
+  `.firebaserc.example` / `VITE_FIREBASE_PROJECT_ID` once it's confirmed
+  which ID is real. **I cannot inspect this project myself** — no `gcloud`
+  or `firebase` CLI, and no Google Cloud credentials, are available in this
+  session; the screenshot only shows the console's blank "Welcome" splash,
+  which doesn't tell me whether Firestore/Storage/Functions/Blaze are
+  configured, or what region was picked. That still needs a human (console
+  or CLI) to verify against the §1.1 checklist in the build spec.
 
 ## Domain and DNS architecture
 
