@@ -2,15 +2,96 @@
 
 **Governing spec:** `IC-ECOS-BUILD-2026-V2` (`01-claude-code-build-spec-v2.md`) +
 `IC-ECOS-MASTER-2026-V2` (`00-master-index-work-partition-map-v2.md`)
-**This session:** 8 August 2026 — first build session, Phases 0–5 scaffolded
+**Session 1 (8 Aug 2026):** first build session, Phases 0–5 scaffolded
 against the spec's ordering.
+**Session 2 (8 Aug 2026, later):** received `02-commercial-rewrite-brief`,
+`03-implementation-rollout-plan`, `04-legal-compliance-workstream`,
+`05-project-schedule` for the first time, plus **duplicate copies of 00 and
+01 — but labelled V1, not V2.** See "Version conflict found in session 2"
+below before trusting anything from that batch other than what's already
+been folded in here.
 **Verified green in this session:** `npm run check:all` (lint, typecheck,
-`check:hex`, 54 unit tests) and `npm run build`, in `ecos-app/`. Cloud
+`check:hex`, 59 unit tests) and `npm run build`, in `ecos-app/`. Cloud
 Functions (`functions/`) compile clean via `npm run build`.
 
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.
+
+---
+
+## Version conflict found in session 2 — unresolved, needs a human call
+
+Session 2 supplied `02`/`03`/`04`/`05` for the first time (useful — see
+below) but also re-supplied `00` and `01` as **`IC-ECOS-MASTER-2026-V1`**
+and **`IC-ECOS-BUILD-2026-V1`** — the version the governing V2 build spec
+(§ header) explicitly says to discard: *"Supersedes: IC-ECOS-BUILD-2026-V1
+entirely... Do not reconcile this against remembered content."* This
+codebase was built from V2. It still is. Nothing described below changed
+that on its own authority — but two things need a human decision:
+
+1. **The V1 bundle is internally self-contradictory about PPFA scope.**
+   `01-claude-code-build-spec.md` (V1) and `00-master-index...` (V1) both
+   describe PPFA as fully in scope and "REINCORPORATED." But
+   `04-legal-compliance-workstream.md`'s Compliance Claims Register says
+   *"'Automated PPFA compliance' ❌ Module removed"* and action item
+   **LG8 ("Verify PPFA excision")** is assigned to Claude Code, and
+   `05-project-schedule.xlsx` has a task **1.5 "PPFA & gatherings excision
+   verification sweep"** and — tellingly — **no PPFA line item anywhere in
+   its Phase 5**. These read like artefacts from the same PPFA-removed
+   draft that the V2 master index says was an error ("V1 had removed it in
+   error"), mixed into a bundle that otherwise already shows PPFA
+   reinstated. I have **not** removed any PPFA code on the strength of
+   this — LG8/task 1.5 directly contradict the governing V2 spec's rule 4
+   ("The Funding & Disclosure (PPFA) module IS in scope"), and undoing the
+   already-built, tested donor/donation/escalation/threshold-config work
+   on the basis of a self-contradicting document would be the expensive
+   kind of wrong guess. **If you want PPFA actually removed, say so
+   explicitly** — that's a one-line instruction and a very different, much
+   smaller build than what exists now.
+2. **The V1 PPFA data model shape differs from V2's** where V1 does
+   describe it (e.g. `Donor.donorType` is
+   `'INDIVIDUAL'|'CORPORATE'|'ENTITY'` in V1 vs
+   `'NATURAL_PERSON'|'JURISTIC_PERSON'|'FOREIGN'|'ANONYMOUS'` in V2;
+   `DonationAlert` has a different status/level shape; V1 has no
+   append-only/evidential `configIdApplied` requirement and no §6.8.1
+   "hold the aggregator pending Q1–Q3" caveat — V1's rollout plan and
+   legal workstream both assume the aggregation function is already built
+   and tested). I kept V2's model (richer, and the explicit last governing
+   instruction). Not changed.
+
+**What I did fold in from the V1-batch, because it's genuinely new,
+additive, and doesn't conflict with anything:** the infrastructure/DNS/
+account detail from `03` (below), and a POPIA data-subject-request
+workflow from `04`'s action LG10 / `05`'s task 3.8 (also below). Neither
+touches PPFA.
+
+## What session 2 added
+
+- **`docs/phase-0-infra-plan.md`** — real domain names
+  (`app.electioncampaignos.co.za` etc.), GCP project IDs
+  (`innovation-consult-ecos-{dev,prod}`), the account register, and the
+  pre-launch checklist, sourced from `03-implementation-rollout-plan.md`.
+  `.env.example` and `.firebaserc.example` updated to match. This partially
+  addresses blocker #2 below — naming is decided, nothing is provisioned.
+- **POPIA data subject request workflow** (access/correction/deletion,
+  Condition 8) — `src/dal/ports/dataSubjectRequests.ts` +
+  Firestore adapter + `firestore.rules` entry + new capabilities
+  (`dsr.view`, `dsr.manage`, granted to Party HQ Admin and Compliance
+  Officer) + route `/settings/data-requests`. This was not in the original
+  build spec; it's `04-legal-compliance-workstream.md` action **LG10** and
+  `05-project-schedule.xlsx` task **3.8**, both assigned to Claude Code.
+  `dataSubjectRequestSla.ts`'s `RESPONSE_TARGET_DAYS = 30` is **my working
+  assumption, not a cited statutory deadline** — POPIA Condition 8 doesn't
+  set a fixed window the way GDPR does; flag this for the attorney review
+  already scheduled for the consent-basis questions (LG2/LG3).
+- **`02-commercial-rewrite-brief.md`** — read, not acted on. It's addressed
+  to Fable 5, not Claude Code (master index routing rule), and has no code
+  implications. Noted here only so it's clear it was reviewed.
+- **`05-project-schedule.xlsx`** — read for calendar/gate context (schedule
+  starts 2026-08-10, gates through Phase 8). Its consumer is PM, not
+  Claude Code, per the same routing rule; no code changes came from it
+  beyond confirming the PPFA conflict above and the DSR workflow task.
 
 ---
 
@@ -210,7 +291,8 @@ npm install
 npm run build       # tsc — succeeds, no errors
 ```
 
-54 unit tests across 10 files, all passing. Coverage highlights:
+59 unit tests across 11 files, all passing (54 from session 1 + 5 for the
+new data-subject-request SLA helper). Coverage highlights:
 capability resolution (5 cases incl. revoke-wins-over-grant), Auth
 minimal-footprint guard (11 cases), nav visibility (4 cases), offline
 schema anti-PPFA guard (3 cases incl. a deliberately-broken schema to

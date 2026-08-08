@@ -207,5 +207,16 @@ service cloud.firestore {
       allow read: if tenantOK(tid) && cap('settings.permissions');
       allow write: if false; // written server-side only
     }
+
+    // ---- POPIA data subject requests (access/correction/deletion) ---------
+    // New scope, added post-initial-build — see
+    // src/dal/ports/dataSubjectRequests.ts for provenance (04-legal-
+    // compliance-workstream.md action LG10).
+
+    match /tenants/{tid}/dataSubjectRequests/{requestId} {
+      allow read: if tenantOK(tid) && cap('dsr.view');
+      allow create, update: if tenantOK(tid) && cap('dsr.manage');
+      allow delete: if false; // the request log itself is a compliance record
+    }
   }
 }

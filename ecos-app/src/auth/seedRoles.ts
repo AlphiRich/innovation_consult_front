@@ -38,6 +38,8 @@ export const SEED_ROLES: Role[] = [
       'team.manage',
       'settings.tenant',
       'settings.permissions',
+      'dsr.view',
+      'dsr.manage',
     ],
   },
   {
@@ -101,7 +103,7 @@ export const SEED_ROLES: Role[] = [
     label: 'Compliance Officer',
     geoScope: 'TENANT',
     systemRole: true,
-    defaultCaps: ['voters.view', 'ppfa.view', 'ppfa.edit', 'analytics.view'],
+    defaultCaps: ['voters.view', 'ppfa.view', 'ppfa.edit', 'analytics.view', 'dsr.view', 'dsr.manage'],
   },
   {
     id: 'finance-officer',

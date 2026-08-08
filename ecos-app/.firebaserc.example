@@ -1,6 +1,8 @@
 {
-  "//": "Copy to .firebaserc once the Firebase project exists (Phase 0, 03-implementation-rollout-plan-v2.md §2). Project region must be africa-south1 — confirmed at project/database creation, not in this file.",
+  "//": "Copy to .firebaserc once the Firebase project exists (docs/phase-0-infra-plan.md). Project region must be africa-south1 — confirmed at project/database creation, not in this file.",
   "projects": {
-    "default": "REPLACE-WITH-FIREBASE-PROJECT-ID"
+    "default": "innovation-consult-ecos-dev",
+    "dev": "innovation-consult-ecos-dev",
+    "prod": "innovation-consult-ecos-prod"
   }
 }

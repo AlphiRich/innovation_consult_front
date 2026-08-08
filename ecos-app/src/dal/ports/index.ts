@@ -20,3 +20,4 @@ export * from './donors';
 export * from './donations';
 export * from './ppfaConfig';
 export * from './donationAlerts';
+export * from './dataSubjectRequests';

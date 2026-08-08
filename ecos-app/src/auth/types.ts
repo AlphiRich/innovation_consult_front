@@ -31,7 +31,15 @@ export type Capability =
   | 'analytics.export'
   | 'team.manage'
   | 'settings.tenant'
-  | 'settings.permissions';
+  | 'settings.permissions'
+  // POPIA data subject request handling (access/correction/deletion —
+  // Condition 8). Added per 04-legal-compliance-workstream.md action LG10
+  // and 05-project-schedule.xlsx task 3.8; not in the original build spec's
+  // capability list. Split view/manage the same way ppfa.view/ppfa.edit
+  // are split — a request log should be readable more widely than it's
+  // actionable.
+  | 'dsr.view'
+  | 'dsr.manage';
 
 export type GeoScope = 'TENANT' | 'MUNICIPALITY' | 'WARD' | 'VD';
 

@@ -22,6 +22,7 @@ import { SettingsPage } from '@/modules/settings/SettingsPage';
 import { MunicipalityConfigPage } from '@/modules/settings/MunicipalityConfigPage';
 import { PermissionsPage } from '@/modules/settings/PermissionsPage';
 import { PPFAThresholdsPage } from '@/modules/settings/PPFAThresholdsPage';
+import { DataSubjectRequestsPage } from '@/modules/settings/DataSubjectRequestsPage';
 import { GatheringsAdvisoryPage } from '@/modules/knowledge/GatheringsAdvisoryPage';
 
 export const router = createBrowserRouter([
@@ -53,6 +54,7 @@ export const router = createBrowserRouter([
           { path: 'municipality', element: <MunicipalityConfigPage /> },
           { path: 'permissions', element: <PermissionsPage /> },
           { path: 'ppfa-thresholds', element: <PPFAThresholdsPage /> },
+          { path: 'data-requests', element: <DataSubjectRequestsPage /> },
         ],
       },
       { path: 'knowledge/gatherings-advisory', element: <GatheringsAdvisoryPage /> },
