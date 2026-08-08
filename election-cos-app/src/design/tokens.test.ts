@@ -34,4 +34,10 @@ describe('design tokens stay in sync with tailwind.config.js', () => {
       expect(Object.values(tokens.color)).not.toContain(hex);
     }
   });
+
+  it('every declared type role has a matching fontSize entry in tailwind.config.js', () => {
+    for (const role of tokens.typeRoles) {
+      expect(configSource).toContain(`'${role}'`);
+    }
+  });
 });

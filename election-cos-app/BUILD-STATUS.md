@@ -46,6 +46,40 @@ the governing artefact's own self-declared reference code, not the
 product's display name, and rewriting them would misattribute the
 citation. `check:all` and `build` re-verified green after the rename (59
 tests, both `election-cos-app/` and `functions/`).
+**Session 5 (9 Aug 2026):** two things. (1) Attempted to create a dedicated
+`election-cos-app` GitHub repo per the human's direction to migrate off
+this monorepo — **blocked**: the GitHub App integration returned
+`403 Resource not accessible by integration` on `create_repository`; it
+can work within granted repos but can't create new ones. Waiting on the
+human to create an empty repo by hand; migration (via `git subtree split`
+on this folder, not the whole monorepo history) is queued once it exists.
+(2) **Received the first real Stitch screen assets** —
+`stitch_ic_election_management_suite.zip`, 66 screens — partially
+resolving blocker #1 below. See `docs/screen-findings.md` for the full
+account: a large share of the batch is the retired Civic Architect/SA
+Elections 2024 shells (excluded); the genuine "ELECTION CAMPAIGN OS"
+voter/household screens were used to build a real, working **Voters
+module** (`src/modules/voters/`) — list + create/edit form wired to the
+existing DAL (`dal.voters`, `dal.households`), phone display-masking
+(`src/lib/phone.ts`), a 5-tier sentiment picker
+(`src/modules/voters/sentiment.ts`), and the POPIA consent gate enforced
+in the form (mirrors `firestore.rules`). Phone *encryption* is
+deliberately not wired — `phoneEncrypted` needs real Cloud KMS key
+management that doesn't exist without a live GCP project; writing a fake
+encrypted field would be worse than omitting it, so it's left off with a
+comment rather than faked. The reference screens show materially more
+fields than the governing `Voter` type (demographics, engagement-history
+timeline, service-delivery status per utility) — **none were added to the
+data model**; `docs/screen-findings.md` has the comparison table and flags
+it as an open decision rather than silent scope creep. Also adopted the
+Stitch suite's documented typographic role scale
+(`civic_authority/DESIGN.md`'s "Brand & Style" section — brand-neutral,
+cites our real colours even though that file's own YAML palette is the
+retired drift) into `tailwind.config.js`/`tokens.ts`, kept in sync by
+`tokens.test.ts`. Verified: 67 tests, lint/typecheck/hex-check/build all
+green (bundle is now 195KB gzipped JS — a `chunks larger than 500kB`
+build warning appeared; not fixed this session, code-splitting is a
+reasonable future pass, not urgent at this size).
 
 **Verified green in this session:** `npm run check:all` (lint, typecheck,
 `check:hex`, 59 unit tests) and `npm run build`, in `election-cos-app/`. Cloud

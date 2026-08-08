@@ -30,6 +30,11 @@ export const tokens = {
     body: '"Public Sans", sans-serif',
     mono: '"IBM Plex Mono", monospace',
   },
+  // Typographic role scale — see tailwind.config.js for the matching
+  // `text-*` utility sizes (e.g. `text-label-caps`). Source: Stitch suite
+  // civic_authority/DESIGN.md "Brand & Style" §Typography (brand-neutral;
+  // that file's colour palette is retired drift, its type scale isn't).
+  typeRoles: ['display-lg', 'display-lg-mobile', 'headline-md', 'body-lg', 'body-md', 'label-caps', 'data-mono'],
 } as const;
 
 export type Tokens = typeof tokens;

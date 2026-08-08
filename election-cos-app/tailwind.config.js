@@ -28,6 +28,21 @@ export default {
         body: ['"Public Sans"', 'sans-serif'],
         mono: ['"IBM Plex Mono"', 'monospace'],
       },
+      // Typographic role scale, sourced from the Stitch suite's civic_authority/
+      // DESIGN.md "Brand & Style" section — that file's YAML colour palette
+      // (#040c30 etc) is retired drift (same list as above), but its
+      // documented type scale explicitly cites OUR real brand colours
+      // (Ink #1A2246, Amber #B7913F, Paper #F7F4EE) and is brand-neutral,
+      // so it's adopted here. Use e.g. `text-label-caps` + `font-display`.
+      fontSize: {
+        'display-lg': ['48px', { lineHeight: '56px', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'display-lg-mobile': ['32px', { lineHeight: '38px', letterSpacing: '-0.01em', fontWeight: '700' }],
+        'headline-md': ['24px', { lineHeight: '32px', letterSpacing: '0.02em', fontWeight: '600' }],
+        'body-lg': ['18px', { lineHeight: '28px', fontWeight: '400' }],
+        'body-md': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+        'label-caps': ['12px', { lineHeight: '16px', letterSpacing: '0.1em', fontWeight: '700' }],
+        'data-mono': ['14px', { lineHeight: '20px', letterSpacing: '-0.01em', fontWeight: '500' }],
+      },
     },
   },
   plugins: [],
