@@ -402,6 +402,51 @@ test` — 13 unit tests, build clean. The Cloud Functions themselves are
 so War Room's tiles will read as zero/empty against a real project until
 they are.
 
+**Session 9, continued — Analytics' 3 sub-views:** replaced all three
+placeholders with real builds, plus a real landing page at `/analytics`
+linking to them.
+
+- **Vote Calculator** (`SeatCalculatorPage.tsx`) — a standalone MMP
+  what-if tool wired directly to the already-real, already-verified
+  `allocateSeats()` (no DAL/session dependency; it's a scenario
+  calculator). Opens on the real JB Marks/NW405 2021 result
+  (`nw405Example.ts`) instead of a blank form. Adds a real "Coalition
+  Builder": tick parties, see their combined seats against a computed
+  majority threshold — genuine derived arithmetic on the calculator's own
+  output, not invented data.
+- **Threshold Analyzer** (`ThresholdAnalyzerPage.tsx`) — the ELECTORAL
+  1% qualification threshold (Schedule 1 Step 2), kept strictly separate
+  from `/settings/ppfa-thresholds` (statutory funding disclosure) per the
+  naming discipline this file's stub already carried. New
+  `electoralThreshold.ts`, tested against the real NW405 2021 figures —
+  every party that won a seat in the real result clears 1%, the one that
+  didn't (Abantu Batho Congress) doesn't. The 1% figure itself is flagged
+  as an unverified working assumption, not a confirmed statutory fact —
+  same treatment as the rest of `docs/unverified-source-documents.md`.
+- **Sentiment Summary Report** (`ScheduledReportsPage.tsx`, née
+  "Automated Reporting") — a real, on-demand, tenant-wide sentiment
+  summary read from the same `warRoomCounters` doc War Room uses, with a
+  CSV export. What the original "Automated Reporting" scope implied and
+  this does NOT do: true cron-based scheduling (no Cloud Scheduler
+  function exists), distribution lists/email delivery (no notification
+  infrastructure exists), or a per-ward ranking (the counters this build
+  maintains are tenant-wide only). All disclosed in the file's own header
+  comment rather than faked.
+
+The human supplied 9 more screenshots for this pass — 2 were directly
+useful (both "Civic Authority," retired shell — structural patterns
+reused, palette/branding/formula not), 2 were report mockups with a
+fabricated signatory that was deliberately not reproduced, 2 were
+entirely out of scope (a marketing landing page — `election-cos-landing`
+territory — and a "Volunteer Rewards Configuration" screen matching no
+capability or data model this build has), and 2 duplicated ground already
+covered. Full account in `docs/screen-findings.md`.
+
+**Verified:** `npm run check:all` — 92 unit tests (up from 80; 12 new —
+7 for `electoralThreshold.ts`, 5 for `sentimentSummary.ts`; the
+already-tested `seatCalculator.ts` is unchanged), lint/typecheck/
+`check:hex`/build all green.
+
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.

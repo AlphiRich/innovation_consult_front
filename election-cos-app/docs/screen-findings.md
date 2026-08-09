@@ -180,3 +180,58 @@ tenant-wide recent-activity query), and the directives repository (no
 UI exists for `dal.documents` yet). `WarRoomPage.tsx`'s header comment
 records this explicitly — same discipline as the Incidents module's
 referral-PDF gap and the Voters module's phone-encryption gap.
+
+## Analytics sub-views (session 9, continued) — 9 new images, mixed batch
+
+The human supplied 9 screenshots "to finish building the 3 remaining
+sub-views" (Vote Calculator, Threshold Analyzer, Sentiment Summary
+Report). Sorted by what they actually were:
+
+**Two directly usable, both "Civic Authority" (retired shell, master
+index §3.2):**
+- A "Hung Council: Strategic Coalition Modeler" screen — nav confirms
+  it's the same tool as `/analytics/seat-calculator` (sidebar: Dashboard,
+  Vote Calculator, Threshold Analyzer, Municipality Config, Reports —
+  matching four of our own real routes one-for-one). Its stat-tile
+  layout and "Coalition Builder" side panel (select parties, compare
+  their combined seats to a majority threshold) are real, generic UI
+  patterns and were reused. Its navy/gold retired palette, its "Civic
+  Authority" branding, and its printed quota formula ("Q = (V/S) + 1")
+  were **not** — that formula is exactly the Droop-adjacent guess session
+  8 disproved against the real NW405 IEC report; see `seatCalculator.ts`.
+- A "Volunteer Performance Metrics" / "Reports" screen — closest visual
+  match to Sentiment Summary Report's original "Automated Reporting"
+  scope, but its entire content (volunteer leaderboards, conversion
+  rates, doors-per-hour) depends on a volunteer-performance data model
+  this build doesn't have. Not adopted as a data source; its existence
+  as a "Reports" nav destination is the only thing carried forward.
+
+**Two report-mockup screens, structurally informative but with fabricated
+identity content that was deliberately NOT reproduced:** "30-Day Ward
+Sentiment Summary" and "Ward 18: Strategic Sentiment" both show a rich
+per-ward ranking (top/at-risk wards, a sentiment heatmap, drill-down
+friction points) — none of which this build has real data for, since the
+warRoomCounters this session built are tenant-wide only, not ward-
+segmented. Both mockups are also "signed" by a fictional
+"Marcus Thorne" — with two different titles and two different fictional
+company names ("Innovation Consult" vs. "Global Strategy Group") between
+the two screens, itself a sign this is placeholder content, not a real
+org chart. `ScheduledReportsPage.tsx` does not name any person, real or
+invented, as having authored or certified its output.
+
+**Two out of scope entirely, not acted on:**
+- A marketing landing page ("Knowledge to Action: The Ultimate LGE War
+  Room," pricing tiers, "Request a Demo") — this is `election-cos-landing`
+  territory, explicitly out of scope for an application-phase build
+  session per BUILD-STATUS.md's "What was deliberately NOT built" list.
+- A "Volunteer Rewards Configuration" screen (points, badge tiers,
+  merchandise redemption, a fulfillment queue) — no capability, DAL port,
+  or spec section anywhere in this build corresponds to a volunteer-
+  gamification/rewards system. Flagged as a genuine mismatch rather than
+  silently built or silently ignored.
+
+**Two already covered by existing modules, no new information:** a
+household-detail mobile screen (Voters, session 5/6) and a voter-intake
+form with demographic/psychographic fields (already the subject of the
+open scope question in the "Voters/households screens" section above —
+same fields, same non-decision).
