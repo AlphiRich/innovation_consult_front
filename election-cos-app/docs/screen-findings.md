@@ -275,3 +275,16 @@ A second dead-code gap: `firestore.rules` already had a
 alongside the status change — a lightweight approval trail distinct from
 the server-only `auditLog`. No UI reads it yet; that's a reasonable
 follow-up, not built this session.
+
+## Funding & Disclosure / PPFA (session 9, continued) — no screens exist
+
+Checked the full 66-screen Stitch batch for anything Funding/PPFA/donor/
+disclosure-shaped: nothing. This module (`FinancePage.tsx`, `DonorForm.tsx`,
+`DonationForm.tsx`, `DonorDetail.tsx`, and `/settings/ppfa-thresholds`)
+was built entirely from the governing data model and build spec §6.8, with
+no visual reference to check against or diverge from. Noted here so a
+future session doesn't spend time searching for a screen that isn't in
+the batch, and so it's clear this module's UI decisions (donor list +
+detail panel, a client-side-only provisional status banner, inline
+"mark disclosed" per donation) are this build's own design, not a
+Stitch-informed one.

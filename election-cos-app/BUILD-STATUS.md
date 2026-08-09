@@ -487,6 +487,50 @@ Found and fixed two real gaps, neither from the screen:
 **Verified:** `npm run check:all` — 96 unit tests (up from 92; 4 new for
 `logisticsMeta.ts`), lint/typecheck/`check:hex`/build all green.
 
+**Session 9, continued — Funding & Disclosure (PPFA) module, and its
+Settings companion:** replaced both the `FinancePage` placeholder and the
+`/settings/ppfa-thresholds` placeholder with real builds. This is the
+most consequence-sensitive module in the codebase (§6.8.3: "never block a
+donation write"), so extra care went into keeping it strictly within the
+already-established boundary:
+
+- `FinancePage.tsx` — donor list + detail panel (`DonorForm.tsx`,
+  `DonationForm.tsx`, `DonorDetail.tsx`). Recording a donation is never
+  blocked by amount or threshold — the DAL already enforced this
+  (`donationsRepository.ts`'s header); nothing added here changes that.
+  `idNumberEncrypted`/`registrationNumberEncrypted` are deliberately
+  absent from the donor form — same disclosed gap as phone encryption,
+  no Cloud KMS key management provisioned.
+- `DonorDetail.tsx` shows a **client-side, display-only** provisional
+  status banner (`levelForAggregate` over the donor's current-financial-
+  year donations, summed in the browser) — explicitly labelled as not
+  the real aggregation. The real one
+  (`functions/src/ppfaAggregation.ts`) stays deliberately unbuilt
+  pending §6.8.1 Q1–Q3 legal confirmation; this banner writes nothing
+  (`donationAlerts` create is `if false` for clients in firestore.rules
+  regardless) and exists only so a compliance officer isn't flying blind
+  in the meantime.
+- New `financialYear.ts` (+ 8 tests) derives `Donation.financialYear`/
+  `quarter` from the tenant's configured (provisional)
+  `financialYearStartMonth` — donationsRepository.ts's header had asked
+  for this "derived by the caller" and nothing had built it yet.
+- `/settings/ppfa-thresholds` (`PPFAThresholdsPage.tsx`) — shows the
+  current governing figures + source citation + effective date, a full
+  history (append-only — every "edit" is a new effective-dated config,
+  matching firestore.rules' `update, delete: if false`), and a create
+  form seeded from the gazetted defaults (`ppfaDefaults.ts`).
+
+Found and fixed a real Rules-of-Hooks bug while building
+`PPFAThresholdsPage.tsx`: an early draft called several `useState` hooks
+*after* an `if (!session) return` early return — a real bug (hook call
+order isn't guaranteed stable if `session` changes), not just a style
+issue. Restructured so every hook runs unconditionally before any return,
+with a short header note explaining why, in case a future page copies
+this file's structure without noticing.
+
+**Verified:** `npm run check:all` — 104 unit tests (up from 96),
+lint/typecheck/`check:hex`/build all green.
+
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.
