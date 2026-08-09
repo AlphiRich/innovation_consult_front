@@ -1,0 +1,1668 @@
+[
+  {
+    "ward": {
+      "id": "NW405-W1",
+      "wardCode": "NW405-W1",
+      "municipalityCode": "NW405",
+      "name": "Ward 1",
+      "registeredVoters": 3209,
+      "vdCodes": [
+        "86821094",
+        "86910587"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W1::86821094",
+        "vdCode": "86821094",
+        "wardCode": "NW405-W1",
+        "name": "UNITING REFORMED CHURCH IN SA",
+        "registeredVoters": 1352,
+        "_split": true
+      },
+      {
+        "id": "NW405-W1::86910587",
+        "vdCode": "86910587",
+        "wardCode": "NW405-W1",
+        "name": "SARAFINA HIGH SCHOOL",
+        "registeredVoters": 1857,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W2",
+      "wardCode": "NW405-W2",
+      "municipalityCode": "NW405",
+      "name": "Ward 2",
+      "registeredVoters": 4121,
+      "vdCodes": [
+        "86820543",
+        "86910363",
+        "86910082",
+        "86820554",
+        "86820486",
+        "86820475",
+        "86820464",
+        "86820992",
+        "86820453",
+        "86820688"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W2::86820543",
+        "vdCode": "86820543",
+        "wardCode": "NW405-W2",
+        "name": "BUFFELSHOEK POLICE STATION",
+        "registeredVoters": 306,
+        "_split": false
+      },
+      {
+        "id": "NW405-W2::86910363",
+        "vdCode": "86910363",
+        "wardCode": "NW405-W2",
+        "name": "APOSTOLIC FAITH MISSION OF SA EMMANUEL ASSEM",
+        "registeredVoters": 0,
+        "_split": true
+      },
+      {
+        "id": "NW405-W2::86910082",
+        "vdCode": "86910082",
+        "wardCode": "NW405-W2",
+        "name": "CHRIS HANI COMMUNITY HALL",
+        "registeredVoters": 153,
+        "_split": true
+      },
+      {
+        "id": "NW405-W2::86820554",
+        "vdCode": "86820554",
+        "wardCode": "NW405-W2",
+        "name": "EARTH ADVENTURES",
+        "registeredVoters": 215,
+        "_split": false
+      },
+      {
+        "id": "NW405-W2::86820486",
+        "vdCode": "86820486",
+        "wardCode": "NW405-W2",
+        "name": "ROODEKRAAL KONTANT WINKEL",
+        "registeredVoters": 852,
+        "_split": false
+      },
+      {
+        "id": "NW405-W2::86820475",
+        "vdCode": "86820475",
+        "wardCode": "NW405-W2",
+        "name": "OLD POLICE STATION",
+        "registeredVoters": 178,
+        "_split": false
+      },
+      {
+        "id": "NW405-W2::86820464",
+        "vdCode": "86820464",
+        "wardCode": "NW405-W2",
+        "name": "NG MIEDERPARK",
+        "registeredVoters": 1463,
+        "_split": true
+      },
+      {
+        "id": "NW405-W2::86820992",
+        "vdCode": "86820992",
+        "wardCode": "NW405-W2",
+        "name": "DAN TLOME PRIMARY SCHOOL",
+        "registeredVoters": 140,
+        "_split": true
+      },
+      {
+        "id": "NW405-W2::86820453",
+        "vdCode": "86820453",
+        "wardCode": "NW405-W2",
+        "name": "TOLMAY SHOP",
+        "registeredVoters": 357,
+        "_split": false
+      },
+      {
+        "id": "NW405-W2::86820688",
+        "vdCode": "86820688",
+        "wardCode": "NW405-W2",
+        "name": "NTHEBE PRIMARY SCHOOL",
+        "registeredVoters": 457,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W3",
+      "wardCode": "NW405-W3",
+      "municipalityCode": "NW405",
+      "name": "Ward 3",
+      "registeredVoters": 4121,
+      "vdCodes": [
+        "86820510",
+        "86820521",
+        "86910532"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W3::86820510",
+        "vdCode": "86820510",
+        "wardCode": "NW405-W3",
+        "name": "VYFHOEK PRIMARY SCHOOL",
+        "registeredVoters": 1558,
+        "_split": false
+      },
+      {
+        "id": "NW405-W3::86820521",
+        "vdCode": "86820521",
+        "wardCode": "NW405-W3",
+        "name": "FIKADIBENG PRIMARY SCHOOL",
+        "registeredVoters": 909,
+        "_split": false
+      },
+      {
+        "id": "NW405-W3::86910532",
+        "vdCode": "86910532",
+        "wardCode": "NW405-W3",
+        "name": "DIE WILGE HIGH SCHOOL",
+        "registeredVoters": 1654,
+        "_split": true
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W4",
+      "wardCode": "NW405-W4",
+      "municipalityCode": "NW405",
+      "name": "Ward 4",
+      "registeredVoters": 3056,
+      "vdCodes": [
+        "86910026",
+        "86910543",
+        "86910015"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W4::86910026",
+        "vdCode": "86910026",
+        "wardCode": "NW405-W4",
+        "name": "ML FICK PRIMARY SCHOOL",
+        "registeredVoters": 200,
+        "_split": true
+      },
+      {
+        "id": "NW405-W4::86910543",
+        "vdCode": "86910543",
+        "wardCode": "NW405-W4",
+        "name": "IKAGENG MAGISTRATE COURT",
+        "registeredVoters": 511,
+        "_split": true
+      },
+      {
+        "id": "NW405-W4::86910015",
+        "vdCode": "86910015",
+        "wardCode": "NW405-W4",
+        "name": "POTCHEFSTROOM PRIMARY SCHOOL",
+        "registeredVoters": 2345,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W5",
+      "wardCode": "NW405-W5",
+      "municipalityCode": "NW405",
+      "name": "Ward 5",
+      "registeredVoters": 3691,
+      "vdCodes": [
+        "86910026",
+        "86820464"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W5::86910026",
+        "vdCode": "86910026",
+        "wardCode": "NW405-W5",
+        "name": "ML FICK PRIMARY SCHOOL",
+        "registeredVoters": 3391,
+        "_split": true
+      },
+      {
+        "id": "NW405-W5::86820464",
+        "vdCode": "86820464",
+        "wardCode": "NW405-W5",
+        "name": "NG MIEDERPARK",
+        "registeredVoters": 300,
+        "_split": true
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W6",
+      "wardCode": "NW405-W6",
+      "municipalityCode": "NW405",
+      "name": "Ward 6",
+      "registeredVoters": 3059,
+      "vdCodes": [
+        "86910161",
+        "86910543",
+        "86910060"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W6::86910161",
+        "vdCode": "86910161",
+        "wardCode": "NW405-W6",
+        "name": "NG KERK NORTH (MOKOKO)",
+        "registeredVoters": 1869,
+        "_split": false
+      },
+      {
+        "id": "NW405-W6::86910543",
+        "vdCode": "86910543",
+        "wardCode": "NW405-W6",
+        "name": "IKAGENG MAGISTRATE COURT",
+        "registeredVoters": 100,
+        "_split": true
+      },
+      {
+        "id": "NW405-W6::86910060",
+        "vdCode": "86910060",
+        "wardCode": "NW405-W6",
+        "name": "N.W.P HEALTH",
+        "registeredVoters": 1090,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W7",
+      "wardCode": "NW405-W7",
+      "municipalityCode": "NW405",
+      "name": "Ward 7",
+      "registeredVoters": 4127,
+      "vdCodes": [
+        "86910385",
+        "86910598"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W7::86910385",
+        "vdCode": "86910385",
+        "wardCode": "NW405-W7",
+        "name": "NG KERK",
+        "registeredVoters": 2769,
+        "_split": false
+      },
+      {
+        "id": "NW405-W7::86910598",
+        "vdCode": "86910598",
+        "wardCode": "NW405-W7",
+        "name": "NG KERK(DIE BULT)",
+        "registeredVoters": 1358,
+        "_split": true
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W8",
+      "wardCode": "NW405-W8",
+      "municipalityCode": "NW405",
+      "name": "Ward 8",
+      "registeredVoters": 3121,
+      "vdCodes": [
+        "86910239",
+        "86910149",
+        "86910318",
+        "86910419"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W8::86910239",
+        "vdCode": "86910239",
+        "wardCode": "NW405-W8",
+        "name": "LESEGO PRIMARY SCHOOL",
+        "registeredVoters": 182,
+        "_split": true
+      },
+      {
+        "id": "NW405-W8::86910149",
+        "vdCode": "86910149",
+        "wardCode": "NW405-W8",
+        "name": "BOTOKA TECHNICAL SCHOOL",
+        "registeredVoters": 1391,
+        "_split": false
+      },
+      {
+        "id": "NW405-W8::86910318",
+        "vdCode": "86910318",
+        "wardCode": "NW405-W8",
+        "name": "THEMBALIDANISI PRIMARY SCHOOL",
+        "registeredVoters": 745,
+        "_split": false
+      },
+      {
+        "id": "NW405-W8::86910419",
+        "vdCode": "86910419",
+        "wardCode": "NW405-W8",
+        "name": "BASUPI PRIMARY SCHOOL",
+        "registeredVoters": 803,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W9",
+      "wardCode": "NW405-W9",
+      "municipalityCode": "NW405",
+      "name": "Ward 9",
+      "registeredVoters": 4058,
+      "vdCodes": [
+        "86910228",
+        "86910240"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W9::86910228",
+        "vdCode": "86910228",
+        "wardCode": "NW405-W9",
+        "name": "BOITSHOKO SECONDARY SCHOOL",
+        "registeredVoters": 2906,
+        "_split": false
+      },
+      {
+        "id": "NW405-W9::86910240",
+        "vdCode": "86910240",
+        "wardCode": "NW405-W9",
+        "name": "MOHADIN COMMUNITY HALL",
+        "registeredVoters": 1152,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W10",
+      "wardCode": "NW405-W10",
+      "municipalityCode": "NW405",
+      "name": "Ward 10",
+      "registeredVoters": 3879,
+      "vdCodes": [
+        "86910138",
+        "86910116",
+        "86910150",
+        "86910127"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W10::86910138",
+        "vdCode": "86910138",
+        "wardCode": "NW405-W10",
+        "name": "PUDULOGO PRIMARY SCHOOL",
+        "registeredVoters": 300,
+        "_split": true
+      },
+      {
+        "id": "NW405-W10::86910116",
+        "vdCode": "86910116",
+        "wardCode": "NW405-W10",
+        "name": "TLOKWE SECONDARY SCHOOL",
+        "registeredVoters": 1038,
+        "_split": false
+      },
+      {
+        "id": "NW405-W10::86910150",
+        "vdCode": "86910150",
+        "wardCode": "NW405-W10",
+        "name": "GOVAN MBEKI COMMUNITY HALL",
+        "registeredVoters": 785,
+        "_split": true
+      },
+      {
+        "id": "NW405-W10::86910127",
+        "vdCode": "86910127",
+        "wardCode": "NW405-W10",
+        "name": "MADIBENG PRIMARY SCHOOL",
+        "registeredVoters": 1756,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W11",
+      "wardCode": "NW405-W11",
+      "municipalityCode": "NW405",
+      "name": "Ward 11",
+      "registeredVoters": 3096,
+      "vdCodes": [
+        "86910194",
+        "86910666",
+        "86910644",
+        "86910183",
+        "86910497"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W11::86910194",
+        "vdCode": "86910194",
+        "wardCode": "NW405-W11",
+        "name": "PROMOSA COMMUNITY HALL",
+        "registeredVoters": 860,
+        "_split": true
+      },
+      {
+        "id": "NW405-W11::86910666",
+        "vdCode": "86910666",
+        "wardCode": "NW405-W11",
+        "name": "ELSHADAI CHURCH PROMOSA",
+        "registeredVoters": 424,
+        "_split": false
+      },
+      {
+        "id": "NW405-W11::86910644",
+        "vdCode": "86910644",
+        "wardCode": "NW405-W11",
+        "name": "WITRAND HOSPITAL HALL",
+        "registeredVoters": 394,
+        "_split": false
+      },
+      {
+        "id": "NW405-W11::86910183",
+        "vdCode": "86910183",
+        "wardCode": "NW405-W11",
+        "name": "ANGLICAN CHURCH RESURRECTION",
+        "registeredVoters": 900,
+        "_split": true
+      },
+      {
+        "id": "NW405-W11::86910497",
+        "vdCode": "86910497",
+        "wardCode": "NW405-W11",
+        "name": "NANOGANG PRIMARY SCHOOL",
+        "registeredVoters": 518,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W12",
+      "wardCode": "NW405-W12",
+      "municipalityCode": "NW405",
+      "name": "Ward 12",
+      "registeredVoters": 3316,
+      "vdCodes": [
+        "86910138",
+        "86910329",
+        "86910239"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W12::86910138",
+        "vdCode": "86910138",
+        "wardCode": "NW405-W12",
+        "name": "PUDULOGO PRIMARY SCHOOL",
+        "registeredVoters": 1094,
+        "_split": true
+      },
+      {
+        "id": "NW405-W12::86910329",
+        "vdCode": "86910329",
+        "wardCode": "NW405-W12",
+        "name": "KEAGILE PRIMARY SCHOOL",
+        "registeredVoters": 704,
+        "_split": false
+      },
+      {
+        "id": "NW405-W12::86910239",
+        "vdCode": "86910239",
+        "wardCode": "NW405-W12",
+        "name": "LESEGO PRIMARY SCHOOL",
+        "registeredVoters": 1518,
+        "_split": true
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W13",
+      "wardCode": "NW405-W13",
+      "municipalityCode": "NW405",
+      "name": "Ward 13",
+      "registeredVoters": 4125,
+      "vdCodes": [
+        "86910442",
+        "86910284",
+        "86910206",
+        "86910420"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W13::86910442",
+        "vdCode": "86910442",
+        "wardCode": "NW405-W13",
+        "name": "TENT AT PROMOSA EXT 3",
+        "registeredVoters": 1898,
+        "_split": false
+      },
+      {
+        "id": "NW405-W13::86910284",
+        "vdCode": "86910284",
+        "wardCode": "NW405-W13",
+        "name": "PROMOSA METHODIST CHURCH",
+        "registeredVoters": 800,
+        "_split": true
+      },
+      {
+        "id": "NW405-W13::86910206",
+        "vdCode": "86910206",
+        "wardCode": "NW405-W13",
+        "name": "B.M CHOABI PRIMARY SCHOOL",
+        "registeredVoters": 418,
+        "_split": true
+      },
+      {
+        "id": "NW405-W13::86910420",
+        "vdCode": "86910420",
+        "wardCode": "NW405-W13",
+        "name": "TODDLER TOWN DAY CARE",
+        "registeredVoters": 1009,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W14",
+      "wardCode": "NW405-W14",
+      "municipalityCode": "NW405",
+      "name": "Ward 14",
+      "registeredVoters": 3473,
+      "vdCodes": [
+        "86910172",
+        "86910408",
+        "86910183",
+        "86910150"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W14::86910172",
+        "vdCode": "86910172",
+        "wardCode": "NW405-W14",
+        "name": "BOITIRELO PRIMARY SCHOOL",
+        "registeredVoters": 1892,
+        "_split": false
+      },
+      {
+        "id": "NW405-W14::86910408",
+        "vdCode": "86910408",
+        "wardCode": "NW405-W14",
+        "name": "TSHEPO PRIMARY SCHOOL",
+        "registeredVoters": 1301,
+        "_split": false
+      },
+      {
+        "id": "NW405-W14::86910183",
+        "vdCode": "86910183",
+        "wardCode": "NW405-W14",
+        "name": "ANGLICAN CHURCH RESURRECTION",
+        "registeredVoters": 80,
+        "_split": true
+      },
+      {
+        "id": "NW405-W14::86910150",
+        "vdCode": "86910150",
+        "wardCode": "NW405-W14",
+        "name": "GOVAN MBEKI COMMUNITY HALL",
+        "registeredVoters": 200,
+        "_split": true
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W15",
+      "wardCode": "NW405-W15",
+      "municipalityCode": "NW405",
+      "name": "Ward 15",
+      "registeredVoters": 3380,
+      "vdCodes": [
+        "86910565",
+        "86910611",
+        "86910037",
+        "86910475"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W15::86910565",
+        "vdCode": "86910565",
+        "wardCode": "NW405-W15",
+        "name": "PRESIDENT PRETORIUS PRIMARY SCHOOL",
+        "registeredVoters": 947,
+        "_split": false
+      },
+      {
+        "id": "NW405-W15::86910611",
+        "vdCode": "86910611",
+        "wardCode": "NW405-W15",
+        "name": "VUSELELA FET COLLEGE",
+        "registeredVoters": 0,
+        "_split": true
+      },
+      {
+        "id": "NW405-W15::86910037",
+        "vdCode": "86910037",
+        "wardCode": "NW405-W15",
+        "name": "POTCHEFSTROOM CENTRAL PRIMARY SCHOOL",
+        "registeredVoters": 1309,
+        "_split": false
+      },
+      {
+        "id": "NW405-W15::86910475",
+        "vdCode": "86910475",
+        "wardCode": "NW405-W15",
+        "name": "POTCHEFSTROOM DIENSSENTRUM VIR DIE BEJAARD",
+        "registeredVoters": 1124,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W16",
+      "wardCode": "NW405-W16",
+      "municipalityCode": "NW405",
+      "name": "Ward 16",
+      "registeredVoters": 3702,
+      "vdCodes": [
+        "86910239",
+        "86910093",
+        "86910431",
+        "86910363"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W16::86910239",
+        "vdCode": "86910239",
+        "wardCode": "NW405-W16",
+        "name": "LESEGO PRIMARY SCHOOL",
+        "registeredVoters": 200,
+        "_split": true
+      },
+      {
+        "id": "NW405-W16::86910093",
+        "vdCode": "86910093",
+        "wardCode": "NW405-W16",
+        "name": "SEIPHEMELO SECONDARY SCHOOL",
+        "registeredVoters": 1476,
+        "_split": true
+      },
+      {
+        "id": "NW405-W16::86910431",
+        "vdCode": "86910431",
+        "wardCode": "NW405-W16",
+        "name": "OLD APOSTOLIC CHURCH (KANANA)",
+        "registeredVoters": 1097,
+        "_split": false
+      },
+      {
+        "id": "NW405-W16::86910363",
+        "vdCode": "86910363",
+        "wardCode": "NW405-W16",
+        "name": "APOSTOLIC FAITH MISSION OF SA EMMANUEL ASSEM",
+        "registeredVoters": 929,
+        "_split": true
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W17",
+      "wardCode": "NW405-W17",
+      "municipalityCode": "NW405",
+      "name": "Ward 17",
+      "registeredVoters": 3053,
+      "vdCodes": [
+        "86910509",
+        "86910217",
+        "86910453"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W17::86910509",
+        "vdCode": "86910509",
+        "wardCode": "NW405-W17",
+        "name": "REJOY DAY CARE",
+        "registeredVoters": 150,
+        "_split": true
+      },
+      {
+        "id": "NW405-W17::86910217",
+        "vdCode": "86910217",
+        "wardCode": "NW405-W17",
+        "name": "KEOTSHEPILE PRIMARY SCHOOL",
+        "registeredVoters": 1630,
+        "_split": false
+      },
+      {
+        "id": "NW405-W17::86910453",
+        "vdCode": "86910453",
+        "wardCode": "NW405-W17",
+        "name": "TSHEPANG DAY CARE CENTRE",
+        "registeredVoters": 1273,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W18",
+      "wardCode": "NW405-W18",
+      "municipalityCode": "NW405",
+      "name": "Ward 18",
+      "registeredVoters": 3383,
+      "vdCodes": [
+        "86910082",
+        "86820992"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W18::86910082",
+        "vdCode": "86910082",
+        "wardCode": "NW405-W18",
+        "name": "CHRIS HANI COMMUNITY HALL",
+        "registeredVoters": 1595,
+        "_split": true
+      },
+      {
+        "id": "NW405-W18::86820992",
+        "vdCode": "86820992",
+        "wardCode": "NW405-W18",
+        "name": "DAN TLOME PRIMARY SCHOOL",
+        "registeredVoters": 1788,
+        "_split": true
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W19",
+      "wardCode": "NW405-W19",
+      "municipalityCode": "NW405",
+      "name": "Ward 19",
+      "registeredVoters": 4011,
+      "vdCodes": [
+        "86910352",
+        "86910655",
+        "86910093",
+        "86910330"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W19::86910352",
+        "vdCode": "86910352",
+        "wardCode": "NW405-W19",
+        "name": "DITAELONG PRIMARY SCHOOL",
+        "registeredVoters": 1716,
+        "_split": false
+      },
+      {
+        "id": "NW405-W19::86910655",
+        "vdCode": "86910655",
+        "wardCode": "NW405-W19",
+        "name": "BUTTER FLY CRECHE",
+        "registeredVoters": 0,
+        "_split": true
+      },
+      {
+        "id": "NW405-W19::86910093",
+        "vdCode": "86910093",
+        "wardCode": "NW405-W19",
+        "name": "SEIPHEMELO SECONDARY SCHOOL",
+        "registeredVoters": 881,
+        "_split": true
+      },
+      {
+        "id": "NW405-W19::86910330",
+        "vdCode": "86910330",
+        "wardCode": "NW405-W19",
+        "name": "TENT AT TOP CITY",
+        "registeredVoters": 1414,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W20",
+      "wardCode": "NW405-W20",
+      "municipalityCode": "NW405",
+      "name": "Ward 20",
+      "registeredVoters": 3706,
+      "vdCodes": [
+        "86910576",
+        "86820756",
+        "86910633"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W20::86910576",
+        "vdCode": "86910576",
+        "wardCode": "NW405-W20",
+        "name": "BA SEOBI HIGH SCHOOL",
+        "registeredVoters": 1822,
+        "_split": false
+      },
+      {
+        "id": "NW405-W20::86820756",
+        "vdCode": "86820756",
+        "wardCode": "NW405-W20",
+        "name": "BANTU METHODIST CHURCH",
+        "registeredVoters": 1257,
+        "_split": true
+      },
+      {
+        "id": "NW405-W20::86910633",
+        "vdCode": "86910633",
+        "wardCode": "NW405-W20",
+        "name": "ST AUGUSTINE ANGLICAN CHURCH",
+        "registeredVoters": 627,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W21",
+      "wardCode": "NW405-W21",
+      "municipalityCode": "NW405",
+      "name": "Ward 21",
+      "registeredVoters": 3385,
+      "vdCodes": [
+        "86910194",
+        "86910206",
+        "86910284"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W21::86910194",
+        "vdCode": "86910194",
+        "wardCode": "NW405-W21",
+        "name": "PROMOSA COMMUNITY HALL",
+        "registeredVoters": 1569,
+        "_split": true
+      },
+      {
+        "id": "NW405-W21::86910206",
+        "vdCode": "86910206",
+        "wardCode": "NW405-W21",
+        "name": "B.M CHOABI PRIMARY SCHOOL",
+        "registeredVoters": 1510,
+        "_split": true
+      },
+      {
+        "id": "NW405-W21::86910284",
+        "vdCode": "86910284",
+        "wardCode": "NW405-W21",
+        "name": "PROMOSA METHODIST CHURCH",
+        "registeredVoters": 306,
+        "_split": true
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W22",
+      "wardCode": "NW405-W22",
+      "municipalityCode": "NW405",
+      "name": "Ward 22",
+      "registeredVoters": 4103,
+      "vdCodes": [
+        "86910598",
+        "86910251",
+        "86910464"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W22::86910598",
+        "vdCode": "86910598",
+        "wardCode": "NW405-W22",
+        "name": "NG KERK(DIE BULT)",
+        "registeredVoters": 142,
+        "_split": true
+      },
+      {
+        "id": "NW405-W22::86910251",
+        "vdCode": "86910251",
+        "wardCode": "NW405-W22",
+        "name": "TENT AT CATCHE PARK",
+        "registeredVoters": 1566,
+        "_split": true
+      },
+      {
+        "id": "NW405-W22::86910464",
+        "vdCode": "86910464",
+        "wardCode": "NW405-W22",
+        "name": "POTCHEFSTROOM GIMNASIUM HIGH SCHOOL",
+        "registeredVoters": 2395,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W23",
+      "wardCode": "NW405-W23",
+      "municipalityCode": "NW405",
+      "name": "Ward 23",
+      "registeredVoters": 4121,
+      "vdCodes": [
+        "86910374",
+        "86910521"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W23::86910374",
+        "vdCode": "86910374",
+        "wardCode": "NW405-W23",
+        "name": "FERDINAND POSTMA HIGH SCHOOL",
+        "registeredVoters": 2997,
+        "_split": false
+      },
+      {
+        "id": "NW405-W23::86910521",
+        "vdCode": "86910521",
+        "wardCode": "NW405-W23",
+        "name": "CRISTA GALLI VENUE",
+        "registeredVoters": 1124,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W24",
+      "wardCode": "NW405-W24",
+      "municipalityCode": "NW405",
+      "name": "Ward 24",
+      "registeredVoters": 3977,
+      "vdCodes": [
+        "86910295",
+        "86910532",
+        "86910048"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W24::86910295",
+        "vdCode": "86910295",
+        "wardCode": "NW405-W24",
+        "name": "NG GRIMBEEK PARK",
+        "registeredVoters": 1562,
+        "_split": false
+      },
+      {
+        "id": "NW405-W24::86910532",
+        "vdCode": "86910532",
+        "wardCode": "NW405-W24",
+        "name": "DIE WILGE HIGH SCHOOL",
+        "registeredVoters": 1600,
+        "_split": true
+      },
+      {
+        "id": "NW405-W24::86910048",
+        "vdCode": "86910048",
+        "wardCode": "NW405-W24",
+        "name": "TOWN HALL",
+        "registeredVoters": 815,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W25",
+      "wardCode": "NW405-W25",
+      "municipalityCode": "NW405",
+      "name": "Ward 25",
+      "registeredVoters": 3410,
+      "vdCodes": [
+        "86910059",
+        "86910611",
+        "86910677",
+        "86910251"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W25::86910059",
+        "vdCode": "86910059",
+        "wardCode": "NW405-W25",
+        "name": "JB MARKS DEPARTMENT OF EDUCATION",
+        "registeredVoters": 1329,
+        "_split": false
+      },
+      {
+        "id": "NW405-W25::86910611",
+        "vdCode": "86910611",
+        "wardCode": "NW405-W25",
+        "name": "VUSELELA FET COLLEGE",
+        "registeredVoters": 1413,
+        "_split": true
+      },
+      {
+        "id": "NW405-W25::86910677",
+        "vdCode": "86910677",
+        "wardCode": "NW405-W25",
+        "name": "PINKSTER PROTESTANTE KERK",
+        "registeredVoters": 498,
+        "_split": false
+      },
+      {
+        "id": "NW405-W25::86910251",
+        "vdCode": "86910251",
+        "wardCode": "NW405-W25",
+        "name": "TENT AT CATCHE PARK",
+        "registeredVoters": 170,
+        "_split": true
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W26",
+      "wardCode": "NW405-W26",
+      "municipalityCode": "NW405",
+      "name": "Ward 26",
+      "registeredVoters": 3956,
+      "vdCodes": [
+        "86910509",
+        "86910396",
+        "86910273",
+        "86910655"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W26::86910509",
+        "vdCode": "86910509",
+        "wardCode": "NW405-W26",
+        "name": "REJOY DAY CARE",
+        "registeredVoters": 926,
+        "_split": true
+      },
+      {
+        "id": "NW405-W26::86910396",
+        "vdCode": "86910396",
+        "wardCode": "NW405-W26",
+        "name": "ROMAN CATHOLIC CHURCH EXT 7 (ASSUMPTION PAR",
+        "registeredVoters": 1005,
+        "_split": false
+      },
+      {
+        "id": "NW405-W26::86910273",
+        "vdCode": "86910273",
+        "wardCode": "NW405-W26",
+        "name": "TSHUPANE PRIMARY SCHOOL",
+        "registeredVoters": 1569,
+        "_split": false
+      },
+      {
+        "id": "NW405-W26::86910655",
+        "vdCode": "86910655",
+        "wardCode": "NW405-W26",
+        "name": "BUTTER FLY CRECHE",
+        "registeredVoters": 456,
+        "_split": true
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W27",
+      "wardCode": "NW405-W27",
+      "municipalityCode": "NW405",
+      "name": "Ward 27",
+      "registeredVoters": 3398,
+      "vdCodes": [
+        "86820767",
+        "86820756",
+        "86820992",
+        "86821094",
+        "86820396",
+        "86820295"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W27::86820767",
+        "vdCode": "86820767",
+        "wardCode": "NW405-W27",
+        "name": "TENT AT KROMDRAAI ALGEMENE HANDELAAR (ELEA",
+        "registeredVoters": 200,
+        "_split": false
+      },
+      {
+        "id": "NW405-W27::86820756",
+        "vdCode": "86820756",
+        "wardCode": "NW405-W27",
+        "name": "BANTU METHODIST CHURCH",
+        "registeredVoters": 521,
+        "_split": true
+      },
+      {
+        "id": "NW405-W27::86820992",
+        "vdCode": "86820992",
+        "wardCode": "NW405-W27",
+        "name": "DAN TLOME PRIMARY SCHOOL",
+        "registeredVoters": 760,
+        "_split": true
+      },
+      {
+        "id": "NW405-W27::86821094",
+        "vdCode": "86821094",
+        "wardCode": "NW405-W27",
+        "name": "UNITING REFORMED CHURCH IN SA",
+        "registeredVoters": 1000,
+        "_split": true
+      },
+      {
+        "id": "NW405-W27::86820396",
+        "vdCode": "86820396",
+        "wardCode": "NW405-W27",
+        "name": "IKHUTSENG SCHOOL",
+        "registeredVoters": 147,
+        "_split": false
+      },
+      {
+        "id": "NW405-W27::86820295",
+        "vdCode": "86820295",
+        "wardCode": "NW405-W27",
+        "name": "JANE LETSAPA PRIMARY SCHOOL",
+        "registeredVoters": 770,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W28",
+      "wardCode": "NW405-W28",
+      "municipalityCode": "NW405",
+      "name": "Ward 28",
+      "registeredVoters": 3380,
+      "vdCodes": [
+        "86820936",
+        "86910071",
+        "86820509",
+        "86820497",
+        "86820442",
+        "86820408",
+        "86820925"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W28::86820936",
+        "vdCode": "86820936",
+        "wardCode": "NW405-W28",
+        "name": "DEBEERSKRAAL PRIMARY SCHOOL",
+        "registeredVoters": 187,
+        "_split": false
+      },
+      {
+        "id": "NW405-W28::86910071",
+        "vdCode": "86910071",
+        "wardCode": "NW405-W28",
+        "name": "NORTH WEST UNIRSITY HALL J17",
+        "registeredVoters": 1364,
+        "_split": false
+      },
+      {
+        "id": "NW405-W28::86820509",
+        "vdCode": "86820509",
+        "wardCode": "NW405-W28",
+        "name": "BATTLE TO SURVIVE SCHOOL",
+        "registeredVoters": 718,
+        "_split": false
+      },
+      {
+        "id": "NW405-W28::86820497",
+        "vdCode": "86820497",
+        "wardCode": "NW405-W28",
+        "name": "MUISKRAAL",
+        "registeredVoters": 329,
+        "_split": false
+      },
+      {
+        "id": "NW405-W28::86820442",
+        "vdCode": "86820442",
+        "wardCode": "NW405-W28",
+        "name": "RYSMIERBULT HALL",
+        "registeredVoters": 503,
+        "_split": false
+      },
+      {
+        "id": "NW405-W28::86820408",
+        "vdCode": "86820408",
+        "wardCode": "NW405-W28",
+        "name": "BUCKINGHAM HALL",
+        "registeredVoters": 196,
+        "_split": false
+      },
+      {
+        "id": "NW405-W28::86820925",
+        "vdCode": "86820925",
+        "wardCode": "NW405-W28",
+        "name": "KLIPGAT FARM",
+        "registeredVoters": 83,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W29",
+      "wardCode": "NW405-W29",
+      "municipalityCode": "NW405",
+      "name": "Ward 29",
+      "registeredVoters": 3334,
+      "vdCodes": [
+        "86940041",
+        "86940018"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W29::86940041",
+        "vdCode": "86940041",
+        "wardCode": "NW405-W29",
+        "name": "TENT AT NDLEBE",
+        "registeredVoters": 1584,
+        "_split": false
+      },
+      {
+        "id": "NW405-W29::86940018",
+        "vdCode": "86940018",
+        "wardCode": "NW405-W29",
+        "name": "TSHING COMMUNITY HALL",
+        "registeredVoters": 1750,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W30",
+      "wardCode": "NW405-W30",
+      "municipalityCode": "NW405",
+      "name": "Ward 30",
+      "registeredVoters": 3336,
+      "vdCodes": [
+        "86940063",
+        "86940052",
+        "86940029",
+        "86940074"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W30::86940063",
+        "vdCode": "86940063",
+        "wardCode": "NW405-W30",
+        "name": "EXTENSION 5 COMMUNITY HALL",
+        "registeredVoters": 131,
+        "_split": true
+      },
+      {
+        "id": "NW405-W30::86940052",
+        "vdCode": "86940052",
+        "wardCode": "NW405-W30",
+        "name": "TSHING PRIMARY SCHOOL",
+        "registeredVoters": 787,
+        "_split": false
+      },
+      {
+        "id": "NW405-W30::86940029",
+        "vdCode": "86940029",
+        "wardCode": "NW405-W30",
+        "name": "THUTOBOSWA SECONDARY SCHOOL",
+        "registeredVoters": 1822,
+        "_split": false
+      },
+      {
+        "id": "NW405-W30::86940074",
+        "vdCode": "86940074",
+        "wardCode": "NW405-W30",
+        "name": "LETSHELEMANE PRIMARY SCHOOL",
+        "registeredVoters": 596,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W31",
+      "wardCode": "NW405-W31",
+      "municipalityCode": "NW405",
+      "name": "Ward 31",
+      "registeredVoters": 3930,
+      "vdCodes": [
+        "86821005",
+        "86820857",
+        "86821151",
+        "86940030",
+        "86820431"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W31::86821005",
+        "vdCode": "86821005",
+        "wardCode": "NW405-W31",
+        "name": "BOIKHUTSONG COMMUNITY HALL",
+        "registeredVoters": 932,
+        "_split": false
+      },
+      {
+        "id": "NW405-W31::86820857",
+        "vdCode": "86820857",
+        "wardCode": "NW405-W31",
+        "name": "POELANO SECONDARY SCHOOL",
+        "registeredVoters": 1176,
+        "_split": false
+      },
+      {
+        "id": "NW405-W31::86821151",
+        "vdCode": "86821151",
+        "wardCode": "NW405-W31",
+        "name": "TENT AT APPELDRAAI",
+        "registeredVoters": 13,
+        "_split": true
+      },
+      {
+        "id": "NW405-W31::86940030",
+        "vdCode": "86940030",
+        "wardCode": "NW405-W31",
+        "name": "KGOLOLOSEGO INTERMEDIATE SCHOOL",
+        "registeredVoters": 1726,
+        "_split": false
+      },
+      {
+        "id": "NW405-W31::86820431",
+        "vdCode": "86820431",
+        "wardCode": "NW405-W31",
+        "name": "SWARTPLAAS SHOP",
+        "registeredVoters": 83,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W32",
+      "wardCode": "NW405-W32",
+      "municipalityCode": "NW405",
+      "name": "Ward 32",
+      "registeredVoters": 3052,
+      "vdCodes": [
+        "86820419",
+        "86820419",
+        "86821151",
+        "86821195",
+        "86820420",
+        "86821207",
+        "86820868"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W32::86820419",
+        "vdCode": "86820419",
+        "wardCode": "NW405-W32",
+        "name": "BOIKHUTSO COMMUNITY HALL",
+        "registeredVoters": 625,
+        "_split": true
+      },
+      {
+        "id": "NW405-W32::86820419",
+        "vdCode": "86820419",
+        "wardCode": "NW405-W32",
+        "name": "BOIKHUTSO COMMUNITY HALL",
+        "registeredVoters": 350,
+        "_split": true
+      },
+      {
+        "id": "NW405-W32::86821151",
+        "vdCode": "86821151",
+        "wardCode": "NW405-W32",
+        "name": "TENT AT APPELDRAAI",
+        "registeredVoters": 180,
+        "_split": true
+      },
+      {
+        "id": "NW405-W32::86821195",
+        "vdCode": "86821195",
+        "wardCode": "NW405-W32",
+        "name": "MOTAUNG PRIMARY SCHOOL",
+        "registeredVoters": 680,
+        "_split": false
+      },
+      {
+        "id": "NW405-W32::86820420",
+        "vdCode": "86820420",
+        "wardCode": "NW405-W32",
+        "name": "WELGEVONDEN PRIMARY SCHOOL",
+        "registeredVoters": 30,
+        "_split": true
+      },
+      {
+        "id": "NW405-W32::86821207",
+        "vdCode": "86821207",
+        "wardCode": "NW405-W32",
+        "name": "THUTOLESEDI EARLY LEARNING CENTRE",
+        "registeredVoters": 445,
+        "_split": false
+      },
+      {
+        "id": "NW405-W32::86820868",
+        "vdCode": "86820868",
+        "wardCode": "NW405-W32",
+        "name": "REGOROGILE COMBINED SCHOOL",
+        "registeredVoters": 742,
+        "_split": false
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W33",
+      "wardCode": "NW405-W33",
+      "municipalityCode": "NW405",
+      "name": "Ward 33",
+      "registeredVoters": 3652,
+      "vdCodes": [
+        "86940063",
+        "86821140",
+        "86820420"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W33::86940063",
+        "vdCode": "86940063",
+        "wardCode": "NW405-W33",
+        "name": "EXTENSION 5 COMMUNITY HALL",
+        "registeredVoters": 2433,
+        "_split": true
+      },
+      {
+        "id": "NW405-W33::86821140",
+        "vdCode": "86821140",
+        "wardCode": "NW405-W33",
+        "name": "TSWANATSATSI PRIMARY SCHOOL",
+        "registeredVoters": 572,
+        "_split": false
+      },
+      {
+        "id": "NW405-W33::86820420",
+        "vdCode": "86820420",
+        "wardCode": "NW405-W33",
+        "name": "WELGEVONDEN PRIMARY SCHOOL",
+        "registeredVoters": 647,
+        "_split": true
+      }
+    ]
+  },
+  {
+    "ward": {
+      "id": "NW405-W34",
+      "wardCode": "NW405-W34",
+      "municipalityCode": "NW405",
+      "name": "Ward 34",
+      "registeredVoters": 3338,
+      "vdCodes": [
+        "86820330",
+        "86820352",
+        "86820363",
+        "86820374",
+        "86820385",
+        "86821274",
+        "86820879",
+        "86820903",
+        "86820914",
+        "86820947",
+        "86821230",
+        "86820329"
+      ]
+    },
+    "votingDistricts": [
+      {
+        "id": "NW405-W34::86820330",
+        "vdCode": "86820330",
+        "wardCode": "NW405-W34",
+        "name": "KAALFONTEIN FARM",
+        "registeredVoters": 122,
+        "_split": false
+      },
+      {
+        "id": "NW405-W34::86820352",
+        "vdCode": "86820352",
+        "wardCode": "NW405-W34",
+        "name": "TENT AT CECILIA'S HOME PRIMARY SCHOOL",
+        "registeredVoters": 118,
+        "_split": false
+      },
+      {
+        "id": "NW405-W34::86820363",
+        "vdCode": "86820363",
+        "wardCode": "NW405-W34",
+        "name": "RABANA PRIMARY SCHOOL",
+        "registeredVoters": 415,
+        "_split": false
+      },
+      {
+        "id": "NW405-W34::86820374",
+        "vdCode": "86820374",
+        "wardCode": "NW405-W34",
+        "name": "DUDUETSANG PRIMARY SCHOOL",
+        "registeredVoters": 152,
+        "_split": false
+      },
+      {
+        "id": "NW405-W34::86820385",
+        "vdCode": "86820385",
+        "wardCode": "NW405-W34",
+        "name": "DOVESDALE RECREATIONAL CENTRE",
+        "registeredVoters": 235,
+        "_split": false
+      },
+      {
+        "id": "NW405-W34::86821274",
+        "vdCode": "86821274",
+        "wardCode": "NW405-W34",
+        "name": "LEARNING & GROW SMART CRECHE",
+        "registeredVoters": 615,
+        "_split": false
+      },
+      {
+        "id": "NW405-W34::86820879",
+        "vdCode": "86820879",
+        "wardCode": "NW405-W34",
+        "name": "OPANG DIATLA PRIMARY SCHOOL",
+        "registeredVoters": 126,
+        "_split": false
+      },
+      {
+        "id": "NW405-W34::86820903",
+        "vdCode": "86820903",
+        "wardCode": "NW405-W34",
+        "name": "DUMELANG PRIMARY SCHOOL",
+        "registeredVoters": 124,
+        "_split": false
+      },
+      {
+        "id": "NW405-W34::86820914",
+        "vdCode": "86820914",
+        "wardCode": "NW405-W34",
+        "name": "OPRAAPSAAL",
+        "registeredVoters": 216,
+        "_split": false
+      },
+      {
+        "id": "NW405-W34::86820947",
+        "vdCode": "86820947",
+        "wardCode": "NW405-W34",
+        "name": "BUFFELVLEI ALGEMENE HANDELAAR",
+        "registeredVoters": 219,
+        "_split": false
+      },
+      {
+        "id": "NW405-W34::86821230",
+        "vdCode": "86821230",
+        "wardCode": "NW405-W34",
+        "name": "KABELO MASHI SECONDARY SCHOOL",
+        "registeredVoters": 793,
+        "_split": false
+      },
+      {
+        "id": "NW405-W34::86820329",
+        "vdCode": "86820329",
+        "wardCode": "NW405-W34",
+        "name": "MAKOKSKRAAL BOERESAAL",
+        "registeredVoters": 203,
+        "_split": false
+      }
+    ]
+  }
+]

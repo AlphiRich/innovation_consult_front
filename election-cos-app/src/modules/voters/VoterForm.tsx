@@ -53,12 +53,22 @@ export function VoterForm({ ctx, voter, defaultHouseholdId, onDone, onCancel }: 
   // Ward is derived from the VD record, not ctx.wardScope — a VD-scoped
   // canvasser's token typically has vdScope but not wardScope, and a new
   // household's wardCode must be correct for §4.2 geographic scoping to
-  // work, not just non-empty.
-  const votingDistrictQuery = useQuery({
-    queryKey: ['votingDistrict', ctx.tenantId, vdCode],
-    queryFn: () => dal.votingDistricts.getByCode(ctx, vdCode),
+  // work, not just non-empty. A vdCode is not unique to one ward (real
+  // NW405 gazette data: ~19% of voting stations are split across wards),
+  // so this looks up every ward-portion and, if there's more than one,
+  // requires the user to pick rather than guessing — see the
+  // wardOptions/selectedWard logic below.
+  const votingDistrictsForCodeQuery = useQuery({
+    queryKey: ['votingDistrictsByVdCode', ctx.tenantId, vdCode],
+    queryFn: () => dal.votingDistricts.findByVdCode(ctx, vdCode),
     enabled: vdCode.length > 0,
   });
+  const wardOptions = votingDistrictsForCodeQuery.data ?? [];
+  const [selectedWardCode, setSelectedWardCode] = useState<string | null>(null);
+  const resolvedVotingDistrict =
+    wardOptions.length === 1
+      ? wardOptions[0]
+      : (wardOptions.find((o) => o.wardCode === (selectedWardCode ?? ctx.wardScope)) ?? null);
 
   const [firstName, setFirstName] = useState(voter?.firstName ?? '');
   const [lastName, setLastName] = useState(voter?.lastName ?? '');
@@ -180,12 +190,34 @@ export function VoterForm({ ctx, voter, defaultHouseholdId, onDone, onCancel }: 
           )}
         </label>
 
+        {showHouseholdQuickAdd && vdCode && wardOptions.length > 1 && !resolvedVotingDistrict && (
+          <label className="space-y-1 block">
+            <span className="text-label-caps font-display uppercase text-slate">
+              VD {vdCode} is split across wards — which one is this household in?
+            </span>
+            <select
+              className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
+              value=""
+              onChange={(e) => setSelectedWardCode(e.target.value)}
+            >
+              <option value="" disabled>
+                Select a ward
+              </option>
+              {wardOptions.map((o) => (
+                <option key={o.wardCode} value={o.wardCode}>
+                  {o.wardCode} ({o.registeredVoters.toLocaleString('en-ZA')} registered here)
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+
         {showHouseholdQuickAdd && vdCode && (
-          votingDistrictQuery.data ? (
+          resolvedVotingDistrict ? (
             <HouseholdQuickAdd
               ctx={ctx}
               vdCode={vdCode}
-              wardCode={votingDistrictQuery.data.wardCode}
+              wardCode={resolvedVotingDistrict.wardCode}
               onCreated={(created) => {
                 setJustCreatedHousehold(created);
                 setHouseholdId(created.id);
@@ -194,11 +226,13 @@ export function VoterForm({ ctx, voter, defaultHouseholdId, onDone, onCancel }: 
               onCancel={() => setShowHouseholdQuickAdd(false)}
             />
           ) : (
-            <p className="text-body-md font-body text-maroon">
-              {votingDistrictQuery.isLoading
-                ? 'Looking up ward for this VD…'
-                : `VD ${vdCode} isn't seeded yet — its ward can't be determined, so a household can't be created safely. See §6.1.`}
-            </p>
+            wardOptions.length <= 1 && (
+              <p className="text-body-md font-body text-maroon">
+                {votingDistrictsForCodeQuery.isLoading
+                  ? 'Looking up ward for this VD…'
+                  : `VD ${vdCode} isn't seeded yet — its ward can't be determined, so a household can't be created safely. See §6.1.`}
+              </p>
+            )
           )
         )}
 

@@ -1,11 +1,16 @@
 /**
  * Election-COS1.0 — Firestore adapter: voting districts
- * IC-ECOS-BUILD-2026-V2 §5, §6.1.
+ * IC-ECOS-BUILD-2026-V2 §5, §6.1. Document id is `${wardCode}::${vdCode}`
+ * — see src/dal/ports/votingDistricts.ts for why (split VDs).
  */
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import type { SessionContext } from '@/dal/ports/session';
 import type { VotingDistrict, VotingDistrictDraft, VotingDistrictRepository } from '@/dal/ports/votingDistricts';
 import { db, getByIdGeneric, tenantCollectionPath, toISO, upsertGeneric } from './base';
+
+function vdDocId(wardCode: string, vdCode: string): string {
+  return `${wardCode}::${vdCode}`;
+}
 
 function fromFirestore(id: string, data: Record<string, unknown>): VotingDistrict {
   return {
@@ -25,8 +30,15 @@ function fromFirestore(id: string, data: Record<string, unknown>): VotingDistric
 }
 
 export const votingDistrictsRepository: VotingDistrictRepository = {
-  async getByCode(ctx: SessionContext, vdCode: string): Promise<VotingDistrict | null> {
-    return getByIdGeneric(ctx, 'votingDistricts', vdCode, fromFirestore);
+  async getByCode(ctx: SessionContext, wardCode: string, vdCode: string): Promise<VotingDistrict | null> {
+    return getByIdGeneric(ctx, 'votingDistricts', vdDocId(wardCode, vdCode), fromFirestore);
+  },
+
+  async findByVdCode(ctx: SessionContext, vdCode: string): Promise<VotingDistrict[]> {
+    const snap = await getDocs(
+      query(collection(db(), tenantCollectionPath(ctx.tenantId, 'votingDistricts')), where('vdCode', '==', vdCode)),
+    );
+    return snap.docs.map((d) => fromFirestore(d.id, d.data()));
   },
 
   async listByWard(ctx: SessionContext, wardCode: string): Promise<VotingDistrict[]> {
@@ -37,6 +49,6 @@ export const votingDistrictsRepository: VotingDistrictRepository = {
   },
 
   async upsert(ctx: SessionContext, vd: VotingDistrictDraft) {
-    return upsertGeneric(ctx, 'votingDistricts', vd.vdCode, vd, false);
+    return upsertGeneric(ctx, 'votingDistricts', vdDocId(vd.wardCode, vd.vdCode), vd, false);
   },
 };

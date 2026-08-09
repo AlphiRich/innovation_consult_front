@@ -1,11 +1,18 @@
 /**
  * Election-COS1.0 — Voting District capture/edit form
  * IC-ECOS-BUILD-2026-V2 §6.1. Scoped to a single ward — vdCode is the IEC
- * code (e.g. '86910138'), captured as free text since no IEC demarcation
- * data was supplied to validate against (see WardForm.tsx header).
+ * code (e.g. '86910138'), captured as free text (real IEC demarcation data
+ * now exists for JB Marks/NW405 — see tools/seed-data/ — but general free
+ * text is kept since other municipalities aren't seeded).
+ *
+ * A vdCode is not unique to one ward: the real NW405 gazette schedules
+ * ~19% of voting stations as split across 2+ wards, each with only its
+ * own portion of registeredVoters (see votingDistricts.ts port comment).
+ * This form warns, non-blockingly, when the vdCode being entered already
+ * exists in another ward — that's expected for a split VD, not an error.
  */
-import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { dal } from '@/dal';
 import type { SessionContext } from '@/dal/ports/session';
 import type { VotingDistrict, VotingDistrictDraft } from '@/dal/ports/votingDistricts';
@@ -23,6 +30,19 @@ export function VDForm({ ctx, wardCode, vd, onDone, onCancel }: VDFormProps) {
   const [vdCode, setVdCode] = useState(vd?.vdCode ?? '');
   const [name, setName] = useState(vd?.name ?? '');
   const [registeredVoters, setRegisteredVoters] = useState(String(vd?.registeredVoters ?? ''));
+  const [debouncedVdCode, setDebouncedVdCode] = useState(vdCode);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedVdCode(vdCode.trim()), 300);
+    return () => clearTimeout(t);
+  }, [vdCode]);
+
+  const otherWardsQuery = useQuery({
+    queryKey: ['votingDistrict-by-vdCode', ctx.tenantId, debouncedVdCode],
+    queryFn: () => dal.votingDistricts.findByVdCode(ctx, debouncedVdCode),
+    enabled: debouncedVdCode.length > 0,
+  });
+  const otherWards = (otherWardsQuery.data ?? []).filter((existing) => existing.wardCode !== wardCode);
 
   const mutation = useMutation({
     mutationFn: async (draft: VotingDistrictDraft) => {
@@ -56,7 +76,7 @@ export function VDForm({ ctx, wardCode, vd, onDone, onCancel }: VDFormProps) {
     e.preventDefault();
     if (!canSubmit) return;
     mutation.mutate({
-      id: vdCode.trim(),
+      id: `${wardCode}::${vdCode.trim()}`,
       tenantId: ctx.tenantId,
       vdCode: vdCode.trim(),
       wardCode,
@@ -80,6 +100,12 @@ export function VDForm({ ctx, wardCode, vd, onDone, onCancel }: VDFormProps) {
             disabled={Boolean(vd)}
             required
           />
+          {otherWards.length > 0 && (
+            <p className="text-body-md font-body text-teal">
+              Also in: {otherWards.map((o) => o.wardCode).join(', ')} — expected for a split voting station, not an
+              error.
+            </p>
+          )}
         </label>
         <label className="space-y-1 block">
           <span className="text-label-caps font-display uppercase text-slate">Registered voters</span>

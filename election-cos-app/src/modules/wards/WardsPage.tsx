@@ -81,8 +81,9 @@ export function WardsPage() {
       )}
       {wards.length === 0 && !wardsQuery.isLoading && (
         <p className="text-body-md font-body text-slate">
-          No wards captured yet. No IEC demarcation seed data was available to this build (see
-          docs/phase-1-ia-consolidation.md) — add wards manually, or run a seed ingest once the source PDFs exist.
+          No wards captured yet. Real JB Marks (NW405) demarcation data exists and can be loaded via
+          tools/seed-data/ once a live Firebase project is provisioned (see docs/nw405-seed-data.md) — until then,
+          add wards manually below.
         </p>
       )}
 

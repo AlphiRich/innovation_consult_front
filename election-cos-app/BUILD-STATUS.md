@@ -183,6 +183,72 @@ forms — the practical fallback until that seed data exists, noted in both
 lint/typecheck/`check:hex` all green; `npm run build` succeeds (same
 pre-existing >500kB chunk-size warning, unchanged, still not addressed).
 
+**Session 8 (9 Aug 2026):** received five more PDFs "to assist... complete
+building the ward/VD function." Two are genuine, verified government/IEC
+documents — the North West Provincial Gazette (Vol 268, No. 8929, 18 Nov
+2025) publishing the MDB's real ward delimitation for **JB Marks Local
+Municipality (NW405)**, and a real IEC "Seat Calculation Detail" report
+for that municipality's actual 2021 LGE result — these are exactly the
+`8929_18112025_NWestDemarcation.pdf` / `NW405.pdf` named but never
+supplied since session 1. The other three ("Electoral Legislative
+Framework Digest," "National Voters' Roll Audit," "Seat Allocation
+Mathematical Conventions") were **not** treated as authoritative — see
+`docs/unverified-source-documents.md` for the specific reasons (identical
+to-the-minute publication timestamps across all three, a
+self-referential "repository" citation style rather than any real gazette
+identifier, a direct contradiction with this build's AWS-vs-GCP/PPFA-
+purge decisions already made in session 3, a wrong acronym for the
+National Population Register, and unverifiable precise statistics). None
+of their specific figures (a council-size formula, national roll totals,
+gazette numbers, the stated 4 Nov 2026 election date / 7 Aug 2026 roll
+closure) were hardcoded anywhere in this codebase.
+
+Built from the two genuine documents (`docs/nw405-seed-data.md` has the
+full account):
+- `tools/seed-data/parse-nw405-demarcation.mjs` — a real, working
+  "repeatable ingest script" (the one build spec §6.1 calls for and every
+  prior session's `WardForm.tsx` header flagged as missing). Verified
+  against the actual gazette: 34 wards, 108 real voting districts,
+  registered-voter sums matching both the gazette's own stated municipal
+  total (122,059) and themselves.
+- `tools/seed-data/load-seed-wards.mjs` — loads the parsed JSON into a
+  live tenant via `firebase-admin`. **Not run end-to-end** — still no
+  live Firebase project (blocker #2 below) — written and reviewed, not
+  falsely claimed as tested.
+- `seed-data/jb-marks-nw405-wards-vds.json` — the real parsed output,
+  committed.
+
+Two real, non-trivial bugs found and fixed by running real data through
+existing code that had only ever been tested synthetically:
+1. **Seat calculator quota formula was wrong.** `allocateSeats()` used a
+   Droop quota (`totalSeats + 1` in the denominator) since session 1,
+   passing every property-based test because those tests only check
+   internal consistency, never a real result. Run against `NW405.pdf`'s
+   actual 2021 result, it produced quota 1,492 against the report's own
+   printed 1,515. Fixed to the real Schedule 1 formula the IEC report
+   prints on its own page — `Q = floor(totalValidVotes / (totalSeats −
+   independentWardSeats − noPRListWardSeats)) + 1` — which now reproduces
+   every published figure in that real report exactly (all nine parties'
+   entitlements, remainder ranking, both round-2 top-ups). New
+   `seatCalculator.test.ts` "real-world regression" block locks this in.
+   A second bug (independents'/no-list-parties' seats not reserved out of
+   the largest-remainder pool) was caught and fixed alongside it.
+2. **VD identity collides for split voting districts.** The real gazette
+   flags ~19% of NW405's voting districts as split across 2+ wards (same
+   physical station, each ward getting only its portion of
+   `registeredVoters`) — `VotingDistrict.id` was `vdCode` alone, so the
+   second ward's write would silently overwrite the first's document.
+   Fixed: id is now `${wardCode}::${vdCode}`; `getByCode` requires a
+   ward; a new `findByVdCode` returns every ward-portion of a code.
+   `VoterForm.tsx`'s household-creation flow now surfaces an explicit
+   ward picker when a canvasser's VD code turns out to be split, instead
+   of guessing; `VDForm.tsx` shows a non-blocking note when a code being
+   entered already exists in another ward.
+
+**Verified:** `npm run check:all` — 72 unit tests (up from 71),
+lint/typecheck/`check:hex` all green; `npm run build` succeeds
+(functions/ compiles clean too).
+
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.

@@ -1,10 +1,11 @@
 /**
  * Election-COS1.0 — Ward capture/edit form
- * IC-ECOS-BUILD-2026-V2 §6.1. No IEC demarcation PDFs were supplied to
- * this build (8929_18112025_NWestDemarcation.pdf / NW405.pdf are named in
- * the governing docs but never uploaded), so the "repeatable ingest
- * script" the spec calls for isn't built — this manual form is the
- * practical fallback until that seed data exists. See BUILD-STATUS.md.
+ * IC-ECOS-BUILD-2026-V2 §6.1. Real IEC demarcation data now exists for JB
+ * Marks/NW405 (session 8 — see tools/seed-data/ and docs/nw405-seed-data.md)
+ * but nothing has been loaded into a live tenant yet (no live Firebase
+ * project — BUILD-STATUS.md blocker #2), and other municipalities still
+ * have no source data at all. This manual form remains the practical
+ * fallback for both cases.
  */
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';

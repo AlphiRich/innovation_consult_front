@@ -100,8 +100,12 @@ that was deliberately **not** reproduced — `SchematicMap.tsx` renders a
 proportional tile grid instead, sized by registered-voter count, with an
 explicit label saying it isn't a real map.
 
-No IEC demarcation source data (`8929_18112025_NWestDemarcation.pdf`,
-`NW405.pdf`) has been supplied to any session so far, so the "repeatable
-ingest script" build spec §6.1 calls for isn't built — `WardForm.tsx` /
-`VDForm.tsx` are manual-capture forms, the practical fallback until that
-seed data exists.
+No IEC demarcation source data had been supplied as of this note's
+original writing; both named PDFs (`8929_18112025_NWestDemarcation.pdf`,
+`NW405.pdf`) arrived in session 8 — see `docs/nw405-seed-data.md` for the
+full account (a real, working ingest script, real seed data for JB Marks,
+and two real bugs it caught: a wrong seat-calculator quota formula and a
+VD-identity collision for split voting districts). `WardForm.tsx` /
+`VDForm.tsx` remain the manual-capture fallback for every municipality
+that isn't JB Marks, and for JB Marks itself until a live Firebase
+project exists to load the seed data into.

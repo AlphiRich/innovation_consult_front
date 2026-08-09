@@ -1,0 +1,14 @@
+{
+  "name": "election-cos-seed-data",
+  "private": true,
+  "version": "1.0.0-dev",
+  "description": "Election-COS1.0 — repeatable ingest scripts for IEC/MDB ward demarcation data. Kept out of the app bundle and functions/, same rationale as tools/docgen.",
+  "type": "module",
+  "scripts": {
+    "parse": "node parse-nw405-demarcation.mjs",
+    "load": "node load-seed-wards.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.5.0"
+  }
+}
