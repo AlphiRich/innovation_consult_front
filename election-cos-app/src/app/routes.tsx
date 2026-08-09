@@ -10,6 +10,7 @@ import { Shell } from './Shell';
 import { WarRoomPage } from '@/modules/war-room/WarRoomPage';
 import { VotersPage } from '@/modules/voters/VotersPage';
 import { WardsPage } from '@/modules/wards/WardsPage';
+import { WardDetailPage } from '@/modules/wards/WardDetailPage';
 import { FieldDiaryPage } from '@/modules/field-diary/FieldDiaryPage';
 import { IncidentsPage } from '@/modules/incidents/IncidentsPage';
 import { LogisticsPage } from '@/modules/logistics/LogisticsPage';
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
       { path: 'war-room', element: <WarRoomPage /> },
       { path: 'voters', element: <VotersPage /> },
       { path: 'wards', element: <WardsPage /> },
+      { path: 'wards/:wardCode', element: <WardDetailPage /> },
       { path: 'diary', element: <FieldDiaryPage /> },
       { path: 'incidents', element: <IncidentsPage /> },
       { path: 'logistics', element: <LogisticsPage /> },

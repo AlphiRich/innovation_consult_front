@@ -71,3 +71,37 @@ module built matches `Voter` exactly as governed by
 screens aren't silently dropped (build spec §3.4 item 5's requirement),
 and so a future session doesn't have to re-derive this comparison from
 scratch.
+
+## A fifth product-name variant: "ElectoralOS"
+
+`vd_captain_dashboard_hyper_local` and `lge_war_room_local_head` render
+under the wordmark **"ElectoralOS"** — a name not listed anywhere in the
+master index's "four shells, three names" inventory (Election Campaign
+OS / Civic Architect / Civic Authority / SA Elections 2024). Nav in both
+(Command Center · Voter Roll · Ward Mapping · Field Diary · Resources ·
+Settings) matches the master index's description of the "ELECTION
+CAMPAIGN OS — Strategy HQ / District Admin" shell exactly, so this is the
+**same target shell**, just a fifth transient name for it in the source
+material — not a new product to reconcile, just one more name to retire
+(consistent with the existing "one product name" consolidation, no
+action needed beyond noting it).
+
+## Wards & VDs (session 7) — used `lge_war_room_local_head`
+
+That screen's "Ward/VD Voter Matrix" table (VD Code · Location/Name ·
+Registered · Active Volunteers · Target Coverage · Performance · Actions)
+is the direct reference for `src/modules/wards/`. Trimmed to columns the
+governing data model actually has (VD code, name, registered voters —
+no volunteer-assignment or coverage-performance fields, those belong to
+a module that doesn't exist yet). The screen embeds a real interactive
+map (Google-Maps-style tiles, pins, "Download Shapefiles"); per build
+spec §6.1 ("schematic map first... do not pull in a GIS stack in v1")
+that was deliberately **not** reproduced — `SchematicMap.tsx` renders a
+proportional tile grid instead, sized by registered-voter count, with an
+explicit label saying it isn't a real map.
+
+No IEC demarcation source data (`8929_18112025_NWestDemarcation.pdf`,
+`NW405.pdf`) has been supplied to any session so far, so the "repeatable
+ingest script" build spec §6.1 calls for isn't built — `WardForm.tsx` /
+`VDForm.tsx` are manual-capture forms, the practical fallback until that
+seed data exists.

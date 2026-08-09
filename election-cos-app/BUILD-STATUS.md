@@ -136,6 +136,53 @@ regenerated and re-verified (XSD-valid, no `.com` text remaining).
 `check:hex`, 67 unit tests) and `npm run build`, in `election-cos-app/`. Cloud
 Functions (`functions/`) compile clean via `npm run build`.
 
+**Session 7 (9 Aug 2026):** confirmed PR #1 merged into `main` (7 commits).
+Found 3 commits from session 6 had landed on the branch only, after the
+merge point — rebased them onto `origin/main` (clean, no conflicts) and
+force-with-lease pushed, per this branch's standing "merged PR ⇒ rebase
+follow-up work" instruction. Then built a real **Wards & Voting Districts
+module** (`src/modules/wards/`), replacing the `WardsPage` placeholder —
+the foundational module everything else geo-scopes to (§6.1). No
+dedicated Stitch "Ward Mapping" screen exists in the 66-screen batch;
+used `lge_war_room_local_head`'s "Ward/VD Voter Matrix" table as the
+structural reference, trimmed to the columns the governing `Ward`/
+`VotingDistrict` types actually have (VD code, name, registered voters —
+no volunteer-assignment or coverage-performance columns, those belong to
+a module that doesn't exist yet). See `docs/screen-findings.md` for the
+full account, including a note that this screen (and
+`vd_captain_dashboard_hyper_local`) render under a fifth transient
+product name, "ElectoralOS" — same target shell, nothing to reconcile.
+
+Shipped: `WardsPage.tsx` (summary stats + ward list + create/edit),
+`WardDetailPage.tsx` (a ward's VDs + create/edit), `SchematicMap.tsx` (a
+deliberately non-GIS proportional tile grid sized by registered-voter
+count — the screen's real interactive Google-Maps-style map was
+intentionally not reproduced, per §6.1's "schematic map first, no GIS
+stack in v1"), `WardForm.tsx`, `VDForm.tsx`, `wardStats.ts` +
+4 unit tests. Route `wards/:wardCode` added.
+
+Two real bugs caught and fixed during the build, not from a failing
+test — spotted by reasoning about the data model before writing the
+code: (1) creating a VD without updating its parent `Ward.vdCodes` would
+leave `wardStats.totalsFor()`'s VD count permanently wrong — `VDForm`'s
+mutation now fetches and updates the parent ward. (2) deriving a new VD's
+`wardCode` from `ctx.wardScope` would risk a wrong/empty value for a
+VD-scoped user (same class of bug already fixed in `HouseholdQuickAdd`
+last session) — derives it from the VD's own record via
+`dal.wards.getByCode` instead. Also caught a raw-`rgba()` anti-pattern in
+`SchematicMap.tsx` during creation (technically passes `check:hex`'s
+hex-literal regex but violates the "only design tokens" intent) — fixed
+to compute an alpha suffix off `tokens.color.ink` instead.
+
+No IEC ward-demarcation source data (shapefiles/PDFs) has been supplied
+to any session so far, so wards/VDs are manually captured through the new
+forms — the practical fallback until that seed data exists, noted in both
+`WardsPage.tsx`'s empty state and `docs/screen-findings.md`.
+
+**Verified:** `npm run check:all` — 71 unit tests (up from 67),
+lint/typecheck/`check:hex` all green; `npm run build` succeeds (same
+pre-existing >500kB chunk-size warning, unchanged, still not addressed).
+
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.
