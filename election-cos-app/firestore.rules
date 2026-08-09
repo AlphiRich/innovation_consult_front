@@ -1,0 +1,222 @@
+rules_version = '2';
+
+// Election-COS1.0 — Firestore security rules
+// IC-ECOS-BUILD-2026-V2 §4.2 "Isolation is enforced in three places"
+// This is layer 2 of 3 (custom claims → THIS → DAL). All three are required;
+// do not treat this file as sufficient on its own.
+//
+// Deny-by-default at /tenants/{tid}/{document=**}, then explicit allow
+// per collection below. Every collection lives under /tenants/{tenantId}/
+// per §4.1 — no exceptions — which is what keeps this file a path check
+// plus a capability check rather than bespoke logic per collection.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- shared helpers -----------------------------------------------
+
+    function tenantOK(tid) {
+      return request.auth != null && request.auth.token.tenantId == tid;
+    }
+
+    function cap(c) {
+      return request.auth != null
+        && request.auth.token.caps is list
+        && c in request.auth.token.caps;
+    }
+
+    // Geographic narrowing per §4.2: HQ/municipal roles see the whole
+    // tenant; ward roles see their ward; VD roles see their VD.
+    // `geoScope` on the token is one of 'TENANT' | 'MUNICIPALITY' | 'WARD' | 'VD'.
+    function inScope(tid, data) {
+      let scope = request.auth.token.geoScope;
+      return scope == 'TENANT'
+        || scope == 'MUNICIPALITY'
+        || (scope == 'WARD' && data.wardCode == request.auth.token.wardScope)
+        || (scope == 'VD' && data.vdCode == request.auth.token.vdScope);
+    }
+
+    function isUnchanged(field) {
+      return request.resource.data[field] == resource.data[field];
+    }
+
+    // Deny by default; every collection below is an explicit exception.
+    match /tenants/{tid}/{document=**} {
+      allow read, write: if false;
+    }
+
+    // ---- tenant profile --------------------------------------------------
+
+    match /tenants/{tid}/profile/{docId} {
+      allow read: if tenantOK(tid);
+      allow write: if tenantOK(tid) && cap('settings.tenant');
+    }
+
+    // ---- staff (identity: minimal-footprint companion to Auth, §4.3) -----
+
+    match /tenants/{tid}/staff/{uid} {
+      allow read: if tenantOK(tid) && (request.auth.uid == uid || cap('team.manage'));
+      allow create, update: if tenantOK(tid) && cap('team.manage');
+      allow delete: if false; // deactivate via `active: false`, never delete
+    }
+
+    // ---- wards & voting districts (reference data) ------------------------
+
+    match /tenants/{tid}/wards/{wardCode} {
+      allow read: if tenantOK(tid) && cap('wards.view');
+      allow write: if tenantOK(tid) && cap('wards.edit');
+    }
+
+    match /tenants/{tid}/votingDistricts/{vdCode} {
+      allow read: if tenantOK(tid) && cap('wards.view');
+      allow write: if tenantOK(tid) && cap('wards.edit');
+    }
+
+    // ---- households --------------------------------------------------------
+
+    match /tenants/{tid}/households/{householdId} {
+      allow read: if tenantOK(tid) && cap('voters.view') && inScope(tid, resource.data);
+      allow create, update: if tenantOK(tid) && cap('voters.edit')
+                             && inScope(tid, request.resource.data);
+      allow delete: if false; // soft delete only (deletedAt)
+    }
+
+    // ---- voters — the consent gate is load-bearing, §4.2 / §6.2 -----------
+
+    match /tenants/{tid}/voters/{voterId} {
+      allow read: if tenantOK(tid) && cap('voters.view') && inScope(tid, resource.data);
+      allow create, update: if tenantOK(tid) && cap('voters.edit')
+                             && inScope(tid, request.resource.data)
+                             && request.resource.data.popiaConsentGiven == true;
+      allow delete: if false; // soft delete only
+    }
+
+    // ---- field diary --------------------------------------------------------
+
+    match /tenants/{tid}/diaryEntries/{entryId} {
+      allow read: if tenantOK(tid) && cap('diary.view') && inScope(tid, resource.data);
+      allow create, update: if tenantOK(tid) && cap('diary.edit')
+                             && inScope(tid, request.resource.data);
+      allow delete: if false;
+    }
+
+    // ---- incidents — fixed taxonomy enforced here too, §6.4 ---------------
+
+    match /tenants/{tid}/incidents/{incidentId} {
+      allow read: if tenantOK(tid) && cap('incidents.view') && inScope(tid, resource.data);
+      allow create: if tenantOK(tid) && cap('incidents.create')
+                    && inScope(tid, request.resource.data)
+                    && request.resource.data.category in
+                       ['WATER_SANITATION', 'ELECTRICITY', 'ROADS_TRANSPORT', 'PUBLIC_SAFETY'];
+      // Triage / escalate are distinct capabilities from create — a
+      // canvasser who can log an incident cannot authorise its escalation.
+      allow update: if tenantOK(tid) && inScope(tid, resource.data) && (
+                       (cap('incidents.triage') && resource.data.status == 'LOGGED')
+                    || (cap('incidents.escalate') && resource.data.status == 'TRIAGED')
+                    || (cap('incidents.view') && isUnchanged('status'))
+                    );
+      allow delete: if false;
+    }
+
+    // ---- logistics ------------------------------------------------------
+
+    match /tenants/{tid}/logistics/{itemId} {
+      allow read: if tenantOK(tid) && cap('logistics.view');
+      allow create, update: if tenantOK(tid) && cap('logistics.view');
+      allow delete: if false;
+    }
+
+    match /tenants/{tid}/logisticsApprovals/{approvalId} {
+      allow read: if tenantOK(tid) && cap('logistics.view');
+      allow create, update: if tenantOK(tid) && cap('logistics.approve');
+      allow delete: if false;
+    }
+
+    // ---- candidates — masked SA ID numbers, §6.6 ---------------------------
+
+    match /tenants/{tid}/candidates/{candidateId} {
+      allow read: if tenantOK(tid) && cap('team.manage');
+      allow write: if tenantOK(tid) && cap('team.manage');
+      allow delete: if false;
+    }
+
+    // ---- tasks ------------------------------------------------------------
+
+    match /tenants/{tid}/tasks/{taskId} {
+      allow read: if tenantOK(tid) && inScope(tid, resource.data);
+      allow create, update: if tenantOK(tid) && inScope(tid, request.resource.data);
+      allow delete: if false;
+    }
+
+    // ---- documents ----------------------------------------------------------
+
+    match /tenants/{tid}/documents/{documentId} {
+      allow read: if tenantOK(tid) && cap('analytics.view');
+      allow write: if tenantOK(tid) && cap('team.manage');
+      allow delete: if false;
+    }
+
+    // ---- Funding & Disclosure (PPFA) — §6.8. Separation of duties matters. -
+
+    match /tenants/{tid}/donorLedger/{donorId} {
+      allow read: if tenantOK(tid) && cap('ppfa.view');
+      allow write: if tenantOK(tid) && cap('ppfa.edit');
+      allow delete: if false;
+    }
+
+    match /tenants/{tid}/donations/{donationId} {
+      allow read: if tenantOK(tid) && cap('ppfa.view');
+      // Never blocked by amount/threshold — §6.8.3. Capability-gated only.
+      allow create, update: if tenantOK(tid) && cap('ppfa.edit');
+      allow delete: if false; // statutory record — never deleted, only corrected
+    }
+
+    match /tenants/{tid}/donationAlerts/{alertId} {
+      allow read: if tenantOK(tid) && cap('ppfa.view');
+      // Alerts are system-raised (Cloud Function) and human-acknowledged;
+      // clients may only add acknowledgement fields, never the alert itself.
+      allow create: if false;
+      allow update: if tenantOK(tid) && cap('ppfa.edit')
+                    && isUnchanged('level')
+                    && isUnchanged('thresholdApplied')
+                    && isUnchanged('configIdApplied')
+                    && isUnchanged('aggregateAtTrigger');
+      allow delete: if false;
+    }
+
+    // ppfaConfigs is append-only and evidential — see model comment in
+    // src/dal/ports/ppfaConfig.ts. Changing a threshold must never rewrite
+    // history; `ppfa.manage_thresholds` is deliberately distinct from
+    // `ppfa.edit` (§4.4 separation-of-duties note).
+    match /tenants/{tid}/ppfaConfigs/{configId} {
+      allow read: if tenantOK(tid) && cap('ppfa.view');
+      allow create: if tenantOK(tid) && cap('ppfa.manage_thresholds');
+      allow update, delete: if false; // append-only, never mutated or removed
+    }
+
+    // ---- analytics counters (pre-aggregated, §7.4 / §8.1) ------------------
+
+    match /tenants/{tid}/counters/{counterId} {
+      allow read: if tenantOK(tid) && cap('warroom.view');
+      allow write: if false; // Cloud Functions (admin SDK) only
+    }
+
+    // ---- audit log — append-only, written by Cloud Functions --------------
+
+    match /tenants/{tid}/auditLog/{eventId} {
+      allow read: if tenantOK(tid) && cap('settings.permissions');
+      allow write: if false; // written server-side only
+    }
+
+    // ---- POPIA data subject requests (access/correction/deletion) ---------
+    // New scope, added post-initial-build — see
+    // src/dal/ports/dataSubjectRequests.ts for provenance (04-legal-
+    // compliance-workstream.md action LG10).
+
+    match /tenants/{tid}/dataSubjectRequests/{requestId} {
+      allow read: if tenantOK(tid) && cap('dsr.view');
+      allow create, update: if tenantOK(tid) && cap('dsr.manage');
+      allow delete: if false; // the request log itself is a compliance record
+    }
+  }
+}

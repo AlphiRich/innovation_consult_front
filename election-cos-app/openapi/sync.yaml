@@ -1,0 +1,112 @@
+openapi: 3.0.3
+info:
+  title: Election-COS1.0 — Offline Sync API
+  version: "1.0.0"
+  description: >
+    IC-ECOS-BUILD-2026-V2 §7.3. Written before the implementation per that
+    section's instruction — the prior design's sync endpoint was never
+    specified and that gap propagated through every downstream artefact.
+    Source of truth for src/offline/syncTypes.ts and functions/src/sync.ts;
+    keep both in lockstep with this file.
+servers:
+  - url: https://REGION-PROJECT.cloudfunctions.net
+    description: Cloud Functions 2nd gen, africa-south1 (§0 rule 1)
+paths:
+  /api/sync:
+    post:
+      operationId: sync
+      summary: Push queued offline operations and pull server changes since a cursor.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncRequest'
+      responses:
+        '200':
+          description: Partial success is normal — never all-or-nothing (§7.3).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResponse'
+        '401':
+          description: Missing or invalid ID token.
+        '413':
+          description: Batch exceeds 200 operations or 5 MB — client must chunk.
+components:
+  schemas:
+    SyncOperation:
+      type: object
+      required: [seq, entity, entityId, op, payload, localUpdatedAt]
+      properties:
+        seq: { type: integer }
+        entity: { type: string, enum: [voter, household, incident, diaryEntry] }
+        entityId: { type: string }
+        op: { type: string, enum: [upsert, softDelete] }
+        payload: { type: object }
+        localUpdatedAt: { type: string, format: date-time }
+    SyncRequest:
+      type: object
+      required: [clientId, idempotencyKey, since, operations]
+      properties:
+        clientId: { type: string, format: uuid }
+        idempotencyKey:
+          type: string
+          format: uuid
+          description: Required. Server dedupes for 24 hours.
+        since: { type: string, format: date-time }
+        operations:
+          type: array
+          maxItems: 200
+          items: { $ref: '#/components/schemas/SyncOperation' }
+    SyncAccepted:
+      type: object
+      required: [seq, serverId, serverUpdatedAt]
+      properties:
+        seq: { type: integer }
+        serverId: { type: string }
+        serverUpdatedAt: { type: string, format: date-time }
+    SyncRejected:
+      type: object
+      required: [seq, code, retryable, message]
+      properties:
+        seq: { type: integer }
+        code: { type: string, enum: [CONSENT_REQUIRED, VALIDATION_FAILED, FORBIDDEN, UNKNOWN] }
+        retryable:
+          type: boolean
+          description: >
+            false means the client must stop retrying and surface it to the
+            user (§7.6) — e.g. CONSENT_REQUIRED is always retryable=false.
+        message: { type: string }
+    SyncConflict:
+      type: object
+      required: [seq, entity, entityId, yours, theirs, resolution, resolvedFields]
+      properties:
+        seq: { type: integer }
+        entity: { type: string }
+        entityId: { type: string }
+        yours: { type: object, description: Discarded value(s). }
+        theirs: { type: object, description: Winning value(s). }
+        resolution: { type: string, enum: [SERVER_WINS] }
+        resolvedFields:
+          type: array
+          items: { type: string }
+          description: Last-write-wins is per FIELD, not per document (§7.5).
+    SyncResponse:
+      type: object
+      required: [accepted, rejected, conflicts, changes, nextSince]
+      properties:
+        accepted:
+          type: array
+          items: { $ref: '#/components/schemas/SyncAccepted' }
+        rejected:
+          type: array
+          items: { $ref: '#/components/schemas/SyncRejected' }
+        conflicts:
+          type: array
+          items: { $ref: '#/components/schemas/SyncConflict' }
+        changes:
+          type: array
+          items: { type: object }
+          description: Server-side changes since `since`. Delta only, never a full collection dump.
+        nextSince: { type: string, format: date-time }

@@ -1,5 +1,14 @@
 # innovation_consult_front
 LegalOS1_1_UserManual
+
+## Election-COS1.0
+
+`election-cos-app/` holds the Election-COS1.0 build — a multi-tenant,
+offline-first PWA for South African political campaign field operations,
+built against `IC-ECOS-BUILD-2026-V2`. See
+[`election-cos-app/BUILD-STATUS.md`](./election-cos-app/BUILD-STATUS.md) for
+what's shipped, what's a placeholder pending real screen assets, and what's
+blocked on infra/legal input.
 <!DOCTYPE html>
 <html lang="en">
 <head>
