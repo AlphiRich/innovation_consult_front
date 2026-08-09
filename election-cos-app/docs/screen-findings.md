@@ -288,3 +288,26 @@ the batch, and so it's clear this module's UI decisions (donor list +
 detail panel, a client-side-only provisional status banner, inline
 "mark disclosed" per donation) are this build's own design, not a
 Stitch-informed one.
+
+## Settings' remaining sub-pages (session 9, continued)
+
+Five "*_permissions_management" screens exist in the batch
+(`field_lead_permissions_management`, `finance_officer_permissions_management`,
+`plo_permissions_role_management`, `volunteer_permissions_management`,
+`ward_admin_permissions_management`) — all branded "Civic Architect," the
+retired shell, and framed around a multi-metro "Team Command" concept
+(1,000+ "agents" across named regions, a "Municipal Team Command" console)
+that doesn't fit this build's single-tenant-per-municipality model. Not
+adopted for palette, branding, or that framing. One reusable pattern was
+taken: `plo_permissions_role_management`'s per-role toggle list — each
+capability shown with a human-readable description ("Manage Funding
+Sources — Authorize and categorize incoming donations and grants"),
+"Edit Mode" / "Save Permissions" / "Restore Defaults" — confirms the
+general shape `PermissionsPage.tsx` uses (a capability checklist per
+role/user), though this build's version lists raw capability strings
+rather than authored descriptions; adding real copy per capability is a
+reasonable follow-up, not done this session.
+
+No screens exist for Municipality Config or Data Subject Requests
+specifically — both built from the governing data model and their own
+existing stub notes only, same as the PPFA module above.

@@ -25,6 +25,7 @@ import { ppfaConfigRepository } from './adapters/firestore/ppfaConfigRepository'
 import { donationAlertsRepository } from './adapters/firestore/donationAlertsRepository';
 import { dataSubjectRequestsRepository } from './adapters/firestore/dataSubjectRequestsRepository';
 import { warRoomCountersRepository } from './adapters/firestore/warRoomCountersRepository';
+import { municipalityProfileRepository } from './adapters/firestore/municipalityProfileRepository';
 
 const adapter = (import.meta.env.VITE_DAL_ADAPTER as string | undefined) ?? 'firestore';
 
@@ -57,6 +58,7 @@ export const dal = {
   donationAlerts: donationAlertsRepository,
   dataSubjectRequests: dataSubjectRequestsRepository,
   warRoomCounters: warRoomCountersRepository,
+  municipalityProfile: municipalityProfileRepository,
 };
 
 export type { SessionContext, GeoScope, Page, PageRequest } from './ports/session';

@@ -531,6 +531,64 @@ this file's structure without noticing.
 **Verified:** `npm run check:all` — 104 unit tests (up from 96),
 lint/typecheck/`check:hex`/build all green.
 
+**Session 9, continued — the rest of Settings: every placeholder module
+in this build is now real.** Replaced `SettingsPage` (index, links to all
+five sub-pages), `MunicipalityConfigPage`, `PermissionsPage`, and
+`DataSubjectRequestsPage`.
+
+- **Municipality Config** — new `src/dal/ports/municipalityProfile.ts` +
+  adapter, backing `tenants/{tid}/profile/municipality`. That collection
+  had a `firestore.rules` entry since Phase 1 with **no DAL port at
+  all** — same class of gap as `counters/warRoom` and
+  `logisticsApprovals`, found and wired up in earlier session-9 passes.
+  Captures municipality code/name/province, seat totals, and election
+  day (defaulting to 4 Nov 2026 — the date corroborated across two
+  independent sources this session, see
+  `docs/iec-election-timetable-2026.md` — offered as an editable
+  default, not asserted as certain). **Not** wired into
+  `/analytics/seat-calculator` this session — that page is a standalone,
+  already-shipped what-if tool; pulling its defaults from here instead
+  is a reasonable follow-up.
+- **Permissions** — real staff list (`dal.staff`) with role assignment
+  and per-user capability-override editing (granted/revoked), plus a
+  read-only reference table of the 7 seed roles. New
+  `src/auth/allCapabilities.ts`: a runtime array of every `Capability`,
+  built as `Record<Capability, true>` so TypeScript itself errors if the
+  union and the array ever drift apart. **Not built:** provisioning a
+  brand-new staff member — that needs a real Firebase Auth account via
+  an invite Cloud Function that doesn't exist yet; this page only
+  manages already-provisioned staff.
+- **Data Subject Requests** — log + status workflow (Received → In
+  Progress → Fulfilled/Rejected) over the data model and SLA helper that
+  already existed, finally with a UI. Flags overdue requests using the
+  existing (attorney-review-flagged, non-statutory) 30-day working
+  assumption.
+
+Checked the Stitch batch for Permissions specifically: five
+"*_permissions_management" screens exist, all "Civic Architect" (retired
+shell) and framed around a multi-metro "Team Command" concept that
+doesn't fit this build's model — not adopted for palette or framing. One
+pattern reused: a per-capability toggle list with human-readable
+descriptions, confirming `PermissionsPage.tsx`'s general shape; this
+build's version uses raw capability strings rather than authored
+descriptions, a reasonable follow-up. No screens exist for Municipality
+Config or Data Subject Requests. Full account in `docs/screen-findings.md`.
+
+**Verified:** `npm run check:all` — 106 unit tests (up from 104),
+lint/typecheck/`check:hex`/build all green.
+
+Every module page in this build is now a real implementation, not a
+`PagePlaceholder` stub. What's NOT real is unchanged from before this
+session and disclosed throughout this file and `docs/screen-findings.md`
+at the specific place each gap lives: no live Firebase project (blocker
+#2, the big one — nothing here has been proven against a real Firestore
+instance), the PPFA aggregation Cloud Function (held on purpose, §6.8.1),
+`functions/src/sync.ts` (skeleton), incident referral-PDF generation, a
+dedicated `election-cos-app` repo (still blocked on the human creating an
+empty one), and several smaller named gaps (phone/donor-ID encryption,
+staff invite flow, per-ward sentiment segmentation, live activity feeds,
+volunteer presence tracking). None of these were faked to look finished.
+
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.
