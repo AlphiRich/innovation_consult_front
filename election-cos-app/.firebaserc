@@ -1,0 +1,6 @@
+{
+  "//": "Election-COS1.0 — real project, confirmed by the human session 10. Was previously only a guess (see docs/phase-0-infra-plan.md) between this ID and innovation-consult-ecos-dev/-prod; that ambiguity is now resolved in favour of this one. Region (africa-south1) must still be verified/set in the console — see this repo's BUILD-STATUS.md session 10 entry, this cannot be changed after Firestore/Storage data exists.",
+  "projects": {
+    "default": "election2026-campaignms7-0"
+  }
+}

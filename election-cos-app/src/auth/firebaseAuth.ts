@@ -25,8 +25,11 @@
 import { getFirebaseAuth } from '@/dal/adapters/firestore/client';
 import {
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut as firebaseSignOut,
+  updateProfile,
   type User,
 } from 'firebase/auth';
 
@@ -92,6 +95,32 @@ export async function signUpWithEmail({ email, password }: MinimalAuthCredential
 
 export async function signInWithEmail({ email, password }: MinimalAuthCredential): Promise<User> {
   const credential = await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+  return credential.user;
+}
+
+/**
+ * Google Sign-in (popup flow). Session 10 — added at the human's explicit
+ * request, using their existing Firebase project.
+ *
+ * TENSION WITH THE MINIMAL-FOOTPRINT RULE ABOVE, disclosed rather than
+ * silently resolved: Firebase's Google OAuth integration automatically
+ * populates `displayName`/`photoURL` on the resulting Auth user record as
+ * a side effect of linking the provider — this is Firebase's own
+ * behaviour, not something `assertMinimalAuthPayload` can intercept (it
+ * only guards fields *this module* chooses to write). Mitigation: right
+ * after a successful sign-in, this function scrubs both fields back to
+ * null via `updateProfile()` — the best narrowing the Firebase Auth API
+ * surface allows, not a guarantee those values were never transiently
+ * present in Google's/Firebase's care during the OAuth handshake itself.
+ * If the real answer is "keep the profile photo," that's a deliberate
+ * policy change to make on purpose, not by silently skipping this scrub.
+ */
+export async function signInWithGoogle(): Promise<User> {
+  const provider = new GoogleAuthProvider();
+  const credential = await signInWithPopup(getFirebaseAuth(), provider);
+  if (credential.user.displayName || credential.user.photoURL) {
+    await updateProfile(credential.user, { displayName: null, photoURL: null });
+  }
   return credential.user;
 }
 

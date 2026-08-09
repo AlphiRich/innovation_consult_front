@@ -589,6 +589,68 @@ empty one), and several smaller named gaps (phone/donor-ID encryption,
 staff invite flow, per-ward sentiment segmentation, live activity feeds,
 volunteer presence tracking). None of these were faked to look finished.
 
+**Session 10 (9 Aug 2026, later) — real Firebase project confirmed; Google
+Sign-in; the app's first-ever sign-in UI.** The human confirmed the real
+GCP project (`election2026-campaignms7-0` — previously an unreconciled
+guess, see `docs/phase-0-infra-plan.md`) and asked for Firebase
+Auth/Firestore as the backend with Google Sign-in specifically. Checked
+this sandbox for a Firebase agent skill and for `firebase`/`gcloud` CLIs
+and Google Cloud credentials first, per the human's instruction to use
+the appropriate skill — none exist here (no skill, no CLI, no
+credentials, no interactive OAuth). Did everything that's actually
+possible without them, and said so plainly rather than claiming more:
+
+- Real `.firebaserc` (`election2026-campaignms7-0`), `.env.example`
+  updated with the confirmed project ID, `docs/phase-0-infra-plan.md`'s
+  "unreconciled" note marked resolved.
+- `signInWithGoogle()` added to `firebaseAuth.ts` (`GoogleAuthProvider` +
+  `signInWithPopup`). **A real tension with §4.3's minimal-footprint
+  Auth rule, flagged rather than silently resolved:** Firebase's Google
+  OAuth integration automatically populates `displayName`/`photoURL` on
+  the Auth record as a side effect of linking the provider — that's
+  Firebase's own behaviour, not something `assertMinimalAuthPayload` can
+  intercept, since it only guards fields this module chooses to write.
+  Mitigated by scrubbing both fields back to `null` via `updateProfile()`
+  immediately after every Google sign-in — the best narrowing the Auth
+  API surface allows, not a guarantee those values were never
+  transiently present in Google's/Firebase's care during the handshake
+  itself. If the real answer is "keep the profile photo," that's a
+  deliberate policy change to make on purpose. 2 new tests (mock-based,
+  `firebaseAuth.test.ts`'s first tests that aren't pure-function checks).
+- **The app had no sign-in UI at all before this** — every module page
+  independently showed "No active session" with no way to reach a
+  signed-in state. Built `src/auth/SignInPage.tsx` (Google-only, per the
+  ask) and refactored `Shell.tsx` to be the single place that branches on
+  the three real auth states — `loading`, `signed-out` (renders
+  SignInPage), and `signed-in` with `session === null` (a real Firebase
+  user who exists but hasn't been assigned a tenant/role yet —
+  previously indistinguishable from "not signed in" in every page's own
+  message, now its own real "Awaiting access" screen with a sign-out
+  escape hatch). Added a sign-out control to the main nav too — didn't
+  exist anywhere either.
+- `GoogleIcon.tsx`: the official Google "G" mark, reproduced at its
+  fixed brand colours — a deliberate, narrow exception to §2.2's
+  no-raw-hex rule (a third-party brand mark isn't this app's design
+  decision to tokenise, same as a Visa mark on a payment button), isolated
+  to one allow-listed file rather than loosening the hex guard generally.
+- **Verified by actually running the app**, not just typecheck/build: started
+  the dev server, drove headless Chromium against it (`playwright` isn't a
+  project dependency — found and used the sandbox's global install via an
+  explicit require path), confirmed no console errors and screenshotted
+  the real sign-in page rendering correctly with no live config, which is
+  exactly the state it should be in without `.env` filled in.
+
+**What's still needed from the human** to actually reach a live signed-in
+session — none of it is possible from this sandbox — is the numbered list
+under blocker #2 above (register the web app, fill `.env`, enable the
+Google provider, verify the Firestore region, deploy rules).
+
+**Verified:** `npm run check:all` — 108 unit tests (up from 106),
+lint/typecheck/`check:hex`/build all green. Dev server smoke-tested with
+a real headless-browser screenshot (see above) — the first time in this
+build's history a session has actually run the app rather than only
+compiled/tested it.
+
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.
@@ -781,20 +843,56 @@ touches PPFA.
    then run the Phase 1 screen-inventory deliverable
    (`docs/phase-1-ia-consolidation.md` §1) for real.
 
-2. **No live Firebase project.** Nothing in this session was deployed —
-   no `firebase init`, no live `africa-south1` Firestore/Storage/Functions,
-   no `.firebaserc` (only `.firebaserc.example`). `npm run check:all`
-   and `npm run build` both pass without one, by design (see
-   `src/dal/adapters/firestore/client.ts` — throws only when a consumer
-   actually calls it, not at import time), but nothing here has been
-   proven against a real Firestore instance, real security rules
-   evaluation, or a real Cloud Function. §1.1's "verify before building"
-   checklist (Firestore in `africa-south1`, Functions 2nd gen region
-   support, Storage bucket region, Blaze plan, free-tier quotas) is
-   **entirely unconfirmed** — it requires GCP console/CLI access this
-   session does not have. **Action:** provision per
-   `03-implementation-rollout-plan-v2.md` §2 (not available this session
-   either — only 00 and 01 were supplied).
+2. **No live Firebase project — partially unblocked session 10, still not
+   deployed.** The human confirmed the real GCP project ID
+   (`election2026-campaignms7-0`) and asked for Google Sign-in wired up.
+   Done from this sandbox: real `.firebaserc` (no longer just
+   `.firebaserc.example`), `.env.example`'s `VITE_FIREBASE_PROJECT_ID`
+   filled in, `signInWithGoogle()` added to `firebaseAuth.ts`, and —
+   because none had existed at all — a real sign-in UI
+   (`src/auth/SignInPage.tsx`) plus `Shell.tsx` now branching on all
+   three real auth states (loading / signed-out / signed-in-but-
+   unprovisioned) instead of every page independently guessing. Verified
+   by actually running the dev server and screenshotting the sign-in
+   page (no live Firebase config, so it correctly falls through to
+   signed-out) — see this session's entry below for the full account,
+   including a real tension this surfaced between Google Sign-in and the
+   §4.3 minimal-footprint Auth rule.
+
+   **Still cannot be finished from this sandbox** — no `firebase`/`gcloud`
+   CLI, no Google Cloud credentials, and no interactive OAuth are
+   available here. **Action, exact remaining steps:**
+   1. In the Firebase Console for `election2026-campaignms7-0`: Project
+      Settings → General → Your apps → **Add app → Web**. Register it
+      (any nickname), and do **not** enable Firebase Hosting from that
+      dialog if hosting is being set up separately later.
+   2. Copy the resulting `firebaseConfig` object's six values into a
+      local `.env` (copy from `.env.example` first) —
+      `VITE_FIREBASE_API_KEY`, `_AUTH_DOMAIN`, `_STORAGE_BUCKET`,
+      `_MESSAGING_SENDER_ID`, `_APP_ID` (project ID is already filled in).
+   3. Authentication → Sign-in method → enable **Google** as a provider,
+      and confirm a support email is set (Google requires one).
+   4. Authentication → Settings → Authorized domains — add whatever
+      domain the app will actually be served from for local dev
+      (`localhost` is usually pre-authorized) and, later, the real
+      `app.electioncampaignos.co.za` once that's live.
+   5. Verify Firestore exists in **`africa-south1`** — build spec §0 rule
+      1, and irreversible once set. If Firestore hasn't been created at
+      all yet, create it there now, before anything writes to it.
+   6. Once `.env` is filled in: `cd election-cos-app && npm run build`
+      still needs to be re-verified against the real config, then
+      `firebase deploy --only firestore:rules,firestore:indexes,storage`
+      (and `hosting`/`functions` when those are ready) — none of this has
+      been run from this session; only the CLI-free code changes have.
+
+   Alternative to steps 1–4 if a future session should do this instead of
+   the human: supply a service-account JSON key with Firebase Admin
+   rights on this project (as `GOOGLE_APPLICATION_CREDENTIALS`, never
+   committed), which would let `firebase-tools` and the Firebase
+   Management API run non-interactively. Not requested this session — the
+   human did the console clicks route implicitly by asking for this to be
+   "set up," which reads as the lower-privilege, faster path; flagging
+   the alternative here rather than assuming.
 
 3. **PPFA aggregation held on purpose**, per §6.8.1 — Q1/Q2/Q3 need legal
    confirmation before `functions/src/ppfaAggregation.ts` gets built out
