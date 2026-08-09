@@ -95,8 +95,14 @@ service cloud.firestore {
 
     match /tenants/{tid}/diaryEntries/{entryId} {
       allow read: if tenantOK(tid) && cap('diary.view') && inScope(tid, resource.data);
+      // activityType allow-list added session 9 alongside the field itself
+      // (src/dal/ports/diary.ts) — same defense-in-depth as incidents'
+      // category check above, so a buggy/malicious client can't write an
+      // arbitrary string a UI select wouldn't ever produce.
       allow create, update: if tenantOK(tid) && cap('diary.edit')
-                             && inScope(tid, request.resource.data);
+                             && inScope(tid, request.resource.data)
+                             && request.resource.data.activityType in
+                                ['CANVASS', 'RALLY', 'OBSERVATION', 'OTHER'];
       allow delete: if false;
     }
 

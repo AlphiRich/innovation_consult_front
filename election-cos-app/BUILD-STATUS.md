@@ -318,6 +318,36 @@ escalation now also authorises recording a referral.
 **Verified:** `npm run check:all` — 78 unit tests (up from 72),
 lint/typecheck/`check:hex` all green; `npm run build` succeeds.
 
+**Session 9, continued — Field Diary module:** replaced the
+`FieldDiaryPage` placeholder with a real build
+(`src/modules/field-diary/`): entry list (newest first, filterable by VD
+— same free-text-code fallback pattern as `VotersPage.tsx` for Ward/
+Municipal Leads without a `vdScope`) and a log-entry form. Found a real
+Stitch screen for this module for the first time —
+`ward_field_app_mobile`'s actual "Field Diary" panel — and it showed a
+type-tagged, titled, notes-only entry shape with **no household-count
+field**, contradicting the port's provisional `streetName`/
+`householdsVisited`-only shape. Since `DiaryEntry` had zero other
+consumers yet and its own header explicitly invited this reconciliation
+(unlike the already-shipped Voters/Incidents schemas, which stay
+flag-only per `docs/screen-findings.md`), the schema itself was updated:
+added `activityType` (`CANVASS`/`RALLY`/`OBSERVATION`/`OTHER`) and an
+optional `title`, keeping `streetName`/`householdsVisited` for the
+`CANVASS` case since War Room's future coverage-% derivation (§6.3) needs
+that quantitative pair and the screen's version has nothing that serves
+it. `firestore.rules`' diary `create`/`update` rule now also validates
+`activityType` against the same four values, matching the defense-in-
+depth already in place for incidents' category.
+
+**Verified:** `npm run check:all` — 80 unit tests (up from 78),
+lint/typecheck/`check:hex` all green; `npm run build` succeeds.
+
+**Still placeholder, for the next session:** War Room, Logistics,
+Finance, Analytics (+ its 3 sub-views), and most of Settings
+(Municipality Config, Permissions, PPFA Thresholds, Data Subject
+Requests) — a fuller list than "Field Diary and Logistics" as previously
+stated in this file; corrected here rather than left inaccurate.
+
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.

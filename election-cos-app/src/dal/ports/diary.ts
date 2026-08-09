@@ -4,11 +4,29 @@
  * shown on the Command Center are DERIVED, never stored — see
  * src/modules/war-room for the counter that aggregates these.
  *
- * Field list is provisional: no Stitch screen field inventory was
- * available this session (master index §6 — Drive folder unresolved).
- * Refine against real screens before Phase 3 sign-off.
+ * `activityType` and `title` added in session 9 against a real Stitch
+ * reference (`ward_field_app_mobile`'s "Field Diary" panel: timestamped
+ * entries with a type tag — Rally, Observation — a short title, and free
+ * notes; no household-count field visible at all). The original fields
+ * (`streetName`, `householdsVisited`) were written provisional — no real
+ * screen was available yet — this header said so explicitly and invited
+ * reconciliation once one existed. Rather than replace them (they're the
+ * quantitative half War Room's future coverage-% derivation needs and
+ * nothing else in this codebase produces that number) or ignore the
+ * screen (per this build's standing discipline against silently dropping
+ * richer reference material), both are kept: `activityType` defaults to
+ * `CANVASS` for the coverage-log case (`householdsVisited` meaningful,
+ * `title` usually empty); `RALLY`/`OBSERVATION`/`OTHER` are the screen's
+ * qualitative journal case (`householdsVisited` typically 0, `title`
+ * carries the headline). No other code in this repo consumed `DiaryEntry`
+ * yet, so this is a real-data-informed schema decision at effectively
+ * zero migration cost, not the same category of change as the Voters/
+ * Incidents field discrepancies (already-shipped, already-tested schemas
+ * — those stayed flag-only, see docs/screen-findings.md).
  */
 import type { Page, PageRequest, SessionContext, UpsertResult } from './session';
+
+export type DiaryActivityType = 'CANVASS' | 'RALLY' | 'OBSERVATION' | 'OTHER';
 
 export interface DiaryEntry {
   id: string;
@@ -16,7 +34,11 @@ export interface DiaryEntry {
   vdCode: string;
   wardCode: string;
   staffUid: string;
+  activityType: DiaryActivityType;
+  /** Short headline — mainly for RALLY/OBSERVATION/OTHER entries, e.g. "Street Corner Meeting: Oak & Main". */
+  title?: string;
   streetName: string;
+  /** Meaningful for CANVASS entries; 0 for the others. */
   householdsVisited: number;
   notes?: string;
   occurredAt: string;

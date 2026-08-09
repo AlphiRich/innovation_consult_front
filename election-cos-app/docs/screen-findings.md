@@ -135,3 +135,24 @@ VD-identity collision for split voting districts). `WardForm.tsx` /
 `VDForm.tsx` remain the manual-capture fallback for every municipality
 that isn't JB Marks, and for JB Marks itself until a live Firebase
 project exists to load the seed data into.
+
+## Field Diary (session 9, continued) — used `ward_field_app_mobile`
+
+`ward_field_app_mobile` (branded "ElectoralOS | Field Interface" — same
+fifth-name shell noted above) has an actual "Field Diary" panel: a
+"+ New Entry" action and timestamped entries, each with a type tag
+("Rally", "Observation"), a short title ("Street Corner Meeting: Oak &
+Main"), and free-text notes. **No household-count field is visible at
+all.** This is the first real screen `src/dal/ports/diary.ts` ever had —
+its header comment had said the field list was provisional and invited
+exactly this reconciliation once a real screen existed.
+
+Unlike the Voters/Incidents cases (shipped, tested schemas — screen
+richness flagged and left alone), this port had zero other consumers and
+an explicit "refine me" note, so the schema itself was updated rather
+than just flagged: `activityType` (`CANVASS`/`RALLY`/`OBSERVATION`/
+`OTHER`) and an optional `title` were added, keeping `streetName` +
+`householdsVisited` for the `CANVASS` case — those are the quantitative
+half the future War Room coverage-% derivation needs (§6.3) and the
+screen's version has nothing that serves that purpose. See
+`src/dal/ports/diary.ts`'s header for the full reasoning.

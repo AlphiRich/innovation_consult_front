@@ -14,6 +14,8 @@ function fromFirestore(id: string, data: Record<string, unknown>): DiaryEntry {
     vdCode: data.vdCode as string,
     wardCode: data.wardCode as string,
     staffUid: data.staffUid as string,
+    activityType: (data.activityType as DiaryEntry['activityType']) ?? 'CANVASS',
+    title: data.title as string | undefined,
     streetName: data.streetName as string,
     householdsVisited: (data.householdsVisited as number) ?? 0,
     notes: data.notes as string | undefined,
