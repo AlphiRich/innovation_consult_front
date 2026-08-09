@@ -22,6 +22,16 @@ export type Capability =
   | 'incidents.triage'
   | 'incidents.escalate'
   | 'logistics.view'
+  // Added session 9: firestore.rules gated logistics create/update on
+  // logistics.view alone (the only module in this codebase to gate a
+  // write on a *.view capability — every other module has a distinct
+  // edit/create capability). Found while building LogisticsPage.tsx;
+  // fixed by splitting a real edit capability out, matching the
+  // view/edit split every other module already has (voters, wards,
+  // diary). logistics.approve remains the separation-of-duties gate for
+  // the approval step specifically — a requester should not also be able
+  // to approve their own request by holding only logistics.edit.
+  | 'logistics.edit'
   | 'logistics.approve'
   | 'ppfa.view'
   | 'ppfa.edit'

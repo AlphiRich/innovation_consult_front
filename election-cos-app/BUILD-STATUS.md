@@ -447,6 +447,46 @@ covered. Full account in `docs/screen-findings.md`.
 already-tested `seatCalculator.ts` is unchanged), lint/typecheck/
 `check:hex`/build all green.
 
+**Session 9, continued — Logistics module:** replaced the placeholder
+with a real build (`src/modules/logistics/`): a request form ("Request
+materials" — item, quantity, delivery urgency, drop-off instructions)
+and a list with an Approve action, reading the whole tenant's logistics
+collection unfiltered (deliberate — `firestore.rules` doesn't geo-scope
+logistics reads, and it's a small, bounded collection, not millions of
+voter records, so that's within §7.4's actual concern rather than a
+violation of it).
+
+Reference: Stitch's `vd_captain_request_materials_modal` — the first
+real screen this port ever had. Same call as the session-9 Diary
+reconciliation: `LogisticsItem`'s field list was provisional with zero
+other consumers, so the schema was updated (added `urgency`,
+`dropOffInstructions`, `vdCode`, `requestedBy`) rather than just flagged.
+The screen's fixed 5-item material taxonomy was **not** adopted —
+`itemName` stays free text.
+
+Found and fixed two real gaps, neither from the screen:
+
+1. `firestore.rules` gated logistics `create`/`update` on `logistics.view`
+   alone — the only module in this codebase to gate a write on a `*.view`
+   capability (every other module has a distinct edit/create capability).
+   Added `logistics.edit` (`src/auth/types.ts`), split the rule so moving
+   status to APPROVED additionally requires `logistics.approve` (a
+   requester can't self-approve via a plain upsert), and while auditing
+   who held what, found **VD Captain had zero logistics capabilities at
+   all** — couldn't even view logistics, despite "Request Materials"
+   being a VD Captain dashboard action in the very screen this pass used.
+   Granted `logistics.view` + `logistics.edit` to VD Captain;
+   `logistics.approve` stays Party-HQ-Admin-only.
+2. `firestore.rules` already had a `logisticsApprovals` collection rule
+   (client-writable, gated on `logistics.approve`) with nothing ever
+   writing to it — dead code since whenever it was first added. Wired
+   up: `approve()` now writes a `LogisticsApproval` record alongside the
+   status change, a lightweight trail distinct from the server-only
+   `auditLog`. No UI reads it yet — reasonable follow-up, not built now.
+
+**Verified:** `npm run check:all` — 96 unit tests (up from 92; 4 new for
+`logisticsMeta.ts`), lint/typecheck/`check:hex`/build all green.
+
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.

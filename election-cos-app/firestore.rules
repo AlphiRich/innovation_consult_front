@@ -135,9 +135,19 @@ service cloud.firestore {
 
     // ---- logistics ------------------------------------------------------
 
+    // create/update were gated on logistics.view alone until session 9 —
+    // the only module in this codebase to gate a write on a *.view
+    // capability. Fixed: logistics.edit (request/log stock) is now
+    // required to write at all, and moving status to APPROVED
+    // additionally requires logistics.approve — a requester holding only
+    // logistics.edit cannot self-approve via a plain upsert.
     match /tenants/{tid}/logistics/{itemId} {
       allow read: if tenantOK(tid) && cap('logistics.view');
-      allow create, update: if tenantOK(tid) && cap('logistics.view');
+      allow create: if tenantOK(tid) && cap('logistics.edit') && request.resource.data.status != 'APPROVED';
+      allow update: if tenantOK(tid) && (
+                       (cap('logistics.edit') && request.resource.data.status == resource.data.status)
+                    || (cap('logistics.approve') && request.resource.data.status == 'APPROVED')
+                    );
       allow delete: if false;
     }
 

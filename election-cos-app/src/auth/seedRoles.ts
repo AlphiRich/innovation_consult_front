@@ -30,6 +30,7 @@ export const SEED_ROLES: Role[] = [
       'incidents.triage',
       'incidents.escalate',
       'logistics.view',
+      'logistics.edit',
       'logistics.approve',
       'ppfa.view',
       'ppfa.manage_thresholds',
@@ -57,6 +58,7 @@ export const SEED_ROLES: Role[] = [
       'incidents.view',
       'incidents.escalate',
       'logistics.view',
+      'logistics.edit',
       'analytics.view',
     ],
   },
@@ -74,6 +76,7 @@ export const SEED_ROLES: Role[] = [
       'incidents.view',
       'incidents.triage',
       'logistics.view',
+      'logistics.edit',
       'analytics.view',
     ],
   },
@@ -89,6 +92,13 @@ export const SEED_ROLES: Role[] = [
       'diary.edit',
       'incidents.view',
       'incidents.create',
+      // Added session 9: VD Captain had zero logistics capabilities,
+      // meaning the "request materials" action the Stitch reference
+      // screens show on their dashboard was impossible — logistics.edit
+      // covers requesting/logging stock; approval stays a separate
+      // capability (logistics.approve) nobody at this level holds.
+      'logistics.view',
+      'logistics.edit',
     ],
   },
   {

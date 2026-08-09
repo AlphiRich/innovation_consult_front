@@ -235,3 +235,43 @@ household-detail mobile screen (Voters, session 5/6) and a voter-intake
 form with demographic/psychographic fields (already the subject of the
 open scope question in the "Voters/households screens" section above —
 same fields, same non-decision).
+
+## Logistics (session 9, continued) — used `vd_captain_request_materials_modal`
+
+The "Request Campaign Materials" modal on this screen (found while
+building the Logistics module, not part of the earlier 9-image batch) is
+the first real Stitch reference this port ever had: Material Type,
+Quantity, Delivery Urgency (Routine 2–3 days / Urgent 24h / Immediate
+GOTV Priority), Drop-off Point/Instructions — "Requests are routed to the
+Municipal Logistics Hub."
+
+`LogisticsItem`'s field list was provisional (its own header said so,
+same invitation-to-reconcile language `diary.ts` had) and had zero other
+consumers, so — same call as session 9's Diary reconciliation — the
+schema was updated rather than just flagged: added `urgency`,
+`dropOffInstructions`, `vdCode`, and `requestedBy` (previously missing
+entirely — a request/approval workflow with no record of who requested
+an item was a real gap). The screen's fixed 5-item Material Type
+taxonomy (Posters/Flyers/Forms/T-Shirts/Stationery) was **not** adopted —
+`itemName` stays free text, since that list is one campaign's plausible
+needs, not a statutory or structural constraint the way incident
+categories are.
+
+Also found, independent of any screen: `firestore.rules` gated logistics
+`create`/`update` on `logistics.view` alone — the only module in this
+codebase to gate a write on a `*.view` capability. Fixed by adding a
+proper `logistics.edit` capability (see `src/auth/types.ts`), and while
+auditing who held it, found VD Captain had **zero** logistics
+capabilities at all — unable to even view logistics, let alone request
+materials, despite "Request Materials" being a VD Captain dashboard
+action in this same batch of reference screens. Granted `logistics.view`
++ `logistics.edit` to VD Captain; `logistics.approve` (separation of
+duties) stays Party-HQ-Admin-only, matching the existing pattern.
+
+A second dead-code gap: `firestore.rules` already had a
+`logisticsApprovals` collection rule (client-writable, gated on
+`logistics.approve`) with nothing ever writing to it. Wired up:
+`LogisticsRepository.approve()` now writes a `LogisticsApproval` record
+alongside the status change — a lightweight approval trail distinct from
+the server-only `auditLog`. No UI reads it yet; that's a reasonable
+follow-up, not built this session.
