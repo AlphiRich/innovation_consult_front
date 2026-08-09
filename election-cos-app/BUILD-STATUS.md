@@ -117,6 +117,15 @@ possible. Verified instead via `python-docx` (opens cleanly, correct
 paragraph/table/section counts and content) and the skill's OOXML XSD
 validator (`validate.py` — all validations passed) on all three files.
 
+Also closed a real gap noticed while continuing: `VoterForm` required
+selecting an *existing* household with no way to create one.
+`src/modules/voters/HouseholdQuickAdd.tsx` adds inline household creation
+from the voter form's household picker — dwelling type, address/informal
+descriptor, and a ward lookup via `dal.votingDistricts.getByCode` rather
+than trusting `ctx.wardScope` (which a VD-scoped canvasser's token
+typically doesn't carry — using it would have risked writing a wrong or
+empty `wardCode`, breaking §4.2 geographic scoping on that household).
+
 **Verified green in this session:** `npm run check:all` (lint, typecheck,
 `check:hex`, 67 unit tests) and `npm run build`, in `election-cos-app/`. Cloud
 Functions (`functions/`) compile clean via `npm run build`.
