@@ -348,6 +348,60 @@ Finance, Analytics (+ its 3 sub-views), and most of Settings
 Requests) — a fuller list than "Field Diary and Logistics" as previously
 stated in this file; corrected here rather than left inaccurate.
 
+**Session 9, continued — War Room module:** replaced the `WarRoomPage`
+placeholder with a real build, and — for the first time — the backend it
+actually needs. §7.4/§8.1 require War Room to read pre-aggregated counter
+documents only, never scan voters/incidents/diaryEntries live; a
+`tenants/{tenantId}/counters/warRoom` doc and its `firestore.rules` entry
+had existed since Phase 1 with nothing maintaining or reading it. Built
+both sides:
+
+- `src/dal/ports/warRoomCounters.ts` + its Firestore adapter — a single
+  doc read, defaulting to a zeroed shape when the doc doesn't exist yet
+  rather than erroring.
+- `functions/src/warRoomCounters.ts` — three Firestore
+  (`onDocumentWritten`) triggers, one each for voters, incidents, and
+  diaryEntries, that keep the counter doc accurate via
+  `FieldValue.increment()` deltas (no read-modify-write, no transaction —
+  each field's increments serialise server-side on their own). The
+  delta logic is pure and unit tested: 13 new tests covering voter
+  create/sentiment-change/soft-delete/hard-delete, incident
+  create/status-change, and diary create/edit/activity-type-change —
+  this is `functions/`'s **first test file ever** (it had `vitest`
+  wired since Phase 0 but nothing exercising it).
+- `WarRoomPage.tsx` — stat tiles (voters captured, households canvassed,
+  wards seeded, open incidents, sentiment breakdown, incidents by
+  status) plus a registered-voter coverage % against the real Wards
+  collection total, and quick links to Voters/Wards/Diary/Incidents.
+  Reference: `lge_war_room_local_head`'s dashboard section (title
+  literally "War Room") — its richer pieces (volunteer presence/online
+  tracking, a "voters per minute" velocity metric, a high-activity-zone
+  ranking, a live diary feed, a directives document repository) have no
+  real, traceable data source in this codebase and were **not** faked;
+  see `docs/screen-findings.md`.
+
+Found and fixed two real cross-package test-runner bugs while adding
+`functions/`'s first test: (1) `functions/`'s own `npm run test` picked
+up its own `tsc` build output (`lib/warRoomCounters.test.js`) alongside
+the source `.ts` file and crashed on the compiled CommonJS copy (vitest
+is ESM-only) — fixed with a `functions/vitest.config.ts` excluding
+`lib/**`. (2) the **app's** `npm run test` (run from `election-cos-app/`)
+had no path restriction and was sweeping into `functions/` entirely —
+redundantly re-running the same suite via the source files, and hitting
+the exact same CommonJS crash via `functions/lib/**`. Fixed by adding an
+explicit `exclude` (repeating vitest's own defaults, since setting
+`exclude` replaces rather than appends them) plus `functions/**` to
+`vite.config.ts`. Neither bug could have surfaced before this session —
+`functions/` had zero test files until now.
+
+**Verified:** `npm run check:all` in `election-cos-app/` — 80 unit tests
+(unchanged — the new logic lives in `functions/`), lint/typecheck/
+`check:hex`/build all green. `cd functions && npm run build && npm run
+test` — 13 unit tests, build clean. The Cloud Functions themselves are
+**not deployed** — same blocker #2 as everything else Firebase-shaped —
+so War Room's tiles will read as zero/empty against a real project until
+they are.
+
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.

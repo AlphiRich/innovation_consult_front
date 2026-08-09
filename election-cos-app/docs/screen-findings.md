@@ -156,3 +156,27 @@ than just flagged: `activityType` (`CANVASS`/`RALLY`/`OBSERVATION`/
 half the future War Room coverage-% derivation needs (§6.3) and the
 screen's version has nothing that serves that purpose. See
 `src/dal/ports/diary.ts`'s header for the full reasoning.
+
+## War Room (session 9, continued) — used `lge_war_room_local_head`, partially
+
+Same screen as the Wards module (its title literally is "War Room", nav
+label "Command Center" — matches this route exactly), this time its top
+dashboard section rather than the Ward/VD table. It shows: Total
+Registered Voters with a target/%-achieved bar, Active Volunteers (with
+an online-now count), Campaign Velocity (a "voters per minute" figure), a
+High Activity Zone ranking, a live Field Diary feed, and an Official
+Directives document repository.
+
+Only the pieces with a real, traceable data source in this codebase were
+built: voters captured, households canvassed, sentiment breakdown, and
+incidents-by-status, all from the new `warRoomCounters` doc, plus a
+registered-voters coverage % against the Wards collection's real total.
+**Not built**, and not faked with placeholder numbers: volunteer presence/
+online tracking (no such feature exists), campaign velocity (no per-
+minute metric is computed anywhere), a high-activity-zone ranking (would
+need a per-ward coverage comparison this session didn't build), a live
+diary feed (the diary port only supports per-VD listing, not a
+tenant-wide recent-activity query), and the directives repository (no
+UI exists for `dal.documents` yet). `WarRoomPage.tsx`'s header comment
+records this explicitly — same discipline as the Incidents module's
+referral-PDF gap and the Voters module's phone-encryption gap.

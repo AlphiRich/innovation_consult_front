@@ -6,6 +6,7 @@
 export { resolveCapabilities } from './resolveCapabilities';
 export { sync } from './sync';
 export { unmaskCandidateIdNumber } from './unmaskCandidateIdNumber';
+export { maintainVoterCounters, maintainIncidentCounters, maintainDiaryCounters } from './warRoomCounters';
 
 // ppfaAggregation is deliberately NOT exported — see its file header and
 // build spec §6.8.1. Do not add it here without legal confirmation.
