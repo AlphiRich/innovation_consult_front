@@ -100,6 +100,32 @@ that was deliberately **not** reproduced — `SchematicMap.tsx` renders a
 proportional tile grid instead, sized by registered-voter count, with an
 explicit label saying it isn't a real map.
 
+## Incidents (session 9) — a real taxonomy discrepancy, not adopted
+
+`vd_captain_log_incident_modal` (same "ElectoralOS"/retired-palette shell
+as the Wards screens above) shows a "Log Local Incident" modal with a
+**different** incident taxonomy than the governing `IncidentCategory`
+enum in `src/dal/ports/incidents.ts`: the screen offers Access Denied,
+Vandalism, Intimidation, Supply Shortage, Other — field-operations/
+canvasser-safety issues — where the governing data model's four
+categories (`WATER_SANITATION`, `ELECTRICITY`, `ROADS_TRANSPORT`,
+`PUBLIC_SAFETY`) are community service-delivery issues meant for
+municipal referral (§6.4). These are two different concepts wearing the
+same "incident" word. `src/modules/incidents/IncidentForm.tsx` (built
+this session) uses the governing enum, matching §6.4 exactly, and does
+**not** adopt the screen's taxonomy — flagged here rather than silently
+picked one or blended them. The screen's Severity field (Low/Medium/
+High/Critical) and Description/Photo fields do match what was built,
+which is a useful confirmation of everything except the category list.
+
+`incident_report_export_*` (DRAFT watermark → authorized → signature →
+timestamped views) are the same retired "Municipal Incident Report" PDF
+export screens already flagged as excluded in the "Retired-shell
+screens" section above — not new information, just confirms
+§6.4's referral-PDF concept (`IncidentRepository.markReferred()`) was a
+real, spec'd feature, not invented — it's just not built yet (see
+`IncidentsPage.tsx`'s header comment for why).
+
 No IEC demarcation source data had been supplied as of this note's
 original writing; both named PDFs (`8929_18112025_NWestDemarcation.pdf`,
 `NW405.pdf`) arrived in session 8 — see `docs/nw405-seed-data.md` for the

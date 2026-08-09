@@ -18,9 +18,10 @@ import type { SessionContext } from '@/dal/ports/session';
 import type { Household } from '@/dal/ports/households';
 import type { Voter, VoterDraft } from '@/dal/ports/voters';
 import { maskPhone } from '@/lib/phone';
+import { useVdWard } from '@/lib/useVdWard';
 import { HouseholdQuickAdd } from './HouseholdQuickAdd';
 import { SENTIMENT_META, SENTIMENT_ORDER } from './sentiment';
-import { TONE_ACTIVE_CLASSES } from './toneClasses';
+import { TONE_ACTIVE_CLASSES } from '@/design/toneClasses';
 
 const NEW_HOUSEHOLD_VALUE = '__new__';
 
@@ -53,22 +54,13 @@ export function VoterForm({ ctx, voter, defaultHouseholdId, onDone, onCancel }: 
   // Ward is derived from the VD record, not ctx.wardScope — a VD-scoped
   // canvasser's token typically has vdScope but not wardScope, and a new
   // household's wardCode must be correct for §4.2 geographic scoping to
-  // work, not just non-empty. A vdCode is not unique to one ward (real
-  // NW405 gazette data: ~19% of voting stations are split across wards),
-  // so this looks up every ward-portion and, if there's more than one,
-  // requires the user to pick rather than guessing — see the
-  // wardOptions/selectedWard logic below.
-  const votingDistrictsForCodeQuery = useQuery({
-    queryKey: ['votingDistrictsByVdCode', ctx.tenantId, vdCode],
-    queryFn: () => dal.votingDistricts.findByVdCode(ctx, vdCode),
-    enabled: vdCode.length > 0,
-  });
-  const wardOptions = votingDistrictsForCodeQuery.data ?? [];
-  const [selectedWardCode, setSelectedWardCode] = useState<string | null>(null);
-  const resolvedVotingDistrict =
-    wardOptions.length === 1
-      ? wardOptions[0]
-      : (wardOptions.find((o) => o.wardCode === (selectedWardCode ?? ctx.wardScope)) ?? null);
+  // work, not just non-empty. See src/lib/useVdWard.ts for why (split VDs).
+  const {
+    wardOptions,
+    resolved: resolvedVotingDistrict,
+    isLoading: votingDistrictsLoading,
+    setSelectedWardCode,
+  } = useVdWard(ctx, vdCode);
 
   const [firstName, setFirstName] = useState(voter?.firstName ?? '');
   const [lastName, setLastName] = useState(voter?.lastName ?? '');
@@ -228,7 +220,7 @@ export function VoterForm({ ctx, voter, defaultHouseholdId, onDone, onCancel }: 
           ) : (
             wardOptions.length <= 1 && (
               <p className="text-body-md font-body text-maroon">
-                {votingDistrictsForCodeQuery.isLoading
+                {votingDistrictsLoading
                   ? 'Looking up ward for this VD…'
                   : `VD ${vdCode} isn't seeded yet — its ward can't be determined, so a household can't be created safely. See §6.1.`}
               </p>

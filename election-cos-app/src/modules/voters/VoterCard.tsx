@@ -5,7 +5,7 @@
  */
 import type { Voter } from '@/dal/ports/voters';
 import { SENTIMENT_META } from './sentiment';
-import { TONE_PILL_CLASSES } from './toneClasses';
+import { TONE_PILL_CLASSES } from '@/design/toneClasses';
 
 interface VoterCardProps {
   voter: Voter;

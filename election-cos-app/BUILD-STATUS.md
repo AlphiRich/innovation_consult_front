@@ -278,6 +278,46 @@ session added no logic to test — the new page is static reference
 content, same as `GatheringsAdvisoryPage.tsx`), lint/typecheck/`check:hex`
 all green; `npm run build` succeeds.
 
+**Session 9, continued — Incidents module:** replaced the `IncidentsPage`
+placeholder with a real build (`src/modules/incidents/`): status-tab list
+(Logged/Triaged/Escalated/Referred/Resolved/Closed), a log-incident form
+with the fixed taxonomy (category/severity selects, never free text —
+matches `firestore.rules`' own category allow-list), and per-status
+actions (Triage sets/confirms severity; Escalate moves it on). The
+referral-PDF step (§6.4) is explicitly **not** built — it needs a
+server-side generator with Storage write access and there's still no live
+Firebase project to deploy one against (blocker #2) — `IncidentsPage.tsx`
+says so in its own header rather than shipping a dead button.
+
+Reused, rather than re-derived, the split-VD ward-resolution logic
+`VoterForm.tsx` built in an earlier pass — extracted to
+`src/lib/useVdWard.ts` and both `VoterForm.tsx` and the new
+`IncidentForm.tsx` now share it, closing a real duplication risk (two
+copies of scoping-correctness logic drifting apart over time). Also moved
+`toneClasses.ts` from `src/modules/voters/` to `src/design/` since
+Incidents needed the same static-Tailwind-class pattern for severity
+pills — one shared lookup instead of a second copy.
+
+Checked the Stitch batch for reference and found a real, worth-recording
+discrepancy: `vd_captain_log_incident_modal` shows a *different* incident
+taxonomy (Access Denied / Vandalism / Intimidation / Supply Shortage /
+Other — canvasser field-safety issues) than the governing
+`IncidentCategory` enum (water/electricity/roads/public-safety —
+municipal service-delivery referrals). Not adopted; see
+`docs/screen-findings.md` for the account. The same screen's
+Severity/Description/Photo fields do match what was built.
+
+Found and fixed a real security-rules gap while building this:
+`firestore.rules`' incident `update` clause allowed the LOGGED→TRIAGED
+and TRIAGED→ESCALATED transitions but had no clause for ESCALATED→
+REFERRED — `IncidentRepository.markReferred()` has existed since Phase 3
+and would have been silently rejected the first time anything called it.
+Fixed: the same `incidents.escalate` capability that authorises
+escalation now also authorises recording a referral.
+
+**Verified:** `npm run check:all` — 78 unit tests (up from 72),
+lint/typecheck/`check:hex` all green; `npm run build` succeeds.
+
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.

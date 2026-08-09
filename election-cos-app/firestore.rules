@@ -110,9 +110,18 @@ service cloud.firestore {
                        ['WATER_SANITATION', 'ELECTRICITY', 'ROADS_TRANSPORT', 'PUBLIC_SAFETY'];
       // Triage / escalate are distinct capabilities from create — a
       // canvasser who can log an incident cannot authorise its escalation.
+      // The ESCALATED -> REFERRED transition (markReferred(), recording a
+      // generated referral PDF's Storage path) is authorised by the same
+      // incidents.escalate capability as the escalation itself — §6.4's
+      // "Municipal Lead escalates -> referral PDF" is one authorisation,
+      // not two. Found missing here (session 9) while building the
+      // Incidents UI: IncidentRepository.markReferred() existed since
+      // Phase 3 with no matching allow clause, which would have silently
+      // rejected the write the first time anything called it.
       allow update: if tenantOK(tid) && inScope(tid, resource.data) && (
                        (cap('incidents.triage') && resource.data.status == 'LOGGED')
                     || (cap('incidents.escalate') && resource.data.status == 'TRIAGED')
+                    || (cap('incidents.escalate') && resource.data.status == 'ESCALATED')
                     || (cap('incidents.view') && isUnchanged('status'))
                     );
       allow delete: if false;
