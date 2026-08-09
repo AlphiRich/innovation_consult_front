@@ -249,6 +249,35 @@ existing code that had only ever been tested synthetically:
 lint/typecheck/`check:hex` all green; `npm run build` succeeds
 (functions/ compiles clean too).
 
+**Session 9 (9 Aug 2026):** the human confirmed the session-8 seat-
+calculator quota-formula fix is correct — retained as-is, no code change.
+Also supplied an IEC website news-article printout ("Electoral Commission
+publishes the 2026 LGE Election Timetable"), with materially stronger
+authenticity signals than the session-8 "digest" batch (named
+spokesperson + real contact line, a real Minister's name, internally
+self-consistent province-level statistics) — see
+`docs/iec-election-timetable-2026.md` for the full comparison. It
+corroborates two of the session-8 digest's previously-unverified claims
+(4 November 2026 election date, 7 August 2026 roll closure) without
+validating the rest of that batch (council-size formula, national roll
+totals, gazette number 51321, the AWS/hard-purge items all remain
+unimplemented — `docs/unverified-source-documents.md` updated to record
+this, not retract it). Built a new static reference page,
+`src/modules/knowledge/ElectionTimetablePage.tsx`
+(`/knowledge/election-timetable`), transcribing the article's statutory
+timetable (roll certification, candidate nomination window and deposits,
+special-vote windows) — same discipline as `GatheringsAdvisoryPage.tsx`
+(§6.7): cited reference only, no tracking/alerts/data model. Also
+recorded, for any future Free State demarcation-seeding session: a High
+Court stay (6 Aug 2026) keeps Kopanong Local Municipality as a single
+9-ward municipality for the 2026 LGE, not the two the MDB's 2026
+re-determination would have created.
+
+**Verified:** `npm run check:all` — 72 unit tests (unchanged, this
+session added no logic to test — the new page is static reference
+content, same as `GatheringsAdvisoryPage.tsx`), lint/typecheck/`check:hex`
+all green; `npm run build` succeeds.
+
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.

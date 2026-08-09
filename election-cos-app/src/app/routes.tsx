@@ -25,6 +25,7 @@ import { PermissionsPage } from '@/modules/settings/PermissionsPage';
 import { PPFAThresholdsPage } from '@/modules/settings/PPFAThresholdsPage';
 import { DataSubjectRequestsPage } from '@/modules/settings/DataSubjectRequestsPage';
 import { GatheringsAdvisoryPage } from '@/modules/knowledge/GatheringsAdvisoryPage';
+import { ElectionTimetablePage } from '@/modules/knowledge/ElectionTimetablePage';
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +61,7 @@ export const router = createBrowserRouter([
         ],
       },
       { path: 'knowledge/gatherings-advisory', element: <GatheringsAdvisoryPage /> },
+      { path: 'knowledge/election-timetable', element: <ElectionTimetablePage /> },
     ],
   },
 ]);

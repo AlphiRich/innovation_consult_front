@@ -87,3 +87,17 @@ explicitly and they can be wired in with a citation to the real source —
 the same standard already applied to the PPFA thresholds (Gazette No.
 53182, confirmed in an earlier session) and the domain name
 (confirmed by the human directly, session 6).
+
+## Session 9 update: the election date and roll-closure date are now corroborated
+
+A session-9 IEC news-article printout independently states the same 4
+November 2026 election date and a 7 August 2026 roll-closure, from a
+source with materially different (and stronger) authenticity signals —
+see `docs/iec-election-timetable-2026.md` for the comparison and for why
+this still isn't treated as fully independent verification. Those two
+specific facts are now transcribed, cited, into
+`src/modules/knowledge/ElectionTimetablePage.tsx`. Everything else this
+document originally flagged — the council-size formula, national roll
+totals, gazette number 51321, the AWS/hard-purge compliance items —
+remains unconfirmed and unimplemented; the new article doesn't touch any
+of it.
