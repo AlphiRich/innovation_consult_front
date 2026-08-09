@@ -44,11 +44,11 @@ const COMPANY = {
   directors: 'M. K. N. Dlutu & A. N. Dlutu',
   address: 'P.O. Box 2590, Potchefstroom, 2520, N.W. Province, South Africa',
   phone: '+27 (0)67 907 1580',
-  email: 'info@innovationconsult.com',
-  // NOTE: the letterhead canvas cites innovationconsult.com; the separate
-  // implementation rollout plan cites innovationconsult.co.za for the
-  // corporate site domain. Not reconciled here — flagged in BUILD-STATUS.md.
-  web: 'www.innovationconsult.com',
+  // The letterhead canvas cited innovationconsult.com; confirmed by the
+  // human (9 Aug 2026) that the actually-registered domain is
+  // innovationconsult.co.za — used here, not the canvas's .com.
+  email: 'info@innovationconsult.co.za',
+  web: 'www.innovationconsult.co.za',
 };
 
 const HEADING_FONT = 'Poppins';

@@ -126,6 +126,12 @@ than trusting `ctx.wardScope` (which a VD-scoped canvasser's token
 typically doesn't carry — using it would have risked writing a wrong or
 empty `wardCode`, breaking §4.2 geographic scoping on that household).
 
+**Domain resolved:** the human confirmed `innovationconsult.co.za` is the
+registered domain (the letterhead canvas's `.com` was design-tool
+filler). `tools/docgen/build-docs.js`'s `COMPANY.email`/`COMPANY.web` and
+`docs/innovation-consult-brand.md` updated; all three `.docx` files
+regenerated and re-verified (XSD-valid, no `.com` text remaining).
+
 **Verified green in this session:** `npm run check:all` (lint, typecheck,
 `check:hex`, 67 unit tests) and `npm run build`, in `election-cos-app/`. Cloud
 Functions (`functions/`) compile clean via `npm run build`.

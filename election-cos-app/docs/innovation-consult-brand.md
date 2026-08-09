@@ -46,8 +46,9 @@ Each pairs a document class with a colourway and a vertical spine label:
 | 3f | **Legal & Compliance** | `#E4E7EA` | LEGAL & COMPLIANCE (§ mark instead of spine icon) |
 
 Every cover carries the same metadata block (Document ID, Author, Date of
-Publication, Revision, Version) and a QR-style corner mark with
-"innovationconsult.com" underneath. Every front cover has a matching back
+Publication, Revision, Version) and a QR-style corner mark with a web
+address underneath (the canvas prints "innovationconsult.com" there —
+superseded, see the domain note below). Every front cover has a matching back
 cover: logo, "Copyright & Disclaimer" heading, the standard copyright +
 disclaimer paragraph (reproduced verbatim below), an ISBN placeholder
 (`978-0-000000-00-0` — never a real one, this is template filler), and the
@@ -70,14 +71,22 @@ Registration Number: 2007/021390/07
 Directors: M. K. N. Dlutu & A. N. Dlutu
 P.O. Box 2590, Potchefstroom, 2520, N.W. Province, South Africa
 +27 (0)67 907 1580
-info@innovationconsult.com
-www.innovationconsult.com
+info@innovationconsult.co.za
+www.innovationconsult.co.za
 ```
 
-**Domain discrepancy, not reconciled:** this canvas cites
-`innovationconsult.com`; `docs/phase-0-infra-plan.md` (sourced from
-`03-implementation-rollout-plan.md`) cites `innovationconsult.co.za` for
-the same corporate site. Flagging rather than guessing which is correct.
+**Domain — resolved.** The letterhead canvas prints `innovationconsult.com`
+throughout (every cover's corner mark, the back-cover contact line, the
+1a/1b letterhead footer). Confirmed by the human (9 Aug 2026): the
+actually-registered domain is `innovationconsult.co.za`, matching
+`docs/phase-0-infra-plan.md`. The canvas's `.com` is design-tool filler,
+not the real domain — `.co.za` is used everywhere in this repo and in the
+generated documents (`tools/docgen/build-docs.js`'s `COMPANY` object).
+The canvas's own cover artwork (the small corner-mark text baked into
+each cover graphic) still says `.com` where it renders the URL as an
+image element rather than text pulled from `COMPANY` — that's cosmetic
+canvas output, not something this repo generates, so there's nothing
+here to fix beyond what's already corrected.
 
 ## Standard copyright/disclaimer block (verbatim from every back cover)
 
