@@ -53,6 +53,11 @@ this monorepo — **blocked**: the GitHub App integration returned
 can work within granted repos but can't create new ones. Waiting on the
 human to create an empty repo by hand; migration (via `git subtree split`
 on this folder, not the whole monorepo history) is queued once it exists.
+A pull request (https://github.com/AlphiRich/innovation_consult_front/pull/1)
+was subsequently opened against this branch from the Claude Code UI —
+noted for continuity; it doesn't change the queued dedicated-repo
+migration above, which is still pending the human creating that empty
+repo.
 (2) **Received the first real Stitch screen assets** —
 `stitch_ic_election_management_suite.zip`, 66 screens — partially
 resolving blocker #1 below. See `docs/screen-findings.md` for the full
@@ -80,9 +85,40 @@ retired drift) into `tailwind.config.js`/`tokens.ts`, kept in sync by
 green (bundle is now 195KB gzipped JS — a `chunks larger than 500kB`
 build warning appeared; not fixed this session, code-splitting is a
 reasonable future pass, not urgent at this size).
+**Session 6 (9 Aug 2026, late):** received the "Letterhead Options" Claude
+Design canvas export (6 cover-page systems 3a–3f + matching back covers +
+two standard letterhead layouts) plus a Claude Design app-shell HTML/JS/CSS
+bundle (the latter is the Claude Design tool's own framework code, not a
+usable asset — not acted on). `docs/innovation-consult-brand.md` records
+the extracted Innovation Consult corporate identity — a colour/type system
+distinct from the Election-COS1.0 product tokens, do not conflate them.
+Built three real deliverables with `tools/docgen/` (a small, separately
+`npm install`-able Node script using `docx`, kept out of the app bundle):
+`docs/legal-drafts/privacy-policy-DRAFT.docx` and
+`docs/legal-drafts/terms-of-use-DRAFT.docx` — both carry a maroon
+"DRAFT — NOT FOR PUBLICATION — REQUIRES ATTORNEY REVIEW" banner on the
+cover and inline `[ATTORNEY REVIEW NEEDED: ...]` markers at every point
+requiring legal sign-off (consent basis under POPIA s26, the DSR
+response-time commitment, retention periods, limitation-of-liability
+wording) — consistent with the standing commitment elsewhere in this file
+not to publish AI-drafted legal text for a system processing special
+personal information; and `docs/app-user-guide.docx`, a complete,
+non-gated guide to the actually-built application (roles/capabilities,
+nav, the Voters workflow, offline behaviour, incidents, funding &
+disclosure, gatherings advisory). The real Innovation Consult logo/icon
+image files were not supplied with the canvas export — the documents use
+a text wordmark placeholder; swap it for the real artwork per
+`tools/docgen/README.md` once available. **Verification gap, disclosed
+rather than hidden:** this sandbox's LibreOffice cannot convert *any*
+docx to PDF (confirmed with a trivial one-paragraph test file, so it's an
+environment issue, not a defect in these documents) — visual
+render-and-inspect per the docx skill's own recommendation wasn't
+possible. Verified instead via `python-docx` (opens cleanly, correct
+paragraph/table/section counts and content) and the skill's OOXML XSD
+validator (`validate.py` — all validations passed) on all three files.
 
 **Verified green in this session:** `npm run check:all` (lint, typecheck,
-`check:hex`, 59 unit tests) and `npm run build`, in `election-cos-app/`. Cloud
+`check:hex`, 67 unit tests) and `npm run build`, in `election-cos-app/`. Cloud
 Functions (`functions/`) compile clean via `npm run build`.
 
 Read this before doing anything else in this repo. It says plainly what's
