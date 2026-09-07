@@ -13,7 +13,7 @@ import type {
   DataSubjectRequestType,
   DataSubjectType,
 } from '@/dal/ports/dataSubjectRequests';
-import { isOverdue, RESPONSE_TARGET_DAYS } from './dataSubjectRequestSla';
+import { isOverdue, RESPONSE_TARGET_BASIS } from './dataSubjectRequestSla';
 
 const SUBJECT_TYPE_LABEL: Record<DataSubjectType, string> = {
   VOTER: 'Voter',
@@ -108,8 +108,7 @@ export function DataSubjectRequestsPage() {
           <p className="text-label-caps font-display uppercase text-slate">/settings/data-requests</p>
           <h1 className="text-headline-md font-display text-ink mt-1">Data Subject Requests</h1>
           <p className="text-body-md font-body text-slate mt-1">
-            POPIA Condition 8. Overdue means past a working {RESPONSE_TARGET_DAYS}-day target — see this page's
-            data helper for why that figure isn't a confirmed legal deadline.
+            POPIA Condition 8. {RESPONSE_TARGET_BASIS}
           </p>
         </div>
         <button

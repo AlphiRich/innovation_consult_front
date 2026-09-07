@@ -1080,6 +1080,50 @@ match Schedule 1's rounding and this repo's own NW405 regression fixture.
 **Verified:** no source changed this session; `check:all` re-run green
 (113 tests).
 
+**Session 16 (7 Sep 2026) — asked to fix the PPFA and DSR statutory claims
+in this repo. There were none to fix; hardened them against the drift
+instead.** The human's instruction followed session 15's findings, but
+those defects are the *fork's*. Re-checked every user-visible string on
+both surfaces before concluding anything:
+
+- `PPFAThresholdsPage.tsx` says "Current governing figures", renders the
+  tenant's own config with its `sourceCitation`, and flags the aggregation
+  rule and financial-year month as provisional (§6.8.1 Q1/Q2). It invents
+  no section numbers — unlike the fork, which captions the same fields
+  "(§9)" and "(§8)".
+- `SettingsPage.tsx` quotes no PPFA figure at all.
+- `DataSubjectRequestsPage.tsx` said "past a working 30-day target — see
+  this page's data helper for why that figure isn't a confirmed legal
+  deadline". Never "statutory".
+
+So nothing was wrong. What *was* missing is a guard: the fork's failure
+began with this repo's own `dataSubjectRequestSla.ts` and ended as
+"21-day statutory turnaround limit", which proves the drift is reachable
+from here. Two gaps closed, both modelled on the existing
+`assertNoFinancialTables` tripwire pattern:
+
+1. **The caveat is now structural, not prose.** `RESPONSE_TARGET_BASIS`
+   is exported from `dataSubjectRequestSla.ts` and rendered by the page,
+   so the figure and the reason it is hedged travel together. A number
+   that can be displayed without its caveat eventually will be.
+2. **A prose guard for the superseded PPFA figures.**
+   `ppfaDefaults.test.ts` guarded the seed *values* — it could not catch a
+   retired figure typed into a screen, which is precisely how the fork
+   failed (correct seed, `R100,000 / R15M` in the settings copy). Five
+   PPFA-facing surfaces are now scanned for `R100,000` / `R15,000,000` /
+   `R15m` / `R80,000`.
+
+**Each guard was verified by breaking it**, not just by passing: injecting
+the fork's literal "21-day statutory turnaround limit" into the DSR page
+fails 2 tests; asserting a statutory window in the caveat constant fails 2;
+pasting the fork's exact `R100,000 threshold, R15M annual ceiling` prose
+into `SettingsPage.tsx` fails the surface scan. All revert clean. The tests
+say plainly in-file that they are a tripwire on known phrasings, not proof
+that every claim on the page is sound.
+
+**Verified:** `check:all` green — **122 tests** (up from 113), lint,
+typecheck, `check:hex`; `npm run build` succeeds.
+
 ---
 
 ## Version conflict found in session 2 — RESOLVED
