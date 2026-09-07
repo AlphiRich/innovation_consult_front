@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — capability model
+ * Election Campaign OS — capability model
  * IC-ECOS-BUILD-2026-V2 §4.4
  *
  * The Stitch permissions screen shows role → capability toggles → per-user

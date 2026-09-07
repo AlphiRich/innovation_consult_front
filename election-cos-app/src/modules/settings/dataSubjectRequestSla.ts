@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — data subject request response tracking
+ * Election Campaign OS — data subject request response tracking
  *
  * POPIA does not prescribe a fixed statutory response window the way
  * GDPR's 30-day rule does — Condition 8 just requires that the responsible

@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Staff profile repository port
+ * Election Campaign OS — Staff profile repository port
  * IC-ECOS-BUILD-2026-V2 §4.1, §4.3. This is where everything forbidden
  * from Firebase Auth actually lives.
  */

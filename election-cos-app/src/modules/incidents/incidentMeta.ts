@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — incident display metadata
+ * Election Campaign OS — incident display metadata
  * IC-ECOS-BUILD-2026-V2 §6.4. Fixed taxonomy only — never free text (the
  * category/severity enums are the whole point: firestore.rules rejects a
  * create whose category isn't one of these four).

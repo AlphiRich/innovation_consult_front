@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: donations (PPFA)
+ * Election Campaign OS — Firestore adapter: donations (PPFA)
  * IC-ECOS-BUILD-2026-V2 §6.8.2, §6.8.3. NEVER blocks on amount — see the
  * port file header. `financialYear` is derived by the caller (module layer)
  * from the current PPFAConfig.financialYearStartMonth, not computed here.

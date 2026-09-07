@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Sentiment Summary Report
+ * Election Campaign OS — Sentiment Summary Report
  * IC-ECOS-BUILD-2026-V2 §8.1, §8.3, §3.2 (retained deliberately, not
  * scope creep). Reads the same pre-aggregated warRoomCounters doc as
  * WarRoomPage.tsx — one doc read, never a live collection scan (§7.4).
@@ -74,7 +74,7 @@ export function ScheduledReportsPage() {
     if (!summary || !counters) return;
     const generatedAt = new Date().toISOString();
     downloadCsv(`sentiment-summary-${session!.tenantId}-${generatedAt.slice(0, 10)}.csv`, [
-      ['Election-COS1.0 — Sentiment Summary Report'],
+      ['Election Campaign OS — Sentiment Summary Report'],
       ['Tenant', session!.tenantId],
       ['Generated', generatedAt],
       [],

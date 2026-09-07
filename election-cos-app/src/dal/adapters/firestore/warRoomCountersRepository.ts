@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: War Room counters
+ * Election Campaign OS — Firestore adapter: War Room counters
  * IC-ECOS-BUILD-2026-V2 §7.4, §8.1. One doc read, never a collection scan
  * — see src/dal/ports/warRoomCounters.ts.
  */

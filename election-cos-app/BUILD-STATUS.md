@@ -1,4 +1,24 @@
-# Election-COS1.0 — Build Status
+# Election Campaign OS — Build Status
+
+> **Naming note (added 7 Sep 2026, third naming directive):** "Election-COS1.0"
+> — the product name Session 4 below documents renaming this codebase to —
+> is itself now superseded. Canonical naming is **Election Campaign OS**
+> (full) / **EC OS** (short), confirmed via a separate ecos-v2 build (a
+> parallel Google AI Studio/Gemini fork of this same repo, diverged after
+> Session 1) whose own `BUILD-STATUS.md` carries this instruction dated
+> 6 Sep 2026, citing a `03-NAMING-SCHEMA.md` this session was not given
+> directly. Applied here on that basis — every live "Election-COS1.0"
+> string in code comments, UI text, README, and doc prose has been changed
+> to "Election Campaign OS"; the session log below is left as an accurate
+> historical record and is not rewritten, so read every "Election-COS1.0"
+> reference below as superseded by this note, not as a live instruction.
+> Not reverted: the `election-cos-app/` folder name and the
+> `election-cos-app`/`election-cos-app-functions` package identifiers —
+> those are infra identifiers, not product branding, and this instruction
+> only speaks to the latter (the ecos-v2 fork itself left its own
+> `functions/package.json` as `election-cos-app-functions`, consistent
+> with that reading). `IC-ECOS-BUILD-2026-V2 §X.Y` spec citations are
+> likewise untouched, per Session 4's own rule below.
 
 **Governing spec:** `IC-ECOS-BUILD-2026-V2` (`01-claude-code-build-spec-v2.md`) +
 `IC-ECOS-MASTER-2026-V2` (`00-master-index-work-partition-map-v2.md`)
@@ -654,6 +674,123 @@ compiled/tested it.
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.
+
+**Session 11 (7 Sep 2026) — ecos-v2 fork received; naming-alignment pass;
+real Google Maps household map.** The human sent a zip, `ecosv2appnamingfixed.zip`
+(`ecos-v2/`), with no accompanying instructions the first time. Investigated
+before acting rather than guessing:
+
+- **What it is:** a separate fork of this exact repo (its `pr.json` etc.
+  are this repo's own PR #1 metadata), built through **Google AI
+  Studio/Gemini code-assist**, not Claude Code — confirmed by
+  `metadata.json`'s `MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API`, an
+  `assets/.aistudio/` folder, `bun.lock`, and a Session-6 note citing
+  platform attribution ID `gmp_mcp_codeassist_v1_aistudio`. It diverged
+  right after this repo's Session 1 and continued independently.
+- **Materially behind on the module build-out, not ahead:** its own
+  `BUILD-STATUS.md` (as of its Session 5) says only Voters is real,
+  everything else is still `PagePlaceholder` — this repo has every module
+  built, DAL-wired, and tested. Confirmed by directory inspection, not
+  just taken on its word.
+- **A real security finding, not adopted:** its
+  `src/lib/googleMapsConfig.ts` had a **hardcoded Google Maps API key**
+  as a source-level fallback (`AIzaSyBTs4...`). Flagged to the human
+  directly (recommended rotating/restricting it in Cloud Console
+  regardless of anything done here) and not carried into this repo's
+  version of that file, which reads only `VITE_GOOGLE_MAPS_API_KEY` —
+  never a bundled key.
+- **A real quality finding, not adopted:** its War Room
+  (`patch_warroom.js`) has hardcoded, invented telemetry —
+  `value: '2,482,901'` for "Total Voter Reach" with a fabricated
+  channel breakdown — baked directly into JSX. Exactly the pattern this
+  build has avoided throughout (real counters via
+  `functions/src/warRoomCounters.ts`, or an honest "not built" note,
+  never an invented number). Not ported.
+- **Asked the human what to do, with findings attached** (a vague first
+  question — "what should I do with this zip" — got "no preference" the
+  one other time an ambiguous multi-choice was tried this project, so
+  this time the options carried the analysis above). Answer: *"Integrate
+  the zip into our build and effect the necessary layout and technical
+  architecture changes."* Scoped that instruction against the findings
+  above rather than importing the fork wholesale:
+  1. **Naming-alignment pass — applied.** ecos-v2's `BUILD-STATUS.md`
+     carries a "6 Sep 2026" naming note: "Election-COS1.0" (Session 4's
+     rename, above) is itself superseded by **"Election Campaign OS"
+     (full) / "EC OS" (short)**, citing a `03-NAMING-SCHEMA.md` this
+     session was never given directly. Applied on the strength of it
+     being a specific, dated instruction rather than treated as live —
+     every "Election-COS1.0" string in code comments, UI text, README,
+     and doc prose across this repo is now "Election Campaign OS" (see
+     the naming note at the very top of this file). **Not** reverted:
+     the `election-cos-app/` folder name or the
+     `election-cos-app`/`election-cos-app-functions` package
+     identifiers — those are infra identifiers, not product branding,
+     and ecos-v2's own `functions/package.json` left its equivalent
+     alone too.
+  2. **Google Maps household map — built for real, not ported.** New
+     `src/lib/googleMapsConfig.ts` (key from env only, no fallback),
+     `src/components/GoogleMapsWrapper.tsx` (renders a "not configured"
+     message instead of crashing when no key is set — same pattern as
+     `dal/adapters/firestore/client.ts`), and
+     `src/modules/voters/VoterHouseholdMap.tsx`: a real "Household map"
+     view added to `VotersPage` (list/map toggle) that plots existing
+     `Household.geo` pins for the current VD and lets a canvasser click
+     the map to drop a pin for a new household, handing the exact
+     coordinates to the existing, tested `HouseholdQuickAdd` form
+     (extended with an optional `initialGeo` prop) rather than building
+     a second household-creation path. Split-VD disambiguation reuses
+     `useVdWard`, the same hook `VoterForm`/`IncidentForm`/etc. already
+     use. No GIS boundary/demarcation data of any kind was copied from
+     ecos-v2 — its "comprehensive GIS boundary benchmarks" for informal
+     settlements had no cited source, which is exactly the kind of
+     confident-sounding unverified geodata this build doesn't fabricate;
+     the only coordinate carried over is Potchefstroom's public
+     town-level centre, used purely to frame the map's initial view, not
+     as ward/demarcation data (real ward/VD geography stays in
+     `seed-data/jb-marks-nw405-wards-vds.json`). Added dependency:
+     `@vis.gl/react-google-maps` (Google's own React wrapper for the
+     Maps JS API). New env vars in `.env.example`:
+     `VITE_GOOGLE_MAPS_API_KEY` (required for the map to render) and
+     `VITE_GOOGLE_MAPS_MAP_ID` (optional, styling only).
+  3. **Legal footer — adopted, corrected.** ecos-v2's
+     `COPYRIGHT_LINE`/`COMPANY_REG_LINE` pattern was accurate but
+     incomplete against `CLAUDEHANDOFF.md` §1's company detail. New
+     `src/lib/legalText.ts` carries the full legal name, registration
+     number, and trading-as detail (`Innovation Consult (Pty) Ltd t/a
+     Just Be Trading 10 (Pty) Ltd · Reg. 2007/021390/07`) — flagged in
+     that file's own header as sourced from `CLAUDEHANDOFF.md`, not
+     independently verified against a company registry. Wired into
+     `Shell.tsx`'s nav footer and `SignInPage.tsx`.
+  4. **RAG status-colour tokens (`amberDeep`/`red`/`tint`/`tint2`) —
+     evaluated, not adopted.** They exist in ecos-v2 to retrofit a
+     status-colour system onto a codebase that had been reusing brand
+     tokens (`gold`/`maroon`) for status. This repo already solved that
+     with `src/design/toneClasses.ts`'s `Tone` system, in place since
+     session 9 and used consistently for sentiment/severity/urgency
+     everywhere — adding a second, parallel colour system would
+     recreate the exact inconsistency `check:hex`/`tokens.test.ts` exist
+     to prevent. Its base 7-colour palette values for `paper`/`teal`/
+     `slate` also differ from this repo's (undocumented drift, no
+     changelog) — not adopted for that reason too; this repo's tokens.ts
+     is unchanged.
+  5. **Not integrated, out of scope:** ecos-v2 contains a much larger,
+     undocumented sprawl beyond what its own `BUILD-STATUS.md` describes
+     — Gmail/Google Sheets/Google Tasks integration modals, a membership
+     OCR capture flow, a persona-switcher modal, and an
+     `RlsDiagnosticDashboard` (implying Postgres RLS, which V2's
+     architecture retired behind Firestore). None of it is in
+     `IC-ECOS-BUILD-2026-V2`'s scope, none of it was reviewed for
+     fabricated content the way the two items above were, and importing
+     dozens of unvetted Gemini-generated components wholesale would be
+     a real regression in this build's discipline, not an integration.
+     If any specific piece of that is actually wanted, it needs its own
+     pass — flagged to the human rather than silently pulled in or
+     silently dropped.
+
+**Verified:** `npm run check:all` — 108 unit tests (unchanged count;
+this session added map UI, not new pure-logic units to cover), lint/
+typecheck/`check:hex`/build all green in `election-cos-app/`; `functions/`
+build + its 13 tests unaffected (this session didn't touch `functions/`).
 
 ---
 

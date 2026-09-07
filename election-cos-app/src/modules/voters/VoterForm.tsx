@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Voter capture/edit form
+ * Election Campaign OS — Voter capture/edit form
  * IC-ECOS-BUILD-2026-V2 §6.2. Layout informed by the Stitch suite's
  * household_voter_logging / voter_profiling_service_delivery_intake
  * screens (card structure, section rhythm) — reskinned to our real

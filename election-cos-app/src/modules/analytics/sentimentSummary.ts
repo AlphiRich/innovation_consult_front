@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — tenant-wide sentiment summary
+ * Election Campaign OS — tenant-wide sentiment summary
  * IC-ECOS-BUILD-2026-V2 §8.1, §8.3. Derives a single net sentiment index
  * from the real warRoomCounters aggregate (§7.4 pre-aggregated-only rule
  * — no live collection scan). Deliberately NOT a per-ward breakdown or

@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: voters
+ * Election Campaign OS — Firestore adapter: voters
  * IC-ECOS-BUILD-2026-V2 §5, §6.2.
  */
 import { where } from 'firebase/firestore';

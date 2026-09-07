@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: candidates
+ * Election Campaign OS — Firestore adapter: candidates
  * IC-ECOS-BUILD-2026-V2 §6.6. Unmasking an SA ID number is a server
  * operation (Cloud Function, Admin SDK) that writes an audit event —
  * never a plain client-side Firestore read of the encrypted field.

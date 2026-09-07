@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Permissions
+ * Election Campaign OS — Permissions
  * IC-ECOS-BUILD-2026-V2 §4.4. "Role → capability toggles → per-user
  * override." Capability: `team.manage` (staff writes) / `settings.permissions`
  * (this page's own nav slot — see nav.ts).

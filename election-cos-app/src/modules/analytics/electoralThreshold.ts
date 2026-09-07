@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — electoral qualification threshold (Schedule 1 Step 2)
+ * Election Campaign OS — electoral qualification threshold (Schedule 1 Step 2)
  * IC-ECOS-BUILD-2026-V2 §8.2. ELECTORAL vote threshold — not to be
  * confused with the PPFA statutory funding-disclosure thresholds at
  * /settings/ppfa-thresholds (see ThresholdAnalyzerPage.tsx's own naming-

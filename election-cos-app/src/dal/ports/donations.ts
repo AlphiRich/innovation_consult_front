@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Donation repository port (PPFA)
+ * Election Campaign OS — Donation repository port (PPFA)
  * IC-ECOS-BUILD-2026-V2 §6.8.2, §6.8.3.
  *
  * Money is integer cents. Never a float — a rounding error on a statutory

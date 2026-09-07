@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Funding & Disclosure (PPFA)
+ * Election Campaign OS — Funding & Disclosure (PPFA)
  * IC-ECOS-BUILD-2026-V2 §6.8. Online only — never wired into the offline
  * layer (§7.1), matches donors.ts's own header.
  *

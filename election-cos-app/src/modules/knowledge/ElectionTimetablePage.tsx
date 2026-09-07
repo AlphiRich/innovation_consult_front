@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — 2026 LGE Election Timetable (reference)
+ * Election Campaign OS — 2026 LGE Election Timetable (reference)
  * IC-ECOS-BUILD-2026-V2 §6.7 pattern: a single static reference page, no
  * tracking, no alerts, no workflow, no data model — same discipline as
  * GatheringsAdvisoryPage.tsx. Capability requirement: `always`.

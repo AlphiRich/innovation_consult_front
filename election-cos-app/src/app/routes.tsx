@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — route table
+ * Election Campaign OS — route table
  * IC-ECOS-BUILD-2026-V2 §3.2. Mirrors the nav table plus the sub-views
  * absorbed under it (not top-level nav): seat calculator, threshold
  * analyzer, scheduled reports, municipality config, permissions,

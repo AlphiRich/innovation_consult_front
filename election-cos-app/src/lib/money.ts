@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — money helpers
+ * Election Campaign OS — money helpers
  * IC-ECOS-BUILD-2026-V2 §6.8.2: "Money is integer cents. Never a float."
  * Used anywhere ZAR amounts cross a UI boundary (PPFA module).
  */

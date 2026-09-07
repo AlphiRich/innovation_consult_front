@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — DAL port barrel
+ * Election Campaign OS — DAL port barrel
  * IC-ECOS-BUILD-2026-V2 §5. Re-exports every port interface and domain
  * type. Modules import from '@/dal/ports', never from an adapter directly.
  */

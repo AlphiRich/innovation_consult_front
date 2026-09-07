@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Google "G" mark
+ * Election Campaign OS — Google "G" mark
  * IC-ECOS-BUILD-2026-V2 §2.2 exception, deliberate: this is Google's own
  * brand mark, reproduced at its official fixed colours per Google's
  * identity guidelines — not a design decision this app gets to make via

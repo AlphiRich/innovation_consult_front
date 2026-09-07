@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — static Tailwind class lookup for design-token tones
+ * Election Campaign OS — static Tailwind class lookup for design-token tones
  *
  * Tailwind's content scanner only picks up class names that appear as
  * complete literal strings in source — `` `bg-${tone}` `` template

@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — donor detail: donation history + live provisional status
+ * Election Campaign OS — donor detail: donation history + live provisional status
  * IC-ECOS-BUILD-2026-V2 §6.8.2, §6.8.3.
  *
  * The banner below is a CLIENT-SIDE, DISPLAY-ONLY computation

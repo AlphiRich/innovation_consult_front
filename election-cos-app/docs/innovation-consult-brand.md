@@ -7,7 +7,7 @@ matching back cover, plus two standard letterhead layouts (1a/1b).
 
 **This is the corporate identity for Innovation Consult publications**
 (reports, contracts, policies, letterheads) — a **separate namespace** from
-the Election-COS1.0 **product** design tokens in `src/design/tokens.ts`.
+the Election Campaign OS **product** design tokens in `src/design/tokens.ts`.
 Do not merge them: `#13244A` (this system's navy) and `#1A2246` (the
 product's ink) are both "navy" but are different values from different
 source systems, used for different things (this is a company that

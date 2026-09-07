@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Field Diary repository port
+ * Election Campaign OS — Field Diary repository port
  * IC-ECOS-BUILD-2026-V2 §5.1, §6.3. Street-level completion percentages
  * shown on the Command Center are DERIVED, never stored — see
  * src/modules/war-room for the counter that aggregates these.

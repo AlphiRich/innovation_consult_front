@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — DAL adapter selection
+ * Election Campaign OS — DAL adapter selection
  * IC-ECOS-BUILD-2026-V2 §5, §10.
  *
  * The ONLY place a module should ever import to get a repository. Swapping

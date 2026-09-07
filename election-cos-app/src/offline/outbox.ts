@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — outbox helpers
+ * Election Campaign OS — outbox helpers
  * IC-ECOS-BUILD-2026-V2 §7.3, §7.5, §7.6.
  *
  * enqueue() is the only way a local write becomes a pending sync operation.

@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: staff profiles
+ * Election Campaign OS — Firestore adapter: staff profiles
  * IC-ECOS-BUILD-2026-V2 §4.1, §4.3. The full-fidelity identity record that
  * Firebase Auth is deliberately NOT allowed to hold.
  */

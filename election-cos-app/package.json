@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0-dev",
   "type": "module",
-  "description": "Election-COS1.0 — application shell (election-cos-app). IC-ECOS-BUILD-2026-V2.",
+  "description": "Election Campaign OS — application shell (election-cos-app). IC-ECOS-BUILD-2026-V2.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.59.0",
+    "@vis.gl/react-google-maps": "^1.10.0",
     "dexie": "^4.0.8",
     "firebase": "^10.13.2",
     "react": "^18.3.1",

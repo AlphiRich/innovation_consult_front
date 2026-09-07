@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — request campaign materials
+ * Election Campaign OS — request campaign materials
  * IC-ECOS-BUILD-2026-V2 §6.5. Reference: Stitch's
  * `vd_captain_request_materials_modal` ("Request Campaign Materials":
  * Material Type / Quantity / Delivery Urgency / Drop-off Point). This

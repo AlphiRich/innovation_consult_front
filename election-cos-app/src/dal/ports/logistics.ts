@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Logistics repository port
+ * Election Campaign OS — Logistics repository port
  * IC-ECOS-BUILD-2026-V2 §5.1, §6.5. Inventory, resupply requests, approval
  * workflow, voucher allocation.
  *

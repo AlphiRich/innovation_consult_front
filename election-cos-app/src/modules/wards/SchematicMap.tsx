@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — schematic ward/VD map
+ * Election Campaign OS — schematic ward/VD map
  * IC-ECOS-BUILD-2026-V2 §6.1: "Mapping: the screens show schematic ward
  * maps, not full GIS. Build schematic first — an SVG or simple tile map
  * with VD markers. Do not pull in a GIS stack in v1." The reference

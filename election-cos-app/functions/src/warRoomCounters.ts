@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — War Room counter-maintenance Cloud Functions
+ * Election Campaign OS — War Room counter-maintenance Cloud Functions
  * IC-ECOS-BUILD-2026-V2 §7.4, §8.1: "Must read pre-aggregated counter
  * documents only — never a live listener on a full collection." These
  * three Firestore triggers are what keeps `tenants/{tenantId}/counters/warRoom`

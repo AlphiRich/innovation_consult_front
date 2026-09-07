@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Seat calculator (Municipal Structures Act MMP allocation)
+ * Election Campaign OS — Seat calculator (Municipal Structures Act MMP allocation)
  * IC-ECOS-BUILD-2026-V2 §8.2.
  *
  * The prior specification contained an arithmetic contradiction: it

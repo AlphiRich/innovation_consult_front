@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Data Subject Requests (POPIA Condition 8)
+ * Election Campaign OS — Data Subject Requests (POPIA Condition 8)
  * IC-ECOS-BUILD-2026-V2 — new scope, see src/dal/ports/dataSubjectRequests.ts.
  * Capability: `dsr.view` (read) / `dsr.manage` (log/update).
  */

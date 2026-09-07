@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Donor repository port (PPFA)
+ * Election Campaign OS — Donor repository port (PPFA)
  * IC-ECOS-BUILD-2026-V2 §6.8.2. Online only — never in the offline layer
  * (§7.1). idNumber/registrationNumber are special personal information —
  * never plaintext.

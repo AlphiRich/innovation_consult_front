@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Document repository port
+ * Election Campaign OS — Document repository port
  * IC-ECOS-BUILD-2026-V2 §8.4. Classification, watermark, e-signature,
  * SHA-256 content hash. Labelled "Document Integrity Hash (SHA-256)" —
  * never "Blockchain Verified Hash" (master index §3.3, build spec §3.5).

@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firebase Auth wrapper, minimal-footprint
+ * Election Campaign OS — Firebase Auth wrapper, minimal-footprint
  * IC-ECOS-BUILD-2026-V2 §4.3
  *
  * "Firebase Authentication stores user records in the United States. There

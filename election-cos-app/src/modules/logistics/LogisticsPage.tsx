@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Logistics module
+ * Election Campaign OS — Logistics module
  * IC-ECOS-BUILD-2026-V2 §6.5. Inventory, resupply requests, approval
  * workflow. Reference: Stitch's `vd_captain_request_materials_modal` —
  * see LogisticsItemForm.tsx and src/dal/ports/logistics.ts's headers for

@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — runtime list of every Capability
+ * Election Campaign OS — runtime list of every Capability
  * IC-ECOS-BUILD-2026-V2 §4.4. `Capability` in types.ts is a TS union, not
  * a runtime value — PermissionsPage.tsx needs an actual array to render
  * checkboxes over. `CAP_SET` is typed `Record<Capability, true>`, which

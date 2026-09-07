@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: documents
+ * Election Campaign OS — Firestore adapter: documents
  * IC-ECOS-BUILD-2026-V2 §8.4.
  */
 import { collection, getDocs, query } from 'firebase/firestore';

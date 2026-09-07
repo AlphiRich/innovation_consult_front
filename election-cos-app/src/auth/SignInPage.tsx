@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — sign-in
+ * Election Campaign OS — sign-in
  * IC-ECOS-BUILD-2026-V2 §4.3. Session 10 — the app never had a sign-in UI
  * at all before this; every module page just showed "No active session"
  * and there was no way to actually reach a signed-in state. Google
@@ -9,6 +9,7 @@
 import { useState } from 'react';
 import { signInWithGoogle } from './firebaseAuth';
 import { GoogleIcon } from './GoogleIcon';
+import { COPYRIGHT_LINE } from '@/lib/legalText';
 
 export function SignInPage() {
   const [pending, setPending] = useState(false);
@@ -39,7 +40,7 @@ export function SignInPage() {
     <div className="min-h-screen flex items-center justify-center bg-paper px-4">
       <div className="w-full max-w-sm bg-white border border-ink/10 rounded-lg p-8 space-y-6">
         <div>
-          <p className="text-label-caps font-display uppercase text-gold">Election-COS1.0</p>
+          <p className="text-label-caps font-display uppercase text-gold">Election Campaign OS</p>
           <h1 className="text-headline-md font-display text-ink mt-1">Sign in</h1>
           <p className="text-body-md font-body text-slate mt-2">
             Use your party-issued Google account to continue.
@@ -62,6 +63,8 @@ export function SignInPage() {
           Signing in doesn't grant access on its own — an administrator still has to assign you a role and
           geographic scope in Settings → Permissions before you can see any data (§4.4).
         </p>
+
+        <p className="text-xs text-slate/60 text-center">{COPYRIGHT_LINE}</p>
       </div>
     </div>
   );

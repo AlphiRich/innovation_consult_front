@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — municipality profile port
+ * Election Campaign OS — municipality profile port
  * IC-ECOS-BUILD-2026-V2 §3.2 (Municipality Config, "retained deliberately
  * — carries seat totals and election parameters the seat calculator
  * depends on").

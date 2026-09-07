@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Settings index
+ * Election Campaign OS — Settings index
  * IC-ECOS-BUILD-2026-V2 §3.2. Landing page for the five sub-views, all
  * real as of session 9.
  */

@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — logistics display metadata
+ * Election Campaign OS — logistics display metadata
  * IC-ECOS-BUILD-2026-V2 §6.5.
  */
 import type { LogisticsItem, LogisticsUrgency } from '@/dal/ports/logistics';

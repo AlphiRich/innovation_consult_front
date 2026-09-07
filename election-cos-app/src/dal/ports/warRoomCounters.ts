@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — War Room / Command Center counters port
+ * Election Campaign OS — War Room / Command Center counters port
  * IC-ECOS-BUILD-2026-V2 §7.4, §8.1: "Must read pre-aggregated counter
  * documents only — never a live listener on a full collection." A single
  * doc read (`tenants/{tenantId}/counters/warRoom`), maintained by Cloud

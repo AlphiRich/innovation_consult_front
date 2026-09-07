@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
 
-// Election-COS1.0 — election-cos-app
+// Election Campaign OS — election-cos-app
 // IC-ECOS-BUILD-2026-V2 §1
 // Imports defineConfig from 'vitest/config' (which merges Vite's and
 // Vitest's config types) so the `test` block below type-checks without an

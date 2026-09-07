@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — resolve a VD code's ward, handling split VDs
+ * Election Campaign OS — resolve a VD code's ward, handling split VDs
  * IC-ECOS-BUILD-2026-V2 §6.1/§6.2/§6.4. Shared by any form that captures a
  * record scoped to `ctx.vdScope` but needs the record's `wardCode` too
  * (household creation, incident logging — anywhere geoScopeConstraints()

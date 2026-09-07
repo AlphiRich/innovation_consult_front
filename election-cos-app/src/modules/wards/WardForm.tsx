@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Ward capture/edit form
+ * Election Campaign OS — Ward capture/edit form
  * IC-ECOS-BUILD-2026-V2 §6.1. Real IEC demarcation data now exists for JB
  * Marks/NW405 (session 8 — see tools/seed-data/ and docs/nw405-seed-data.md)
  * but nothing has been loaded into a live tenant yet (no live Firebase

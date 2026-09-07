@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — record a donation (PPFA)
+ * Election Campaign OS — record a donation (PPFA)
  * IC-ECOS-BUILD-2026-V2 §6.8.2, §6.8.3. This form NEVER blocks on amount
  * or threshold — dal.donations.record() has no rejection path for that,
  * and this component doesn't add one either. Capability: `ppfa.edit`.

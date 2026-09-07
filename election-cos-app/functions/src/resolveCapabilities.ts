@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — resolveCapabilities Cloud Function
+ * Election Campaign OS — resolveCapabilities Cloud Function
  * IC-ECOS-BUILD-2026-V2 §4.4.
  *
  * "Resolve on the server in a Cloud Function, write to custom claims, force

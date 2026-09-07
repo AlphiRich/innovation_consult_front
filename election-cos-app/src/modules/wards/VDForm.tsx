@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Voting District capture/edit form
+ * Election Campaign OS — Voting District capture/edit form
  * IC-ECOS-BUILD-2026-V2 §6.1. Scoped to a single ward — vdCode is the IEC
  * code (e.g. '86910138'), captured as free text (real IEC demarcation data
  * now exists for JB Marks/NW405 — see tools/seed-data/ — but general free

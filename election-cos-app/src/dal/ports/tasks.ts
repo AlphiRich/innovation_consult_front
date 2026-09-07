@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Task repository port
+ * Election Campaign OS — Task repository port
  * IC-ECOS-BUILD-2026-V2 §4.1. Field list provisional pending real screens.
  */
 import type { SessionContext, UpsertResult } from './session';

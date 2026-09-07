@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Donation alert port (PPFA)
+ * Election Campaign OS — Donation alert port (PPFA)
  * IC-ECOS-BUILD-2026-V2 §6.8.2, §6.8.3. System-raised (Cloud Function),
  * human-acknowledged. Never auto-resolved, never blocks the underlying
  * donation write.

@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Incidents module
+ * Election Campaign OS — Incidents module
  * IC-ECOS-BUILD-2026-V2 §6.4. Workflow: Canvasser/VD Captain logs (fixed
  * taxonomy) → Ward Lead triages (confirms/adjusts severity) → Municipal
  * Lead escalates → referral PDF.

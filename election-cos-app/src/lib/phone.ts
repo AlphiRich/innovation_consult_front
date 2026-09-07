@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — phone number display masking
+ * Election Campaign OS — phone number display masking
  * IC-ECOS-BUILD-2026-V2 §6.2.1.
  *
  * This is the DISPLAY mask only (`Voter.phoneMasked`) — not encryption.

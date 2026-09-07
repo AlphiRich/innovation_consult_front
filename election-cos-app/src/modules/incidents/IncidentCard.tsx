@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — incident list card
+ * Election Campaign OS — incident list card
  * IC-ECOS-BUILD-2026-V2 §6.4. One status-appropriate action per card:
  * Triage (LOGGED), Escalate (TRIAGED). ESCALATED has no action here —
  * referral-PDF generation isn't built (see IncidentsPage.tsx header).

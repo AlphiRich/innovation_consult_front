@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Analytics index
+ * Election Campaign OS — Analytics index
  * IC-ECOS-BUILD-2026-V2 §8. Landing page for the three sub-views, all
  * real as of session 9: Vote Calculator, Threshold Analyzer, Sentiment
  * Summary Report.

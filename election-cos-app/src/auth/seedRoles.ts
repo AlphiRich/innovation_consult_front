@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — seed roles
+ * Election Campaign OS — seed roles
  * IC-ECOS-BUILD-2026-V2 §4.4
  *
  * Seven seed roles, labels from the Stitch screens. The permissions screen

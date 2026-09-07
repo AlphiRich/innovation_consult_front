@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: municipality profile
+ * Election Campaign OS — Firestore adapter: municipality profile
  * IC-ECOS-BUILD-2026-V2 §3.2. Single doc: tenants/{tid}/profile/municipality.
  */
 import type { SessionContext } from '@/dal/ports/session';

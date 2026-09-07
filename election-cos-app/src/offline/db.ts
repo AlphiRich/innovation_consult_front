@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — offline local database (Dexie / IndexedDB)
+ * Election Campaign OS — offline local database (Dexie / IndexedDB)
  * IC-ECOS-BUILD-2026-V2 §7.2.
  *
  * DELIBERATELY NO donor/donation/PPFA TABLE HERE. §7.1: "The Dexie schema

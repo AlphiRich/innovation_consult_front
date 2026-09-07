@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: field diary
+ * Election Campaign OS — Firestore adapter: field diary
  * IC-ECOS-BUILD-2026-V2 §5, §6.3.
  */
 import { where } from 'firebase/firestore';

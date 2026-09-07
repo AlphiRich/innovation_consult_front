@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Wards module
+ * Election Campaign OS — Wards module
  * IC-ECOS-BUILD-2026-V2 §6.1 — foundational; everything else scopes to it.
  * Layout informed by the Stitch suite's lge_war_room_local_head screen
  * (municipality-level summary + Ward/VD table), reskinned to our tokens

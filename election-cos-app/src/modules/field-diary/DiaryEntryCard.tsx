@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — field diary entry card
+ * Election Campaign OS — field diary entry card
  * IC-ECOS-BUILD-2026-V2 §6.3.
  */
 import type { DiaryEntry } from '@/dal/ports/diary';

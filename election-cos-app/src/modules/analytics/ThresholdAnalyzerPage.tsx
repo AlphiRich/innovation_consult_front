@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Threshold Analyzer (ELECTORAL vote threshold)
+ * Election Campaign OS — Threshold Analyzer (ELECTORAL vote threshold)
  * IC-ECOS-BUILD-2026-V2 §8.2.
  *
  * NAMING DISCIPLINE (§3.2): this is the ELECTORAL vote-threshold tool —

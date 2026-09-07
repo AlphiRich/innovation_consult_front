@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — navigation model
+ * Election Campaign OS — navigation model
  * IC-ECOS-BUILD-2026-V2 §3.2.
  *
  * One shell, one nav. Items render conditionally on capability grants —

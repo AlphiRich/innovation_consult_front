@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Municipality Config
+ * Election Campaign OS — Municipality Config
  * IC-ECOS-BUILD-2026-V2 §3.2: "Carries seat totals and election
  * parameters the seat calculator depends on. Retained deliberately."
  *

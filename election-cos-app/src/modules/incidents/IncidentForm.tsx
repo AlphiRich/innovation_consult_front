@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — log an incident
+ * Election Campaign OS — log an incident
  * IC-ECOS-BUILD-2026-V2 §6.4. Fixed taxonomy: category and severity are
  * both selects over the enum, never free text (mirrors firestore.rules'
  * own category allow-list). Photos are Cloud Storage paths, never Base64

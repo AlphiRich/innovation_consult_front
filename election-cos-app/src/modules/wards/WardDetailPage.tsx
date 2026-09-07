@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Ward detail: its voting districts
+ * Election Campaign OS — Ward detail: its voting districts
  * IC-ECOS-BUILD-2026-V2 §6.1.
  */
 import { useState } from 'react';

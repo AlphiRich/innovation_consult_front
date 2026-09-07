@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Voting District repository port
+ * Election Campaign OS — Voting District repository port
  * IC-ECOS-BUILD-2026-V2 §5.1, §6.1. Seeded from IEC demarcation PDFs for
  * JB Marks (NW405) via a repeatable ingest script — see
  * tools/seed-data/parse-nw-demarcation.mjs and docs/nw405-seed-data.md.

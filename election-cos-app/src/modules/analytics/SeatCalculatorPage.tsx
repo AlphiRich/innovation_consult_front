@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Vote Calculator (MMP seat allocation)
+ * Election Campaign OS — Vote Calculator (MMP seat allocation)
  * IC-ECOS-BUILD-2026-V2 §8.2. Standalone what-if tool — no DAL/session
  * dependency, since it's a scenario calculator, not a live-data view.
  * Allocation logic (allocateSeats) is fully implemented, property-tested,

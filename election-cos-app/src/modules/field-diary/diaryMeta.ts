@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — field diary activity-type display metadata
+ * Election Campaign OS — field diary activity-type display metadata
  * IC-ECOS-BUILD-2026-V2 §6.3. See src/dal/ports/diary.ts for why
  * `activityType` exists (session 9, real Stitch reference).
  */

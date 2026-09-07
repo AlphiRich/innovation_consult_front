@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — log a field diary entry
+ * Election Campaign OS — log a field diary entry
  * IC-ECOS-BUILD-2026-V2 §6.3. See src/dal/ports/diary.ts for the
  * CANVASS-vs-RALLY/OBSERVATION/OTHER split and why both exist.
  */

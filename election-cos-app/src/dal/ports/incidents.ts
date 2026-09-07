@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Incident repository port
+ * Election Campaign OS — Incident repository port
  * IC-ECOS-BUILD-2026-V2 §5.1, §6.4. Fixed taxonomy — never free-text.
  * Workflow: Canvasser logs -> Ward Lead triages -> Municipal Lead
  * authorises -> formal referral PDF generated (authorisation strips the

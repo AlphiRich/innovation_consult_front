@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: donation alerts (PPFA)
+ * Election Campaign OS — Firestore adapter: donation alerts (PPFA)
  * IC-ECOS-BUILD-2026-V2 §6.8.3. Alerts are raised server-side
  * (functions/src/ppfaAggregation.ts, currently HELD per §6.8.1) — this
  * adapter only reads and acknowledges, never creates.

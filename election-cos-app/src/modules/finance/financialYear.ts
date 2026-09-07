@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — financial year / quarter derivation
+ * Election Campaign OS — financial year / quarter derivation
  * IC-ECOS-BUILD-2026-V2 §6.8.2, §6.8.3. `Donation.financialYear`/`quarter`
  * are "derived by the caller (module layer) from the current
  * PPFAConfig.financialYearStartMonth, not computed [in the adapter]" —

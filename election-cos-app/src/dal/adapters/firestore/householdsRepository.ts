@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: households
+ * Election Campaign OS — Firestore adapter: households
  * IC-ECOS-BUILD-2026-V2 §5, §6.2.
  */
 import { where } from 'firebase/firestore';

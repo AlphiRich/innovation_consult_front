@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — shared party-list row editor
+ * Election Campaign OS — shared party-list row editor
  * IC-ECOS-BUILD-2026-V2 §8.2. Used by both SeatCalculatorPage.tsx and
  * ThresholdAnalyzerPage.tsx — same add/remove/edit-row mechanics, just a
  * different column set (`showWardSeats`), so it's one component instead

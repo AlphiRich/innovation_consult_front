@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: voting districts
+ * Election Campaign OS — Firestore adapter: voting districts
  * IC-ECOS-BUILD-2026-V2 §5, §6.1. Document id is `${wardCode}::${vdCode}`
  * — see src/dal/ports/votingDistricts.ts for why (split VDs).
  */

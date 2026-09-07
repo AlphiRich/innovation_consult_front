@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — application shell
+ * Election Campaign OS — application shell
  * IC-ECOS-BUILD-2026-V2 §3.2, §3.4.
  *
  * One shell, one nav, conditional on capability grants. This component
@@ -22,6 +22,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useAuthState } from '@/auth/useSession';
 import { SignInPage } from '@/auth/SignInPage';
 import { signOut } from '@/auth/firebaseAuth';
+import { COPYRIGHT_LINE } from '@/lib/legalText';
 import { PRIMARY_NAV, isNavItemVisible } from './nav';
 
 export function Shell() {
@@ -65,7 +66,7 @@ export function Shell() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-paper">
       <nav className="md:w-64 shrink-0 bg-ink text-paper p-4 md:min-h-screen flex flex-col">
-        <div className="font-display text-lg tracking-wide mb-6">Election-COS1.0</div>
+        <div className="font-display text-lg tracking-wide mb-6">Election Campaign OS</div>
         <ul className="space-y-1">
           {PRIMARY_NAV.filter((item) => isNavItemVisible(item, caps)).map((item) => (
             <li key={item.route}>
@@ -87,6 +88,7 @@ export function Shell() {
           <button type="button" onClick={() => signOut()} className="text-xs text-paper/60 hover:text-paper mt-1">
             Sign out
           </button>
+          <p className="text-xs text-paper/40 mt-4">{COPYRIGHT_LINE}</p>
         </div>
       </nav>
       <main className="flex-1 p-4 md:p-8">

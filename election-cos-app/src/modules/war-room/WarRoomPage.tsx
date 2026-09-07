@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — War Room / Command Center
+ * Election Campaign OS — War Room / Command Center
  * IC-ECOS-BUILD-2026-V2 §7.4, §8.1. Reads exactly two things: the single
  * pre-aggregated counters doc (dal.warRoomCounters, maintained by
  * functions/src/warRoomCounters.ts's Firestore triggers — never a live

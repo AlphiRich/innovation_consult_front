@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — PPFA Threshold Config
+ * Election Campaign OS — PPFA Threshold Config
  * IC-ECOS-BUILD-2026-V2 §6.8.2, §6.8.5.
  *
  * NAMING DISCIPLINE (§3.2): this is the STATUTORY FUNDING settings screen

@@ -1,5 +1,5 @@
 {
-  "//": "Election-COS1.0 — election-cos-app Firebase config. IC-ECOS-BUILD-2026-V2 §1. Region is africa-south1 everywhere per rule 1 in §0 — set at resource-creation time in the console/CLI, not expressible in this file for Firestore/Storage location, but Cloud Functions region is pinned in functions/src/index.ts per-function.",
+  "//": "Election Campaign OS — election-cos-app Firebase config. IC-ECOS-BUILD-2026-V2 §1. Region is africa-south1 everywhere per rule 1 in §0 — set at resource-creation time in the console/CLI, not expressible in this file for Firestore/Storage location, but Cloud Functions region is pinned in functions/src/index.ts per-function.",
   "hosting": {
     "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],

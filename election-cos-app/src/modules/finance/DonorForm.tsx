@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — donor capture/edit form (PPFA)
+ * Election Campaign OS — donor capture/edit form (PPFA)
  * IC-ECOS-BUILD-2026-V2 §6.8.2. `idNumberEncrypted`/`registrationNumberEncrypted`
  * are deliberately not in this form — real AES-256 encryption needs a
  * Cloud KMS-backed key exchange that isn't provisioned yet (no live

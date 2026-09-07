@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Voter repository port
+ * Election Campaign OS — Voter repository port
  * IC-ECOS-BUILD-2026-V2 §5.1, §6.2
  */
 import type { Page, PageRequest, SessionContext, UpsertResult } from './session';

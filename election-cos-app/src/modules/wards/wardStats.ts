@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — ward/VD aggregate stats
+ * Election Campaign OS — ward/VD aggregate stats
  * IC-ECOS-BUILD-2026-V2 §6.1. Pure helper, kept separate from the page so
  * it's testable without a live session — the Ward/VD Voter Matrix pattern
  * in the reference screens rolls these up at the municipality level.

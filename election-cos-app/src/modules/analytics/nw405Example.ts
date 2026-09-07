@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — a real worked example for the Analytics calculators
+ * Election Campaign OS — a real worked example for the Analytics calculators
  * IC-ECOS-BUILD-2026-V2 §8.2. The actual 2021 LGE result for JB Marks
  * Local Municipality (NW405), transcribed from the real IEC "Seat
  * Calculation Detail" report the human supplied in session 8 — see

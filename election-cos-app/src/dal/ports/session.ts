@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — DAL shared types
+ * Election Campaign OS — DAL shared types
  * IC-ECOS-BUILD-2026-V2 §5.1
  *
  * SessionContext is the one thing every port method takes as its first

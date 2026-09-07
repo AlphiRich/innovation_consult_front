@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Candidate list repository port
+ * Election Campaign OS — Candidate list repository port
  * IC-ECOS-BUILD-2026-V2 §6.6. SA ID numbers here are special personal
  * information: encrypted at rest, masked in all UI, unmask requires an
  * explicit capability and writes an audit event, export requires a

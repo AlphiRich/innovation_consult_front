@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Ward repository port
+ * Election Campaign OS — Ward repository port
  * IC-ECOS-BUILD-2026-V2 §5.1, §6.1 — foundational; everything else scopes to it.
  */
 import type { SessionContext, UpsertResult } from './session';

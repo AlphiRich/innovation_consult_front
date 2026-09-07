@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Field Diary module
+ * Election Campaign OS — Field Diary module
  * IC-ECOS-BUILD-2026-V2 §6.3. Street-level completion % shown on the
  * Command Center is DERIVED from these entries (householdsVisited per
  * street vs. Household counts), never stored here — that derivation

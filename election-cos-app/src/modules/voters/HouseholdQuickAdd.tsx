@@ -1,12 +1,15 @@
 /**
- * Election-COS1.0 — inline household quick-add
+ * Election Campaign OS — inline household quick-add
  * IC-ECOS-BUILD-2026-V2 §6.2. Closes a real gap: VoterForm requires
  * selecting an existing household, but there was no way to create one.
  * `dwellingType` + `informalDescriptor` + GPS is the working identifier
  * for informal settlements where formal street addressing doesn't exist
- * — see src/dal/ports/households.ts. GPS capture isn't wired here (no
- * device geolocation call in this pass); address/descriptor is enough to
- * unblock voter capture, and the household record can be enriched later.
+ * — see src/dal/ports/households.ts. Address/descriptor alone is enough
+ * to unblock voter capture, and the household record can be enriched
+ * later; `initialGeo` (session 11) lets a caller that already has real
+ * coordinates — currently `VoterHouseholdMap.tsx`'s click-to-place flow —
+ * pass them through instead of leaving `geo` unset. No device geolocation
+ * call is made from inside this form itself.
  */
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -25,11 +28,20 @@ interface HouseholdQuickAddProps {
   ctx: SessionContext;
   vdCode: string;
   wardCode: string;
+  /** Real coordinates already captured by the caller (e.g. a map click) — see file header. */
+  initialGeo?: { lat: number; lng: number; accuracyM: number };
   onCreated: (household: Household) => void;
   onCancel: () => void;
 }
 
-export function HouseholdQuickAdd({ ctx, vdCode, wardCode, onCreated, onCancel }: HouseholdQuickAddProps) {
+export function HouseholdQuickAdd({
+  ctx,
+  vdCode,
+  wardCode,
+  initialGeo,
+  onCreated,
+  onCancel,
+}: HouseholdQuickAddProps) {
   const queryClient = useQueryClient();
   const [dwellingType, setDwellingType] = useState<Household['dwellingType']>('FORMAL');
   const [addressLine, setAddressLine] = useState('');
@@ -67,12 +79,20 @@ export function HouseholdQuickAdd({ ctx, vdCode, wardCode, onCreated, onCancel }
       addressLine: addressLine.trim(),
       dwellingType,
       informalDescriptor: informalDescriptor.trim() || undefined,
+      geo: initialGeo,
     });
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-3 border border-gold/40 bg-paper p-4 rounded">
       <h4 className="text-label-caps font-display uppercase text-ink">New household</h4>
+
+      {initialGeo && (
+        <p className="text-body-md font-body text-teal">
+          Pinned at {initialGeo.lat.toFixed(5)}, {initialGeo.lng.toFixed(5)} — this will be saved with the
+          household.
+        </p>
+      )}
 
       <label className="space-y-1 block">
         <span className="text-label-caps font-display uppercase text-slate">Dwelling type</span>

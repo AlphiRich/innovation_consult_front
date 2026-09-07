@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — voter list card
+ * Election Campaign OS — voter list card
  * Structure informed by the Stitch suite's household_voter_logging screen
  * (name + sentiment pill + Log Response action), reskinned to our tokens.
  */

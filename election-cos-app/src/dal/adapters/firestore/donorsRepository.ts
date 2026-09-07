@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: donors (PPFA)
+ * Election Campaign OS — Firestore adapter: donors (PPFA)
  * IC-ECOS-BUILD-2026-V2 §6.8.2. Online only — never wired into the offline
  * layer (§7.1).
  */

@@ -12,7 +12,7 @@ stated defaults were applied. Revisit if that's wrong:
 
 | # | Decision | Applied |
 |---|---|---|
-| D1 | Product name | **Election-COS1.0.** "Civic Architect", "Civic Authority", "SA Elections 2024" retired. |
+| D1 | Product name | **Election Campaign OS.** "Civic Architect", "Civic Authority", "SA Elections 2024" retired. |
 | D2 | Navigation | The 9-item shell in build spec §3.2 — see `src/app/nav.ts`, tested in `nav.test.ts`. |
 | D3 | Brand palette | Stated constants (`#1A2246` / `#B7913F` / `#7E1F2E` + the four supporting colours) — see `src/design/tokens.ts`. |
 | D4 | Differentiator ordering | Not yet consumed by this build (commercial-material concern, artefact 02 — Fable 5's remit, not election-cos-app's). Noted here for traceability only. |
