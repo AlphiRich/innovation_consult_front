@@ -321,6 +321,120 @@ fabrications:
   **portable artefact that outlives the screen** and reads as an
   operational record.
 
+### 4h. `PRCandidateListExportPage.tsx` — real named people, fabricated ID numbers
+
+**The most serious artefact in the fork.** A PR candidate list export with
+ten entries. The names are not invented personas like the fork's
+"Thabo Mofokeng" — they are **real, identifiable South African public
+figures**, several of them former City of Johannesburg mayors, MMCs and
+council office-bearers. Each is given:
+
+- a full 13-digit `rawId` South African ID number,
+- a masked form of it,
+- a gender, a qualifications string,
+- SARS tax-compliance status — including a **negative** one rendered as
+  "AUDIT REQUIRED",
+- and a "Mark Verified" button.
+
+The ID numbers were checked, not assumed. Nine of the ten **fail the DHA
+checksum** — they are fabricated. The tenth is **checksum-valid**, which
+is the worse case: a well-formed SA ID number attached to a named real
+person will pass validation anywhere it is pasted, and may collide with an
+actual individual's identity number.
+
+Attaching a fabricated identity number and a fabricated tax-compliance
+finding to a real, named person is a different category of problem from
+the rest of this fork's fabrication. It is not a placeholder metric; it is
+adverse information about identifiable individuals.
+
+It also exports. `handleTriggerExport()` writes CSV and XML — the XML under
+namespace `urn:iec:elections:sa:2026` with a `classification` attribute
+set to **`OFFICIAL`** — and the footer cites "Section 17 Electoral
+Commission Municipal Act". So the fabricated records leave the screen as
+files that present themselves as an official IEC submission.
+
+**And the unmasking is a client-side boolean.** `const [unmaskIds,
+setUnmaskIds] = useState(false)` toggled by an eye icon, with the raw IDs
+then written straight into the CSV/XML export. No capability check, no
+audit event, no server round-trip.
+
+Compare this repo, which was checked rather than assumed:
+`functions/src/unmaskCandidateIdNumber.ts` is a **callable Cloud Function**
+that checks `caps.includes('team.manage')` and throws `permission-denied`
+otherwise; its decrypt-and-audit body is an explicit TODO and it throws
+`unimplemented` rather than returning anything — it **fails closed**.
+`firestore.rules` gates `candidates` read *and* write on `team.manage`
+with `delete: if false`. §6.6's "unmask requires an explicit capability and
+writes an audit event" is honoured as a gate even though the KMS work
+behind it is unbuilt.
+
+### 4i. `ReferralPdfModal.tsx` — a party document wearing municipal letterhead
+
+This is the referral-PDF feature this repo's BUILD-STATUS lists as not
+built, so it is worth being precise about what it gets wrong — a future
+implementation here should not repeat any of it:
+
+- **It presents as a municipal document.** The letterhead reads "Republic
+  of South Africa · North West Province" above "JB MARKS LOCAL MUNICIPALITY
+  (NW405)", with a circular "OFFICIAL" seal badge. But this is a *party's*
+  referral **to** the municipality, not an instrument issued **by** it. A
+  reader receiving this could reasonably take it for municipal
+  correspondence.
+- **The integrity hash is not a hash.** `HASH: #NW405-{incident.id.slice(0, 8)}`
+  is the first eight characters of the record's own id.
+- **"SHA-256 Verified"** is rendered as a badge beside every photo path.
+  Nothing is hashed anywhere in the file.
+- **The signatory is hardcoded.** Every authorised referral is signed
+  "James Khumalo (Municipal Lead)" regardless of who authorised it —
+  the same invented name used in the fork's PermissionsPage.
+- **It is not a PDF.** `handlePrint()` calls `window.print()`.
+- It still says "Election-COS 1.0", pre-dating the naming alignment.
+
+The DRAFT-watermark-until-authorised mechanic itself is a reasonable
+reading of §6.4 and worth keeping in mind; everything attached to it here
+is not.
+
+### 4j. A role switcher in the UI — the self-minted session, taken to its end
+
+`IncidentsPage.tsx` renders four buttons — **Canvasser / Ward Lead /
+Municipal Lead / HQ Admin** — that rebuild `sessionCtx.caps` from local
+state and default to `'admin'`:
+
+```ts
+const [activeRole, setActiveRole] = useState<...>('admin');
+if (activeRole === 'municipal-lead' || activeRole === 'admin') caps.push('incidents.escalate');
+return { tenantId: 'tenant-sa-2026', uid: `user-${activeRole}`, caps: caps as any, ... };
+```
+
+Anyone can grant themselves `incidents.escalate` by clicking a button —
+the capability that authorises stripping the DRAFT watermark off a document
+addressed to a municipality. Sessions 14 and 15 found components minting a
+fixed session; this is that pattern promoted to a user-facing control.
+
+Also here: `IncidentsPage` falls back to `SEED_INCIDENTS` — five fabricated
+service-delivery cases with named canvassers and specific claims ("320
+households without tap water"; "Three robbery incidents reported this
+week") — whenever the DAL returns empty **or throws**. A fresh tenant, or a
+broken connection, silently displays them as live casework.
+
+### 4k. Two more invented capabilities behind `as any`
+
+Adding to session 15's `ppfa.manage_thresholds`:
+
+- `FinancePage.tsx` — `caps: ['finance.view', 'finance.create'] as any`.
+  No `finance.*` capability exists in this repo's union (`ppfa.view` /
+  `ppfa.edit` / `ppfa.export`) or in the bundle's seed.
+- `FieldDiaryPage.tsx` — `caps: ['diary.view', 'diary.create'] as any`.
+  This repo has `diary.view` / `diary.edit`; `diary.create` does not exist.
+
+`FinancePage` additionally renders `donor.idNumberEncrypted` and
+`registrationNumberEncrypted` **directly as label text** ("ID Number:
+{donor.idNumberEncrypted}") — printing to screen a field whose name asserts
+it is encrypted. It also adds PPFA statutory section citations ("Section 9
+of the Political Party Funding Act") that this repo deliberately does not
+make; unverified either way, and noted only because inventing section
+numbers is how §4d's problems started.
+
 ### 5. `main.tsx` — boot-time Firestore connection test
 
 The fork calls `testConnection()` at startup. Declining for an

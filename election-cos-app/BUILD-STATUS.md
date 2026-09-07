@@ -1124,6 +1124,66 @@ that every claim on the page is sound.
 **Verified:** `check:all` green — **122 tests** (up from 113), lint,
 typecheck, `check:hex`; `npm run build` succeeds.
 
+**Session 17 (7 Sep 2026) — the fork's worst artefact: real named people
+given fabricated ID numbers. This repo verified sound on the same
+surface.** Sixteen more files (two pairs uploaded twice; four are this
+repo's own returned unchanged — `ppfaDefaults.test.ts` again a *stale*
+pre-session-16 copy, without the prose guard added that session). Nothing
+adopted. Detail in `docs/ecos-v2-fork-review.md` §4h–4k.
+
+**`PRCandidateListExportPage.tsx` is a different category of problem from
+everything found so far.** Its ten-row candidate list does not use invented
+personas — the names are **real, identifiable South African public
+figures**, several former City of Johannesburg mayors and MMCs. Each is
+given a full 13-digit `rawId` SA identity number, a gender, qualifications,
+and a SARS tax-compliance status **including a negative one** ("AUDIT
+REQUIRED"). Checked rather than assumed: **nine of the ten ID numbers fail
+the DHA checksum**; the tenth is checksum-*valid*, which is worse — a
+well-formed SA ID attached to a named real person passes validation
+anywhere and may collide with an actual individual's identity number.
+Fabricated identity numbers and fabricated adverse tax findings, attached
+to identifiable people, then exported: `handleTriggerExport()` writes CSV
+and XML under namespace `urn:iec:elections:sa:2026` with
+`classification="OFFICIAL"`.
+
+Its unmasking is `useState(false)` behind an eye icon, feeding raw IDs
+straight into those exports — no capability check, no audit, no server.
+**This repo was checked against that and is sound:**
+`functions/src/unmaskCandidateIdNumber.ts` gates on
+`caps.includes('team.manage')`, throws `permission-denied` otherwise, and
+throws `unimplemented` rather than returning anything while its KMS
+decrypt/audit body is still a TODO — it fails closed. `firestore.rules`
+gates `candidates` read *and* write on `team.manage`, `delete: if false`.
+
+**`ReferralPdfModal.tsx`** is the referral-PDF feature this file lists as
+unbuilt, so it is worth naming what not to repeat: it renders "Republic of
+South Africa · North West Province / JB MARKS LOCAL MUNICIPALITY (NW405)"
+with an "OFFICIAL" seal as its **letterhead** — presenting a party's
+referral *to* the municipality as if issued *by* it; its integrity hash is
+`incident.id.slice(0, 8)`; it badges every photo "SHA-256 Verified" while
+hashing nothing; it hardcodes "James Khumalo (Municipal Lead)" as the
+signatory on every referral; and it is `window.print()`, not a PDF. The
+DRAFT-watermark-until-authorised mechanic itself is a sound reading of
+§6.4 and worth keeping when this does get built.
+
+**The self-minted session is now a user-facing control.** `IncidentsPage`
+renders Canvasser / Ward Lead / Municipal Lead / HQ Admin buttons that
+rebuild `caps` from local state, defaulting to `'admin'` — anyone can
+click their way to `incidents.escalate`, the capability that authorises
+stripping the DRAFT watermark off a document sent to a municipality. The
+same page falls back to five fabricated `SEED_INCIDENTS` whenever the DAL
+returns empty *or throws*, so a fresh tenant or a dropped connection shows
+invented casework as live.
+
+Two further invented capabilities behind `as any`, adding to session 15's
+`ppfa.manage_thresholds`: `finance.view`/`finance.create` (FinancePage) and
+`diary.create` (FieldDiaryPage) — none exist in this repo's union or the
+bundle's seed. FinancePage also prints `donor.idNumberEncrypted` directly
+as label text.
+
+**Verified:** no source changed this session; `check:all` re-run green
+(122 tests).
+
 ---
 
 ## Version conflict found in session 2 — RESOLVED
