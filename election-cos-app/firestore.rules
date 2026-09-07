@@ -175,9 +175,30 @@ service cloud.firestore {
 
     // ---- documents ----------------------------------------------------------
 
+    // Referral records (documentId `referral-{incidentId}`, see
+    // referralDocument.ts) are the one kind of document a Municipal Lead
+    // files without holding team.manage: §6.4 makes escalation and
+    // referral one authorisation, and incidents.escalate is the capability
+    // that carries it. The id prefix is how that narrower allowance is
+    // expressed — a holder of incidents.escalate can create a referral
+    // entry and nothing else in this collection, and cannot amend one
+    // after the fact.
+    function isReferral(documentId) {
+      return documentId.matches('referral-.*');
+    }
+
     match /tenants/{tid}/documents/{documentId} {
-      allow read: if tenantOK(tid) && cap('analytics.view');
-      allow write: if tenantOK(tid) && cap('team.manage');
+      allow read: if tenantOK(tid) && (
+                     cap('analytics.view')
+                  || (cap('incidents.view') && isReferral(documentId))
+                  );
+      allow create: if tenantOK(tid) && (
+                       cap('team.manage')
+                    || (cap('incidents.escalate') && isReferral(documentId)
+                        && request.resource.data.classification == 'CONFIDENTIAL'
+                        && request.resource.data.watermark == 'FINAL')
+                    );
+      allow update: if tenantOK(tid) && cap('team.manage');
       allow delete: if false;
     }
 

@@ -1,16 +1,19 @@
 /**
  * Election Campaign OS — incident list card
  * IC-ECOS-BUILD-2026-V2 §6.4. One status-appropriate action per card:
- * Triage (LOGGED), Escalate (TRIAGED). ESCALATED has no action here —
- * referral-PDF generation isn't built (see IncidentsPage.tsx header).
+ * Triage (LOGGED), Escalate (TRIAGED), Prepare referral (ESCALATED).
+ * REFERRED shows the issued document's integrity hash rather than an
+ * action — the workflow's last step has already happened.
  */
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { dal } from '@/dal';
 import type { SessionContext } from '@/dal/ports/session';
 import type { Incident, IncidentSeverity } from '@/dal/ports/incidents';
 import { TONE_PILL_CLASSES } from '@/design/toneClasses';
 import { CATEGORY_LABEL, SEVERITY_META, SEVERITY_ORDER } from './incidentMeta';
+import { ReferralPrepareModal } from './referral/ReferralPrepareModal';
+import { referralDocumentId } from './referral/referralDocument';
 
 interface IncidentCardProps {
   ctx: SessionContext;
@@ -21,6 +24,15 @@ export function IncidentCard({ ctx, incident }: IncidentCardProps) {
   const queryClient = useQueryClient();
   const [triageSeverity, setTriageSeverity] = useState<IncidentSeverity>(incident.severity);
   const [showTriage, setShowTriage] = useState(false);
+  const [showReferral, setShowReferral] = useState(false);
+
+  // Only for an already-referred incident, so the card can show the hash a
+  // municipality would quote back. Not fetched otherwise.
+  const referralQuery = useQuery({
+    queryKey: ['documents', ctx.tenantId, referralDocumentId(incident.id)],
+    queryFn: () => dal.documents.getById(ctx, referralDocumentId(incident.id)),
+    enabled: incident.status === 'REFERRED',
+  });
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['incidents', ctx.tenantId] });
 
@@ -111,8 +123,35 @@ export function IncidentCard({ ctx, incident }: IncidentCardProps) {
         </button>
       )}
 
+      {incident.status === 'ESCALATED' && (
+        <button
+          type="button"
+          onClick={() => setShowReferral(true)}
+          className="px-3 py-1.5 bg-ink text-paper rounded text-label-caps font-display uppercase"
+        >
+          Prepare referral
+        </button>
+      )}
+
+      {incident.status === 'REFERRED' && (
+        <div className="border-t border-ink/10 pt-2">
+          <p className="text-label-caps font-display uppercase text-slate">
+            Referred{referralQuery.data ? ` · ${referralQuery.data.title}` : ''}
+          </p>
+          {referralQuery.data && (
+            <p className="text-data-mono font-mono text-slate break-all">
+              Integrity hash {referralQuery.data.integrityHashSha256}
+            </p>
+          )}
+        </div>
+      )}
+
       {(triageMutation.isError || escalateMutation.isError) && (
         <p className="text-body-md text-maroon">Action failed — try again.</p>
+      )}
+
+      {showReferral && (
+        <ReferralPrepareModal ctx={ctx} incident={incident} onClose={() => setShowReferral(false)} />
       )}
     </div>
   );

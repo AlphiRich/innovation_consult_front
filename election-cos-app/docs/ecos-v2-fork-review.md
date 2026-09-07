@@ -394,6 +394,35 @@ The DRAFT-watermark-until-authorised mechanic itself is a reasonable
 reading of §6.4 and worth keeping in mind; everything attached to it here
 is not.
 
+**Session 18 — this feature is now built here** (`src/modules/incidents/
+referral/`, `src/lib/pdf/`), and every item above is answered:
+
+- the issuing campaign is named first and the municipality is an
+  addressee; a standing disclaimer in the body says the document is not a
+  municipal or government instrument, carries no municipal or state
+  authority, and is not a notice or demand under any statute;
+- the integrity hash is a real SHA-256 over a versioned canonical
+  serialization, with a verify function; the layout function throws on
+  anything that is not 64 lowercase hex, so the fork's construction
+  cannot be printed under a hash label even by accident. The id prefix
+  survives as `reference` — labelled Reference, which is what it always
+  was;
+- there is no verification badge; the evidence block says the paths are
+  for retrieval only and the images are not hashed. The word "verified"
+  appears nowhere in the printed output;
+- the signatory is read from the signed-in user's staff profile, with no
+  fallback, and the issue step refuses if the named signatory is not the
+  session making the write;
+- it is a real PDF, verified with poppler.
+
+The DRAFT-watermark mechanic was carried across, as noted. It is the only
+thing from this file that was.
+
+Two of the guards above are source scans over `referralDocument.ts`. They
+strip comments before matching, because that file's header quotes the
+failures listed here so a future reader knows what not to reintroduce —
+scanning raw text would match its own warning label.
+
 ### 4j. A role switcher in the UI — the self-minted session, taken to its end
 
 `IncidentsPage.tsx` renders four buttons — **Canvasser / Ward Lead /

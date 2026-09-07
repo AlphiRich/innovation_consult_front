@@ -26,6 +26,7 @@ import { donationAlertsRepository } from './adapters/firestore/donationAlertsRep
 import { dataSubjectRequestsRepository } from './adapters/firestore/dataSubjectRequestsRepository';
 import { warRoomCountersRepository } from './adapters/firestore/warRoomCountersRepository';
 import { municipalityProfileRepository } from './adapters/firestore/municipalityProfileRepository';
+import { fileStoreRepository } from './adapters/firestore/fileStoreRepository';
 
 const adapter = (import.meta.env.VITE_DAL_ADAPTER as string | undefined) ?? 'firestore';
 
@@ -59,6 +60,9 @@ export const dal = {
   dataSubjectRequests: dataSubjectRequestsRepository,
   warRoomCounters: warRoomCountersRepository,
   municipalityProfile: municipalityProfileRepository,
+  // Cloud Storage rather than Firestore, but the same rule applies: module
+  // code reaches object storage through the DAL or not at all (§5, §10).
+  fileStore: fileStoreRepository,
 };
 
 export type { SessionContext, GeoScope, Page, PageRequest } from './ports/session';

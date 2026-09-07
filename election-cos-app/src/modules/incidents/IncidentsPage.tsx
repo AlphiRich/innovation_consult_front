@@ -4,15 +4,15 @@
  * taxonomy) → Ward Lead triages (confirms/adjusts severity) → Municipal
  * Lead escalates → referral PDF.
  *
- * The referral PDF step (§6.4: "authorisation strips the DRAFT watermark
- * and appends signature + timestamp") is NOT built this session — it
- * needs a server-side PDF generator with Storage write access, the same
- * category of work as tools/docgen/ but triggered from the app rather
- * than run by hand, and there's no live Firebase project to deploy a
- * Cloud Function against yet (BUILD-STATUS.md blocker #2). ESCALATED is
- * therefore this UI's terminal state — real, not faked, and not silently
- * dead-ended either: IncidentCard.tsx shows no button past it rather than
- * a button that does nothing.
+ * The referral step (§6.4: "authorisation strips the DRAFT watermark and
+ * appends signature + timestamp") is built — see src/modules/incidents/
+ * referral/. An earlier session deferred it for wanting a server-side PDF
+ * generator; it turned out not to need one. The document is text-only over
+ * the Adobe standard-14 fonts, so it is generated on the device by
+ * src/lib/pdf/ with no dependency and no Cloud Function, which also means
+ * a Municipal Lead can produce and read a draft with no connectivity.
+ * Issuing it — Storage upload, registry entry, ESCALATED → REFERRED —
+ * still needs a live project (BUILD-STATUS.md blocker #2).
  */
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';

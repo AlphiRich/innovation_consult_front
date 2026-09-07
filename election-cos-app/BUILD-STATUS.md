@@ -307,7 +307,9 @@ actions (Triage sets/confirms severity; Escalate moves it on). The
 referral-PDF step (§6.4) is explicitly **not** built — it needs a
 server-side generator with Storage write access and there's still no live
 Firebase project to deploy one against (blocker #2) — `IncidentsPage.tsx`
-says so in its own header rather than shipping a dead button.
+says so in its own header rather than shipping a dead button. *(Session 18
+built it, and the premise here turned out to be wrong: it needed no server
+at all. See that entry.)*
 
 Reused, rather than re-derived, the split-VD ward-resolution logic
 `VoterForm.tsx` built in an earlier pass — extracted to
@@ -603,8 +605,8 @@ session and disclosed throughout this file and `docs/screen-findings.md`
 at the specific place each gap lives: no live Firebase project (blocker
 #2, the big one — nothing here has been proven against a real Firestore
 instance), the PPFA aggregation Cloud Function (held on purpose, §6.8.1),
-`functions/src/sync.ts` (skeleton), incident referral-PDF generation, a
-dedicated `election-cos-app` repo (still blocked on the human creating an
+`functions/src/sync.ts` (skeleton), incident referral-PDF generation
+*(built in session 18)*, a dedicated `election-cos-app` repo (still blocked on the human creating an
 empty one), and several smaller named gaps (phone/donor-ID encryption,
 staff invite flow, per-ward sentiment segmentation, live activity feeds,
 volunteer presence tracking). None of these were faked to look finished.
@@ -1164,7 +1166,8 @@ referral *to* the municipality as if issued *by* it; its integrity hash is
 hashing nothing; it hardcodes "James Khumalo (Municipal Lead)" as the
 signatory on every referral; and it is `window.print()`, not a PDF. The
 DRAFT-watermark-until-authorised mechanic itself is a sound reading of
-§6.4 and worth keeping when this does get built.
+§6.4 and worth keeping when this does get built. *(Session 18 built it;
+that mechanic is the one thing carried across.)*
 
 **The self-minted session is now a user-facing control.** `IncidentsPage`
 renders Canvasser / Ward Lead / Municipal Lead / HQ Admin buttons that
@@ -1183,6 +1186,86 @@ as label text.
 
 **Verified:** no source changed this session; `check:all` re-run green
 (122 tests).
+
+**Session 18 (7 Sep 2026) — the referral PDF, built.** §6.4's last step —
+"Municipal Lead authorises → formal referral PDF generated (authorisation
+strips the DRAFT watermark and appends signature + timestamp)" — is now
+real, in `src/modules/incidents/referral/` and `src/lib/pdf/`.
+
+**The deferral reason was wrong.** Session 9 held this back for wanting "a
+server-side PDF generator with Storage write access" and a live Firebase
+project. It needs neither. The document is text-only over the Adobe
+standard-14 fonts, which every PDF reader is required to have, so no font
+programme is embedded and no library is required: `src/lib/pdf/` is a
+~350-line PDF 1.7 writer with **no new dependency**, and a Municipal Lead
+can build and read a draft on a device with no connectivity. Only
+*issuing* — Storage upload, registry entry, ESCALATED → REFERRED — needs
+the live project (blocker #2 still stands for that half).
+
+It is an actual PDF, verified against poppler (`pdfinfo`/`pdftotext`), not
+a `window.print()` view wearing the name. Output is byte-for-byte
+deterministic — no clock read, no random file id — because a document's
+integrity hash has to be reproducible from the stored record months later.
+Text is measured against the published Adobe AFM metrics so paragraphs
+wrap at a real column width, and an over-long token (a Storage path) is
+hard-split rather than run off the page.
+
+**Every failure catalogued in `docs/ecos-v2-fork-review.md` §4i is
+answered, and most are now guarded by a test rather than by care:**
+
+| The fork's version | This one |
+|---|---|
+| "Republic of South Africa · North West Province / JB MARKS LOCAL MUNICIPALITY" letterhead with an "OFFICIAL" seal | The issuing campaign is named first and the municipality appears as an addressee. `STANDING_DISCLAIMER` is printed in the body: not a municipal or government document, no municipal or state authority, not a notice or demand made under any statute. Tests fail on that vocabulary reappearing, and on the disclaimer weakening. |
+| `HASH: #NW405-${incident.id.slice(0, 8)}` | A real SHA-256 over a versioned canonical serialization of every field the reader sees, via `crypto.subtle`. `verifyReferralContentHash()` lets a holder of the paper and the record check they describe the same referral. `buildReferralPdfBytes` throws on anything that isn't 64 lowercase hex. The id prefix survives — as `reference`, labelled Reference, which is what it always was. |
+| "SHA-256 Verified" badged beside every photo, nothing hashed | `EVIDENCE_BASIS` says the paths are for retrieval only, the images are not hashed, and the document makes no attestation about them. The word "verified" appears nowhere in the printed output — asserted by test. |
+| "James Khumalo (Municipal Lead)" on every referral | Signatory read from the signed-in user's own staff profile. The model throws on a blank name and has no fallback; `issueReferral` refuses if the named signatory is not the session making the write. |
+| A party name and municipality baked in | The municipality comes from the tenant's configured profile; if it is unset the screen says so and stops. The issuing campaign's name has **no default at all** — this codebase holds no tenant display name (`SessionContext` carries an id), and inventing one on a document addressed to a municipality is the exact fabrication class this build refuses. |
+| `window.print()` | Real bytes. |
+
+The DRAFT-watermark-until-authorised mechanic — the one sound idea in the
+fork's version — is kept, as a rotated watermark repeated on every page,
+alongside a printed line saying the draft must not be sent.
+
+**Writes, in order, and the order is the point:** PDF to Storage → registry
+entry in `documents` (§8.4: CONFIDENTIAL, FINAL, integrity hash, signatory)
+→ `markReferred()`. A failure at step 2 or 3 leaves the incident ESCALATED
+and the operator can retry; the retry is safe rather than duplicative
+because everything is content-addressed — the same referral hashes to the
+same value, so it resolves to the same Storage path and the same document
+id. The failure this avoids is an incident marked REFERRED pointing at a
+PDF that was never written.
+
+**New DAL port.** `IncidentRepository.markReferred()` has taken a
+`referralPdfPath` since Phase 3 with nothing in the DAL able to produce
+one. `src/dal/ports/fileStore.ts` + its Storage adapter close that; module
+code still reaches object storage through the DAL or not at all, and the
+adapter refuses a path outside the caller's tenant before a byte leaves
+the device.
+
+**Security rules widened, narrowly.** A Municipal Lead holds
+`incidents.escalate`, not `team.manage`, so neither the `documents`
+collection nor Storage would have accepted their referral. Both now key a
+narrower allowance off the `referral-` id prefix: `incidents.escalate` can
+*create* a referral entry (classification CONFIDENTIAL, watermark FINAL)
+and nothing else in that collection, cannot amend one afterwards, and in
+Storage cannot overwrite or delete an issued file at all — an authorised
+referral that left the building is a record, not a draft. Also fixed a
+naming-alignment miss: `storage.rules` still said "Election-COS1.0".
+
+**Two real defects found and fixed while building, both caught by
+verification rather than by reading:** the byte builder was glyph-encoding
+PDF *structure*, which has no glyph for a line feed and substituted `?` for
+every newline — no reader could parse the file; and the document
+information dictionary was written in WinAnsi, which PDF interprets as
+PDFDocEncoding, so "Ward 12 Campaign Office — Tlokwe" reached the reader's
+title bar as "Office Š Tlokwe". Metadata is now UTF-16BE with a BOM. Both
+have regression tests.
+
+**Verified:** `check:all` green — **197 tests** (up from 122; 21 PDF
+writer, 26 document model, 17 layout, 10 issue workflow), lint, typecheck,
+`check:hex`; `npm run build` succeeds; the DAL boundary holds (no
+`firebase/*` import outside `src/dal/adapters/firestore/` and `src/auth/`).
+Sample output opened and read back with poppler.
 
 ---
 
