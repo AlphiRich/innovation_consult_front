@@ -1015,6 +1015,71 @@ Unsplash photographs of real people presented as field staff.
 **Verified:** `npm run check:all` — lint, typecheck, `check:hex`, **113
 tests** (up from 108), all green; `npm run build` succeeds.
 
+**Session 15 (7 Sep 2026) — the fork's Settings layer: false statutory
+claims found; this repo audited clean against the same defects.** Sixteen
+more files (one, `LogisticsPage.tsx`, uploaded twice — byte-identical).
+Three are this repo's own returned unchanged, including
+`dataSubjectRequestSla.ts`, which matters below. Nothing was adopted;
+there was nothing here worth adopting. Full detail in
+`docs/ecos-v2-fork-review.md` §4d–4g.
+
+**The most serious findings so far, because these are legal assertions
+rather than invented metrics:**
+
+1. **The superseded PPFA figures, on the settings landing page.** The
+   fork's `SettingsPage.tsx` describes the PPFA module as "Political Party
+   Funding Act limits (**R100,000 threshold, R15M annual ceiling**)" —
+   the retired values. Current is R200,000 / R30,000,000 per Gazette
+   53182, which the bundle's own harvest migration cites as superseding
+   exactly those numbers. The fork contradicts itself: its
+   `PPFAThresholdsPage.tsx` defaults the form to the correct figures. A
+   party admin is shown the retired number on the index and the current
+   one on the form beneath it.
+2. **A hedged assumption converted into two conflicting "statutory"
+   deadlines.** This repo's `dataSubjectRequestSla.ts` states that POPIA
+   prescribes no fixed response window and that `RESPONSE_TARGET_DAYS` is
+   "a working assumption (not a legal deadline)" pending attorney review.
+   The fork renders that as "**21-day statutory** turnaround limit"
+   (DSR page) and "**14-day SLA** enforcement" (Settings page) — two
+   different numbers, neither the source's, one labelled statutory, for a
+   window the source explicitly says is not.
+3. **Two different gazette numbers for one demarcation.**
+   `MunicipalityConfigPage.tsx` cites "Gazette No. 51892" where three
+   other places cite "8929" — the number this project was actually
+   supplied (`docs/nw405-seed-data.md`). A gazette citation is a
+   provenance claim.
+
+**The self-minted `SessionContext` is systemic.** Session 14 found it in
+one modal; `PPFAThresholdsPage` and `DataSubjectRequestsPage` do it too.
+The PPFA one grants itself `'ppfa.manage_thresholds'` — **a capability
+that exists in no catalogue**, this repo's or the bundle's — with
+`as any` suppressing the type error that would have caught it, on the one
+screen where §6.8 separation of duties matters most.
+
+**This repo audited against all of it, and is clean** — stated with
+evidence rather than assumed: zero components construct a
+`SessionContext` (every module takes `ctx` from `useSession()`), zero
+`as any` anywhere in `src/`, no superseded PPFA figure in live code
+(`ppfaDefaults.test.ts` actively asserts none can appear), and our DSR
+page says "past a working 30-day target" pointing at the caveat rather
+than calling it statutory.
+
+Also: the fork's `PermissionsPage.tsx` invents a **fourth** role
+vocabulary (`MUNICIPAL_LEAD`, `DATA_OFFICER`, `EXPORT_ALL` — in neither
+the 6-role canonical set nor this repo's 7) and its permission toggles are
+static JSX whose "Save Changes" only closes the modal. And
+`telemetryData.ts` — the source behind session 13's test finding — is
+frozen to `'Today (04 Sep)'` and ships `downloadTelemetryCSV()`, exporting
+the invented figures as a CSV headed "Election Campaign OS — Campaign
+Voter Outreach Telemetry Export" with no marking that it is synthetic.
+
+*Not flagged, having checked:* the fork's 67 total / 34 ward / 33 PR split
+for NW405 and its `Math.ceil(total / 2)` derivation are correct — they
+match Schedule 1's rounding and this repo's own NW405 regression fixture.
+
+**Verified:** no source changed this session; `check:all` re-run green
+(113 tests).
+
 ---
 
 ## Version conflict found in session 2 — RESOLVED

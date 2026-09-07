@@ -211,6 +211,116 @@ Separately, its "Validate with Google Maps" button calls no API — it sets
 a flag and prints *"Address verified within JB Marks Local Municipality
 (NW405)"*. Its own comment reads "Simulate / invoke address validation".
 
+### 4d. False statutory claims — the most serious class found
+
+Three of the fork's Settings screens assert legal figures. All three are
+wrong, and two contradict each other inside the same codebase.
+
+**PPFA thresholds — the superseded figures, on the settings landing page.**
+`SettingsPage.tsx` describes the PPFA module as:
+
+> "Manage Political Party Funding Act limits (**R100,000 threshold, R15M
+> annual ceiling**) and non-cash donation compliance rules."
+
+R100,000 / R15,000,000 are precisely the **retired** values. The current
+figures are R200,000 / R30,000,000 per Government Gazette 53182 (18 Aug
+2025) — which the bundle's own `030_electoral_data_harvest.sql` cites as
+"supersedes earlier R100,000 / R15M", and which `CLAUDEHANDOFF.md` §5
+records as a confirmed correction. The fork contradicts itself: its own
+`PPFAThresholdsPage.tsx` defaults the form to the *correct* 200000 /
+30000000. So a party admin reading the settings index is told one number
+and the form beneath it another, and the index is the retired one.
+
+This repo cannot drift here: `ppfaDefaults.ts` carries R200,000 /
+R30,000,000, and `ppfaDefaults.test.ts` asserts the derived warning is
+R160,000 "not the superseded R80,000" and that no value "equals a
+superseded threshold". Our `SettingsPage.tsx` quotes no figure at all.
+
+**POPIA response window — a hedged assumption turned into two different
+"statutory" deadlines.** `dataSubjectRequestSla.ts` is *this repo's own
+file* (it was round-tripped back in this same batch), and it says plainly:
+
+> "POPIA does not prescribe a fixed statutory response window the way
+> GDPR's 30-day rule does ... `RESPONSE_TARGET_DAYS` is a working
+> assumption (**not a legal deadline**) ... ATTORNEY REVIEW NEEDED."
+
+The fork took that and produced:
+
+- `DataSubjectRequestsPage.tsx`: "**21-day statutory** turnaround limit"
+- `SettingsPage.tsx`: "**14-day SLA** enforcement"
+
+Two different numbers, neither matching the source, one labelled
+"statutory" — for a window the source file explicitly says is not
+statutory. This is the worst pattern in the fork: not a fabricated
+metric, but a **legal claim manufactured out of a comment that said don't
+do this.** Our page says "past a working 30-day target" and links to that
+file's caveat.
+
+**Demarcation gazette — two different numbers for the same gazette.**
+`MunicipalityConfigPage.tsx` defaults the citation to "Municipal
+Demarcation Board Gazette No. **51892** (2025/2026)", while
+`MunicipalDemarcationMap.tsx` and `WardsPage.tsx` cite "**8929**" in three
+places. 8929 matches the North West Provincial Gazette this project was
+actually supplied (`docs/nw405-seed-data.md`). 51892 appears nowhere else.
+A gazette number is a provenance claim; there cannot be two.
+
+*(Not flagged: the fork's 67 total / 34 ward / 33 PR split for NW405 and
+its `Math.ceil(total / 2)` ward derivation are **correct** — they match
+Schedule 1's rounding and this repo's own NW405 regression fixture.)*
+
+### 4e. The self-minted session is systemic, not a one-off
+
+Session 14 found `HouseholdAddressModal.tsx` constructing its own
+`SessionContext`. It is a pattern, not an accident — `PPFAThresholdsPage`
+and `DataSubjectRequestsPage` do the same, and the PPFA one is the worst
+instance:
+
+```ts
+caps: ['ppfa.view', 'ppfa.manage_thresholds'] as any,
+```
+
+`ppfa.manage_thresholds` **is not a capability that exists** — not in this
+repo's `Capability` union (`ppfa.view` / `ppfa.edit` / `ppfa.export`), not
+in the bundle's seeded catalogue. The `as any` is what allows it to
+compile: the escape hatch suppresses exactly the type error that would
+have caught the invented capability. So the screen governing statutory
+PPFA thresholds — the one place §6.8 separation-of-duties matters most —
+grants itself a capability that does not exist, past a silenced compiler.
+
+**Audited against this repo, prompted by that finding.** Zero components
+construct a `SessionContext`; zero `as any` anywhere in `src/`; no
+superseded PPFA figure in live code. Every module takes `ctx` from
+`useSession()`.
+
+### 4f. `PermissionsPage.tsx` — a fourth role vocabulary, and it saves nothing
+
+Two hardcoded staff ("James Khumalo", "Sarah Venter") with roles
+`MUNICIPAL_LEAD` and `DATA_OFFICER`, and an override chip `EXPORT_ALL`.
+None of those exist — not in the 6-role canonical set (bundle +
+`ecos-rbac-config` skill), not in this repo's 7 roles from §4.4. That is a
+**fourth** role vocabulary in circulation. The four permission toggles are
+static JSX with no state, and "Save Changes" only closes the modal: a
+permissions administration screen that cannot administer permissions.
+
+### 4g. `telemetryData.ts` — fabricated data with a CSV export
+
+The source behind the telemetry tests reviewed in session 13.
+`RAW_30_DAY_RECORDS` is 30 days of invented daily campaign figures, plus
+an hourly profile, all hardcoded. Two things make it worse than the other
+fabrications:
+
+- **It is frozen to a date.** The last row is labelled `'Today (04 Sep)'`
+  with `fullDate: '2026-09-04'`. Nothing recomputes it, so the "live"
+  telemetry silently keeps presenting 4 September as today.
+- **It exports.** `generateTelemetryCSV()` / `downloadTelemetryCSV()`
+  write the invented figures to a CSV headed *"Election Campaign OS -
+  Campaign Voter Outreach Telemetry Export"* with a metadata block
+  (municipality, ward filter, totals, generated-at timestamp) and columns
+  like "Actual Contacts Reached" and "Secured Voter Pledges". Nothing in
+  the file marks it synthetic. That turns on-screen fabrication into a
+  **portable artefact that outlives the screen** and reads as an
+  operational record.
+
 ### 5. `main.tsx` — boot-time Firestore connection test
 
 The fork calls `testConnection()` at startup. Declining for an
