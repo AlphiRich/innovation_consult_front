@@ -72,6 +72,37 @@ export class EcosOfflineDb extends Dexie {
       conflicts: 'id, entity, entityId, detectedAt, resolved',
     });
   }
+
+  /**
+   * Reopens the connection if the browser closed it, then resolves.
+   *
+   * Why this is needed (session 14): once an IndexedDB connection is
+   * closed, Dexie rejects every subsequent operation with
+   * `DatabaseClosedError` — it does *not* transparently reopen. Verified
+   * against this repo's own Dexie version, not assumed. A browser closes
+   * the connection on its own for reasons a canvasser will hit routinely:
+   * backgrounding the tab under storage pressure, or another tab starting
+   * a schema upgrade. Without this, the first write after the app comes
+   * back to the foreground fails, and for an offline-first field app that
+   * write is someone's canvass result.
+   *
+   * Deliberately NOT paired with a `versionchange` handler that returns
+   * false to keep the connection alive. That pattern (seen in the ecos-v2
+   * fork) trades a recoverable closed connection for an unrecoverable one:
+   * `versionchange` fires when *another tab* wants to upgrade the schema,
+   * and refusing to close blocks that upgrade indefinitely. Letting Dexie
+   * close and reopening here is the strictly better trade — see
+   * docs/ecos-v2-fork-review.md.
+   */
+  async ensureOpen(): Promise<this> {
+    if (!this.isOpen()) {
+      // Deliberately not caught: a genuine open failure (quota, corrupt
+      // store, blocked upgrade) should surface as itself, not as a
+      // confusing DatabaseClosedError from the next line of the caller.
+      await this.open();
+    }
+    return this;
+  }
 }
 
 export const offlineDb = new EcosOfflineDb();

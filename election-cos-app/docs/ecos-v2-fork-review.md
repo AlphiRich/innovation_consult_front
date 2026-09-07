@@ -28,6 +28,38 @@ Google Maps integration (ported properly in session 11) and the naming pass
 |---|---|---|
 | Household geocoding on a map | `src/modules/voters/VoterHouseholdMap.tsx` | Rebuilt, not copied — see session 11 in BUILD-STATUS.md |
 | Ownership/rights strings | `src/lib/legalText.ts` | Corrected against `CLAUDEHANDOFF.md` §1 and later `03-NAMING-SCHEMA.md` §2.1/§2.3 |
+| IndexedDB reopen-safety | `offlineDb.ensureOpen()` + 3 outbox call sites | Session 14 — the idea was sound and this repo had no lifecycle handling at all. Adopted **without** the fork's `versionchange` blocker; see below |
+
+### The one genuine engineering improvement: `ensureOpen()`
+
+The fork's `db.ts` adds connection-lifecycle handling this repo lacked
+entirely. The underlying problem is real and was verified against this
+repo's own Dexie version rather than taken on trust: once an IndexedDB
+connection is closed, **Dexie rejects every subsequent operation with
+`DatabaseClosedError`** — it does not transparently reopen. An explicit
+`open()` recovers it. For an offline-first field app, the write that fails
+is a canvasser's result after they background and reopen the app.
+
+Adopted: `ensureOpen()` on the three outbox entry points, covered by tests
+that were confirmed to fail without the guard (`DatabaseClosedError`) and
+pass with it.
+
+**Not adopted — `this.on('versionchange', () => false)`.** The fork uses
+this to stop the browser closing the connection. It is the wrong trade:
+`versionchange` fires when *another tab* is trying to upgrade the schema,
+and refusing to close blocks that upgrade indefinitely, leaving the other
+tab hanging on `blocked`. A closed connection is recoverable
+(`ensureOpen()`); a wedged schema upgrade is not. The fork's own comment
+("guard against hidden tab / iframe reload database closure") describes
+backgrounding, which is not what that event signals.
+
+Also skipped: its `visibilitychange` listener that proactively reopens.
+Redundant once every entry point calls `ensureOpen()`, and it registers a
+never-removed global listener from a module-scope singleton constructor.
+And its `ensureOpen()` swallows open failures in a `catch` that only
+`console.warn`s, which converts a real quota/corruption error into a
+confusing `DatabaseClosedError` one line later — this repo's version lets
+it throw.
 
 ## Rejected, with reasons
 
@@ -126,6 +158,59 @@ rather than behind an opt-in flag, derive test vectors by computing them
 rather than copying the fork's fixtures, and leave the seed registry
 behind.
 
+### 4b. `SmartMembershipCaptureModal.tsx` — compliance claims for processing that doesn't exist
+
+A five-step membership-capture flow (photo → OCR → review → WhatsApp OTP →
+verified). None of it is wired to anything:
+
+- "OCR" is `setTimeout(2500)` followed by three hardcoded values —
+  `'Thabo Mofokeng'`, ID `8506125009087` (which also fails its own
+  checksum: expects 2, carries 7), `'082 123 4567'`.
+- The OTP is `if (otp === '123456')`, with an on-screen "Hint for demo:
+  Use 123456".
+- The audit reference is `ECOS-${Math.floor(Math.random() * 1000000)}`.
+
+The problem is not that it is a prototype — it is what the prototype
+asserts to the user while being one:
+
+> "Images are uploaded to a temporary, encrypted bucket (africa-south1)
+> and deleted automatically after processing. Only verified structured data
+> is retained."
+
+No image is uploaded anywhere. And on completion: *"details have been
+verified and securely logged to the immutable append-only ledger"* —
+nothing is logged. It also collects an explicit POPIA consent declaration
+and discards it. Screens that state POPIA guarantees the code does not
+implement are the highest-risk artefact in this whole fork, because the
+claim is exactly what a buyer would be relying on.
+
+### 4c. `HouseholdAddressModal.tsx` — a component that mints its own session
+
+Session 11 declined to copy this file; reading the source confirms why. It
+constructs a `SessionContext` inline and hands it to the DAL:
+
+```ts
+const sessionCtx: SessionContext = {
+  tenantId, uid: 'user-admin',
+  caps: ['voters.view', 'voters.edit', 'wards.view', 'wards.edit'],
+  geoScope: 'TENANT',
+};
+await dal.households.upsert(sessionCtx, householdDraft);
+```
+
+A client component granting itself capabilities inverts §4.4 entirely —
+caps are resolved server-side from custom claims, and the whole
+three-layer isolation model (claims → rules → DAL) assumes the client
+cannot assert them. Against real `firestore.rules` this write would be
+rejected, since rules read `request.auth.token.caps` and ignore whatever
+the client passes; so it is not an exploit so much as a pattern that only
+appears to work because nothing is enforcing anything yet. `tenantId`
+also defaults to a hardcoded `'tenant-1'`.
+
+Separately, its "Validate with Google Maps" button calls no API — it sets
+a flag and prints *"Address verified within JB Marks Local Municipality
+(NW405)"*. Its own comment reads "Simulate / invoke address validation".
+
 ### 5. `main.tsx` — boot-time Firestore connection test
 
 The fork calls `testConnection()` at startup. Declining for an
@@ -133,12 +218,34 @@ offline-first PWA: a canvasser cold-starting the app in the field with no
 signal is the normal case, not an error worth a console warning on every
 boot.
 
-### 6. Everything else in the batch
+### 6. `WarRoomPage.tsx` / `WardsPage.tsx` / `FieldDiaryFeedSection.tsx`
 
-`App.tsx`, `vite-env.d.ts`, `MemberCapture.tsx` (a re-export shim) are
-trivial or identical to this repo's. `setup.ts` and `syncTypes.ts` **are
-this repo's own files** round-tripped back — `syncTypes.ts` still carries
-the post-rename "Election Campaign OS" header from session 11.
+The Bento War Room, now read in full rather than inferred from its patch
+scripts. Every headline number is a literal: `displayRegistered = 142893`,
+`targetRegistered = 183000`, "312" canvassers, "89.4 VPM", "84 Units
+Online", "+2.4% this week", ward sentiment bars at 74/65/58 %, "1,280"
+Section 33 registrations, "1,450 / 1,500" posters, "18,400" pamphlets. The
+volunteer avatars are **Unsplash stock photographs of real people**
+presented as field staff. `INITIAL_DIARY_EVENTS` supplies six invented
+diary entries naming real streets and specific counts.
+
+`WardsPage.tsx` additionally hardcodes `#040c30` and Tailwind's default
+palette (`bg-teal-700`, `bg-amber-100`) rather than this repo's tokens —
+both of which `check:hex` and the token discipline exist to prevent.
+
+### 7. Everything else in the batch
+
+`App.tsx`, `vite-env.d.ts`, `Dashboard.tsx` and `MemberCapture.tsx`
+(re-export shims) are trivial. `WardVdPicker.tsx` reads a hardcoded
+`@/dal/data/jbMarksData` constant rather than the DAL.
+
+Several files are **this repo's own, round-tripped back**: `setup.ts`,
+`syncTypes.ts`, `sentiment.ts`, `sentiment.test.ts`, `db.test.ts`,
+`outbox.test.ts`. One is a *stale* copy — the supplied `toneClasses.ts` is
+the pre-session-9 version (typed for sentiment only, `Tone` not exported),
+superseded here when incidents/logistics started sharing it. Worth noting
+only because re-importing any of these from the fork would silently roll
+this repo backwards.
 
 ## A hard conflict the fork exposes in the V2 bundle
 

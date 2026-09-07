@@ -959,6 +959,62 @@ open conflict recorded in session 12's item 3.
 **Verified:** no source changed this session, so the prior verification
 stands; `check:all` re-run green regardless.
 
+**Session 14 (7 Sep 2026) — offline DB made reopen-safe; the fork's UI
+layer reviewed in full.** Sixteen more ecos-v2 files. Six are this repo's
+own round-tripped back (one, `toneClasses.ts`, a *stale* pre-session-9
+copy). The rest are the fork's UI layer, reviewed and added to
+`docs/ecos-v2-fork-review.md`.
+
+**One genuine improvement adopted — the first from this fork that is
+better engineering than what was here.** Its `db.ts` handles IndexedDB
+connection lifecycle; this repo had none. The failure mode was verified
+against this repo's own Dexie rather than assumed: **a closed connection
+rejects every subsequent operation with `DatabaseClosedError`; Dexie does
+not transparently reopen it.** For an offline-first field app, the write
+that fails is a canvasser's canvass result after backgrounding the app.
+Added `offlineDb.ensureOpen()` and called it from `enqueue()`,
+`drainOutboxBatch()` and `applySyncResponse()`. 5 new tests (113 total, up
+from 108) — and the new tests were confirmed to **fail** with the guard
+removed (`DatabaseClosedError`) and pass with it, so they protect
+something real. One db.test.ts case asserts the Dexie premise itself, so a
+future Dexie change surfaces instead of silently making the guard pointless.
+
+**Not adopted from the same file:** the fork's
+`on('versionchange', () => false)`. That event fires when *another tab* is
+upgrading the schema; refusing to close blocks that upgrade indefinitely.
+A closed connection is recoverable, a wedged upgrade is not. Its
+`visibilitychange` reopener (redundant once every entry point guards, and
+a never-removed global listener) and its error-swallowing `catch` in
+`ensureOpen` were also left out.
+
+**Two findings that raise the stakes on the fabrication issue**, both new
+this session:
+
+- **`SmartMembershipCaptureModal.tsx` states POPIA guarantees for
+  processing that does not exist.** The flow is `setTimeout`-simulated
+  OCR (hardcoded to `'Thabo Mofokeng'` / ID `8506125009087`, which also
+  fails its checksum), a mock OTP `'123456'` with an on-screen hint, and a
+  `Math.random()` audit reference. It tells the user images "are uploaded
+  to a temporary, encrypted bucket (africa-south1) and deleted
+  automatically after processing" — nothing is uploaded — and that details
+  were "securely logged to the immutable append-only ledger" — nothing is
+  logged. It collects a POPIA consent declaration and discards it.
+- **`HouseholdAddressModal.tsx` mints its own `SessionContext`** with its
+  own `caps` array and passes it to the DAL, inverting §4.4's server-side
+  capability resolution. Real `firestore.rules` would reject the write
+  (rules read `request.auth.token.caps`), so it is a pattern failure
+  rather than a live hole — but it is the pattern the whole three-layer
+  isolation model exists to prevent. Its "Validate with Google Maps"
+  button calls nothing and then reports the address verified.
+
+Also read in full and unchanged in assessment: the Bento War Room's
+numbers are all literals (`142893` registered, `89.4` VPM, "312"
+canvassers, 74/65/58 % sentiment bars), and its volunteer avatars are
+Unsplash photographs of real people presented as field staff.
+
+**Verified:** `npm run check:all` — lint, typecheck, `check:hex`, **113
+tests** (up from 108), all green; `npm run build` succeeds.
+
 ---
 
 ## Version conflict found in session 2 — RESOLVED

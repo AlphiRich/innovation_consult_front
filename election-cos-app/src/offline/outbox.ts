@@ -7,11 +7,17 @@
  * get folded back into local state — this is the function that makes
  * §7.5 ("conflicts must be visible") and §7.6 ("rejections must be
  * actionable") real rather than aspirational.
+ *
+ * Every exported function here starts with `offlineDb.ensureOpen()`. These
+ * are the three entry points that touch IndexedDB after the app may have
+ * been backgrounded, and Dexie does not reopen a closed connection on its
+ * own — see the note on `ensureOpen()` in db.ts.
  */
 import { offlineDb, type ConflictEntry, type OutboxEntry, type SyncState } from './db';
 import type { SyncOperation, SyncResponse } from './syncTypes';
 
 export async function enqueue(entry: Omit<OutboxEntry, 'seq'>): Promise<void> {
+  await offlineDb.ensureOpen();
   await offlineDb.outbox.add(entry as OutboxEntry);
   const table = tableFor(entry.entity);
   await table.update(entry.entityId, { _syncState: 'PENDING' as SyncState });
@@ -31,6 +37,7 @@ function tableFor(entity: OutboxEntry['entity']) {
 }
 
 export async function drainOutboxBatch(maxOps: number): Promise<SyncOperation[]> {
+  await offlineDb.ensureOpen();
   const entries = await offlineDb.outbox.orderBy('seq').limit(maxOps).toArray();
   return entries.map((e) => ({
     seq: e.seq!,
@@ -48,6 +55,7 @@ export async function drainOutboxBatch(maxOps: number): Promise<SyncOperation[]>
  * (§7.6).
  */
 export async function applySyncResponse(response: SyncResponse): Promise<void> {
+  await offlineDb.ensureOpen();
   for (const accepted of response.accepted) {
     await offlineDb.outbox.delete(accepted.seq);
   }
