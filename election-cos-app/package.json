@@ -1,5 +1,5 @@
 {
-  "name": "election-cos-app",
+  "name": "@innovation-consult/ecos-app",
   "private": true,
   "version": "1.0.0-dev",
   "type": "module",

@@ -792,6 +792,117 @@ this session added map UI, not new pure-logic units to cover), lint/
 typecheck/`check:hex`/build all green in `election-cos-app/`; `functions/`
 build + its 13 tests unaffected (this session didn't touch `functions/`).
 
+**Session 12 (7 Sep 2026) — the V2 bundle arrived; naming pass corrected
+against its real source; four conflicts flagged, none silently resolved.**
+The human sent the actual `IC-ECOS-BUILD-2026-V2` bundle (5–6 Sep 2026):
+`00-MASTER-DECISIONS.md`, `01-HOSTING-COST-COMPARISON.md`,
+`02-PRICING-V2-WEEKLY-METERED.md`, **`03-NAMING-SCHEMA.md`**,
+`04-APP-REVIEW.md`, `05-ARTEFACT-INDEX.md`, `prisma/schema.prisma`, SQL
+migrations `010`–`040`, both OpenAPI contracts, and the TS SDK client.
+Session 11 applied that naming pass **secondhand**, from a citation in the
+ecos-v2 fork's BUILD-STATUS; this session had the source document and
+checked the work against it.
+
+**Session 11's pass was directionally right and wrong in the details.**
+`03-NAMING-SCHEMA.md` §2.3 fixes specific strings per surface, and session
+11's blanket replace to the full product name overshot on four of them.
+Corrected here:
+
+| Surface | Session 11 had | §2.3 canonical — now applied |
+|---|---|---|
+| Nav-shell mark (`Shell.tsx`) | `Election Campaign OS` | **`EC OS`** (compact form) |
+| Nav footer (`Shell.tsx`) | `Copyright © … All rights reserved.` | **`© Innovation Consult (Pty) Ltd · knowledge to action`** |
+| Sign-in header (`SignInPage.tsx`) | eyebrow + `Sign in` | **`Sign in to Election Campaign OS`** |
+| Error boundary (`ErrorBoundary.tsx`) | `Something went wrong` | **`Election Campaign OS encountered an error`** |
+| `package.json` → `name` | `election-cos-app` (session 11 deliberately left it) | **`@innovation-consult/ecos-app`** per §2.1 |
+
+The package-name call in session 11 ("infra identifier, not branding, so
+don't touch it") was wrong — §2.1 names the node package explicitly.
+§2.5 separately keeps the *repo/directory* as `election-cos-app`, so the
+CI `working-directory:` paths are correct as they stand and were not
+touched. Verified by running the app, not just building it: dev server +
+headless Chromium, sign-in page renders both new strings, no console
+errors. Strings now come from `src/lib/legalText.ts` constants
+(`PRODUCT_NAME`, `PRODUCT_NAME_SHORT`, `NAV_FOOTER_LINE`) rather than
+being retyped per file — the fourth naming directive won't need another
+repo-wide sweep.
+
+**Closed by this repo, contrary to the bundle:** `04-APP-REVIEW.md` §2 and
+`01-HOSTING` §6.5 both flag the GCP project identity
+(`innovation-consult-ecos-prod` vs `election2026-campaignms7-0`) as
+unreconciled and needing a human. **It was resolved in session 10** — the
+human confirmed `election2026-campaignms7-0`, and this repo has a real
+`.firebaserc` for it. The bundle predates that. No action needed; the
+bundle's next-step #3 is already done.
+
+**Flagged, deliberately NOT resolved — each needs a human decision:**
+
+1. **Where the metering engine runs.** The bundle's own `04-APP-REVIEW.md`
+   §4 and `05-ARTEFACT-INDEX.md` next-step #1 name this as the blocking
+   decision, and it is: `prisma/schema.prisma` + `020_metering_tokens_vouchers.sql`
+   are Postgres-native (PL/pgSQL `debit_tokens()`/`reverse_debit()`), this
+   app is Firestore-native, and `src/dal/adapters/postgres/` is empty by
+   design until Phase 8's paying-subscriber trigger. Either metering gets a
+   Firestore implementation or Postgres gets provisioned early. Not picked
+   here.
+2. **The bundle contradicts itself on that same point.**
+   `00-MASTER-DECISIONS.md` §2 says V2's database is *"Firestore Standard"*
+   and §4 says V2 is a *"Shared Firestore database"* — while the schema and
+   migrations in the same bundle describe V2 as the Postgres shared-tenancy
+   product. Worth resolving in the artefact before anyone builds against it.
+3. **RBAC role model conflict — the previously-flagged defect class, again.**
+   `010_v2_shared_tenancy.sql` seeds **6** roles (`HQ_ADMIN`, `LOCAL_HEAD`,
+   `FINANCE_OFFICER`, `WARD_LEAD`, `VD_CAPTAIN`, `VOLUNTEER`), and the
+   `ecos-rbac-config` skill calls those six canonical, explicitly warning
+   that a 7th like `COMPLIANCE_OFFICER` is usually a task-owner label
+   leaking into login RBAC. This repo has **7** roles from
+   `IC-ECOS-BUILD-2026-V2 §4.4`, and the 7th *is* `compliance-officer` —
+   but it is not a leak: it holds `dsr.view`/`dsr.manage` for the POPIA
+   data-subject-request workflow that `04-legal-compliance-workstream.md`
+   action **LG10** required, which is a real product decision. Also
+   divergent: id convention (`ward-lead` vs `WARD_LEAD`) and UI labels
+   (this repo's "Ward Lead" / "Municipal Team Lead" vs the skill's "Field
+   Coordinator" / "Local Election Head" — the skill itself flags that
+   label mapping as worth confirming). **Not reconciled unilaterally**:
+   dropping Compliance Officer would strip the POPIA workflow's owner.
+4. **Capability catalogue divergence.** 25 capability keys here vs ~45 in
+   the bundle's seed, with different conventions in places (`incident.read`
+   vs this repo's `incidents.view`). The bundle's are metering-shaped
+   (`diary.geospatial.review` at 25 tokens); this repo's are
+   access-control-shaped. They must reconcile before any debit call is
+   wired, or the two systems will disagree about what a capability *is*.
+   `05-ARTEFACT-INDEX.md` records the bundle already hit this once — its
+   OpenAPI examples cited keys that didn't match its own seeded table.
+
+**Two real gaps this bundle surfaced in this repo:**
+
+- **No PWA manifest exists at all.** §2.3 specifies `manifest.json`
+  install names (`EC OS` short, `Election Campaign OS` long); there is no
+  `manifest.json` and no `public/` directory in this repo, despite
+  "offline-first PWA" being the architecture throughout. Not fabricated
+  here — a real manifest needs real icon assets that don't exist yet.
+- **§2.3's nav mark wants "tenant name below" — there is no tenant name
+  to render.** `SessionContext` carries `tenantId` only (an opaque id);
+  `Tenant.displayName` lives in the unbuilt Postgres store. The slot is
+  left empty with a comment rather than filled with an id.
+
+**One knowing exception to §4's cross-check.** That section says
+`grep -R "Civic Architect\|Civic Authority\|..." src/` should return zero
+hits. It returns four here — all of them comments *documenting the
+retirement* ("reskinned to our tokens, not the retired Civic Authority
+palette"). Removing them would delete the provenance trail explaining why
+those screens look the way they do. Left in place deliberately; flagging
+rather than quietly failing the check.
+
+**Not acted on:** the metering/harvest SDK, OpenAPI contracts, and SQL
+migrations are untouched — they are new integration surface gated behind
+decision #1, not something to wire in on spec. A bare `x.com` link was
+also supplied with no context and could not be opened from this sandbox.
+
+**Verified:** `npm run check:all` — lint, typecheck, `check:hex`, 108
+tests, all green; `npm run build` succeeds; sign-in page smoke-tested in
+a real browser (see above).
+
 ---
 
 ## Version conflict found in session 2 — RESOLVED

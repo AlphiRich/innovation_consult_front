@@ -15,8 +15,24 @@
 export const COMPANY_LEGAL_NAME = 'Innovation Consult (Pty) Ltd';
 export const COMPANY_REG_NUMBER = '2007/021390/07';
 export const COMPANY_TRADING_AS = 'Just Be Trading 10 (Pty) Ltd';
+/** IC-ECOS-NAMING-2026-V1 §2.1. */
+export const COMPANY_TAGLINE = 'knowledge to action';
+
+/** Product name, canonical per IC-ECOS-NAMING-2026-V1 §2.1. Full form. */
+export const PRODUCT_NAME = 'Election Campaign OS';
+/** Short/compact form — nav mark, PWA short_name. Same doc, same section. */
+export const PRODUCT_NAME_SHORT = 'EC OS';
 
 export const COPYRIGHT_LINE = `Copyright © ${COMPANY_LEGAL_NAME}. All rights reserved.`;
+
+/**
+ * The nav-shell footer string, quoted verbatim from IC-ECOS-NAMING-2026-V1
+ * §2.3 — it is deliberately shorter than COPYRIGHT_LINE above and pairs the
+ * company with its tagline rather than a rights assertion. Don't "harmonise"
+ * the two; §2.3 governs this surface specifically, COPYRIGHT_LINE governs
+ * outbound documents (EMAIL_FOOTER, pdfFooter).
+ */
+export const NAV_FOOTER_LINE = `© ${COMPANY_LEGAL_NAME} · ${COMPANY_TAGLINE}`;
 
 export const COMPANY_REG_LINE = `${COMPANY_LEGAL_NAME} (t/a ${COMPANY_TRADING_AS}) · Reg. ${COMPANY_REG_NUMBER}`;
 

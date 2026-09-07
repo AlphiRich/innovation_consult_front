@@ -9,7 +9,7 @@
 import { useState } from 'react';
 import { signInWithGoogle } from './firebaseAuth';
 import { GoogleIcon } from './GoogleIcon';
-import { COPYRIGHT_LINE } from '@/lib/legalText';
+import { NAV_FOOTER_LINE, PRODUCT_NAME } from '@/lib/legalText';
 
 export function SignInPage() {
   const [pending, setPending] = useState(false);
@@ -40,8 +40,8 @@ export function SignInPage() {
     <div className="min-h-screen flex items-center justify-center bg-paper px-4">
       <div className="w-full max-w-sm bg-white border border-ink/10 rounded-lg p-8 space-y-6">
         <div>
-          <p className="text-label-caps font-display uppercase text-gold">Election Campaign OS</p>
-          <h1 className="text-headline-md font-display text-ink mt-1">Sign in</h1>
+          {/* IC-ECOS-NAMING-2026-V1 §2.3 fixes this header string exactly. */}
+          <h1 className="text-headline-md font-display text-ink">Sign in to {PRODUCT_NAME}</h1>
           <p className="text-body-md font-body text-slate mt-2">
             Use your party-issued Google account to continue.
           </p>
@@ -64,7 +64,7 @@ export function SignInPage() {
           geographic scope in Settings → Permissions before you can see any data (§4.4).
         </p>
 
-        <p className="text-xs text-slate/60 text-center">{COPYRIGHT_LINE}</p>
+        <p className="text-xs text-slate/60 text-center">{NAV_FOOTER_LINE}</p>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react';
+import { PRODUCT_NAME } from '@/lib/legalText';
 
 interface Props {
   children: ReactNode;
@@ -25,7 +26,8 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-screen flex items-center justify-center bg-paper p-8">
           <div className="max-w-md rounded-lg border border-maroon/40 bg-white p-6 text-center">
-            <h1 className="font-display text-xl text-maroon">Something went wrong</h1>
+            {/* String fixed by IC-ECOS-NAMING-2026-V1 §2.3. */}
+            <h1 className="font-display text-xl text-maroon">{PRODUCT_NAME} encountered an error</h1>
             <p className="mt-2 text-sm text-slate">
               This has been logged. Reload the page, or contact support if it persists.
             </p>

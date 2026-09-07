@@ -22,7 +22,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useAuthState } from '@/auth/useSession';
 import { SignInPage } from '@/auth/SignInPage';
 import { signOut } from '@/auth/firebaseAuth';
-import { COPYRIGHT_LINE } from '@/lib/legalText';
+import { NAV_FOOTER_LINE, PRODUCT_NAME_SHORT } from '@/lib/legalText';
 import { PRIMARY_NAV, isNavItemVisible } from './nav';
 
 export function Shell() {
@@ -66,7 +66,19 @@ export function Shell() {
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-paper">
       <nav className="md:w-64 shrink-0 bg-ink text-paper p-4 md:min-h-screen flex flex-col">
-        <div className="font-display text-lg tracking-wide mb-6">Election Campaign OS</div>
+        {/*
+         * IC-ECOS-NAMING-2026-V1 §2.3: this surface takes the compact mark
+         * ("EC OS"), not the full product name — the full name belongs in
+         * <title>, the sign-in header, and document/report headers.
+         *
+         * §2.3 also specifies "with tenant name below". Not rendered: no
+         * tenant *name* exists to render. SessionContext carries tenantId
+         * only (an opaque id — showing it here would be worse than showing
+         * nothing), and the Tenant.displayName field that would supply a
+         * real name lives in the V2 Postgres store, which is unbuilt. Slot
+         * stays empty on purpose until there's a real name to put in it.
+         */}
+        <div className="font-display text-lg tracking-wide mb-6">{PRODUCT_NAME_SHORT}</div>
         <ul className="space-y-1">
           {PRIMARY_NAV.filter((item) => isNavItemVisible(item, caps)).map((item) => (
             <li key={item.route}>
@@ -88,7 +100,7 @@ export function Shell() {
           <button type="button" onClick={() => signOut()} className="text-xs text-paper/60 hover:text-paper mt-1">
             Sign out
           </button>
-          <p className="text-xs text-paper/40 mt-4">{COPYRIGHT_LINE}</p>
+          <p className="text-xs text-paper/40 mt-4">{NAV_FOOTER_LINE}</p>
         </div>
       </nav>
       <main className="flex-1 p-4 md:p-8">
