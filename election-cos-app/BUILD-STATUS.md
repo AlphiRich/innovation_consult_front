@@ -903,6 +903,62 @@ also supplied with no context and could not be opened from this sandbox.
 tests, all green; `npm run build` succeeds; sign-in page smoke-tested in
 a real browser (see above).
 
+**Session 13 (7 Sep 2026) — the rest of the bundle, and ecos-v2 source
+read directly. No code changed; one real defect and one hard conflict
+found.** The human supplied the bundle's three remaining artefacts
+(`skills/ecos-v2-metering/SKILL.md`, its
+`references/action-pricing-checklist.md`, and
+`skills/ecos-electoral-data-harvest/references/source-manifest-starter.md`)
+plus thirteen loose source files from the ecos-v2 fork. The bundle is now
+complete as listed in `05-ARTEFACT-INDEX.md`; the metering skill and
+checklist are reference material for work still gated behind session 12's
+decision #1 (where the metering engine runs), so nothing was built from
+them.
+
+The fork files are the primary sources behind session 11's findings, which
+had been made from patch scripts rather than the code itself. Full review
+written up in **`docs/ecos-v2-fork-review.md`** — what was taken, what was
+rejected, and why. Two items are worth surfacing here:
+
+1. **A real defect in the fork's POPIA anti-fraud validator.**
+   `validateSouthAfricanId()` enforces the SA ID checksum only when the
+   caller opts in with `{ strictLuhn: true }`, and
+   `validateAndVerifyMemberCapture()` — the anti-fraud capture path —
+   calls it without that option, so a checksum-invalid ID is accepted as
+   valid by the routine whose whole purpose is catching fraudulent
+   captures. Its test suite cannot catch this because its own
+   "valid" fixture (`8804150123183`) computes check digit 7 and carries 3.
+   Verified by transcribing the algorithm and running it, not by reading:
+   the algorithm itself is correct, and all six of its fabricated
+   `SEED_CAPTURED_IDS` member records also fail the checksum. Nothing
+   ported — there is no consumer for SA ID validation in this repo today
+   (`Candidate.idNumberMasked` is written by nothing, Candidates has no UI
+   or route, `DonorForm` deliberately doesn't capture ID numbers), so
+   building one now would be speculative. The review doc records what to
+   reuse and what to fix if Candidates ever gets a capture screen.
+2. **The fork's RLS tests and the bundle's RLS migration contradict each
+   other.** `tenantIsolationRls.test.ts` exists specifically to prove
+   VARCHAR(36) tenant ids like `'tenant-jbm-anc-2026'` work without a
+   UUID cast; `010_v2_shared_tenancy.sql` declares `tenant.id uuid` and
+   every policy does `current_setting('app.current_tenant_id', true)::uuid`,
+   which raises `invalid input syntax for type uuid` on exactly those ids.
+   One of the two has to change. Neither applies to this Firestore-native
+   repo yet, so it is flagged for whoever owns the bundle rather than
+   resolved here.
+
+Also confirmed from source rather than inference: the fork's
+`metricsService.ts` defaults to a mock path built from hardcoded constants
+(including **R15.45 m of fabricated donations** in a PPFA-regulated
+product) with chart series synthesised by `Math.sin()`; and its
+`index.css` regresses the brand navy to `#040c30`, the value
+`CLAUDEHANDOFF.md` §5 records as already retired in favour of `#1A2246`.
+Neither adopted. Its `tenantIsolationRls.test.ts` is also a third
+independent source for the 6-role set, against this repo's seven — the
+open conflict recorded in session 12's item 3.
+
+**Verified:** no source changed this session, so the prior verification
+stands; `check:all` re-run green regardless.
+
 ---
 
 ## Version conflict found in session 2 — RESOLVED
