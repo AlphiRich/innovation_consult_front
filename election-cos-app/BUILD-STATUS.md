@@ -1267,6 +1267,91 @@ writer, 26 document model, 17 layout, 10 issue workflow), lint, typecheck,
 `firebase/*` import outside `src/dal/adapters/firestore/` and `src/auth/`).
 Sample output opened and read back with poppler.
 
+**Session 19 (12 Sep 2026) — infrastructure blueprint batch; architecture
+unchanged; one guard adopted.** Sixteen files, no instruction text: a
+3-page stack/hosting blueprint, a documentation-placement docx, a pypdf
+encryption script, 13 CSVs (8 unique — five are byte-identical
+duplicates), and an academic paper that was never readable. Plus, as
+message text, a security review of a Postgres MFA/OTP spec. Full account
+in `docs/infrastructure-blueprint-review.md`.
+
+**Nothing in the batch changed the build.** The headline proposal — drop
+Firestore for Cloud SQL Postgres + Cloud Run + Cloudflare — is a real
+architecture decision and not one a session takes on an uploaded CSV. It
+is now the **sixth** unresolved conflict held for a human, and it overlaps
+the second (the V2 bundle contradicting itself on Firestore vs Postgres);
+they should be decided together, once. Noted in its favour: the DAL was
+built for exactly this swap and module code would not change. Noted
+against the argument as written: "no RLS → tenant isolation moves to app
+code" is not accurate for this repo — Firestore Security Rules are
+enforced by Google server-side, not in app code. They are weaker and
+harder to audit than Postgres RLS, which is the defensible form of the
+claim.
+
+**Verified errors, recorded because they would cause real harm if acted
+on:**
+
+- The blueprint names "the primary GCP region (e.g., Johannesburg
+  **europe-west8**)". `europe-west8` is **Milan**. Johannesburg is
+  `africa-south1`. Followed literally that puts SA personal information in
+  the EU — POPIA §72, and the §0 rule 1 the whole build is pinned against.
+  *This repo is clean:* every function pinned via `functions/src/region.ts`,
+  no `europe-west` anywhere in the tree.
+- The Firebase cost table's Cloud Functions row overstates compute by
+  ~24,000× (`$0.40/GB-sec` against a real `$0.00001667`), inverts the free
+  tier ("invocations after 2M are free" — the *first* 2M are), and gets
+  both free-tier quotas wrong. The `$0.40` is the per-million-*invocations*
+  price in the compute row. Its Firestore row is broadly accurate.
+- The scenario comparison omits the 2.2 TB map-tile line from its own
+  traffic table (~$264) while totalling egress at $36. The traffic
+  projections themselves are unsourced — no user, ward or canvasser count
+  appears anywhere in the batch.
+- The blueprint and the CSVs cannot both be followed: one keeps Firestore
+  for offline-sync, the other rejects it for canvassing data. Those
+  overlap.
+- "Firebase Storage NOT NEEDED, Cloud Storage covers it" conflates two
+  access paths to the same bucket — relevant to the `fileStore` adapter
+  and `storage.rules` built last session.
+
+**The MFA/OTP security review targets a spec that is not in this
+repository** — no MFA, no OTP, no `auth.*` schema, no Postgres. Its
+findings look correct; there was nothing here to fix and nothing was
+invented to fix. Its defect *classes* were audited against this repo the
+same way every fork batch has been: phone stored encrypted not hashed
+(sound), no credential material in IndexedDB (sound), region (sound),
+tenant id on every path (sound). One applies by design and is flagged for
+a human: capabilities ride in custom claims on a ~1h ID token, so a
+revoked capability stays live until refresh.
+
+**Adopted — one thing, and it lands on code written last session.** The
+review's point that SHA-256 is built for speed and so protects nothing
+when used to commit to a low-entropy secret is correct, and
+`src/lib/hash.ts` is precisely where that mistake would be made:
+`sha256Hex(canonicalPayload(doc))` and `sha256Hex(otpCode)` look identical
+and only one is sound. `hash.ts` now states the distinction and
+`hash.test.ts` enforces it — a scan that fails if either entry point is
+handed something named like an OTP/PIN/password/secret/key, and a second
+that fails if a password-hashing KDF appears without the note being
+revisited.
+
+**The guard was proved, and the first draft of it was broken.** Injecting
+`sha256Hex(otpCode)` did *not* trip the first regex: it had a trailing
+`\b`, and there is no word boundary between `otp` and `C`. It passed its
+own tripwire proof by matching nothing. Fixed and re-proved against four
+cases — `sha256Hex(otpCode)` fires, `sha256Hex(user.password)` fires, a
+`bcrypt` import fires, and `sha256Hex(mapping)` correctly does not. Also
+caught by its own tests: a SHA-256 vector for `"é"` written from memory in
+the first draft and simply wrong. The implementation was right, the
+expectation was invented; vectors are now computed and the line says so.
+
+**Not reviewed:** the ProgramBench paper. The upload directory was cleared
+before it could be opened; no content from it reached this session, and it
+is not assessed in either direction.
+
+**Verified:** `check:all` green — **206 tests** (up from 197), lint,
+typecheck, `check:hex`; `npm run build` succeeds. `node_modules` had to be
+reinstalled — the container was recycled between sessions.
+
 ---
 
 ## Version conflict found in session 2 — RESOLVED

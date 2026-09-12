@@ -10,6 +10,25 @@
  * `crypto.subtle` requires a secure context (HTTPS or localhost). If it is
  * unavailable this throws rather than degrading to a weaker digest: a
  * document that cannot be hashed must not be issued claiming it was.
+ *
+ * WHAT THIS IS FOR, AND WHAT IT MUST NEVER BE USED FOR
+ *
+ * This is an INTEGRITY hash over content that is not secret — a referral's
+ * canonical field serialization, an export's bytes. SHA-256 is the right
+ * tool there precisely because it is fast and deterministic: anyone
+ * holding the record can recompute it and get the same answer.
+ *
+ * That same speed makes it the WRONG tool for committing to a low-entropy
+ * secret — an OTP, a PIN, a passcode, a password, a short account number.
+ * A six-digit OTP has a million possible values; an attacker holding the
+ * database can exhaust every SHA-256 of them in well under a second, so
+ * the hash protects nothing. Secrets need a deliberately slow,
+ * salted KDF (bcrypt, scrypt, argon2id, or PBKDF2 with a high iteration
+ * count) — not this function.
+ *
+ * Nothing in this product hashes a secret today. `hash.test.ts` scans the
+ * source tree and fails if that changes, because the mistake is easy to
+ * make and invisible once made: the code looks identical either way.
  */
 
 function subtle(): SubtleCrypto {
