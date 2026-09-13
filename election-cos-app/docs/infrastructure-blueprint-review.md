@@ -25,7 +25,16 @@ bytes, different filenames.
 A separate security review of a Postgres MFA/OTP specification also
 arrived as message text. That spec is **not in this repository** — see §6.
 
-## 2. The headline proposal: drop Firestore for Postgres
+## 2. The headline proposal: drop Firestore for Postgres — DECLINED
+
+> **RESOLVED 13 Sep 2026 by the project owner: "Firestore is my final
+> decision."** Firestore is the database; there is no Postgres migration.
+> The analysis below is kept as written — it is the record of what was
+> proposed and what was wrong with how it was argued — but the question is
+> closed. See `BUILD-STATUS.md`, "DECISION — Firestore is the database",
+> for the decision record, including the two criticisms of Firestore that
+> were fair and are now the accepted terms of the choice.
+
 
 The CSVs argue Cloud Firestore should be **rejected for tenant and
 canvassing data** ("No RLS → tenant isolation moves to app code"), with
@@ -39,6 +48,9 @@ make.** Recording the position rather than acting on it:
   `src/dal/adapters/postgres/` is deliberately empty pending Phase 8, and
   the ESLint boundary already prevents Firebase imports leaking outside
   `src/dal/adapters/firestore/**`. Module code would not change.
+  *(Superseded: that directory is now permanently empty and Phase 8 is
+  closed. The seam stays for its other three reasons — see the decision
+  record.)*
 - What *would* change and is not free: `firestore.rules` is currently a
   real enforcement layer (three-layer isolation — custom claims → rules →
   DAL). Moving to Postgres RLS replaces one of those layers with a
@@ -51,11 +63,14 @@ make.** Recording the position rather than acting on it:
   "Firestore's isolation primitives are weaker and harder to audit than
   RLS," which is defensible. The version in the CSV is not.
 
-This is now the **sixth** unresolved architecture conflict carried for a
-human decision, alongside the five already logged in `BUILD-STATUS.md`
-(where the V2 metering engine runs; Firestore-vs-Postgres in the V2
-bundle; 6-vs-7 roles; 25-vs-45 capabilities; uuid-vs-VARCHAR(36) in RLS).
-It overlaps the second of those and should be decided with it, once.
+This was the sixth unresolved architecture conflict carried for a human
+decision, alongside the five logged in `BUILD-STATUS.md` (where the V2
+metering engine runs; Firestore-vs-Postgres in the V2 bundle; 6-vs-7
+roles; 25-vs-45 capabilities; uuid-vs-VARCHAR(36) in RLS). It overlapped
+the second, and both were closed together by the decision above. **Three
+remain open:** the role model, the capability catalogue, and the RLS key
+type — none of which the Firestore decision touches, since all three are
+about the V2 artefacts rather than this app's datastore.
 
 ## 3. Verified errors in the blueprint PDF
 

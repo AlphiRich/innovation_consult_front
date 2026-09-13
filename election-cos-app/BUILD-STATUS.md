@@ -839,6 +839,14 @@ bundle's next-step #3 is already done.
 
 **Flagged, deliberately NOT resolved — each needs a human decision:**
 
+> **RESOLVED 13 Sep 2026 (session 20), items 1 and 2 below, by the project
+> owner: "Firestore is my final decision."** Firestore is the database.
+> There is no Postgres migration — not deferred, not conditional,
+> *decided*. Items 1 and 2 are kept in place below for the record of what
+> was asked and when; do not re-open either. See the decision record at
+> the end of this file.
+
+
 1. **Where the metering engine runs.** The bundle's own `04-APP-REVIEW.md`
    §4 and `05-ARTEFACT-INDEX.md` next-step #1 name this as the blocking
    decision, and it is: `prisma/schema.prisma` + `020_metering_tokens_vouchers.sql`
@@ -1351,6 +1359,120 @@ is not assessed in either direction.
 **Verified:** `check:all` green — **206 tests** (up from 197), lint,
 typecheck, `check:hex`; `npm run build` succeeds. `node_modules` had to be
 reinstalled — the container was recycled between sessions.
+
+**Session 20 (13 Sep 2026) — the database question is closed.** The
+project owner decided: *"Firestore is my final decision."* Recorded as a
+decision section at the end of this file, and reflected in three places a
+future session or uploaded batch will actually hit:
+`src/dal/adapters/postgres/README.md` (rewritten from "Phase 8,
+conditional" to closed), `src/dal/index.ts` (the
+`VITE_DAL_ADAPTER=postgres` throw now enforces a decision, not an unbuilt
+phase), and `src/dal/dalAdapter.test.ts` — a new tripwire that fails if a
+SQL client is added to `package.json`, if the Postgres adapter directory
+acquires code, if the env-var guard is softened to a warning, or if a
+module reaches past the DAL to the Firebase SDK.
+
+Proved, not assumed: all four cases were injected and each failed the
+suite, then reverted. The decision closes conflicts 1 and 2 from the
+session-13 list; **three remain open** (role model, capability catalogue,
+RLS key type) and are untouched by it, being about the V2 artefacts rather
+than this app's datastore.
+
+The DAL port/adapter pattern **stays**. Its migration justification is
+gone; three live ones are not — it keeps the Firebase SDK out of
+`src/modules/**`, forces `SessionContext` through every data call, and is
+the seam the offline outbox sits against. The decision record says so
+explicitly, and the tripwire's second half asserts the seam, so "the
+migration is off, so the abstraction is pointless" cannot quietly become a
+refactor.
+
+The record also states what the decision *accepts* rather than only what
+it rejects: Firestore's isolation primitives are genuinely weaker than
+Postgres RLS (compensated by three-layer isolation), and read volume is
+the real cost risk (compensated by §7.4 page-size discipline, which is now
+load-bearing in review). Those were the two fair criticisms in the
+uploaded batches. They are the terms of the choice, not grounds to
+re-open it.
+
+**Verified:** `check:all` green — **212 tests** (up from 206), lint,
+typecheck, `check:hex`; `npm run build` succeeds.
+
+---
+
+## DECISION — Firestore is the database (13 Sep 2026)
+
+**Decided by the project owner, in these words: "Firestore is my final
+decision."** Recorded here because the question had been raised by four
+separate uploaded batches across sessions 13–19 and re-litigating it each
+time was costing more than the question was worth.
+
+### What this settles
+
+- **Firestore is the datastore for Election Campaign OS.** Not "for now",
+  not "until Phase 8". Decided.
+- **There is no Postgres migration.** The conditional Phase 8 migration in
+  `IC-ECOS-BUILD-2026-V2` §10 is closed. `src/dal/adapters/postgres/`
+  stays empty permanently, and `src/dal/index.ts` continues to throw on
+  `VITE_DAL_ADAPTER=postgres` — that guard is now enforcing a decision
+  rather than an unbuilt phase.
+- **Conflicts 1 and 2 in the session-13 list are closed.** The metering
+  engine, if it is built here, gets a Firestore implementation. The V2
+  bundle's self-contradiction is resolved in favour of the reading its own
+  `00-MASTER-DECISIONS.md` §2/§4 already gave — *"Firestore Standard"*,
+  *"Shared Firestore database"*.
+- **The infrastructure batch's central proposal is declined**
+  (`docs/infrastructure-blueprint-review.md` §2). That batch's other
+  findings stand on their own and are unaffected.
+
+### What this does NOT change
+
+The **DAL port/adapter pattern stays exactly as it is.** It was originally
+justified as migration insulation, but that was never its only value and
+is now not its main one:
+
+- it keeps the Firebase SDK out of `src/modules/**` — the ESLint boundary
+  that makes every module testable without a Firebase mock;
+- it forces `SessionContext` through every data call (§5.2,
+  non-negotiable #1), which is a third of the tenant-isolation story;
+- it is the seam the offline outbox and the Dexie mirror already sit
+  against.
+
+Deleting the abstraction because the migration is off would throw away
+three live benefits to remove one dead one. Nothing about this decision
+licenses that, and a future session should not read it that way.
+
+### What we are accepting by choosing Firestore
+
+Recording this so the decision is held honestly rather than defended. Two
+of the criticisms levelled at Firestore across those batches were partly
+fair, and choosing Firestore means accepting them:
+
+1. **Isolation primitives are weaker than Postgres RLS.** `firestore.rules`
+   is enforced server-side by Google — the "isolation moves to app code"
+   claim was wrong — but rules cannot join, cannot evaluate policy
+   transactionally, and are harder to audit than a `USING` clause. The
+   compensating control already in place is that isolation is not left to
+   rules alone: custom claims → `firestore.rules` → DAL, three layers,
+   with `tenantOK(tid)` on every path and `delete: if false` almost
+   everywhere.
+2. **Read volume is the real cost risk.** The uploaded cost table was
+   badly wrong about Cloud Functions (§4 of the infrastructure review),
+   but the underlying point about Firestore reads at scale is sound. The
+   compensating control already in place is §7.4 free-tier discipline —
+   `DEFAULT_PAGE_SIZE = 25`, no unbounded `listAll` on a hot path, and
+   war-room counters maintained by Cloud Function triggers rather than
+   recomputed by clients. That discipline now matters more, not less, and
+   should be treated as load-bearing in review.
+
+Neither is a reason to revisit the decision. They are the terms of it.
+
+### Tripwire
+
+`src/dal/dalAdapter.test.ts` fails if a Postgres/SQL client dependency is
+added, if the Postgres adapter directory acquires an implementation, or if
+the `VITE_DAL_ADAPTER=postgres` guard is softened. This exists because the
+proposal arrived four times from outside the repo; the next arrival should
+meet a failing test and this section, not a fresh debate.
 
 ---
 
