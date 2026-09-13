@@ -31,7 +31,14 @@ export interface Candidate {
   listRank?: number;
   gender?: CandidateGender;
   idNumberEncrypted: string; // never plaintext
-  idNumberMasked: string; // e.g. '771120 •••• 081'
+  /**
+   * Produced by `maskSaIdNumber()`. Session 27 narrowed the format: an
+   * earlier example here read '771120 •••• 081', which reveals nine of
+   * thirteen digits — including a full date of birth — and one of the four
+   * it hides is fixed by the check digit. Four digits is what a mask
+   * shows.
+   */
+  idNumberMasked: string; // '••••••••• 9087'
   verificationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
   createdAt: string;
   updatedAt: string;

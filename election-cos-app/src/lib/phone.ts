@@ -7,10 +7,14 @@
  * pending real key management — see BUILD-STATUS.md) is a separate
  * concern from this formatting helper.
  *
- * Format mirrors the masking style already used for candidate SA ID
- * numbers elsewhere in the app ("771120 •••• 081"): keep enough of both
- * ends to be recognisable to the canvasser who captured it, mask the
- * middle.
+ * Keeps enough of both ends to be recognisable to the canvasser who
+ * captured it, and masks the middle.
+ *
+ * This is NOT the same trade-off as `maskSaIdNumber()`, which reveals four
+ * digits and no more. A phone number is a contact detail the canvasser has
+ * to recognise at a glance in a list; an ID number is special personal
+ * information whose leading digits are a date of birth. Different
+ * sensitivity, different mask — see that function's header.
  */
 export function maskPhone(raw: string): string {
   const digits = raw.replace(/\D/g, '');

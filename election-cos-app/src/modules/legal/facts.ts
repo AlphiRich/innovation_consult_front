@@ -128,6 +128,14 @@ export const PRODUCT_FACTS: ProductFact[] = [
     guardedBy: 'householdSafety.test.ts',
   },
   {
+    claim:
+      'A candidate identity number is checked only for structure — length, date, citizenship digit and check ' +
+      'digit. The product performs no identity verification against Home Affairs and presents no structural ' +
+      'check as one, and identity numbers are masked to their last four digits for display.',
+    establishedIn: 'src/lib/saIdNumber.ts',
+    guardedBy: 'saIdNumber.test.ts',
+  },
+  {
     claim: 'Entitlement records state what a tenant subscribed to and until when. They never carry a price.',
     establishedIn: 'src/dal/ports/entitlements.ts',
     guardedBy: 'entitlements.test.ts',
