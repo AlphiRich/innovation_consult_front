@@ -118,3 +118,72 @@ a contract.
 4. The instruments are drafted against it.
 5. Anything the instruments need that the product cannot do comes back as
    a build item — not as a sentence in a contract.
+
+---
+
+## The document set, as built (session 27)
+
+The manual and the legal set are now produced as real files — PDF and
+Word, from one model, on the Innovation Consult letterhead.
+
+    npm run docs:emit -- --out dist-documents --role canvasser
+
+Nine documents, eighteen files:
+
+| Ref | Document | Status |
+|---|---|---|
+| IC-ECOS-MAN-2026 | Onboarding & Operations Manual (role-filtered) | Issued |
+| IC-ECOS-LEG-01 | Privacy Notice | Draft — pending attorney review |
+| IC-ECOS-LEG-02 | Data Processing & Residency Disclosure | Draft — pending attorney review |
+| IC-ECOS-LEG-03 | Product Capability & Limitations Statement | Draft — pending attorney review |
+| IC-ECOS-LEG-04 | Terms of Use | Drafting pack |
+| IC-ECOS-LEG-05 | Subscriber Tenancy Agreement | Drafting pack |
+| IC-ECOS-LEG-06 | Licence Agreement | Drafting pack |
+| IC-ECOS-LEG-07 | Disclaimers, Indemnities & Limitation of Liability | Drafting pack |
+| IC-ECOS-LEG-08 | Pricing & Accounts Terms | Drafting pack |
+
+### Why the set splits in two
+
+**LEG-01 to LEG-03 describe what the system does.** This repository is the
+authority on that, so they are drafted here — and still marked draft,
+because describing a system accurately is not the same as discharging a
+statutory duty. POPIA §18 prescribes what a notification must contain,
+§20–21 govern the operator relationship and §72 the transfer out of the
+Republic; whether these say enough, to the right person, at the right
+time, is counsel's call.
+
+**LEG-04 to LEG-08 allocate risk.** They are not drafted here at all. Each
+is a *drafting pack*: the instrument's purpose and scope, the commercial
+decisions only the company can make, the questions for counsel, and the
+three schedules — what the product does, what must never be claimed, what
+remains open. No operative clauses, and `legal.test.ts` fails if one
+appears.
+
+### What the schedules are generated from
+
+`src/modules/legal/facts.ts` holds the table above this line in
+machine-readable form. Every entry names the source file that makes it
+true and the test that fails if it stops being true, and `legal.test.ts`
+asserts that every file and every test named actually exists — a schedule
+citing a deleted test is worse than no schedule, because it looks
+verified. That guard has already caught three stale citations in its own
+first run.
+
+### The letterhead
+
+`src/modules/manual/letterhead.ts`. The uploaded design asset was a
+transcript describing a corporate identity system, not the system itself —
+the design canvas and the exported Word files were not in it, and the only
+SVGs were the chat client's own interface icons. So the design *language*
+is implemented (burgundy → gold → navy bar, logo top-left, contact block
+top-right, services line in the footer, Poppins named for Word) and the
+**logo itself is deliberately absent**: `LOGO_SLOT` sets the company name
+where the mark belongs. Supply the artwork and it drops into one place.
+
+### Open, and deliberately so
+
+- No logo artwork, as above.
+- Poppins is named for Word and approximated by Helvetica in the PDF.
+  Embedding it means shipping a licensed font binary — a licensing
+  decision, not a formatting one.
+- SOP-02 … SOP-12 are listed in the manual's appendix as not yet issued.

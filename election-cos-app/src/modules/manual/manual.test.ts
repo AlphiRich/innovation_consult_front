@@ -229,7 +229,8 @@ describe('the printed manual', () => {
   it('names the role and the organisation the copy was made for', () => {
     const text = printed(buildManualPdf(manual, meta));
     expect(text).toContain('Ward 12 Campaign Office');
-    expect(text).toContain('Prepared for: Canvasser');
+    expect(text).toContain('Prepared for');
+    expect(text).toContain('Canvasser copy');
   });
 
   it('prints the safety section a canvasser needs', () => {
@@ -276,7 +277,7 @@ describe('the printed manual', () => {
     expect(Array.from(buildManualPdf(manual, meta))).toEqual(Array.from(buildManualPdf(manual, meta)));
   });
 
-  it('names the file after the role and version', () => {
-    expect(manualFileName(manual, meta)).toBe('ecos-manual-canvasser-v1-0.pdf');
+  it('names the file after the document reference, the role and the version', () => {
+    expect(manualFileName(manual, meta)).toBe('ic-ecos-man-2026-canvasser-copy-v1-0.pdf');
   });
 });

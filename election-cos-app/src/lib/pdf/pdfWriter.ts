@@ -30,6 +30,19 @@ import { encodeWinAnsi, toWinAnsiBytes } from './winAnsi';
 export const A4_WIDTH = 595.28;
 export const A4_HEIGHT = 841.89;
 
+/**
+ * A colour, each channel 0–1. Optional everywhere: greyscale remains the
+ * default because most of what this writer produces is body text, and a
+ * greyscale operator is one number rather than three.
+ */
+export type Rgb = readonly [number, number, number];
+
+/** `#RRGGBB` → device RGB. The tokens are hex; PDF is not. */
+export function hexToRgb(hex: string): Rgb {
+  const n = parseInt(hex.slice(1), 16);
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255] as const;
+}
+
 export type PdfOp =
   | {
       kind: 'text';
@@ -40,6 +53,8 @@ export type PdfOp =
       size: number;
       /** 0 = black, 1 = white. Defaults to black. */
       grey?: number;
+      /** Overrides `grey` when set. Each channel 0–1. */
+      rgb?: Rgb;
     }
   | {
       kind: 'rule';
@@ -48,6 +63,8 @@ export type PdfOp =
       x2: number;
       y2: number;
       grey?: number;
+      /** Overrides `grey` when set. Each channel 0–1. */
+      rgb?: Rgb;
       lineWidth?: number;
     }
   | {
@@ -271,9 +288,11 @@ function contentStreamBytes(page: PdfPage): number[] {
 
   for (const op of page.ops) {
     if (op.kind === 'rule') {
-      const grey = op.grey ?? 0.75;
+      const stroke = op.rgb
+        ? `${op.rgb.map(formatNumber).join(' ')} RG`
+        : `${formatNumber(op.grey ?? 0.75)} G`;
       emit(
-        `q ${formatNumber(grey)} G ${formatNumber(op.lineWidth ?? 0.6)} w ` +
+        `q ${stroke} ${formatNumber(op.lineWidth ?? 0.6)} w ` +
           `${formatNumber(op.x1)} ${formatNumber(op.y1)} m ${formatNumber(op.x2)} ${formatNumber(op.y2)} l S Q\n`,
       );
       continue;
@@ -295,8 +314,8 @@ function contentStreamBytes(page: PdfPage): number[] {
       continue;
     }
 
-    const grey = op.grey ?? 0;
-    emit(`q ${formatNumber(grey)} g BT /${FONT_RESOURCE[op.font]} ${formatNumber(op.size)} Tf `);
+    const fill = op.rgb ? `${op.rgb.map(formatNumber).join(' ')} rg` : `${formatNumber(op.grey ?? 0)} g`;
+    emit(`q ${fill} BT /${FONT_RESOURCE[op.font]} ${formatNumber(op.size)} Tf `);
     emit(`1 0 0 1 ${formatNumber(op.x)} ${formatNumber(op.y)} Tm `);
     out.push(...literalString(op.text));
     emit(' Tj ET Q\n');
