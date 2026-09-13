@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Incident } from '@/dal/ports/incidents';
 import type { SessionContext } from '@/dal/ports/session';
-import { buildReferralDocument, referralDocumentId, type ReferralInput } from './referralDocument';
+import { buildReferralDocument, canonicalPayload, referralDocumentId, type ReferralInput } from './referralDocument';
+import { sha256Hex } from '@/lib/hash';
 import { issueReferral } from './issueReferral';
 
 const calls: string[] = [];
@@ -104,6 +105,18 @@ describe('issueReferral', () => {
     expect(registryEntry.watermark).toBe('FINAL');
     expect(registryEntry.classification).toBe('CONFIDENTIAL');
     expect(registryEntry.signedBy).toBe('uid-municipal-lead-1');
+  });
+
+  it('stores the particulars the hash was taken over, so it can be recomputed', async () => {
+    // Without this the printed hash is unverifiable by anyone, including
+    // the campaign that issued the document — the particulars would exist
+    // only inside the PDF. See referral/verifyReferral.ts.
+    const result = await issueReferral(ctx, authorised);
+    const registryEntry = upsert.mock.calls[0][1] as Record<string, unknown>;
+    expect(typeof registryEntry.canonicalPayload).toBe('string');
+    expect(registryEntry.canonicalPayload).toBe(canonicalPayload(authorised));
+    // The end-to-end property: what is stored hashes to what is recorded.
+    expect(await sha256Hex(registryEntry.canonicalPayload as string)).toBe(result.contentHash);
   });
 
   it('points the incident at the path it actually wrote', async () => {

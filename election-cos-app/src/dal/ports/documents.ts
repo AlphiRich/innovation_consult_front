@@ -15,6 +15,20 @@ export interface CampaignDocument {
   classification: DocumentClassification;
   storagePath: string;
   integrityHashSha256: string;
+  /**
+   * The exact serialization the integrity hash was computed over.
+   *
+   * Without it the printed hash is unverifiable by anyone, including the
+   * campaign that issued the document: the hash covers the referral's
+   * particulars, and until session 27 those particulars existed only
+   * inside the PDF. A hash nobody can recompute attests to nothing, which
+   * is the failure the fork's "SHA-256 Verified" badge made loudly and
+   * this build was making quietly.
+   *
+   * Optional because documents predating this carry none, and a
+   * verification that cannot be performed says so rather than failing.
+   */
+  canonicalPayload?: string;
   watermark: 'DRAFT' | 'FINAL' | null;
   signedBy?: string;
   signedAt?: string;

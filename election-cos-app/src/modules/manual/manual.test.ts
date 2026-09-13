@@ -13,6 +13,13 @@ import { WARD_SEEDING_SOP } from './sops/wardSeedingSop';
 import { REGISTER_IMPORT_SOP } from './sops/registerImportSop';
 import { WARD_ROUND_SOP } from './sops/wardRoundSop';
 import { INCIDENT_SOP } from './sops/incidentSop';
+import { REFERRAL_SOP } from './sops/referralSop';
+import {
+  EVIDENCE_BASIS,
+  INTEGRITY_HASH_BASIS,
+  buildReferralDocument,
+} from '@/modules/incidents/referral/referralDocument';
+import { CHECK_MESSAGE } from '@/modules/incidents/referral/verifyReferral';
 import { CATEGORY_LABEL, STATUS_ORDER } from '@/modules/incidents/incidentMeta';
 import {
   INCIDENT_TRANSITIONS,
@@ -918,5 +925,104 @@ describe('SOP-06 describes the incident path that actually exists', () => {
   it('keeps incidents about places and access notes about safety', () => {
     expect(text).toMatch(/about a place, not about a person/i);
     expect(text).toContain('SOP-01');
+  });
+});
+
+
+/**
+ * SOP-07 is the only procedure whose output is read by somebody the
+ * campaign does not control. Its quoted constants are checked against the
+ * ones actually printed on the document.
+ */
+describe('SOP-07 describes the referral that actually gets issued', () => {
+  const text = JSON.stringify(REFERRAL_SOP);
+
+  const INCIDENT_FIXTURE = {
+    id: '8f2c1a9e-4d55-4f6b-9c31-7a0e5b2d8811',
+    tenantId: 't',
+    vdCode: '32900123',
+    wardCode: 'NW405012',
+    category: 'WATER_SANITATION' as const,
+    severity: 'HIGH' as const,
+    status: 'ESCALATED' as const,
+    description: 'Sewage overflow at the corner of Church and Kruis Street.',
+    photoPaths: [],
+    reportedBy: 'uid-canvasser',
+    createdAt: '2026-03-02T08:00:00.000Z',
+    updatedAt: '2026-03-04T10:00:00.000Z',
+    updatedBy: 'uid-lead',
+    deletedAt: null,
+    schemaVersion: 1,
+  };
+
+  const REFERRAL_INPUT = {
+    incident: INCIDENT_FIXTURE,
+    issuingOrganisation: 'Ward 12 Campaign Office',
+    recipient: {
+      municipalityName: 'JB Marks Local Municipality',
+      municipalityCode: 'NW405',
+      department: 'Water & Sanitation',
+    },
+    coveringNote: '',
+    preparedByUid: 'uid-lead',
+    preparedAt: '2026-03-04T10:00:00.000Z',
+    authorisation: null,
+  };
+
+  it('goes to the role that can authorise one', () => {
+    expect(REFERRAL_SOP.roles).toEqual(['municipal-team-lead']);
+    expect(REFERRAL_SOP.requiresAnyCapability).toEqual(['incidents.escalate']);
+    const lead = SEED_ROLES.find((r) => r.id === 'municipal-team-lead')!;
+    expect(lead.defaultCaps).toContain('incidents.escalate');
+  });
+
+  it('quotes the disclaimer printed on the document, verbatim', () => {
+    expect(text).toContain(STANDING_DISCLAIMER);
+    // And the disclaimer still says the document carries no authority.
+    expect(STANDING_DISCLAIMER).toMatch(/not a municipal or government document/i);
+    expect(STANDING_DISCLAIMER).toMatch(/carries no municipal or state authority/i);
+  });
+
+  it('quotes the evidence and hash bases rather than paraphrasing them', () => {
+    expect(text).toContain(EVIDENCE_BASIS);
+    expect(text).toContain(INTEGRITY_HASH_BASIS);
+  });
+
+  it('carries the tamper message the check itself produces', () => {
+    expect(text).toContain(CHECK_MESSAGE.DIFFERS);
+  });
+
+  it('is right that a referral needs an escalated incident', () => {
+    const logged = { ...INCIDENT_FIXTURE, status: 'LOGGED' as const };
+    expect(() => buildReferralDocument({ ...REFERRAL_INPUT, incident: logged })).toThrow(/escalated/i);
+    expect(text).toMatch(/can only be prepared for an incident that has been escalated/i);
+  });
+
+  it('is right that the issuing organisation is never filled in for you', () => {
+    expect(() =>
+      buildReferralDocument({ ...REFERRAL_INPUT, issuingOrganisation: '   ' }),
+    ).toThrow();
+    expect(text).toMatch(/typed by you and is not filled in from anywhere/i);
+  });
+
+  it('is right that one person cannot sign in another’s name', () => {
+    expect(text).toMatch(/refuses to let one person sign in another/i);
+  });
+
+  it('claims no transmission and no notification', () => {
+    expect(text).toMatch(/platform sends nothing and notifies nobody/i);
+    expect(text).toMatch(/referred to a filing cabinet/i);
+    expect(text).not.toMatch(/\bautomatically (sends|submits|notifies)\b/i);
+  });
+
+  it('states the narrow meaning of a passing check', () => {
+    expect(text).toMatch(/nothing about the photographs/i);
+    expect(text).toMatch(/not a signature/i);
+    expect(text).toMatch(/cannot show the referral was ever delivered/i);
+  });
+
+  it('tells nobody to quietly replace a document already sent', () => {
+    expect(text).toMatch(/do not quietly re-issue a corrected one/i);
+    expect(text).toMatch(/Tell the department, in writing, quoting the original reference/i);
   });
 });

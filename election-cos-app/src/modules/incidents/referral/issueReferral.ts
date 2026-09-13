@@ -20,7 +20,7 @@
  */
 import { dal } from '@/dal';
 import type { SessionContext } from '@/dal/ports/session';
-import { referralDocumentId, referralStoragePath, type ReferralDocument } from './referralDocument';
+import { canonicalPayload, referralDocumentId, referralStoragePath, type ReferralDocument } from './referralDocument';
 import { renderReferralPdf } from './referralPdf';
 
 export interface IssuedReferral {
@@ -60,6 +60,11 @@ export async function issueReferral(ctx: SessionContext, doc: ReferralDocument):
     classification: 'CONFIDENTIAL',
     storagePath,
     integrityHashSha256: contentHash,
+    // Stored so the hash can actually be recomputed later. The document
+    // tells its reader the hash "verifies that the particulars above match
+    // the record held in Election Campaign OS" — which was not true while
+    // the particulars lived only in the PDF.
+    canonicalPayload: canonicalPayload(doc),
     watermark: 'FINAL',
     signedBy: doc.authorisation!.signatory.uid,
     signedAt: doc.authorisation!.authorisedAt,

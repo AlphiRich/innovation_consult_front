@@ -15,6 +15,7 @@ import { CATEGORY_LABEL, SEVERITY_META, SEVERITY_ORDER } from './incidentMeta';
 import { ReferralPrepareModal } from './referral/ReferralPrepareModal';
 import { referralDocumentId } from './referral/referralDocument';
 import { availableTransitions } from './incidentWorkflow';
+import { verifyIssuedReferral, type ReferralCheck } from './referral/verifyReferral';
 
 interface IncidentCardProps {
   ctx: SessionContext;
@@ -50,6 +51,12 @@ export function IncidentCard({ ctx, incident }: IncidentCardProps) {
   const endTransitions = availableTransitions(incident.status, ctx.caps).filter(
     (transition) => transition.to === 'RESOLVED' || transition.to === 'CLOSED',
   );
+
+  const [check, setCheck] = useState<ReferralCheck | null>(null);
+  const checkMutation = useMutation({
+    mutationFn: () => verifyIssuedReferral(ctx, incident.id),
+    onSuccess: setCheck,
+  });
 
   const endMutation = useMutation({
     mutationFn: (to: IncidentStatus) =>
@@ -149,7 +156,7 @@ export function IncidentCard({ ctx, incident }: IncidentCardProps) {
       )}
 
       {incident.status === 'REFERRED' && (
-        <div className="border-t border-ink/10 pt-2">
+        <div className="border-t border-ink/10 pt-2 space-y-2">
           <p className="text-label-caps font-display uppercase text-slate">
             Referred{referralQuery.data ? ` · ${referralQuery.data.title}` : ''}
           </p>
@@ -157,6 +164,36 @@ export function IncidentCard({ ctx, incident }: IncidentCardProps) {
             <p className="text-data-mono font-mono text-slate break-all">
               Integrity hash {referralQuery.data.integrityHashSha256}
             </p>
+          )}
+          {/*
+           * The printed document tells its reader this hash verifies the
+           * particulars against the record held here. Until session 27
+           * nothing could perform that check — the particulars existed
+           * only inside the PDF. See referral/verifyReferral.ts.
+           */}
+          <button
+            type="button"
+            disabled={checkMutation.isPending}
+            onClick={() => checkMutation.mutate()}
+            className="px-3 py-1.5 border border-ink/20 rounded text-label-caps font-display uppercase text-ink disabled:opacity-40"
+          >
+            {checkMutation.isPending ? 'Checking…' : 'Check against the record'}
+          </button>
+          {check && (
+            <div className="space-y-1">
+              <p
+                className={`text-body-md font-body ${
+                  check.outcome === 'MATCHES' ? 'text-green' : check.outcome === 'DIFFERS' ? 'text-maroon' : 'text-slate'
+                }`}
+              >
+                {check.message}
+              </p>
+              {check.recomputedHash && check.recomputedHash !== check.recordedHash && (
+                <p className="text-data-mono font-mono text-maroon break-all">
+                  Particulars hash to {check.recomputedHash}
+                </p>
+              )}
+            </div>
           )}
         </div>
       )}

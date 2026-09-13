@@ -111,8 +111,8 @@ a contract.
 
 ## Sequence
 
-1. SOP-01 through SOP-06 are issued (`src/modules/manual/sops/`).
-2. SOP-07 … SOP-12 are written (`PLANNED_SOPS` carries the register).
+1. SOP-01 through SOP-07 are issued (`src/modules/manual/sops/`).
+2. SOP-08 … SOP-12 are written (`PLANNED_SOPS` carries the register).
 3. The completed manual goes to an attorney **with this file**, which
    tells them what is safe to rely on and what must not be said.
 4. The instruments are drafted against it.
@@ -468,3 +468,60 @@ The rules dropping the resolve clause while the model kept it; closing
 downgraded to the triage capability; SOP-06 rewritten to claim the
 platform submits the referral automatically; and RESOLVED made unreachable
 again.
+
+---
+
+## SOP-07, and a promise the document could not keep (session 27)
+
+SOP-07 covers issuing a service delivery referral — the only procedure in
+the manual whose output is read by somebody the campaign does not control.
+
+The referral module was already complete and well guarded: the document,
+the non-removable disclaimer, the deterministic PDF, the content hash, the
+three ordered writes, the signatory read from a real staff record. Writing
+the SOP found the one thing missing, and it was a claim rather than a
+feature.
+
+**Every referral prints an integrity hash and a sentence about it:** that
+it "verifies that the particulars above match the record held in Election
+Campaign OS". Nothing could perform that check.
+`verifyReferralContentHash()` existed and needed a `ReferralDocument`, and
+a `ReferralDocument` could not be rebuilt from anything stored — the
+issuing organisation, the addressee, the covering note and the timestamps
+went into the PDF and into the hash and nowhere else.
+
+So the document asserted its own verifiability and the product could not
+deliver it. That is the same defect as the fork's "SHA-256 Verified" badge
+over nothing, made quietly rather than loudly, and worse here because this
+hash is real: a campaign challenged on what it sent could produce a number
+and no way to stand behind it.
+
+### What changed
+
+`CampaignDocument.canonicalPayload` stores the exact serialization the
+hash was taken over. `issueReferral()` writes it.
+`referral/verifyReferral.ts` recomputes it and reports one of four
+outcomes — matches, differs, nothing issued, or issued before the
+particulars were stored and therefore not checkable. The last one matters:
+it says so, and says re-issuing is not a fix, because re-issuing would
+produce a second authorised copy of the same referral.
+
+The check is on the incident card, behind "Check against the record".
+
+### What a passing check is careful not to claim
+
+That the record has not been altered since issue. Not that the
+photographs are attested, not that it is a signature, and not that the
+referral was ever delivered — the platform sends nothing and notifies
+nobody, by design. A test scans the operator-facing messages for the
+vocabulary this project has already rejected once: blockchain, certified,
+notarised, legally binding.
+
+### A guard that did not guard
+
+The first injection — removing `canonicalPayload` from the registry write
+— passed every test. `issueReferral.test.ts` did not assert the
+particulars were stored, and `verifyReferral.test.ts` built its own
+registry entry rather than going through the issuing path, so neither saw
+it. The end-to-end property is now asserted where it belongs: what issuing
+stores must hash to what issuing records.
