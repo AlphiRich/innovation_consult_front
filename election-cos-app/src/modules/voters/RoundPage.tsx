@@ -27,6 +27,7 @@
  * that a determined user can remove.
  */
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { dal } from '@/dal';
 import { useSession } from '@/auth/useSession';
@@ -101,9 +102,26 @@ export function RoundPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div>
-        <p className="text-label-caps font-display uppercase text-slate">/round</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Round</h1>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-label-caps font-display uppercase text-slate">/round</p>
+          <h1 className="text-headline-md font-display text-ink mt-1">Round</h1>
+        </div>
+        {/*
+         * A canvasser holds incidents.create and not incidents.view, so
+         * the Incidents nav item is hidden from them and this was the only
+         * permission in the product with nowhere to use it. Linked from
+         * the round because that is where they are standing when they see
+         * the burst pipe.
+         */}
+        {session.caps.includes('incidents.create') && (
+          <Link
+            to="/incidents/new"
+            className="border border-ink/20 rounded px-4 py-2 text-label-caps font-display uppercase text-ink"
+          >
+            Report an incident
+          </Link>
+        )}
       </div>
 
       <label className="block space-y-1 max-w-xs">

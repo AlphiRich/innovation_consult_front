@@ -111,8 +111,8 @@ a contract.
 
 ## Sequence
 
-1. SOP-01 through SOP-05 are issued (`src/modules/manual/sops/`).
-2. SOP-06 … SOP-12 are written (`PLANNED_SOPS` carries the register).
+1. SOP-01 through SOP-06 are issued (`src/modules/manual/sops/`).
+2. SOP-07 … SOP-12 are written (`PLANNED_SOPS` carries the register).
 3. The completed manual goes to an attorney **with this file**, which
    tells them what is safe to rely on and what must not be said.
 4. The instruments are drafted against it.
@@ -416,3 +416,55 @@ the test passed while the printed procedure silently lost a step. Found by
 injection rather than by review. The outcomes are now named explicitly,
 and a second test asserts the map still covers every state the queue can
 be in.
+
+---
+
+## SOP-06, and two defects in the incident path (session 27)
+
+SOP-06 is shared by four roles and is the only procedure whose output
+leaves the campaign: a referral is a document addressed to a municipality,
+carrying the party's name.
+
+**A canvasser held a permission with nowhere to use it.** `incidents.create`
+is a Canvasser default; `incidents.view` is not. That is the capability
+model working — a canvasser reports what they see and is not given a
+window onto every complaint in the district — but the Incidents nav item
+is gated on `incidents.view`, so the only route to the incident form was
+one they could not reach. `ReportIncidentPage.tsx` is a create-only route
+linked from the round, and it says plainly what happens next, because a
+canvasser who submits a report and then cannot find it has no way to tell
+that from a report that went nowhere.
+
+**Two of the six statuses could never be reached.** RESOLVED and CLOSED
+were in `IncidentStatus`, in `STATUS_LABEL` and in `STATUS_ORDER` — so the
+Incidents page rendered a tab for each — and no capability, repository
+method or security rule could put an incident into either. An incident
+referred to a municipality stayed referred for ever, which means a war
+room's count of open incidents only ever goes up and the last two tabs are
+permanently empty.
+
+### The lifecycle now has one owner
+
+`src/modules/incidents/incidentWorkflow.ts` says which move is legal and
+who may make it. `resolve()` and `close()` exist on the port and the
+adapter, and `firestore.rules` gained the two clauses to match.
+
+- **Resolving** takes `incidents.triage`, from triaged onwards — a
+  municipality sometimes fixes a thing before a referral is ever issued,
+  and whoever triages is close enough to the ground to know.
+- **Closing** takes `incidents.escalate`. It ends the record, so it sits
+  with the authority that authorises escalation and referral.
+- **CLOSED is terminal and is still not a deletion.** `delete: if false`
+  holds on this collection like every other, and a test asserts it.
+
+`incidentWorkflow.test.ts` reads `firestore.rules` from disk and checks
+the model against it. A transition allowed in one and refused by the other
+is a button that fails at the moment somebody presses it in a street, and
+that is the class of defect the mirror exists to catch.
+
+### Guards proven by injection
+
+The rules dropping the resolve clause while the model kept it; closing
+downgraded to the triage capability; SOP-06 rewritten to claim the
+platform submits the referral automatically; and RESOLVED made unreachable
+again.

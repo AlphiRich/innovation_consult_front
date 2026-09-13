@@ -9,11 +9,12 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { dal } from '@/dal';
 import type { SessionContext } from '@/dal/ports/session';
-import type { Incident, IncidentSeverity } from '@/dal/ports/incidents';
+import type { Incident, IncidentSeverity, IncidentStatus } from '@/dal/ports/incidents';
 import { TONE_PILL_CLASSES } from '@/design/toneClasses';
 import { CATEGORY_LABEL, SEVERITY_META, SEVERITY_ORDER } from './incidentMeta';
 import { ReferralPrepareModal } from './referral/ReferralPrepareModal';
 import { referralDocumentId } from './referral/referralDocument';
+import { availableTransitions } from './incidentWorkflow';
 
 interface IncidentCardProps {
   ctx: SessionContext;
@@ -42,6 +43,20 @@ export function IncidentCard({ ctx, incident }: IncidentCardProps) {
       setShowTriage(false);
       invalidate();
     },
+  });
+
+  // Only the two that end an incident; triage/escalate/refer have their
+  // own buttons above, with their own confirmation steps.
+  const endTransitions = availableTransitions(incident.status, ctx.caps).filter(
+    (transition) => transition.to === 'RESOLVED' || transition.to === 'CLOSED',
+  );
+
+  const endMutation = useMutation({
+    mutationFn: (to: IncidentStatus) =>
+      to === 'RESOLVED'
+        ? dal.incidents.resolve(ctx, incident.id)
+        : dal.incidents.close(ctx, incident.id, 'Closed from the incidents list'),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['incidents'] }),
   });
 
   const escalateMutation = useMutation({
@@ -146,7 +161,33 @@ export function IncidentCard({ ctx, incident }: IncidentCardProps) {
         </div>
       )}
 
-      {(triageMutation.isError || escalateMutation.isError) && (
+      {/*
+       * Resolve and close. Until session 27 an incident could not reach
+       * either status: both were in the type, in STATUS_LABEL and in
+       * STATUS_ORDER — so this page rendered a tab for each — and no
+       * capability, repository method or security rule could put an
+       * incident into one. Which moves are offered comes from
+       * `incidentWorkflow.ts`, so this list cannot drift from the rules.
+       */}
+      {endTransitions.length > 0 && (
+        <div className="flex flex-wrap gap-2 border-t border-ink/10 pt-2">
+          {endTransitions.map((transition) => (
+            <button
+              key={transition.to}
+              type="button"
+              disabled={endMutation.isPending}
+              onClick={() => endMutation.mutate(transition.to)}
+              className={`px-3 py-1.5 border rounded text-label-caps font-display uppercase disabled:opacity-40 ${
+                transition.to === 'RESOLVED' ? 'border-green/50 text-green' : 'border-ink/20 text-ink'
+              }`}
+            >
+              {transition.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {(triageMutation.isError || escalateMutation.isError || endMutation.isError) && (
         <p className="text-body-md text-maroon">Action failed — try again.</p>
       )}
 

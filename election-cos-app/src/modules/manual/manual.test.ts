@@ -12,6 +12,15 @@ import { ROLE_PURPOSE, TENANT_SETUP_SOP } from './sops/tenantSetupSop';
 import { WARD_SEEDING_SOP } from './sops/wardSeedingSop';
 import { REGISTER_IMPORT_SOP } from './sops/registerImportSop';
 import { WARD_ROUND_SOP } from './sops/wardRoundSop';
+import { INCIDENT_SOP } from './sops/incidentSop';
+import { CATEGORY_LABEL, STATUS_ORDER } from '@/modules/incidents/incidentMeta';
+import {
+  INCIDENT_TRANSITIONS,
+  availableTransitions,
+  canTransition,
+  isOpen,
+} from '@/modules/incidents/incidentWorkflow';
+import { STANDING_DISCLAIMER } from '@/modules/incidents/referral/referralDocument';
 import {
   CONTACT_STATUS_LABEL,
   INACCESSIBLE_COOLOFF_HOURS as INACCESSIBLE_HOURS,
@@ -819,5 +828,95 @@ describe('SOP-05 describes the round that actually exists', () => {
   it('connects the address-less import back to SOP-04', () => {
     expect(text).toMatch(/holding record and never enter a round/i);
     expect(text).toContain('SOP-04');
+  });
+});
+
+
+/**
+ * SOP-06 is shared by four roles and is the only procedure whose output
+ * leaves the campaign. Its steps are checked against the workflow model,
+ * which is itself checked against firestore.rules — so a step described
+ * here is a step the database will permit.
+ */
+describe('SOP-06 describes the incident path that actually exists', () => {
+  const text = JSON.stringify(INCIDENT_SOP);
+
+  it('reaches every role that can log or read an incident', () => {
+    const involved = SEED_ROLES.filter(
+      (r) => r.defaultCaps.includes('incidents.create') || r.defaultCaps.includes('incidents.view'),
+    ).map((r) => r.id);
+    // The HQ admin holds incidents.view but runs no field procedure; the
+    // SOP is addressed to the four roles that work an incident.
+    for (const roleId of INCIDENT_SOP.roles) {
+      expect(involved, roleId).toContain(roleId);
+    }
+    expect(INCIDENT_SOP.roles).toEqual(['canvasser', 'vd-captain', 'ward-lead', 'municipal-team-lead']);
+    expect(INCIDENT_SOP.requiresAnyCapability).toEqual(['incidents.create', 'incidents.view']);
+  });
+
+  it('names the four categories the database will accept, and no others', () => {
+    const body = (INCIDENT_SOP.sections[0].body ?? []).join(' ');
+    for (const label of Object.values(CATEGORY_LABEL)) {
+      expect(body.toLowerCase(), label).toContain(label.toLowerCase());
+    }
+    expect(body).toMatch(/no free-text category/i);
+  });
+
+  it('is right that a canvasser cannot see what they logged', () => {
+    const canvasser = SEED_ROLES.find((r) => r.id === 'canvasser')!;
+    expect(canvasser.defaultCaps).toContain('incidents.create');
+    expect(canvasser.defaultCaps).not.toContain('incidents.view');
+    expect(text).toMatch(/cannot see incidents after logging them, including their own/i);
+  });
+
+  it('is right that triage and escalation are held apart', () => {
+    expect(canTransition('LOGGED', 'TRIAGED', ['incidents.escalate'])).toBe(false);
+    expect(canTransition('TRIAGED', 'ESCALATED', ['incidents.triage'])).toBe(false);
+    expect(text).toMatch(/cannot escalate, and whoever escalates cannot triage/i);
+  });
+
+  it('lists every distinct step with the permission the model requires', () => {
+    const section = INCIDENT_SOP.sections.find((s) => s.heading.includes('Who does which step'))!;
+    const listed = (section.steps ?? []).join('\n');
+    for (const transition of INCIDENT_TRANSITIONS) {
+      expect(listed, transition.label).toContain(transition.label);
+      expect(listed, transition.capability).toContain(transition.capability);
+    }
+  });
+
+  it('describes resolving and closing, which the product can now actually do', () => {
+    // The defect SOP-06 was written against: both were unreachable.
+    expect(canTransition('REFERRED', 'RESOLVED', ['incidents.triage'])).toBe(true);
+    expect(canTransition('REFERRED', 'CLOSED', ['incidents.escalate'])).toBe(true);
+    expect(text).toMatch(/Mark it resolved when the problem is actually fixed/i);
+    expect(text).toMatch(/only ever goes up/i);
+    // And every declared status is reachable, so no tab is permanently empty.
+    const reachable = new Set(['LOGGED', ...INCIDENT_TRANSITIONS.map((t) => t.to)]);
+    for (const status of STATUS_ORDER) expect(reachable.has(status), status).toBe(true);
+  });
+
+  it('is right that closing is terminal and is not a deletion', () => {
+    expect(availableTransitions('CLOSED', ['incidents.escalate', 'incidents.triage'])).toEqual([]);
+    expect(text).toMatch(/There is no reopening/i);
+    expect(text).toMatch(/Nothing here deletes an incident/i);
+    expect(STATUS_ORDER.filter(isOpen)).not.toContain('CLOSED');
+  });
+
+  it('carries the referral disclaimer verbatim rather than paraphrasing it', () => {
+    expect(text).toContain(STANDING_DISCLAIMER);
+  });
+
+  it('claims no transmission, no dispatch and no alert', () => {
+    expect(text).toMatch(/The platform sends nothing/i);
+    expect(text).toMatch(/not an emergency service/i);
+    expect(text).toMatch(/alerts nobody, and dispatches nothing/i);
+    // And it must not claim the opposite anywhere.
+    expect(text).not.toMatch(/\bnotifies the municipality\b/i);
+    expect(text).not.toMatch(/\bsubmits? (the referral|it) to\b/i);
+  });
+
+  it('keeps incidents about places and access notes about safety', () => {
+    expect(text).toMatch(/about a place, not about a person/i);
+    expect(text).toContain('SOP-01');
   });
 });

@@ -11,6 +11,7 @@ import { WarRoomPage } from '@/modules/war-room/WarRoomPage';
 import { VotersPage } from '@/modules/voters/VotersPage';
 import { BulkImportPage } from '@/modules/voters/BulkImportPage';
 import { RoundPage } from '@/modules/voters/RoundPage';
+import { ReportIncidentPage } from '@/modules/incidents/ReportIncidentPage';
 import { WardsPage } from '@/modules/wards/WardsPage';
 import { WardDetailPage } from '@/modules/wards/WardDetailPage';
 import { FieldDiaryPage } from '@/modules/field-diary/FieldDiaryPage';
@@ -39,6 +40,7 @@ export const router = createBrowserRouter([
       { path: 'voters', element: <VotersPage /> },
       { path: 'voters/import', element: <BulkImportPage /> },
       { path: 'round', element: <RoundPage /> },
+      { path: 'incidents/new', element: <ReportIncidentPage /> },
       { path: 'wards', element: <WardsPage /> },
       { path: 'wards/:wardCode', element: <WardDetailPage /> },
       { path: 'diary', element: <FieldDiaryPage /> },

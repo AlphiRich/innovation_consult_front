@@ -128,6 +128,19 @@ service cloud.firestore {
                        (cap('incidents.triage') && resource.data.status == 'LOGGED')
                     || (cap('incidents.escalate') && resource.data.status == 'TRIAGED')
                     || (cap('incidents.escalate') && resource.data.status == 'ESCALATED')
+                    // Resolved: something in the world got fixed. Whoever
+                    // triages is close enough to the ground to know, and a
+                    // municipality can act before a referral is issued —
+                    // so this is reachable from triaged onwards.
+                    || (cap('incidents.triage')
+                        && resource.data.status in ['TRIAGED', 'ESCALATED', 'REFERRED']
+                        && request.resource.data.status == 'RESOLVED')
+                    // Closed: the campaign will do nothing further. Ends
+                    // the record, so it takes the same capability that
+                    // authorises escalation. Still not a deletion.
+                    || (cap('incidents.escalate')
+                        && resource.data.status != 'CLOSED'
+                        && request.resource.data.status == 'CLOSED')
                     || (cap('incidents.view') && isUnchanged('status'))
                     );
       allow delete: if false;

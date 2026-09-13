@@ -64,4 +64,12 @@ export const incidentsRepository: IncidentRepository = {
   async markReferred(ctx: SessionContext, id: string, referralPdfPath: string): Promise<void> {
     await upsertGeneric(ctx, 'incidents', id, { status: 'REFERRED' as IncidentStatus, referralPdfPath }, false);
   },
+
+  async resolve(ctx: SessionContext, id: string): Promise<void> {
+    await upsertGeneric(ctx, 'incidents', id, { status: 'RESOLVED' as IncidentStatus }, false);
+  },
+
+  async close(ctx: SessionContext, id: string, reason: string): Promise<void> {
+    await upsertGeneric(ctx, 'incidents', id, { status: 'CLOSED' as IncidentStatus, closeReason: reason }, false);
+  },
 };

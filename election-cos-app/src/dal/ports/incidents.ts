@@ -42,4 +42,16 @@ export interface IncidentRepository {
   triage(ctx: SessionContext, id: string, severity: IncidentSeverity): Promise<void>;
   escalate(ctx: SessionContext, id: string): Promise<void>;
   markReferred(ctx: SessionContext, id: string, referralPdfPath: string): Promise<void>;
+  /**
+   * Something in the world got fixed. Reachable from any point after
+   * triage — a municipality can act before a referral is ever issued.
+   * See `src/modules/incidents/incidentWorkflow.ts` for who may do it.
+   */
+  resolve(ctx: SessionContext, id: string): Promise<void>;
+  /**
+   * The campaign will do nothing further. Terminal in the workflow, and
+   * still not a deletion — `delete: if false` holds on this collection
+   * like every other.
+   */
+  close(ctx: SessionContext, id: string, reason: string): Promise<void>;
 }

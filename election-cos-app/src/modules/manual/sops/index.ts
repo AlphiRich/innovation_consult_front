@@ -1,7 +1,7 @@
 /**
  * Election Campaign OS — the SOP register
  *
- * SOP-01 through SOP-05 are written. The rest are declared as the manual's
+ * SOP-01 through SOP-06 are written. The rest are declared as the manual's
  * intended structure with the area, audience and gating each will carry,
  * and are not shipped until written — an SOP stub that printed as a
  * heading with nothing under it would be worse than an honest gap, because
@@ -19,6 +19,7 @@ import { TENANT_SETUP_SOP } from './tenantSetupSop';
 import { WARD_SEEDING_SOP } from './wardSeedingSop';
 import { REGISTER_IMPORT_SOP } from './registerImportSop';
 import { WARD_ROUND_SOP } from './wardRoundSop';
+import { INCIDENT_SOP } from './incidentSop';
 
 export const SOPS: Sop[] = [
   CANVASSER_SOP,
@@ -26,6 +27,7 @@ export const SOPS: Sop[] = [
   WARD_SEEDING_SOP,
   REGISTER_IMPORT_SOP,
   WARD_ROUND_SOP,
+  INCIDENT_SOP,
 ];
 
 export interface PlannedSop {
@@ -38,7 +40,6 @@ export interface PlannedSop {
 
 /** Written next, in this order. */
 export const PLANNED_SOPS: PlannedSop[] = [
-  { number: 'SOP-06', title: 'Logging, triaging and escalating an incident', area: 'FIELD', roles: ['canvasser', 'vd-captain', 'ward-lead', 'municipal-team-lead'] },
   { number: 'SOP-07', title: 'Issuing a service delivery referral', area: 'WAR_ROOM', roles: ['municipal-team-lead'] },
   { number: 'SOP-08', title: 'Reading the war room', area: 'WAR_ROOM', roles: ['municipal-team-lead', 'party-hq-admin'] },
   { number: 'SOP-09', title: 'Handling a data subject request', area: 'COMPLIANCE', roles: ['compliance-officer', 'party-hq-admin'] },
