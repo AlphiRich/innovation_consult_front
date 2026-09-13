@@ -18,6 +18,7 @@ function fromFirestore(id: string, data: Record<string, unknown>): Household {
     contactStatus: data.contactStatus as Household['contactStatus'] | undefined,
     lastContactedAt: data.lastContactedAt as string | undefined,
     lastContactedBy: data.lastContactedBy as string | undefined,
+    accessNote: data.accessNote as Household['accessNote'] | undefined,
     informalDescriptor: data.informalDescriptor as string | undefined,
     geo: data.geo as Household['geo'],
     createdAt: toISO(data.createdAt as string) ?? '',

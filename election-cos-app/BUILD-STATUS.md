@@ -1670,6 +1670,67 @@ function.
 **Verified:** `check:all` green — **347 tests** (up from 321), lint,
 typecheck, `check:hex`; `npm run build` succeeds.
 
+**Session 26 (13 Sep 2026) — canvasser safety notes, and the operations
+manual they live in.** Backlog item 4 built, inside the structure the
+whole manual will use. Legal groundwork in
+`docs/manual-and-legal-instruments.md`.
+
+**Household access notes** (`src/modules/voters/householdSafety.ts`,
+`HouseholdAccessNoteCard.tsx`, `Household.accessNote`). Two rules that
+pull against each other, both honoured:
+
+- **About the property, not the people.** A safety note is the easiest
+  place in this product to write voter profiling and call it something
+  else. The hazard list is a fixed enum for that reason, and
+  `noteConcerns()` flags free text that has drifted into describing a
+  resident — a prompt, never a block, because someone at a gate with a
+  genuine concern must still be able to record it.
+- **It has to actually keep someone safe.** Sanitising it into
+  uselessness is its own failure, so `HOSTILE_RECEPTION_REPORTED` exists,
+  hazards are ordered by what injures people, and three of them raise
+  "do not work this door alone".
+- **Access codes leave nothing.** A gate code is access control for
+  somebody's home. `redactForExport()` strips it and a test proves no
+  export, referral or printed page can carry one.
+
+**The manual** (`src/modules/manual/`). SOP-01, *Canvassing a voting
+district*, is written and includes the two safety sections. The manual is
+**role- and entitlement-filtered** using the two gates built in sessions
+20 and 24 — a canvasser does not receive the PPFA procedure, and a tenant
+without a module does not receive a procedure for a feature it cannot
+use. Withheld SOPs are **listed with a reason** rather than dropped, so
+nothing is silently missing.
+
+**Print-ready means print-ready:** rendered as real PDF bytes by our own
+`src/lib/pdf/` writer — A4, real Helvetica metrics, cover, contents, page
+numbers, and an appendix showing the shape of the full manual with
+unwritten SOPs marked "not yet issued" rather than stubbed. Deterministic,
+so a subscriber can be told which version they hold. Verified structurally
+(xref offsets all resolve, every `/Length` exact, 5 pages) — poppler was
+not available in this container, so that check was done directly rather
+than claimed.
+
+**The manual grounds the legal instruments, not the other way around.**
+`docs/manual-and-legal-instruments.md` gives an attorney sixteen claims
+that are established and test-guarded, and seven that must **never** be
+made — chief among them that personal information is deleted, erased or
+purged, which is the single most likely sentence to appear in a draft
+Privacy Policy and the single most likely to be wrong here. **No legal
+instrument is drafted in this repository and none should be.**
+
+`manual.test.ts` asserts SOP-01 against the code it describes: the real
+cool-off constants, all six door states, the refusal-is-terminal rule,
+every hazard category, and the erasure position rather than a purge
+promise.
+
+Proved by injection: letting the access code into an export fails 3
+tests, dropping the person-directed flag fails 3, letting the SOP promise
+a post-election purge fails 1, drifting the SOP off the real cool-off
+constant fails 1.
+
+**Verified:** `check:all` green — **395 tests** (up from 347), lint,
+typecheck, `check:hex`; `npm run build` succeeds.
+
 ---
 
 ## DECISION — seven roles; Compliance Officer stays (13 Sep 2026)
