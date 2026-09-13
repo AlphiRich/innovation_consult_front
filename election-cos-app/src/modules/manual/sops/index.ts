@@ -1,20 +1,23 @@
 /**
  * Election Campaign OS — the SOP register
  *
- * SOP-01 is written. The rest are declared as the manual's intended
- * structure with the area, audience and gating each will carry, and are
- * not shipped until written — an SOP stub that printed as a heading with
- * nothing under it would be worse than an honest gap, because a manual
- * that looks complete stops anyone asking what is missing.
+ * SOP-01 and SOP-02 are written. The rest are declared as the manual's
+ * intended structure with the area, audience and gating each will carry,
+ * and are not shipped until written — an SOP stub that printed as a
+ * heading with nothing under it would be worse than an honest gap, because
+ * a manual that looks complete stops anyone asking what is missing.
  *
  * `PLANNED_SOPS` is not exported into the manual. It is the register, and
- * `manualPdf.ts` prints it as a contents-of-the-full-manual appendix so a
- * subscriber can see the shape of what they will receive.
+ * the printed appendix lists it so a subscriber can see the shape of what
+ * they will receive. A number moves out of `PLANNED_SOPS` and into `SOPS`
+ * when it is written, never before — `manual.test.ts` fails if a number
+ * appears in both.
  */
 import type { Sop, SopArea } from '../manualModel';
 import { CANVASSER_SOP } from './canvasserSop';
+import { TENANT_SETUP_SOP } from './tenantSetupSop';
 
-export const SOPS: Sop[] = [CANVASSER_SOP];
+export const SOPS: Sop[] = [CANVASSER_SOP, TENANT_SETUP_SOP];
 
 export interface PlannedSop {
   number: string;
@@ -26,7 +29,6 @@ export interface PlannedSop {
 
 /** Written next, in this order. */
 export const PLANNED_SOPS: PlannedSop[] = [
-  { number: 'SOP-02', title: 'Setting up a tenant and inviting your team', area: 'ONBOARDING', roles: ['party-hq-admin'] },
   { number: 'SOP-03', title: 'Seeding wards and voting districts', area: 'ONBOARDING', roles: ['party-hq-admin', 'municipal-team-lead'] },
   { number: 'SOP-04', title: 'Importing an existing membership register', area: 'ONBOARDING', roles: ['party-hq-admin', 'municipal-team-lead'] },
   { number: 'SOP-05', title: 'Running a ward round and reading coverage', area: 'FIELD', roles: ['ward-lead', 'vd-captain'] },

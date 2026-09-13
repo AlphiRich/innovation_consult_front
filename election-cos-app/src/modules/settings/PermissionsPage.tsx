@@ -12,10 +12,21 @@
  * and per-user capability overrides (`StaffProfile.capOverrides`), via
  * `dal.staff`.
  *
- * NOT built: provisioning a brand-new staff member. That needs a real
- * Firebase Auth account created through the minimal-footprint invite path
- * `firebaseAuth.ts` names as a future server-side flow — no such Cloud
- * Function exists yet. This page only manages already-provisioned staff.
+ * ADDING A PERSON (session 27). This page now creates staff records as
+ * well as editing them. What it does NOT do is create anyone's sign-in
+ * account: that needs the Auth Admin SDK, so no Cloud Function in this
+ * build can do it, and inventing one would mean this product holding
+ * someone else's password.
+ *
+ * The order is therefore: the person signs in themselves, lands on
+ * "Awaiting access" (Shell.tsx), and sends the sign-in ID it shows them to
+ * an administrator, who fills in the form below. That also happens to be
+ * the arrangement §4.3 wants — the name, phone, role and scope are
+ * written here to Firestore in South Africa and never to Auth.
+ *
+ * Validation lives in `staffProvisioning.ts`, tested, because two of its
+ * rules prevent an account that signs in perfectly and then shows an empty
+ * application with no error to explain it. See that file's header.
  */
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -24,6 +35,15 @@ import { useSession } from '@/auth/useSession';
 import { SEED_ROLES } from '@/auth/seedRoles';
 import { ALL_CAPABILITIES } from '@/auth/allCapabilities';
 import type { StaffProfile, Capability } from '@/auth/types';
+import {
+  EMPTY_DRAFT,
+  provisioningProblems,
+  scopeRequirement,
+  SIGN_IN_ID_BASIS,
+  toStaffProfile,
+  type ProvisioningField,
+  type StaffDraft,
+} from './staffProvisioning';
 
 function toggle<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
@@ -39,6 +59,8 @@ export function PermissionsPage() {
     enabled: Boolean(session),
   });
 
+  const [adding, setAdding] = useState(false);
+  const [newStaff, setNewStaff] = useState<StaffDraft>(EMPTY_DRAFT);
   const [editingUid, setEditingUid] = useState<string | null>(null);
   const [roleId, setRoleId] = useState('');
   const [wardScope, setWardScope] = useState('');
@@ -83,6 +105,21 @@ export function PermissionsPage() {
     setRevoked(profile.capOverrides.revoked);
   }
 
+  const existingUids = (staffQuery.data ?? []).map((s) => s.uid);
+  const newStaffProblems = adding ? provisioningProblems(newStaff, existingUids) : [];
+  const problemFor = (field: ProvisioningField) => newStaffProblems.find((p) => p.field === field)?.message;
+  const newStaffScope = scopeRequirement(newStaff.roleId);
+
+  function handleAdd() {
+    if (newStaffProblems.length > 0) return;
+    saveMutation.mutate(toStaffProfile(newStaff, session!.tenantId), {
+      onSuccess: () => {
+        setNewStaff(EMPTY_DRAFT);
+        setAdding(false);
+      },
+    });
+  }
+
   function handleSave(profile: StaffProfile) {
     saveMutation.mutate({
       ...profile,
@@ -112,8 +149,124 @@ export function PermissionsPage() {
         ))}
       </div>
 
-      <div className="space-y-2">
-        <h2 className="text-label-caps font-display uppercase text-slate">Staff</h2>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-label-caps font-display uppercase text-slate">Staff</h2>
+          <button
+            type="button"
+            onClick={() => setAdding((open) => !open)}
+            className="px-3 py-1.5 border border-ink/20 rounded text-label-caps font-display uppercase text-ink"
+          >
+            {adding ? 'Cancel' : 'Add a person'}
+          </button>
+        </div>
+
+        {adding && (
+          <div className="bg-white border border-gold/60 rounded-lg p-4 space-y-3">
+            <p className="text-body-md font-body text-slate">{SIGN_IN_ID_BASIS}</p>
+
+            <label className="space-y-1 block">
+              <span className="text-label-caps font-display uppercase text-slate">Sign-in ID</span>
+              <input
+                className="w-full border border-ink/20 rounded px-2 py-1.5 text-data-mono font-mono"
+                value={newStaff.signInId}
+                onChange={(e) => setNewStaff((d) => ({ ...d, signInId: e.target.value }))}
+              />
+              {problemFor('signInId') && <span className="block text-body-md text-maroon">{problemFor('signInId')}</span>}
+            </label>
+
+            <div className="grid grid-cols-3 gap-3">
+              <label className="space-y-1 block">
+                <span className="text-label-caps font-display uppercase text-slate">First name</span>
+                <input
+                  className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body"
+                  value={newStaff.firstName}
+                  onChange={(e) => setNewStaff((d) => ({ ...d, firstName: e.target.value }))}
+                />
+              </label>
+              <label className="space-y-1 block">
+                <span className="text-label-caps font-display uppercase text-slate">Last name</span>
+                <input
+                  className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body"
+                  value={newStaff.lastName}
+                  onChange={(e) => setNewStaff((d) => ({ ...d, lastName: e.target.value }))}
+                />
+              </label>
+              <label className="space-y-1 block">
+                <span className="text-label-caps font-display uppercase text-slate">Contact number</span>
+                <input
+                  className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body"
+                  value={newStaff.phone}
+                  onChange={(e) => setNewStaff((d) => ({ ...d, phone: e.target.value }))}
+                />
+              </label>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <label className="space-y-1 block">
+                <span className="text-label-caps font-display uppercase text-slate">Role</span>
+                <select
+                  className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body bg-white"
+                  value={newStaff.roleId}
+                  onChange={(e) => setNewStaff((d) => ({ ...d, roleId: e.target.value }))}
+                >
+                  <option value="">Choose a role…</option>
+                  {SEED_ROLES.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {/*
+               * Only the scope the chosen role actually uses is offered.
+               * The role decides this, not the person filling in the form —
+               * a ward code on a tenant-wide role is recorded and never
+               * applied, and a ward role with no code is denied every
+               * record by inScope(). Both are refused in staffProvisioning.
+               */}
+              {newStaffScope === 'WARD' && (
+                <label className="space-y-1 block">
+                  <span className="text-label-caps font-display uppercase text-slate">Ward code</span>
+                  <input
+                    className="w-full border border-ink/20 rounded px-2 py-1.5 text-data-mono font-mono"
+                    value={newStaff.wardScope}
+                    onChange={(e) => setNewStaff((d) => ({ ...d, wardScope: e.target.value }))}
+                  />
+                </label>
+              )}
+              {newStaffScope === 'VD' && (
+                <label className="space-y-1 block">
+                  <span className="text-label-caps font-display uppercase text-slate">VD code</span>
+                  <input
+                    className="w-full border border-ink/20 rounded px-2 py-1.5 text-data-mono font-mono"
+                    value={newStaff.vdScope}
+                    onChange={(e) => setNewStaff((d) => ({ ...d, vdScope: e.target.value }))}
+                  />
+                </label>
+              )}
+            </div>
+
+            {newStaff.roleId !== '' && newStaffProblems.length > 0 && (
+              <ul className="space-y-1">
+                {newStaffProblems.map((problem) => (
+                  <li key={problem.field + problem.message} className="text-body-md font-body text-maroon">
+                    {problem.message}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <button
+              type="button"
+              onClick={handleAdd}
+              disabled={newStaffProblems.length > 0 || saveMutation.isPending}
+              className="px-4 py-2 bg-ink text-paper rounded text-label-caps font-display uppercase disabled:opacity-40"
+            >
+              Add to the team
+            </button>
+          </div>
+        )}
         {staffQuery.isLoading && <p className="text-body-md font-body text-slate">Loading…</p>}
         {staffQuery.isError && (
           <p className="text-body-md font-body text-maroon">

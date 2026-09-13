@@ -47,8 +47,21 @@ export function Shell() {
           <p className="text-headline-md font-display text-ink">Awaiting access</p>
           <p className="text-body-md font-body text-slate">
             You're signed in as {user?.email}, but no role or geographic scope has been assigned to your account yet.
-            Ask an administrator to add you under Settings → Permissions.
+            Send your administrator the sign-in ID below and ask them to add you under Settings → Permissions.
           </p>
+          {/*
+           * The sign-in ID is shown because the administrator has no way to
+           * look one up. A staff record is keyed by Firebase Auth uid, and
+           * resolving an email address to a uid needs the Admin SDK — which
+           * means a Cloud Function that does not exist. Until it does, the
+           * person holding the account is the only one who can supply it,
+           * and a screen that tells them to ask for access without telling
+           * them what to send leaves both sides stuck.
+           */}
+          <div className="rounded border border-ink/10 bg-paper p-3">
+            <p className="text-label-caps font-display uppercase text-slate">Your sign-in ID</p>
+            <p className="text-data-mono font-mono text-ink mt-1 break-all">{user?.uid}</p>
+          </div>
           <button
             type="button"
             onClick={() => signOut()}

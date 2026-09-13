@@ -6,6 +6,8 @@ import { HAZARD_LABEL, HAZARD_ORDER, PAIR_UP_HAZARDS } from '@/modules/voters/ho
 import { assembleManual, groupByArea, type Sop } from './manualModel';
 import { PLANNED_SOPS, SOPS } from './sops';
 import { CANVASSER_SOP } from './sops/canvasserSop';
+import { ROLE_PURPOSE, TENANT_SETUP_SOP } from './sops/tenantSetupSop';
+import { EMPTY_DRAFT, provisioningProblems, SIGN_IN_ID_BASIS } from '@/modules/settings/staffProvisioning';
 import { DOORSTEP_ERASURE_ANSWER } from '@/modules/settings/dataSubjectErasure';
 import { buildManualPdf, manualFileName, MANUAL_STATUS_NOTE } from './manualPdf';
 
@@ -55,6 +57,16 @@ describe('the SOP register', () => {
   it('starts with the canvasser SOP — the one most people will ever read', () => {
     expect(SOPS[0].number).toBe('SOP-01');
     expect(SOPS[0].roles).toEqual(['canvasser', 'vd-captain']);
+  });
+
+  it('never lists a number as both written and planned', () => {
+    // The appendix prints PLANNED_SOPS as "not yet issued". A number left
+    // in both lists after being written would print as issued in the body
+    // and unwritten in the appendix of the same document.
+    const written = new Set(SOPS.map((s) => s.number));
+    for (const planned of PLANNED_SOPS) {
+      expect(written.has(planned.number), `${planned.number} is written and still listed as planned`).toBe(false);
+    }
   });
 
   it('ships no empty SOP — a heading with nothing under it is worse than a gap', () => {
@@ -292,6 +304,20 @@ describe('the printed manual', () => {
     expect(text).toContain('SOP-09');
   });
 
+  it('lists every procedure in the appendix, written ones included, each with its state', () => {
+    // A register of only the unwritten ones makes "not in your copy" and
+    // "does not exist" indistinguishable, which is the question the
+    // appendix exists to answer.
+    const text = printed(buildManualPdf(manual, meta));
+    for (const sop of [...SOPS, ...PLANNED_SOPS]) {
+      expect(text, sop.number).toContain(sop.number);
+    }
+    expect(text).toContain('in this copy');
+    // SOP-02 is the Party HQ Admin's, so a canvasser's copy has to say so
+    // rather than leaving a hole between SOP-01 and SOP-03.
+    expect(text).toContain('addressed to another role');
+  });
+
   it('numbers every page', () => {
     const raw = decoder.decode(buildManualPdf(manual, meta));
     const count = Number(/\/Count (\d+)/.exec(raw)![1]);
@@ -305,5 +331,138 @@ describe('the printed manual', () => {
 
   it('names the file after the document reference, the role and the version', () => {
     expect(manualFileName(manual, meta)).toBe('ic-ecos-man-2026-canvasser-copy-v1-0.pdf');
+  });
+});
+
+
+/**
+ * SOP-02 is the administrator's first hour, and the procedure everything
+ * else in the manual assumes was done. Its claims are checked against the
+ * role table, the provisioning rules and the security rules it describes.
+ */
+describe('SOP-02 describes the setup path that actually exists', () => {
+  const text = JSON.stringify(TENANT_SETUP_SOP);
+
+  it('is addressed to the role that can actually perform it', () => {
+    expect(TENANT_SETUP_SOP.roles).toEqual(['party-hq-admin']);
+    expect(TENANT_SETUP_SOP.requiresAnyCapability).toContain('team.manage');
+    const admin = SEED_ROLES.find((r) => r.id === 'party-hq-admin')!;
+    for (const cap of TENANT_SETUP_SOP.requiresAnyCapability ?? []) {
+      expect(admin.defaultCaps, `party-hq-admin cannot ${cap}`).toContain(cap);
+    }
+  });
+
+  it('names every role, with the reach the role table actually gives it', () => {
+    const scopeWord: Record<string, string> = {
+      TENANT: 'whole tenant',
+      MUNICIPALITY: 'whole municipality',
+      WARD: 'one ward',
+      VD: 'one voting district',
+    };
+    const section = TENANT_SETUP_SOP.sections.find((s) => s.heading.includes('Choosing the role'));
+    const listed = (section?.steps ?? []).join('\n');
+    expect(section?.steps).toHaveLength(SEED_ROLES.length);
+    for (const role of SEED_ROLES) {
+      expect(listed, role.id).toContain(`${role.label} (${scopeWord[role.geoScope]})`);
+    }
+  });
+
+  it('states the count of roles by deriving it, never as a written-in number', () => {
+    // "Seven roles" in prose is a number that goes stale the day an eighth
+    // is added. It is allowed to appear only if it is still true.
+    const spelled = /\b(five|six|seven|eight|nine)\b\s+roles/i.exec(text);
+    if (spelled) {
+      const words: Record<string, number> = { five: 5, six: 6, seven: 7, eight: 8, nine: 9 };
+      expect(words[spelled[1].toLowerCase()], 'the SOP names a role count that is now wrong').toBe(SEED_ROLES.length);
+    }
+  });
+
+  it('tells the administrator the sign-in ID comes from the person, not from a lookup', () => {
+    expect(text).toContain(SIGN_IN_ID_BASIS);
+    expect(text).toMatch(/Awaiting access/);
+  });
+
+  it('warns about the silent failure the provisioning rules exist to prevent', () => {
+    const section = TENANT_SETUP_SOP.sections.find((s) => s.heading.includes('give them their ground'));
+    const warnings = (section?.warnings ?? []).join(' ');
+    expect(warnings).toMatch(/empty application/i);
+    // The SOP may only promise a refusal the code actually performs.
+    expect(
+      provisioningProblems(
+        { ...EMPTY_DRAFT, signInId: 'uid', firstName: 'A', lastName: 'B', phone: '1', roleId: 'ward-lead' },
+        [],
+      ).map((p) => p.field),
+    ).toEqual(['wardScope']);
+    expect(
+      provisioningProblems(
+        { ...EMPTY_DRAFT, signInId: 'uid', firstName: 'A', lastName: 'B', phone: '1', roleId: 'finance-officer', wardScope: 'W12' },
+        [],
+      ).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it('has prose for every role, so none prints as “undefined”', () => {
+    for (const role of SEED_ROLES) {
+      expect(ROLE_PURPOSE[role.id], `no SOP-02 description for ${role.id}`).toBeTruthy();
+    }
+  });
+
+  it('describes each role with capabilities the role actually has, and lacks', () => {
+    const caps = (id: string) => SEED_ROLES.find((r) => r.id === id)!.defaultCaps;
+    const listed = (TENANT_SETUP_SOP.sections.find((s) => s.heading.includes('Choosing the role'))?.steps ?? []).join('\n');
+
+    // "reads everything — but deliberately cannot edit a voter record or a donation"
+    expect(listed).toMatch(/Party HQ Admin[^\n]*cannot edit a voter record or a donation/);
+    for (const view of ['warroom.view', 'voters.view', 'wards.view', 'diary.view', 'incidents.view', 'logistics.view', 'ppfa.view', 'analytics.view', 'dsr.view'] as const) {
+      expect(caps('party-hq-admin'), `party-hq-admin is described as reading everything but lacks ${view}`).toContain(view);
+    }
+    expect(caps('party-hq-admin')).not.toContain('voters.edit');
+    expect(caps('party-hq-admin')).not.toContain('ppfa.edit');
+
+    // "Holds no export and cannot change disclosure thresholds"
+    expect(listed).toMatch(/Compliance Officer[^\n]*Holds no export/);
+    for (const cap of caps('compliance-officer')) {
+      expect(cap.endsWith('.export'), `compliance-officer holds ${cap}`).toBe(false);
+    }
+
+    // "Holds nothing on the voter roll"
+    expect(listed).toMatch(/Finance Officer[^\n]*Holds nothing on the voter roll/);
+    for (const cap of caps('finance-officer')) {
+      expect(cap.startsWith('voters.'), `finance-officer holds ${cap}`).toBe(false);
+    }
+  });
+
+  it('states the separation of duties the role table keeps, and that an override can break it', () => {
+    const section = TENANT_SETUP_SOP.sections.find((s) => s.heading.includes('not quite right'));
+    const warnings = (section?.warnings ?? []).join(' ');
+    expect(warnings).toMatch(/disclosure thresholds/i);
+    // The claim is the three-way concentration rule roleModel.test.ts
+    // enforces, not a two-way one. Stated precisely because the first
+    // draft of this SOP said the defaults keep thresholds and data
+    // requests apart — which is true of the Compliance and Finance
+    // Officers and false of the Party HQ Admin, who holds both.
+    const caps = (id: string) => SEED_ROLES.find((r) => r.id === id)!.defaultCaps;
+    for (const role of SEED_ROLES) {
+      const allThree =
+        role.defaultCaps.includes('ppfa.edit') &&
+        role.defaultCaps.includes('ppfa.manage_thresholds') &&
+        role.defaultCaps.includes('dsr.manage');
+      expect(allThree, `${role.id} holds all three of the combination SOP-02 says no role holds`).toBe(false);
+    }
+    expect(warnings).toMatch(/Compliance Officer cannot change disclosure thresholds/i);
+    expect(caps('compliance-officer')).not.toContain('ppfa.manage_thresholds');
+    expect(warnings).toMatch(/Finance Officer cannot answer data requests/i);
+    expect(caps('finance-officer')).not.toContain('dsr.manage');
+  });
+
+  it('does not claim deactivation reaches a device that is already offline', () => {
+    const section = TENANT_SETUP_SOP.sections.find((s) => s.heading.includes('someone leaves'));
+    const warnings = (section?.warnings ?? []).join(' ');
+    expect(warnings).toMatch(/not a remote wipe/i);
+    expect(warnings).toMatch(/already offline/i);
+  });
+
+  it('promises no deletion of the departed person’s record', () => {
+    expect(text).toMatch(/it is not deleted/i);
   });
 });

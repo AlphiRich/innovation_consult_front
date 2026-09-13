@@ -111,8 +111,9 @@ a contract.
 
 ## Sequence
 
-1. SOP-01 is issued (`src/modules/manual/sops/canvasserSop.ts`).
-2. SOP-02 … SOP-12 are written (`PLANNED_SOPS` carries the register).
+1. SOP-01 and SOP-02 are issued
+   (`src/modules/manual/sops/`).
+2. SOP-03 … SOP-12 are written (`PLANNED_SOPS` carries the register).
 3. The completed manual goes to an attorney **with this file**, which
    tells them what is safe to rely on and what must not be said.
 4. The instruments are drafted against it.
@@ -187,3 +188,60 @@ where the mark belongs. Supply the artwork and it drops into one place.
   Embedding it means shipping a licensed font binary — a licensing
   decision, not a formatting one.
 - SOP-02 … SOP-12 are listed in the manual's appendix as not yet issued.
+
+
+---
+
+## SOP-02, and what writing it found (session 27)
+
+SOP-02 documents the administrator's first hour: record the municipality,
+get people signed in, give each of them a role and a patch of ground, take
+access away again when someone leaves.
+
+Writing it against the code — the discipline this whole module runs on —
+found that the path it documents did not work end to end. Three defects,
+all on that path, all fixed before the SOP was written:
+
+1. **The capability resolver stamped an empty token for every role.**
+   `functions/src/resolveCapabilities.ts` held a placeholder role lookup
+   returning `defaultCaps: []`, so a person's effective capabilities were
+   their per-user overrides and nothing else. Assigning someone the Ward
+   Lead role would have produced an account that signs in and sees an
+   empty application, with no error anywhere to explain it. The role table
+   is now generated into the functions package by `npm run gen:roles` and
+   guarded by `src/auth/roleMirror.test.ts`.
+2. **"Awaiting access" told a person to ask for access without telling
+   them what to send.** A staff record is keyed by Firebase Auth UID and
+   there is no way to resolve one from an email address without the Admin
+   SDK. The screen now shows the sign-in ID.
+3. **There was no way to add a person at all.** The Permissions page
+   managed already-provisioned staff only. It now creates records too —
+   not sign-in accounts, which would mean this product holding someone
+   else's password, but the record that turns an account into a team
+   member.
+
+New in `src/modules/settings/staffProvisioning.ts`: the two refusals that
+prevent the same silent failure from the other direction — a ward or VD
+role saved with no scope (denied every record by `inScope()`), and a scope
+set on a role that has none (recorded and never applied).
+
+### One claim SOP-02 had to correct about itself
+
+The first draft said the default roles keep apart the person who answers a
+donor's data request and the person who sets disclosure thresholds. The
+guard written alongside it failed: `party-hq-admin` holds both. The
+settled rule in `roleModel.test.ts` is a three-way one — no role may
+*record* donations, *set* thresholds and *answer* the donor's data request
+— plus two specific exclusions (the Compliance Officer cannot set
+thresholds; the Finance Officer cannot answer data requests). The SOP now
+states that rule, and the guard asserts it.
+
+### Noted, not fixed
+
+`inScope()` narrows a VD-scoped user on `vdCode` alone. `VotingDistrict`
+identity is the `(wardCode, vdCode)` pair precisely because a voting
+station's roll can be split across wards — about 19% of NW405's are. A VD
+user whose district is split may therefore be in scope for the other
+ward's portion. Changing `inScope()` is a security-rules change with wide
+blast radius and is not something to fold into an SOP commit. Recorded
+here so it is not found twice.

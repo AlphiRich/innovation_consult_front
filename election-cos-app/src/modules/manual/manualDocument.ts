@@ -7,7 +7,7 @@
  */
 import type { Block, PrintDocument } from '@/lib/document/model';
 import { AREA_LABEL, groupByArea, type Manual } from './manualModel';
-import { PLANNED_SOPS } from './sops';
+import { PLANNED_SOPS, SOPS } from './sops';
 
 export const MANUAL_STATUS_NOTE =
   'This is an operating manual. It describes how the platform works and how it is meant to be used. ' +
@@ -71,13 +71,28 @@ export function manualToDocument(manual: Manual, meta: ManualDocumentMeta): Prin
     kind: 'para',
     muted: true,
     text:
-      'The complete manual is structured as the procedures below. Those not yet issued are listed so ' +
-      'the shape of the whole is visible; they are not included here because an empty heading is ' +
-      'worse than an acknowledged gap.',
+      'Every procedure in the manual, whether or not it is in your copy. Each says why it is not here ' +
+      'when it is not: another role’s procedure, outside your subscription, or not yet written. A ' +
+      'procedure not yet written is listed rather than omitted, because an empty heading is worse ' +
+      'than an acknowledged gap — and a list of only the ones you hold makes it impossible to tell ' +
+      'the difference between the two.',
   });
+  const included = new Set(manual.sops.map((s) => s.number));
+  const withheldReason = new Map(manual.withheld.map((w) => [w.number, w.reason]));
+  const register = [
+    ...SOPS.map((sop) => ({
+      number: sop.number,
+      title: sop.title,
+      area: sop.area,
+      state: included.has(sop.number)
+        ? 'in this copy'
+        : (withheldReason.get(sop.number) ?? 'written, and addressed to another role'),
+    })),
+    ...PLANNED_SOPS.map((p) => ({ number: p.number, title: p.title, area: p.area, state: 'not yet issued' })),
+  ].sort((a, b) => a.number.localeCompare(b.number));
   blocks.push({
     kind: 'bullets',
-    items: PLANNED_SOPS.map((p) => `${p.number} — ${p.title} (${AREA_LABEL[p.area]}) · not yet issued`),
+    items: register.map((r) => `${r.number} — ${r.title} (${AREA_LABEL[r.area]}) · ${r.state}`),
   });
 
   return {

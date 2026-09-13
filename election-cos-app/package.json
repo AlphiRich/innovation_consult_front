@@ -14,6 +14,7 @@
     "test:watch": "vitest",
     "check:hex": "node scripts/check-no-hex.mjs",
     "docs:emit": "vite-node scripts/emit-documents.ts --",
+    "gen:roles": "vite-node scripts/gen-roles.ts",
     "check:all": "npm run lint && npm run typecheck && npm run check:hex && npm run test"
   },
   "dependencies": {
