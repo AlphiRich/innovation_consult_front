@@ -67,10 +67,11 @@ This was the sixth unresolved architecture conflict carried for a human
 decision, alongside the five logged in `BUILD-STATUS.md` (where the V2
 metering engine runs; Firestore-vs-Postgres in the V2 bundle; 6-vs-7
 roles; 25-vs-45 capabilities; uuid-vs-VARCHAR(36) in RLS). It overlapped
-the second, and both were closed together by the decision above. **Three
-remain open:** the role model, the capability catalogue, and the RLS key
-type — none of which the Firestore decision touches, since all three are
-about the V2 artefacts rather than this app's datastore.
+the second, and both were closed together by the decision above. The role
+model was then resolved on 13 Sep (seven roles, Compliance Officer stays —
+see `BUILD-STATUS.md`), and the RLS key type went moot with the Postgres
+migration it belonged to. **One remains open:** the 25-vs-45 capability
+catalogue.
 
 ## 3. Verified errors in the blueprint PDF
 

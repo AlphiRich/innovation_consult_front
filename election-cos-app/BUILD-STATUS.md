@@ -861,6 +861,9 @@ bundle's next-step #3 is already done.
    migrations in the same bundle describe V2 as the Postgres shared-tenancy
    product. Worth resolving in the artefact before anyone builds against it.
 3. **RBAC role model conflict — the previously-flagged defect class, again.**
+   *(**RESOLVED 13 Sep 2026, session 21:** seven roles, `compliance-officer`
+   stays. See the decision record at the end of this file. Kept below for
+   the record of what was asked; do not re-open.)*
    `010_v2_shared_tenancy.sql` seeds **6** roles (`HQ_ADMIN`, `LOCAL_HEAD`,
    `FINANCE_OFFICER`, `WARD_LEAD`, `VD_CAPTAIN`, `VOLUNTEER`), and the
    `ecos-rbac-config` skill calls those six canonical, explicitly warning
@@ -1473,6 +1476,118 @@ added, if the Postgres adapter directory acquires an implementation, or if
 the `VITE_DAL_ADAPTER=postgres` guard is softened. This exists because the
 proposal arrived four times from outside the repo; the next arrival should
 meet a failing test and this section, not a fresh debate.
+
+---
+
+## DECISION — seven roles; Compliance Officer stays (13 Sep 2026)
+
+**Decided by the project owner.** With the standing instruction that came
+with it, which is broader than this decision and is recorded here because
+it now governs how this kind of finding gets handled:
+
+> *"Exhaust rewording customer-facing marketing commitments first before
+> scrapping genuinely valuable functions and application comparative
+> advantages."*
+
+That is the rule applied below: where a claim outran what the code does,
+the **claim** was corrected. No capability, role or feature was removed.
+
+### The conflict was never about a count
+
+This repo's seven map one-to-one onto the six the `ecos-rbac-config` skill
+calls canonical — `party-hq-admin`/HQ_ADMIN, `municipal-team-lead`/LOCAL_HEAD,
+`ward-lead`/WARD_LEAD, `vd-captain`/VD_CAPTAIN, `canvasser`/VOLUNTEER,
+`finance-officer`/FINANCE_OFFICER — plus `compliance-officer`. No naming
+drift, no scope mismatch, one extra role. The skill permits a seventh
+"unless a product decision explicitly adds them"; this is that decision,
+and the role meets the carve-out rather than leaning on it: two real
+capabilities, a built page, server-side enforcement.
+
+### Why it is not folded into another role (POPIA/PPFA)
+
+- Into **`party-hq-admin`**: it already holds `dsr.*` but deliberately not
+  `ppfa.edit`. Folding POPIA duties there makes data-subject handling an
+  HQ-admin-only function — the opposite of the separation POPIA's
+  information-officer concept assumes.
+- Into **`finance-officer`**: it holds the full PPFA set including
+  `ppfa.manage_thresholds`. That would let the person answering a donor's
+  data request also set the disclosure thresholds applied to that donor.
+  **This is the one combination refused outright**, and
+  `roleModel.test.ts` now fails if any role acquires
+  `ppfa.edit` + `ppfa.manage_thresholds` + `dsr.manage` together.
+
+Compliance Officer holds `ppfa.edit` because POPIA's correction right over
+a donor record cannot be actioned without it — load-bearing, not
+convenience. It holds neither `ppfa.export` nor `ppfa.manage_thresholds`.
+The compensating controls are structural: `donations` and `donorLedger`
+are `delete: if false` (amend, never remove) and `ppfaConfigs` is
+append-only (history cannot be rewritten to match an amendment).
+
+### Applying the mind to POPIA turned up a real defect — in the claim
+
+Auditing the role's actual POPIA surface surfaced something wider than the
+role, and it is the more important half of this session:
+
+**Every one of the fourteen tenant collections is `allow delete: if false`.**
+Voters and households carry `deletedAt` and are *suppressed*, not
+destroyed. Donations say so in the rules themselves ("statutory record —
+never deleted, only corrected"). **There is no de-identification routine
+anywhere in this codebase.**
+
+Against that, `DataSubjectRequestsPage` offered DELETION as a request type
+and a **"Mark fulfilled"** button. Pressing it would have written *"this
+erasure was completed"* into a compliance record the Information Regulator
+may one day read, when nothing had been erased and nothing could be. That
+is the same class of defect this build has repeatedly caught in other
+people's work — a claim outliving the code behind it — found this time in
+our own.
+
+**Fixed by rewording, per the standing instruction. Nothing was removed:**
+
+- `dataSubjectErasure.ts` states, per subject type, what a deletion
+  request can actually achieve here: `RESTRICTED_BY_LAW` for donors
+  (retention under the PPFA; POPIA §14(1) permits retention required or
+  authorised by law), `SUPPRESSION_ONLY` for everyone else, and
+  `canRecordFulfilled: false` throughout — kept as a field, not a
+  constant, so building real de-identification flips one place.
+- The request log renders that position on the request itself, and
+  withholds **only** the button that would write a false outcome. The
+  DELETION request type, the log, and the Compliance Officer's ability to
+  action requests all stay. ACCESS and CORRECTION are untouched — this
+  product can genuinely do both.
+- A donor refusal offers a prefilled reason carrying the legal basis
+  instead of a bare "rejected", and the button reads "Refuse — retention
+  required". Offered, not auto-applied: a reason that writes itself is how
+  a template ends up asserting something nobody checked.
+- Every legal position is marked **pending attorney review**, the same
+  discipline as `dataSubjectRequestSla.ts`. POPIA §14(1) was verified
+  against the Act rather than recalled.
+
+**Genuine gap now named rather than hidden:** de-identification is not
+built. Until it is, this product cannot fulfil an erasure request in the
+POPIA sense for any subject type. That is a real limitation and a real
+roadmap item — not a reason to remove the request type, which is exactly
+the "scrapping a valuable function" the instruction warns against.
+
+### Tripwires
+
+`src/auth/roleModel.test.ts` fails if the role count changes, if
+`compliance-officer` loses its DSR capabilities or gains threshold
+control, if any role concentrates funding *and* data compliance, or if
+`firestore.rules` starts naming a role id instead of checking a
+capability. `src/modules/settings/dataSubjectErasure.test.ts` fails if any
+collection opens a hard delete, if a surface starts claiming erasure, or
+if a legal position loses its attorney-review hedge.
+
+Both were proved by injection, not assumed: removing `compliance-officer`
+fails 5 tests, giving Finance Officer `dsr.manage` fails 2, and opening a
+delete on `donations` fails 2. All reverted clean.
+
+### Still open
+
+One conflict remains from the session-13 list — the **25-vs-45 capability
+catalogue**. The uuid-vs-VARCHAR(36) RLS key type is moot: it only ever
+applied to the Postgres migration closed on 13 Sep.
 
 ---
 

@@ -14,6 +14,12 @@ import type {
   DataSubjectType,
 } from '@/dal/ports/dataSubjectRequests';
 import { isOverdue, RESPONSE_TARGET_BASIS } from './dataSubjectRequestSla';
+import {
+  blocksFulfilment,
+  DONOR_ERASURE_REFUSAL_REASON,
+  ERASURE_CAPABILITY_BASIS,
+  erasurePosition,
+} from './dataSubjectErasure';
 
 const SUBJECT_TYPE_LABEL: Record<DataSubjectType, string> = {
   VOTER: 'Voter',
@@ -110,6 +116,7 @@ export function DataSubjectRequestsPage() {
           <p className="text-body-md font-body text-slate mt-1">
             POPIA Condition 8. {RESPONSE_TARGET_BASIS}
           </p>
+          <p className="text-body-md font-body text-slate mt-1">{ERASURE_CAPABILITY_BASIS}</p>
         </div>
         <button
           type="button"
@@ -202,6 +209,13 @@ export function DataSubjectRequestsPage() {
       <div className="space-y-3">
         {requests.map((req) => {
           const overdue = isOverdue(req.receivedAt, req.status);
+          // A DELETION cannot be honestly fulfilled by this system for any
+          // subject type — see dataSubjectErasure.ts. The request, the log
+          // and the Compliance Officer's ability to action it all stay;
+          // what is withheld is the button that would write a false
+          // outcome into the compliance record.
+          const fulfilBlocked = blocksFulfilment(req.subjectType, req.requestType);
+          const erasure = req.requestType === 'DELETION' ? erasurePosition(req.subjectType) : null;
           return (
             <div key={req.id} className="bg-white border border-ink/10 rounded-lg p-4 space-y-2">
               <div className="flex items-start justify-between gap-3">
@@ -221,6 +235,12 @@ export function DataSubjectRequestsPage() {
                 )}
               </div>
 
+              {erasure && (
+                <p className="text-body-md font-body text-maroon border-l-2 border-maroon/40 pl-3">
+                  {erasure.basis}
+                </p>
+              )}
+
               <div className="flex items-center gap-2 flex-wrap">
                 {req.status === 'RECEIVED' && (
                   <button
@@ -231,7 +251,7 @@ export function DataSubjectRequestsPage() {
                     Start
                   </button>
                 )}
-                {req.status !== 'FULFILLED' && (
+                {req.status !== 'FULFILLED' && !fulfilBlocked && (
                   <button
                     type="button"
                     onClick={() => statusMutation.mutate({ id: req.id, status: 'FULFILLED', detail: {} })}
@@ -262,10 +282,18 @@ export function DataSubjectRequestsPage() {
                 ) : (
                   <button
                     type="button"
-                    onClick={() => setRejectingId(req.id)}
+                    onClick={() => {
+                      setRejectingId(req.id);
+                      // Offered, not applied — the operator can edit or clear
+                      // it. A reason that writes itself is how a template ends
+                      // up asserting something nobody checked.
+                      setRejectionReason(
+                        erasure?.disposition === 'RESTRICTED_BY_LAW' ? DONOR_ERASURE_REFUSAL_REASON : '',
+                      );
+                    }}
                     className="px-3 py-1.5 border border-maroon/40 rounded text-label-caps font-display uppercase text-maroon"
                   >
-                    Reject
+                    {erasure?.disposition === 'RESTRICTED_BY_LAW' ? 'Refuse — retention required' : 'Reject'}
                   </button>
                 )}
               </div>
