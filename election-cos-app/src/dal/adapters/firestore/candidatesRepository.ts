@@ -19,6 +19,7 @@ function fromFirestore(id: string, data: Record<string, unknown>): Candidate {
     affiliation: data.affiliation as Candidate['affiliation'],
     wardCode: data.wardCode as string | undefined,
     listRank: data.listRank as number | undefined,
+    gender: data.gender as Candidate['gender'] | undefined,
     idNumberEncrypted: data.idNumberEncrypted as string,
     idNumberMasked: data.idNumberMasked as string,
     verificationStatus: data.verificationStatus as Candidate['verificationStatus'],

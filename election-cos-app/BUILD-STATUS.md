@@ -1477,6 +1477,64 @@ the `VITE_DAL_ADAPTER=postgres` guard is softened. This exists because the
 proposal arrived four times from outside the repo; the next arrival should
 meet a failing test and this section, not a fresh debate.
 
+**Session 22 (13 Sep 2026) — functional extraction from the AI Studio
+build.** Five artefacts, read under a changed instruction: extract
+function, do not re-audit settled conflicts or defunct bugs. Backlog and
+reasoning in `docs/ai-studio-functional-extraction.md`.
+
+**Built: the PR party list compliance aid** (`src/modules/candidates/prList.ts`).
+The candidates port has carried `affiliation: 'PR'` and `listRank` since
+Phase 3 with nothing enforcing either; this is the missing half. 24 tests.
+
+- **Citation corrected at source.** Party lists are governed by **s14**
+  (submission) and **s15** (certification) of the Municipal Electoral Act
+  27 of 2000, composition by **Schedule 1** of the Municipal Structures Act
+  117 of 1998. **Section 17 is ward candidate nominations, not PR lists** —
+  another build cited it; ours never did and a test keeps it out.
+- **Gender is a warning and can never block.** Schedule 1 says a party must
+  *"seek to ensure"* half its candidates are women and that the sexes are
+  *"evenly distributed"* — verified wording, and an aspiration rather than
+  a gate. Blocking on it would invent an obligation and refuse a lawful act
+  on it. A test asserts no gender issue can be raised at blocking severity.
+- **The list-length cap is configured, not hardcoded.** Reported elsewhere
+  as 2× PR seats, but SAFLII, lawlibrary.org.za and the gov.za mirror were
+  all egress-blocked, so Item 11(1) could not be read from source. Default
+  + citation + attorney-review hedge, overridable per tenant — the
+  `PPFAConfig` treatment, because a wrong hard block rejects a lawful list.
+  **Confirm against the Act.**
+- Over-long lists are **blocked, never truncated** — silently dropping a
+  name the party meant to include is the worse failure.
+- `Candidate.gender` added to the port: optional, self-declared, never
+  inferred from a name; `UNDISCLOSED` is an answer, not a gap.
+
+Proved by injection: making the gender shortfall blocking fails 2 tests,
+silently truncating an over-long list fails 1, reintroducing the s17
+citation fails 1. All reverted clean.
+
+**Backlog extracted, ranked** (detail in the doc): tenant module
+entitlements — the architectural one, since capabilities answer *what may
+this user do* and nothing answers *what did this tenant buy*; seeding the
+Campaign Diary with the IEC timetable we already hold; canvasser safety
+notes on the household card; out-of-band escalation for critical
+incidents; field diagnostic guidance for the Dexie layer.
+
+**Deliberately not built:** the tutorial's automated T-7/T-3 Gatherings Act
+engine. The positioning paper of the same date states the gatherings module
+remains advisory only and warns that implying the diary tracks permit
+deadlines would be an overclaim. Recorded so it is not built later by
+someone reading only the tutorial.
+
+**One claim to correct before it ships:** the tutorial's doorstep POPIA
+script has the canvasser tell a voter her details "will be permanently
+purged post-election." This build hard-deletes nothing (session 21). Said
+at the door that is a promise the system cannot keep — and the substance
+the voter actually needs (number masked, data held in South Africa,
+consent withdrawable) is all true and all deliverable. Only the purge
+sentence is not.
+
+**Verified:** `check:all` green — **268 tests** (up from 244), lint,
+typecheck, `check:hex`; `npm run build` succeeds.
+
 ---
 
 ## DECISION — seven roles; Compliance Officer stays (13 Sep 2026)
