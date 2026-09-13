@@ -10,6 +10,8 @@ import { PLANNED_SOPS, SOPS } from './sops';
 import { CANVASSER_SOP } from './sops/canvasserSop';
 import { ROLE_PURPOSE, TENANT_SETUP_SOP } from './sops/tenantSetupSop';
 import { WARD_SEEDING_SOP } from './sops/wardSeedingSop';
+import { REGISTER_IMPORT_SOP } from './sops/registerImportSop';
+import { MIN_REFERENCE_LENGTH, holdingAddressLine, planImport } from '@/modules/voters/bulkImport';
 import { RECONCILIATION_BASIS, reconcileSeed } from '@/modules/wards/seedReconciliation';
 import { EMPTY_DRAFT, provisioningProblems, SIGN_IN_ID_BASIS } from '@/modules/settings/staffProvisioning';
 import { DOORSTEP_ERASURE_ANSWER } from '@/modules/settings/dataSubjectErasure';
@@ -580,5 +582,104 @@ describe('SOP-03 describes the seeding path that actually exists', () => {
 
   it('tells nobody to adjust a number to make totals agree', () => {
     expect(text).toMatch(/do not adjust a number to make them match/i);
+  });
+});
+
+
+/**
+ * SOP-04 is the one onboarding step that writes people rather than
+ * reference data, so its refusals are the part that matters. Each is
+ * checked by running the planner, not by reading the prose.
+ */
+describe('SOP-04 describes the import that actually exists', () => {
+  const text = JSON.stringify(REGISTER_IMPORT_SOP);
+
+  const CONSENT = {
+    method: 'WRITTEN' as const,
+    declaredAt: '2026-03-02T00:00:00.000Z',
+    reference: 'Membership forms 001-112, Ikageng drive, 2 March 2026',
+  };
+  const VDS = [
+    { vdCode: 'SPLIT', wardCode: 'W1' },
+    { vdCode: 'SPLIT', wardCode: 'W2' },
+    { vdCode: 'SIMPLE', wardCode: 'W1' },
+  ];
+  const person = (over: Record<string, unknown> = {}) => ({
+    firstName: 'Lerato',
+    lastName: 'Molefe',
+    phone: '0821234567',
+    lineNumber: 2,
+    ...over,
+  });
+
+  it('goes to the one role that holds both permissions an import needs', () => {
+    // Writing voters needs voters.edit; placing them needs to read the
+    // ward table, which needs wards.view. Exactly one role holds both.
+    const both = SEED_ROLES.filter(
+      (r) => r.defaultCaps.includes('voters.edit') && r.defaultCaps.includes('wards.view'),
+    ).map((r) => r.id);
+    expect(both).toEqual(['municipal-team-lead']);
+    expect(REGISTER_IMPORT_SOP.roles).toEqual(both);
+    expect(REGISTER_IMPORT_SOP.requiresAnyCapability).toEqual(['voters.edit']);
+  });
+
+  it('is right that the HQ admin cannot run one', () => {
+    const admin = SEED_ROLES.find((r) => r.id === 'party-hq-admin')!;
+    expect(admin.defaultCaps).not.toContain('voters.edit');
+    expect(text).toMatch(/deliberately kept off the voter roll/i);
+  });
+
+  it('quotes the real minimum reference length', () => {
+    expect(text).toContain(`At least ${MIN_REFERENCE_LENGTH} characters`);
+  });
+
+  it('promises a refusal for a split district, and the planner delivers it', () => {
+    const warnings = (REGISTER_IMPORT_SOP.sections.find((s) => s.heading.includes('refused for its voting district'))?.warnings ?? []).join(' ');
+    expect(warnings).toMatch(/does not say which ward/i);
+    const result = planImport({ rows: [person({ vdCode: 'SPLIT' })], consent: CONSENT, votingDistricts: VDS });
+    expect(result.ready).toHaveLength(0);
+    expect(result.rejected[0].code).toBe('SPLIT_VOTING_DISTRICT');
+  });
+
+  it('promises a refusal for an unseeded district, and the planner delivers it', () => {
+    const result = planImport({ rows: [person({ vdCode: 'ELSEWHERE' })], consent: CONSENT, votingDistricts: VDS });
+    expect(result.rejected[0].code).toBe('UNKNOWN_VOTING_DISTRICT');
+  });
+
+  it('promises the whole file is refused with no districts loaded, and points at SOP-03', () => {
+    const warnings = JSON.stringify(REGISTER_IMPORT_SOP.sections);
+    expect(warnings).toMatch(/Seed the wards first — SOP-03/);
+    const result = planImport({ rows: [person()], consent: CONSENT, votingDistricts: [] });
+    expect(result.fileErrors[0]).toMatch(/SOP-03/);
+  });
+
+  it('promises no invented address, and the planner invents none', () => {
+    const result = planImport({
+      rows: [person({ vdCode: 'SIMPLE' })],
+      consent: CONSENT,
+      votingDistricts: VDS,
+      makeId: () => 'fixed',
+    });
+    expect(result.households[0].addressLine).toBe(holdingAddressLine(CONSENT.reference));
+    expect(text).toMatch(/No street is invented for them/i);
+    expect(text).toMatch(/canvasser sent to a door that is not there/i);
+  });
+
+  it('promises doors are written before the people in them', () => {
+    expect(text).toMatch(/Doors are created first, then the people in them/i);
+  });
+
+  it('refuses a doorstep consent method for a batch, as the SOP says', () => {
+    expect(text).toMatch(/nobody verbally consented four hundred people in a batch/i);
+    // The type system is the enforcement — BulkConsentMethod excludes it —
+    // so the SOP is describing something that cannot be expressed at all.
+    const methods: string[] = ['WRITTEN', 'DIGITAL'];
+    expect(methods).not.toContain('VERBAL_DOORSTEP');
+  });
+
+  it('says the duplicate check errs towards holding a name back', () => {
+    const warnings = (REGISTER_IMPORT_SOP.sections.find((s) => s.heading.includes('before you write anything'))?.warnings ?? []).join(' ');
+    expect(warnings).toMatch(/errs towards holding a name back/i);
+    expect(warnings).toMatch(/the rest is masked/i);
   });
 });

@@ -6,6 +6,7 @@
  * Authority ones) — reskinned to our tokens throughout.
  */
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { dal } from '@/dal';
 import { useSession } from '@/auth/useSession';
@@ -49,14 +50,22 @@ export function VotersPage() {
           <p className="text-label-caps font-display uppercase text-slate">/voters</p>
           <h1 className="text-headline-md font-display text-ink mt-1">Voters</h1>
         </div>
-        <button
-          type="button"
-          onClick={() => setForm({ mode: 'create' })}
-          disabled={!vdCode}
-          className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase disabled:opacity-40"
-        >
-          + New voter
-        </button>
+        <div className="flex gap-2">
+          <Link
+            to="/voters/import"
+            className="border border-ink/20 rounded px-4 py-2 text-label-caps font-display uppercase text-ink"
+          >
+            Import a register
+          </Link>
+          <button
+            type="button"
+            onClick={() => setForm({ mode: 'create' })}
+            disabled={!vdCode}
+            className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase disabled:opacity-40"
+          >
+            + New voter
+          </button>
+        </div>
       </div>
 
       <label className="block space-y-1 max-w-xs">

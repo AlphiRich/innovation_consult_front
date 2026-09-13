@@ -9,6 +9,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Shell } from './Shell';
 import { WarRoomPage } from '@/modules/war-room/WarRoomPage';
 import { VotersPage } from '@/modules/voters/VotersPage';
+import { BulkImportPage } from '@/modules/voters/BulkImportPage';
 import { WardsPage } from '@/modules/wards/WardsPage';
 import { WardDetailPage } from '@/modules/wards/WardDetailPage';
 import { FieldDiaryPage } from '@/modules/field-diary/FieldDiaryPage';
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/war-room" replace /> },
       { path: 'war-room', element: <WarRoomPage /> },
       { path: 'voters', element: <VotersPage /> },
+      { path: 'voters/import', element: <BulkImportPage /> },
       { path: 'wards', element: <WardsPage /> },
       { path: 'wards/:wardCode', element: <WardDetailPage /> },
       { path: 'diary', element: <FieldDiaryPage /> },

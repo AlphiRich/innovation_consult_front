@@ -111,9 +111,8 @@ a contract.
 
 ## Sequence
 
-1. SOP-01, SOP-02 and SOP-03 are issued
-   (`src/modules/manual/sops/`).
-2. SOP-04 … SOP-12 are written (`PLANNED_SOPS` carries the register).
+1. SOP-01 through SOP-04 are issued (`src/modules/manual/sops/`).
+2. SOP-05 … SOP-12 are written (`PLANNED_SOPS` carries the register).
 3. The completed manual goes to an attorney **with this file**, which
    tells them what is safe to rely on and what must not be said.
 4. The instruments are drafted against it.
@@ -297,3 +296,68 @@ team lead is usually who notices the ward data is wrong, and the fix goes
 through the HQ admin. A test asserts the SOP's audience equals the set of
 roles that hold `wards.view`, so a role gaining that capability without
 the SOP being reconsidered fails the build.
+
+---
+
+## SOP-04, and two defects on the import path (session 27)
+
+SOP-04 covers importing an existing membership register — the first time
+onboarding writes *people* rather than reference data, and therefore the
+first time it can import a consent problem.
+
+Two things had to change before it could be written truthfully.
+
+**The import had no screen.** `bulkImport.ts` was a tested pure module
+with no page anywhere in the application. `BulkImportPage.tsx` is that
+page: consent declaration, file, plan, commit — and it writes households
+before the voters that reference them, because a voter whose household
+does not exist is a dangling reference nothing in this product reports.
+
+**The planner put an entire register at one address.** `PlanOptions` took
+a single `vdCode`, `wardCode` and `householdId` for the whole file. That
+is fine for one street and wrong for a membership register — the case the
+module's own header names. Rows now carry their own voting district, ward
+and address, and the planner refuses rather than guesses:
+
+- a voting district not loaded for this tenant is refused by code;
+- a **split** voting district with no ward is refused, because a station's
+  roll divided across a ward boundary does not say which ward a person is
+  in, and ward is what every permission and coverage figure turns on;
+- an absent address stays absent — the person goes into a per-district
+  holding record whose address line says so. No street is invented,
+  because a fabricated address is a canvasser sent to a door that is not
+  there.
+
+### A third defect, found while wiring the page
+
+The duplicate check against people already on the roll could never have
+matched. A stored voter has no plaintext number — `phoneMasked` keeps
+three digits at each end — so keying the roll on a raw number and the
+import row on its raw number compares two different things, and an entire
+re-import would have reported as new people. `existingVoterKey()` masks
+both sides. The cost is stated in its header and in the SOP: two numbers
+sharing their visible digits key the same, so the check errs towards
+holding a name back, which is recoverable, rather than duplicating a
+person on the roll, which is not.
+
+### Audience: exactly one role, and that is the finding
+
+An import needs two permissions at once — `voters.edit` to write the
+records, and `wards.view` to read the table it places them into. The
+intersection is **`municipal-team-lead` alone**. The Party HQ Admin is
+deliberately kept off the voter roll; a Ward Lead, VD Captain or Canvasser
+can edit voters in their own ground but does not hold the municipality-wide
+reference table. A test asserts the SOP's audience equals that
+intersection.
+
+### Noted, not fixed
+
+`wards.view` is held by no field role, yet field flows read voting
+districts — `VoterForm.tsx` resolves a household's ward from a VD code via
+`findByVdCode`, which `firestore.rules` gates on `wards.view`. A ward lead
+or canvasser would be denied. Ward and voting-district records are
+reference data carrying no personal information, so the likely fix is to
+grant `wards.view` to the field roles — but that changes the token for
+four roles and touches `roleModel.test.ts` and `geoScope.test.ts`, which is
+not something to fold into an SOP commit. Recorded here so it is not found
+twice.
