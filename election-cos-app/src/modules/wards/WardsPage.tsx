@@ -14,6 +14,7 @@ import { useSession } from '@/auth/useSession';
 import type { Ward } from '@/dal/ports/wards';
 import { WardForm } from './WardForm';
 import { defaultMunicipalityCode, totalsFor } from './wardStats';
+import { RECONCILIATION_BASIS, reconcileSeed } from './seedReconciliation';
 
 export function WardsPage() {
   const session = useSession();
@@ -24,6 +25,15 @@ export function WardsPage() {
   const wardsQuery = useQuery({
     queryKey: ['wards', session?.tenantId],
     queryFn: () => dal.wards.listAll(session!),
+    enabled: Boolean(session),
+  });
+
+  // Read rather than written here: the expected ward count lives in
+  // Municipality Config, and a seed that stopped one ward short has no
+  // other symptom anywhere in the application. See seedReconciliation.ts.
+  const profileQuery = useQuery({
+    queryKey: ['municipalityProfile', session?.tenantId],
+    queryFn: () => dal.municipalityProfile.get(session!),
     enabled: Boolean(session),
   });
 
@@ -41,6 +51,7 @@ export function WardsPage() {
 
   const wards = wardsQuery.data ?? [];
   const totals = totalsFor(wards);
+  const reconciliation = profileQuery.isLoading ? null : reconcileSeed(wards, profileQuery.data ?? null);
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -61,7 +72,12 @@ export function WardsPage() {
       <div className="grid grid-cols-3 gap-3">
         <div className="bg-white border border-ink/10 rounded p-4">
           <p className="text-label-caps font-display uppercase text-slate">Wards</p>
-          <p className="text-display-lg-mobile font-display text-ink">{totals.wardCount}</p>
+          <p className="text-display-lg-mobile font-display text-ink">
+            {totals.wardCount}
+            {reconciliation?.expectedWardCount ? (
+              <span className="text-body-md font-body text-slate"> / {reconciliation.expectedWardCount}</span>
+            ) : null}
+          </p>
         </div>
         <div className="bg-white border border-ink/10 rounded p-4">
           <p className="text-label-caps font-display uppercase text-slate">Voting districts</p>
@@ -72,6 +88,31 @@ export function WardsPage() {
           <p className="text-display-lg-mobile font-display">{totals.registeredVoters.toLocaleString('en-ZA')}</p>
         </div>
       </div>
+
+      {reconciliation && reconciliation.issues.length > 0 && (
+        <div className="bg-white border border-ink/10 rounded-lg p-4 space-y-2">
+          <p className="text-label-caps font-display uppercase text-slate">
+            Seed check {reconciliation.reconciled ? '· consistent' : '· needs attention'}
+          </p>
+          <ul className="space-y-2">
+            {reconciliation.issues.map((seedIssue) => (
+              <li
+                key={seedIssue.code}
+                className={`text-body-md font-body ${seedIssue.severity === 'BLOCKING' ? 'text-maroon' : 'text-slate'}`}
+              >
+                {seedIssue.message}
+                {seedIssue.wardCodes.length > 0 && (
+                  <span className="block text-data-mono font-mono text-slate">
+                    {seedIssue.wardCodes.slice(0, 12).join(', ')}
+                    {seedIssue.wardCodes.length > 12 ? ` … and ${seedIssue.wardCodes.length - 12} more` : ''}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+          <p className="text-body-md font-body text-slate">{RECONCILIATION_BASIS}</p>
+        </div>
+      )}
 
       {wardsQuery.isLoading && <p className="text-body-md font-body text-slate">Loading…</p>}
       {wardsQuery.isError && (

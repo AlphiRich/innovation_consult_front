@@ -111,9 +111,9 @@ a contract.
 
 ## Sequence
 
-1. SOP-01 and SOP-02 are issued
+1. SOP-01, SOP-02 and SOP-03 are issued
    (`src/modules/manual/sops/`).
-2. SOP-03 … SOP-12 are written (`PLANNED_SOPS` carries the register).
+2. SOP-04 … SOP-12 are written (`PLANNED_SOPS` carries the register).
 3. The completed manual goes to an attorney **with this file**, which
    tells them what is safe to rely on and what must not be said.
 4. The instruments are drafted against it.
@@ -245,3 +245,55 @@ user whose district is split may therefore be in scope for the other
 ward's portion. Changing `inScope()` is a security-rules change with wide
 blast radius and is not something to fold into an SOP commit. Recorded
 here so it is not found twice.
+
+---
+
+## SOP-03, and the defect it had no way to describe (session 27)
+
+SOP-03 covers seeding wards and voting districts — the foundation every
+scope, coverage percentage and seat projection is computed over.
+
+Its failure mode is why it needed code before it could be written
+honestly: **a seed that stops one ward short raises no error anywhere.**
+The ward list renders, the schematic map draws, coverage computes, and the
+seat projection comes out confidently wrong. Nothing in the application was
+asking whether the loaded wards matched the demarcation notice the operator
+had already typed into Municipality Config.
+
+`src/modules/wards/seedReconciliation.ts` asks it. Blocking findings are
+contradictions between two numbers the tenant already holds — ward count
+against expected ward count, ward seats plus PR seats against the council
+total, a duplicated ward code, a ward carrying another municipality's code,
+the same voting district twice inside one ward. Warnings are shapes that
+usually mean unfinished: a ward with no voting districts, or none with
+registered voters. It is surfaced on the Wards page, with the loaded count
+shown against the expected one.
+
+### What the check refuses to claim
+
+`RECONCILIATION_BASIS` is quoted verbatim in the SOP: the comparison is
+between two things the same tenant holds, so agreement means they are
+consistent, **not that either is correct**. Only the Board's delimitation
+notice can establish that, and a person has to read it. A test asserts the
+module claims no verification against any external source — the same
+discipline applied to the PPFA module and the PR list export.
+
+### The split voting district, counted rather than quoted
+
+About a quarter of NW405's voting stations are split across a ward
+boundary, which is why `VotingDistrict.id` is the `(wardCode, vdCode)`
+pair. SOP-03 states the figure — 26 of 108 station codes — and
+`manual.test.ts` counts it from `seed-data/jb-marks-nw405-wards-vds.json`
+rather than accepting the prose. The reconciliation deliberately does not
+flag a code repeated across wards, and a test injects the opposite
+behaviour to prove it would be caught: a check that flagged this would
+flag a quarter of every real seed.
+
+### Audience
+
+`wards.view` is held by exactly two roles — Party HQ Admin and Municipal
+Team Lead — and `wards.edit` by one. SOP-03 goes to both and says so: the
+team lead is usually who notices the ward data is wrong, and the fix goes
+through the HQ admin. A test asserts the SOP's audience equals the set of
+roles that hold `wards.view`, so a role gaining that capability without
+the SOP being reconsidered fails the build.

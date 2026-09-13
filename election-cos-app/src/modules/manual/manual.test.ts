@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { TenantEntitlement } from '@/dal/ports/entitlements';
 import { SEED_ROLES } from '@/auth/seedRoles';
@@ -7,6 +9,8 @@ import { assembleManual, groupByArea, type Sop } from './manualModel';
 import { PLANNED_SOPS, SOPS } from './sops';
 import { CANVASSER_SOP } from './sops/canvasserSop';
 import { ROLE_PURPOSE, TENANT_SETUP_SOP } from './sops/tenantSetupSop';
+import { WARD_SEEDING_SOP } from './sops/wardSeedingSop';
+import { RECONCILIATION_BASIS, reconcileSeed } from '@/modules/wards/seedReconciliation';
 import { EMPTY_DRAFT, provisioningProblems, SIGN_IN_ID_BASIS } from '@/modules/settings/staffProvisioning';
 import { DOORSTEP_ERASURE_ANSWER } from '@/modules/settings/dataSubjectErasure';
 import { buildManualPdf, manualFileName, MANUAL_STATUS_NOTE } from './manualPdf';
@@ -464,5 +468,117 @@ describe('SOP-02 describes the setup path that actually exists', () => {
 
   it('promises no deletion of the departed person’s record', () => {
     expect(text).toMatch(/it is not deleted/i);
+  });
+});
+
+
+/**
+ * SOP-03 is the foundation everything else scopes to, and the one whose
+ * numbers can be wrong without anything saying so. Its claims are checked
+ * against the reconciliation code and against the real gazette output on
+ * disk — the split-voting-district figures in the prose are counted from
+ * `seed-data/`, not quoted.
+ */
+describe('SOP-03 describes the seeding path that actually exists', () => {
+  const text = JSON.stringify(WARD_SEEDING_SOP);
+
+  it('reaches both roles that can see ward data, and no others', () => {
+    expect(WARD_SEEDING_SOP.roles).toEqual(['party-hq-admin', 'municipal-team-lead']);
+    expect(WARD_SEEDING_SOP.requiresAnyCapability).toEqual(['wards.view']);
+    const canSee = SEED_ROLES.filter((r) => r.defaultCaps.includes('wards.view')).map((r) => r.id);
+    expect(canSee.sort()).toEqual([...WARD_SEEDING_SOP.roles].sort());
+  });
+
+  it('says only the HQ admin can change wards, which is what the roles say', () => {
+    const section = WARD_SEEDING_SOP.sections.find((s) => s.heading.includes('Who can do which part'));
+    expect((section?.body ?? []).join(' ')).toMatch(/Municipal Team Lead can see everything[^.]*change none/i);
+    const editors = SEED_ROLES.filter((r) => r.defaultCaps.includes('wards.edit')).map((r) => r.id);
+    expect(editors).toEqual(['party-hq-admin']);
+  });
+
+  it('quotes the reconciliation basis rather than paraphrasing it', () => {
+    expect(text).toContain(RECONCILIATION_BASIS);
+  });
+
+  it('describes severities the way the reconciliation code actually assigns them', () => {
+    const profile = {
+      id: 'municipality',
+      tenantId: 't',
+      municipalityCode: 'NW405',
+      municipalityName: 'JB Marks Local Municipality',
+      province: 'North West',
+      totalCouncilSeats: 67,
+      wardSeats: 2,
+      prSeats: 65,
+      createdAt: '',
+      updatedAt: '',
+      updatedBy: 'system',
+    };
+    const ward = (over: Record<string, unknown>) => ({
+      id: 'w',
+      tenantId: 't',
+      wardCode: 'NW405-W1',
+      municipalityCode: 'NW405',
+      name: 'Ward 1',
+      registeredVoters: 100,
+      vdCodes: ['1'],
+      createdAt: '',
+      updatedAt: '',
+      updatedBy: 'system',
+      deletedAt: null,
+      schemaVersion: 1,
+      ...over,
+    });
+
+    // "Clear everything marked in red" — a short count must be BLOCKING.
+    const short = reconcileSeed([ward({})], profile);
+    expect(short.blocking.map((i) => i.code)).toContain('WARD_COUNT_MISMATCH');
+
+    // "usually a seed that was interrupted; occasionally simply the next
+    // thing on your list" — a ward with no VDs must NOT block.
+    const noVds = reconcileSeed(
+      [ward({}), ward({ id: 'w2', wardCode: 'NW405-W2', vdCodes: [] })],
+      profile,
+    );
+    expect(noVds.warnings.map((i) => i.code)).toContain('WARD_WITHOUT_VDS');
+    expect(noVds.blocking.map((i) => i.code)).not.toContain('WARD_WITHOUT_VDS');
+
+    // "the same code twice in one ward ... the seed check blocks on it"
+    const doubled = reconcileSeed(
+      [ward({ vdCodes: ['1', '1'] }), ward({ id: 'w2', wardCode: 'NW405-W2' })],
+      profile,
+    );
+    expect(doubled.blocking.map((i) => i.code)).toContain('VD_CODE_REPEATED_IN_WARD');
+  });
+
+  it('counts split voting districts from the real gazette output, not from memory', () => {
+    const seed = JSON.parse(
+      readFileSync(path.resolve(__dirname, '..', '..', '..', 'seed-data', 'jb-marks-nw405-wards-vds.json'), 'utf-8'),
+    ) as { votingDistricts: { vdCode: string }[] }[];
+    const perCode = new Map<string, number>();
+    for (const entry of seed) {
+      for (const vd of entry.votingDistricts) perCode.set(vd.vdCode, (perCode.get(vd.vdCode) ?? 0) + 1);
+    }
+    const splitCount = [...perCode.values()].filter((n) => n > 1).length;
+    const section = WARD_SEEDING_SOP.sections.find((s) => s.heading.includes('two wards'));
+    const body = (section?.body ?? []).join(' ');
+    expect(body).toContain(`${splitCount} of ${perCode.size} station codes are split`);
+    // The SOP calls that "a quarter of them". Hold the prose to the maths.
+    expect(splitCount / perCode.size).toBeGreaterThan(0.2);
+    expect(splitCount / perCode.size).toBeLessThan(0.3);
+  });
+
+  it('warns that a re-seed strips a ward lead of their scope', () => {
+    const section = WARD_SEEDING_SOP.sections.find((s) => s.heading.includes('demarcation changes'));
+    expect((section?.warnings ?? []).join(' ')).toMatch(/renumbered leaves that person seeing nothing/i);
+  });
+
+  it('refuses to call a clean check a correct ward list', () => {
+    const section = WARD_SEEDING_SOP.sections.find((s) => s.heading.includes('before anyone works it'));
+    expect((section?.warnings ?? []).join(' ')).toMatch(/not a statement that your ward list is correct/i);
+  });
+
+  it('tells nobody to adjust a number to make totals agree', () => {
+    expect(text).toMatch(/do not adjust a number to make them match/i);
   });
 });
