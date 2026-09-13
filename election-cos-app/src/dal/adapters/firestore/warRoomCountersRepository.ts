@@ -25,6 +25,14 @@ const ZERO_COUNTERS: WarRoomCounters = {
     CLOSED: 0,
   },
   totalHouseholdsVisited: 0,
+  householdsByContactStatus: {
+    NOT_CONTACTED: 0,
+    IN_PROGRESS: 0,
+    CONTACTED: 0,
+    NO_ANSWER: 0,
+    INACCESSIBLE: 0,
+    REFUSED_RECONTACT: 0,
+  },
   updatedAt: null,
 };
 
@@ -34,6 +42,10 @@ function fromFirestore(_id: string, data: Record<string, unknown>): WarRoomCount
     sentimentBreakdown: { ...ZERO_COUNTERS.sentimentBreakdown, ...(data.sentimentBreakdown as object) },
     incidentsByStatus: { ...ZERO_COUNTERS.incidentsByStatus, ...(data.incidentsByStatus as object) },
     totalHouseholdsVisited: (data.totalHouseholdsVisited as number) ?? 0,
+    householdsByContactStatus: {
+      ...ZERO_COUNTERS.householdsByContactStatus,
+      ...(data.householdsByContactStatus as object),
+    },
     updatedAt: toISO(data.updatedAt as string | undefined),
   };
 }

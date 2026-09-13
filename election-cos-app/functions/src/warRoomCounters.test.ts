@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { diaryCounterDelta, incidentCounterDelta, voterCounterDelta } from './warRoomCounters';
+import {
+  diaryCounterDelta,
+  householdCounterDelta,
+  incidentCounterDelta,
+  voterCounterDelta,
+} from './warRoomCounters';
 
 describe('voterCounterDelta', () => {
   it('a new voter increments totalVoters and their sentiment bucket', () => {
@@ -67,6 +72,53 @@ describe('incidentCounterDelta', () => {
 
   it('an update that leaves status unchanged produces no delta', () => {
     expect(incidentCounterDelta({ status: 'ESCALATED' }, { status: 'ESCALATED' })).toEqual({});
+  });
+});
+
+describe('householdCounterDelta', () => {
+  const door = (over: Record<string, unknown> = {}) => ({ deletedAt: null, ...over });
+
+  it('a new door with no status counts as not contacted', () => {
+    // statusOf() on the app side reads an absent status the same way. A
+    // door nobody has been to is a door nobody has been to, not a door
+    // outside the count.
+    expect(householdCounterDelta(undefined, door())).toEqual({
+      'householdsByContactStatus.NOT_CONTACTED': 1,
+    });
+  });
+
+  it('closing a door out moves it between buckets, leaving the total alone', () => {
+    const delta = householdCounterDelta(door(), door({ contactStatus: 'CONTACTED' }));
+    expect(delta).toEqual({
+      'householdsByContactStatus.NOT_CONTACTED': -1,
+      'householdsByContactStatus.CONTACTED': 1,
+    });
+    expect(Object.values(delta).reduce((a, b) => a + b, 0)).toBe(0);
+  });
+
+  it('a refusal lands in its own bucket, so coverage can exclude it', () => {
+    expect(householdCounterDelta(door({ contactStatus: 'NO_ANSWER' }), door({ contactStatus: 'REFUSED_RECONTACT' })))
+      .toEqual({
+        'householdsByContactStatus.NO_ANSWER': -1,
+        'householdsByContactStatus.REFUSED_RECONTACT': 1,
+      });
+  });
+
+  it('a write that changes neither status nor deletedAt produces no delta', () => {
+    expect(householdCounterDelta(door({ contactStatus: 'CONTACTED' }), door({ contactStatus: 'CONTACTED' }))).toEqual({});
+  });
+
+  it('a soft delete removes the door from its bucket', () => {
+    expect(householdCounterDelta(door({ contactStatus: 'CONTACTED' }), door({ contactStatus: 'CONTACTED', deletedAt: '2026-03-02' })))
+      .toEqual({ 'householdsByContactStatus.CONTACTED': -1 });
+  });
+
+  it('a hard delete undoes the contribution, defensively', () => {
+    // firestore.rules disallows a real delete; an admin-SDK one still fires.
+    expect(householdCounterDelta(door({ contactStatus: 'NO_ANSWER' }), undefined)).toEqual({
+      'householdsByContactStatus.NO_ANSWER': -1,
+    });
+    expect(householdCounterDelta(door({ deletedAt: '2026-03-02' }), undefined)).toEqual({});
   });
 });
 

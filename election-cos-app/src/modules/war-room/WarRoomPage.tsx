@@ -25,8 +25,11 @@ import { dal } from '@/dal';
 import { useSession } from '@/auth/useSession';
 import { SENTIMENT_META, SENTIMENT_ORDER } from '@/modules/voters/sentiment';
 import { STATUS_LABEL, STATUS_ORDER } from '@/modules/incidents/incidentMeta';
+import { isOpen } from '@/modules/incidents/incidentWorkflow';
+import { CONTACT_STATUS_LABEL } from '@/modules/voters/canvassQueue';
 import { TONE_PILL_CLASSES } from '@/design/toneClasses';
 import { totalsFor } from '@/modules/wards/wardStats';
+import { reconcileSeed } from '@/modules/wards/seedReconciliation';
 
 const QUICK_LINKS = [
   { to: '/voters', label: 'Voter Roll' },
@@ -50,6 +53,16 @@ export function WarRoomPage() {
     enabled: Boolean(session),
   });
 
+  // The expected ward count lives in Municipality Config. A dashboard
+  // reporting "33 wards seeded" with no sign that 34 were expected is the
+  // silent-short-seed defect SOP-03 exists to catch, repeated on the one
+  // screen a campaign looks at every morning.
+  const profileQuery = useQuery({
+    queryKey: ['municipalityProfile', session?.tenantId],
+    queryFn: () => dal.municipalityProfile.get(session!),
+    enabled: Boolean(session),
+  });
+
   if (!session) {
     return (
       <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
@@ -64,8 +77,18 @@ export function WarRoomPage() {
 
   const counters = countersQuery.data;
   const registeredVoters = wardsQuery.data ? totalsFor(wardsQuery.data).registeredVoters : 0;
-  const coveragePct =
+  // Share of the roll this campaign holds a record for. NOT canvassing
+  // coverage — SOP-05's figure is doors worked over doors workable, and
+  // two different numbers both called "coverage" is how a war room ends
+  // up quoting the wrong one at a press conference.
+  const rollSharePct =
     counters && registeredVoters > 0 ? Math.min(100, Math.round((counters.totalVoters / registeredVoters) * 100)) : null;
+  const seed = wardsQuery.data ? reconcileSeed(wardsQuery.data, profileQuery.data ?? null) : null;
+  const doorsWorked = counters
+    ? counters.householdsByContactStatus.CONTACTED +
+      counters.householdsByContactStatus.NO_ANSWER +
+      counters.householdsByContactStatus.INACCESSIBLE
+    : 0;
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -90,31 +113,59 @@ export function WarRoomPage() {
         <div className="bg-ink text-paper rounded p-4">
           <p className="text-label-caps font-display uppercase text-gold">Voters captured</p>
           <p className="text-display-lg-mobile font-display">{(counters?.totalVoters ?? 0).toLocaleString('en-ZA')}</p>
-          {coveragePct !== null && (
+          {rollSharePct !== null && (
             <p className="text-data-mono font-mono text-paper/70 mt-1">
-              {coveragePct}% of {registeredVoters.toLocaleString('en-ZA')} registered
+              {rollSharePct}% of {registeredVoters.toLocaleString('en-ZA')} registered
             </p>
           )}
         </div>
         <div className="bg-white border border-ink/10 rounded p-4">
-          <p className="text-label-caps font-display uppercase text-slate">Households canvassed</p>
-          <p className="text-display-lg-mobile font-display text-ink">
-            {(counters?.totalHouseholdsVisited ?? 0).toLocaleString('en-ZA')}
+          <p className="text-label-caps font-display uppercase text-slate">Doors worked</p>
+          <p className="text-display-lg-mobile font-display text-ink">{doorsWorked.toLocaleString('en-ZA')}</p>
+          <p className="text-data-mono font-mono text-slate mt-1">
+            from door records · {(counters?.totalHouseholdsVisited ?? 0).toLocaleString('en-ZA')} self-reported
           </p>
         </div>
         <div className="bg-white border border-ink/10 rounded p-4">
           <p className="text-label-caps font-display uppercase text-slate">Wards seeded</p>
-          <p className="text-display-lg-mobile font-display text-ink">{wardsQuery.data?.length ?? 0}</p>
+          <p className="text-display-lg-mobile font-display text-ink">
+            {wardsQuery.data?.length ?? 0}
+            {seed?.expectedWardCount ? (
+              <span className="text-body-md font-body text-slate"> / {seed.expectedWardCount}</span>
+            ) : null}
+          </p>
+          {seed && !seed.reconciled && (
+            <p className="text-body-md font-body text-maroon mt-1">Seed check needs attention</p>
+          )}
         </div>
         <div className="bg-white border border-ink/10 rounded p-4">
           <p className="text-label-caps font-display uppercase text-slate">Open incidents</p>
+          {/* isOpen() is the workflow module's own definition — the same
+              one the incident list uses. It was duplicated inline here. */}
           <p className="text-display-lg-mobile font-display text-ink">
-            {STATUS_ORDER.filter((s) => s !== 'RESOLVED' && s !== 'CLOSED').reduce(
-              (sum, s) => sum + (counters?.incidentsByStatus[s] ?? 0),
-              0,
-            )}
+            {STATUS_ORDER.filter(isOpen).reduce((sum, s) => sum + (counters?.incidentsByStatus[s] ?? 0), 0)}
           </p>
         </div>
+      </div>
+
+      <div className="bg-white border border-ink/10 rounded-lg p-4 space-y-3">
+        <h2 className="text-label-caps font-display uppercase text-slate">Doors by state</h2>
+        <div className="flex flex-wrap gap-2">
+          {(Object.keys(CONTACT_STATUS_LABEL) as (keyof typeof CONTACT_STATUS_LABEL)[]).map((status) => (
+            <span
+              key={status}
+              className="px-3 py-1.5 rounded border border-ink/20 text-label-caps font-display uppercase text-ink"
+            >
+              {CONTACT_STATUS_LABEL[status]}:{' '}
+              {(counters?.householdsByContactStatus[status] ?? 0).toLocaleString('en-ZA')}
+            </span>
+          ))}
+        </div>
+        <p className="text-body-md font-body text-slate">
+          Counted from the door records themselves. The self-reported figure beside &ldquo;Doors worked&rdquo; is
+          summed from canvassers&rsquo; own diary entries and is a different measurement — the two will differ, and
+          neither is a correction of the other.
+        </p>
       </div>
 
       <div className="bg-white border border-ink/10 rounded-lg p-4 space-y-3">

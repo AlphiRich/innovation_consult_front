@@ -171,6 +171,60 @@ export function diaryCounterDelta(before: DiarySnapshot | undefined, after: Diar
   return change === 0 ? {} : { totalHouseholdsVisited: change };
 }
 
+// ---- households -----------------------------------------------------------
+
+type ContactStatus =
+  | 'NOT_CONTACTED'
+  | 'IN_PROGRESS'
+  | 'CONTACTED'
+  | 'NO_ANSWER'
+  | 'INACCESSIBLE'
+  | 'REFUSED_RECONTACT';
+
+interface HouseholdSnapshot {
+  contactStatus?: ContactStatus;
+  deletedAt: string | null;
+}
+
+/**
+ * Exported for testing. Doors by the state they were actually left in —
+ * the counterpart to `totalHouseholdsVisited`, which is a canvasser's own
+ * account of their shift and can differ.
+ *
+ * An absent `contactStatus` reads as NOT_CONTACTED, exactly as
+ * `canvassQueue.statusOf()` does on the app side. A door with no status
+ * is a door nobody has been to, not a door outside the count.
+ */
+export function householdCounterDelta(
+  before: HouseholdSnapshot | undefined,
+  after: HouseholdSnapshot | undefined,
+): Delta {
+  const bucketOf = (snapshot: HouseholdSnapshot | undefined): ContactStatus | null => {
+    if (!snapshot || snapshot.deletedAt) return null;
+    return snapshot.contactStatus ?? 'NOT_CONTACTED';
+  };
+
+  const from = bucketOf(before);
+  const to = bucketOf(after);
+  if (from === to) return {};
+
+  return mergeDeltas(
+    from ? { [`householdsByContactStatus.${from}`]: -1 } : {},
+    to ? { [`householdsByContactStatus.${to}`]: 1 } : {},
+  );
+}
+
+export const maintainHouseholdCounters = onDocumentWritten(
+  { document: 'tenants/{tenantId}/households/{householdId}', region: REGION },
+  async (event) => {
+    const delta = householdCounterDelta(
+      event.data?.before?.data() as HouseholdSnapshot | undefined,
+      event.data?.after?.data() as HouseholdSnapshot | undefined,
+    );
+    await applyDelta((event.params as { tenantId: string }).tenantId, delta);
+  },
+);
+
 export const maintainDiaryCounters = onDocumentWritten(
   { document: 'tenants/{tenantId}/diaryEntries/{entryId}', region: REGION },
   async (event) => {

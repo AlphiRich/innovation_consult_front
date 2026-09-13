@@ -24,6 +24,14 @@ function counters(overrides: Partial<WarRoomCounters['sentimentBreakdown']> = {}
       CLOSED: 0,
     },
     totalHouseholdsVisited: 0,
+  householdsByContactStatus: {
+    NOT_CONTACTED: 0,
+    IN_PROGRESS: 0,
+    CONTACTED: 0,
+    NO_ANSWER: 0,
+    INACCESSIBLE: 0,
+    REFUSED_RECONTACT: 0,
+  },
     updatedAt: null,
   };
 }

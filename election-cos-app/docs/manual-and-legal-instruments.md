@@ -111,8 +111,8 @@ a contract.
 
 ## Sequence
 
-1. SOP-01 through SOP-07 are issued (`src/modules/manual/sops/`).
-2. SOP-08 … SOP-12 are written (`PLANNED_SOPS` carries the register).
+1. SOP-01 through SOP-08 are issued (`src/modules/manual/sops/`).
+2. SOP-09 … SOP-12 are written (`PLANNED_SOPS` carries the register).
 3. The completed manual goes to an attorney **with this file**, which
    tells them what is safe to rely on and what must not be said.
 4. The instruments are drafted against it.
@@ -525,3 +525,51 @@ particulars were stored, and `verifyReferral.test.ts` built its own
 registry entry rather than going through the issuing path, so neither saw
 it. The end-to-end property is now asserted where it belongs: what issuing
 stores must hash to what issuing records.
+
+---
+
+## SOP-08, and three things wrong with the screen everyone reads (session 27)
+
+SOP-08 covers reading the war room. It is mostly about provenance, because
+the dashboard's tiles come from three different places — pre-aggregated
+counters, the ward reference table, and canvassers' own diary entries —
+and a reader who does not know which is which will eventually quote the
+wrong one upward.
+
+**"Households canvassed" was a self-reported total presented as a
+measurement.** It sums the household counts canvassers typed into their own
+CANVASS diary entries. That number has real value — it is a person's
+account of their shift — but it is not a count of doors worked, and
+nothing said so. Since SOP-05 gave `contactStatus` a writer, a real
+counter is now possible: `maintainHouseholdCounters` keeps
+`householdsByContactStatus` from the door records themselves. The tile
+reports the measured figure with the self-reported one beside it, labelled,
+and the SOP says plainly that they will differ and that neither corrects
+the other.
+
+**"Open incidents" carried a private copy of what "open" means.** The page
+computed `STATUS_ORDER.filter((s) => s !== 'RESOLVED' && s !== 'CLOSED')`
+inline while `incidentWorkflow.isOpen()` — written for SOP-06 — says the
+same thing in one place. Now it uses the shared definition, so the
+dashboard and the incident list cannot drift apart.
+
+**"Wards seeded" showed a bare count.** No expected number, no flag — which
+is exactly the silent-short-seed defect SOP-03 exists to catch, repeated on
+the one screen a campaign reads every morning. It now shows loaded against
+expected and surfaces the seed check when they disagree.
+
+### The two percentages
+
+The war room's percentage is records held over the registered roll — a
+data-capture figure. The round's is doors worked over doors workable,
+excluding refusals — a fieldwork figure. Both were called "coverage" in the
+code; the war room's variable is `rollSharePct` now, and SOP-08 spends a
+section on the distinction, because "40% coverage" in a meeting will be
+heard as whichever one the listener already had in mind.
+
+### Guards proven by injection
+
+A door with no status dropping out of the count; the open-incident rule
+drifting from the workflow model; SOP-08 rewritten to present sentiment as
+a projected vote share; and SOP-08 rewritten to say the two percentages
+are interchangeable.

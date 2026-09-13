@@ -14,13 +14,14 @@ import { REGISTER_IMPORT_SOP } from './sops/registerImportSop';
 import { WARD_ROUND_SOP } from './sops/wardRoundSop';
 import { INCIDENT_SOP } from './sops/incidentSop';
 import { REFERRAL_SOP } from './sops/referralSop';
+import { WAR_ROOM_SOP } from './sops/warRoomSop';
 import {
   EVIDENCE_BASIS,
   INTEGRITY_HASH_BASIS,
   buildReferralDocument,
 } from '@/modules/incidents/referral/referralDocument';
 import { CHECK_MESSAGE } from '@/modules/incidents/referral/verifyReferral';
-import { CATEGORY_LABEL, STATUS_ORDER } from '@/modules/incidents/incidentMeta';
+import { CATEGORY_LABEL, STATUS_LABEL, STATUS_ORDER } from '@/modules/incidents/incidentMeta';
 import {
   INCIDENT_TRANSITIONS,
   availableTransitions,
@@ -1024,5 +1025,74 @@ describe('SOP-07 describes the referral that actually gets issued', () => {
   it('tells nobody to quietly replace a document already sent', () => {
     expect(text).toMatch(/do not quietly re-issue a corrected one/i);
     expect(text).toMatch(/Tell the department, in writing, quoting the original reference/i);
+  });
+});
+
+
+/**
+ * SOP-08 is read every morning and quoted upward, so its job is
+ * provenance: which number came from where. The tests check the claims
+ * that decide whether a reader trusts the right one.
+ */
+describe('SOP-08 describes the war room honestly', () => {
+  const text = JSON.stringify(WAR_ROOM_SOP);
+
+  it('goes to the roles that can open it', () => {
+    expect(WAR_ROOM_SOP.roles).toEqual(['municipal-team-lead', 'party-hq-admin']);
+    expect(WAR_ROOM_SOP.requiresAnyCapability).toEqual(['warroom.view']);
+    for (const roleId of WAR_ROOM_SOP.roles) {
+      expect(SEED_ROLES.find((r) => r.id === roleId)!.defaultCaps, roleId).toContain('warroom.view');
+    }
+  });
+
+  it('separates the two percentages that sound alike', () => {
+    // The war room's is records held over the registered roll; the round's
+    // is doors worked over doors workable. Conflating them is the single
+    // most likely misreading of this screen.
+    expect(text).toMatch(/share of the electorate this campaign holds a record for/i);
+    expect(text).toMatch(/doors worked out of doors workable/i);
+    expect(text).toMatch(/neither is a substitute for the other/i);
+  });
+
+  it('says which door figure is measured and which is self-reported', () => {
+    expect(text).toMatch(/counted from the door records/i);
+    expect(text).toMatch(/self-reported/i);
+    expect(text).toMatch(/Never present the self-reported figure as a measurement/i);
+  });
+
+  it('lists every door state the counters actually carry', () => {
+    const section = WAR_ROOM_SOP.sections.find((s) => s.heading.includes('Doors by state'))!;
+    expect(section.steps).toEqual(Object.values(CONTACT_STATUS_LABEL));
+  });
+
+  it('quotes the seed-check basis rather than paraphrasing it', () => {
+    expect(text).toContain(RECONCILIATION_BASIS);
+    expect(text).toMatch(/A short seed has no other symptom/i);
+  });
+
+  it('defines open incidents the way the workflow module does', () => {
+    const open = STATUS_ORDER.filter(isOpen);
+    expect(open).toEqual(['LOGGED', 'TRIAGED', 'ESCALATED', 'REFERRED']);
+    const body = (WAR_ROOM_SOP.sections.find((s) => s.heading === 'Open incidents')?.body ?? []).join(' ');
+    for (const status of open) {
+      expect(body.toLowerCase(), status).toContain(STATUS_LABEL[status].toLowerCase());
+    }
+    expect(body).toMatch(/Resolved and closed drop out of it/i);
+  });
+
+  it('refuses to let referred be read as delivered', () => {
+    expect(text).toMatch(/has not necessarily been delivered/i);
+    expect(text).toMatch(/the platform sends nothing/i);
+  });
+
+  it('refuses to let sentiment be read as a poll', () => {
+    expect(text).toMatch(/it is not a poll/i);
+    expect(text).toMatch(/no sampling frame, no weighting and no margin of error/i);
+    expect(text).not.toMatch(/\b(projected|forecast) (turnout|result|vote share)\b/i);
+  });
+
+  it('says plainly what the platform does not track', () => {
+    expect(text).toMatch(/no volunteer presence tracking/i);
+    expect(text).toMatch(/does not know what the other parties are doing/i);
   });
 });
