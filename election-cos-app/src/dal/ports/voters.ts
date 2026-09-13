@@ -18,6 +18,18 @@ export interface Voter {
   popiaConsentGiven: boolean; // write blocked (server-side) if false
   popiaConsentAt?: string;
   popiaConsentMethod: 'VERBAL_DOORSTEP' | 'WRITTEN' | 'DIGITAL';
+  /**
+   * How this consent could be demonstrated if it were ever questioned —
+   * a membership-form batch reference, an event name and date, a signup
+   * campaign id. POPIA puts the burden of showing consent was given on
+   * the responsible party, and "WRITTEN" on its own shows nothing.
+   *
+   * Optional because a doorstep capture is already evidenced by the
+   * canvasser and timestamp on the record. Required by `bulkImport.ts`
+   * for anything imported in bulk, where there is no canvasser standing
+   * at a door to be the evidence.
+   */
+  popiaConsentReference?: string;
   createdAt: string;
   updatedAt: string;
   updatedBy: string;

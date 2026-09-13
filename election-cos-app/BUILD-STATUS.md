@@ -1622,6 +1622,54 @@ hash guard made with `otpCode`.
 **Verified:** `check:all` green — **321 tests** (up from 294), lint,
 typecheck, `check:hex`; `npm run build` succeeds.
 
+**Session 25 (13 Sep 2026) — full AI Studio source tree; bulk voter import
+built.** 282 files, a fork of this repo (its CI still declares
+`working-directory: election-cos-app`). Detail in
+`docs/ai-studio-functional-extraction.md`.
+
+**Backlog probe result worth recording:** canvasser safety notes, field
+diagnostic guidance and the T-7/T-3 gatherings engine are **not
+implemented there either** — they exist only in the tutorial's narrative.
+Nothing to salvage for those, and no implementation to compare against
+when they are built.
+
+**Built: `src/modules/voters/bulkImport.ts`** — 26 tests. A campaign
+starts with a membership register in a spreadsheet and this build had no
+way to bring one in.
+
+The compliance dimension is ours: their `CsvBatchImportModal.tsx` has
+**zero** occurrences of "consent" or "POPIA" (it imports contacts, not
+voters). For us it is the whole question — `firestore.rules` refuses a
+voter without `popiaConsentGiven == true`, and bulk import is the one
+place that gate could be satisfied by simply asserting it.
+
+- No importable row without a **consent declaration that could be shown
+  to someone**: basis, date, and a reference identifying where the consent
+  lives. A reference under eight characters is refused — "yes" is not a
+  reference.
+- **A doorstep method cannot be expressed for a batch at the type level**
+  (`Extract<…, 'WRITTEN' | 'DIGITAL'>`). Nobody verbally consented four
+  hundred people at once.
+- `Voter.popiaConsentReference` added — provenance travels on the record,
+  not in a log nobody can find two years later.
+- **The module writes nothing.** It returns a plan: every row ready,
+  rejected or already present, with a reason and the spreadsheet line
+  number. A half-done import nobody can reconstruct is worse than one that
+  refuses.
+
+Proved by injection: proceeding without a declaration fails 2 tests,
+accepting any reference fails 1, allowing a doorstep method fails 1,
+silently dropping duplicates fails 2.
+
+**Noted, not built:** `googleWorkspace.ts` (54KB) and eight workspace
+surfaces — needs a product decision on OAuth scopes against tenant data
+first; `useMembershipOCR.ts`, interesting as the front end of this import;
+`RbacVisualizer.tsx`, where the value is visualisation rather than
+function.
+
+**Verified:** `check:all` green — **347 tests** (up from 321), lint,
+typecheck, `check:hex`; `npm run build` succeeds.
+
 ---
 
 ## DECISION — seven roles; Compliance Officer stays (13 Sep 2026)

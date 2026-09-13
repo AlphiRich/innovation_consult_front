@@ -22,6 +22,7 @@ function fromFirestore(id: string, data: Record<string, unknown>): Voter {
     popiaConsentGiven: Boolean(data.popiaConsentGiven),
     popiaConsentAt: (data.popiaConsentAt as string | undefined) ?? undefined,
     popiaConsentMethod: data.popiaConsentMethod as Voter['popiaConsentMethod'],
+    popiaConsentReference: data.popiaConsentReference as string | undefined,
     createdAt: toISO(data.createdAt as string) ?? '',
     updatedAt: toISO(data.updatedAt as string) ?? '',
     updatedBy: data.updatedBy as string,

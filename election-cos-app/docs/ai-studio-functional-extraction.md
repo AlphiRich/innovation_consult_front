@@ -378,3 +378,95 @@ document's low-RAM, low-data argument. §6.4's "never Base64 in the
 document" already covers the Firestore side; the offline side was already
 right too.
 
+---
+
+# Fourth pass — the full AI Studio source tree (session 25)
+
+282 files. Its own `.github/workflows/ci.yml` still declares
+`working-directory: election-cos-app`, so this is a fork of this
+repository that AI Studio then built on. Most of the large files are ones
+already reviewed across sessions 13–23 and were not re-read.
+
+## What the backlog probe actually found
+
+Three of the six items still on the backlog are **not implemented there
+either** — they exist only in the tutorial's narrative:
+
+| Backlog item | In the source tree? |
+|---|---|
+| Canvasser safety notes | **No** — zero matches for safety note, gate code, dog on property |
+| Field diagnostic guidance | **No** — the only hit was an unrelated `ThemeContext` |
+| T-7/T-3 gatherings engine | **No** — consistent with the positioning paper's advisory-only scope, and with our decision not to build it |
+
+Worth recording: the tutorial described aspirations, not shipped
+features, so there is nothing to salvage for those items and no
+implementation to compare ours against when they are built.
+
+## Built: bulk voter import
+
+The one genuinely new capability with day-one value. A campaign does not
+start empty — it starts with a membership register in a spreadsheet, and
+this build had no way to bring one in. Voters were captured one at a time
+at a door; the only bulk path in the repository was the VD demarcation
+seed, which is reference data rather than people.
+
+`src/modules/voters/bulkImport.ts` — 26 tests.
+
+**The compliance dimension is ours, not theirs.** Their
+`CsvBatchImportModal.tsx` has **zero** occurrences of "consent" or
+"POPIA"; it imports contacts, not voters, so the question never arose for
+it. For us it is the whole question: `firestore.rules` refuses to create a
+voter unless `popiaConsentGiven == true`, and that gate exists because
+consent is captured at a door, by a canvasser, from the person. A
+spreadsheet has neither door nor canvasser, so bulk import is the one
+place the gate could be satisfied by simply asserting it — which would
+make the gate decorative.
+
+So the module will not produce an importable row without a **consent
+declaration that could be shown to someone**: a lawful basis, a date, and
+a reference identifying where the consent lives. POPIA puts the burden of
+demonstrating consent on the responsible party, and "everyone on this list
+agreed" demonstrates nothing. A reference shorter than eight characters is
+refused, because "yes" is not a reference.
+
+**A doorstep method cannot be expressed for a batch at all.**
+`BulkConsentMethod` is `Extract<…, 'WRITTEN' | 'DIGITAL'>` — nobody
+verbally consented four hundred people in a batch, so a file claiming it
+is mislabelled or untrue, and the case cannot be constructed.
+
+**Provenance travels on the record, not in a log.** `popiaConsentReference`
+was added to the `Voter` port and is written onto every imported person.
+An import log nobody can find two years later is not a demonstration of
+consent.
+
+**The module writes nothing.** It returns a plan: every row classified as
+ready, rejected or already present, each with a reason and a line number
+the operator can find in their spreadsheet. A half-finished import that
+silently created some people and dropped others is worse than one that
+refuses, because afterwards nobody can tell which happened. A test asserts
+the module imports no repository at all.
+
+Also: numbers are masked, never carried in the clear; sentiment defaults
+to UNDECIDED rather than inventing support; the CSV reader handles quoted
+fields, embedded commas, doubled quotes and CRLF; and header matching
+accepts the spellings a real spreadsheet uses, Afrikaans included
+(`Voornaam`, `Van`, `Selfoon`).
+
+Proved by injection: proceeding without a consent declaration fails 2
+tests, accepting any reference fails 1, widening the method to allow
+doorstep fails 1, and silently dropping duplicates fails 2.
+
+## Noted, not built
+
+- `src/lib/googleWorkspace.ts` (54KB) plus eight `components/workspace/`
+  surfaces — Gmail, Sheets, Tasks and Calendar integration. A real feature
+  surface and a large one; it needs a product decision about OAuth scopes
+  against tenant data before any of it is worth porting, not a quiet
+  afternoon's work.
+- `useMembershipOCR.ts` — OCR of membership forms. Interesting as the
+  front end of the import built above: the same consent-provenance rule
+  would apply, and a scanned form is a better reference than a typed one.
+- `RbacVisualizer.tsx` (70KB) — a permissions visualiser. Our
+  `PermissionsPage` covers the function; the value here would be in the
+  visualisation, which is a design question.
+
