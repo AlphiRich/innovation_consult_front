@@ -33,6 +33,7 @@ import { dataSubjectRequestsRepository } from './adapters/firestore/dataSubjectR
 import { warRoomCountersRepository } from './adapters/firestore/warRoomCountersRepository';
 import { municipalityProfileRepository } from './adapters/firestore/municipalityProfileRepository';
 import { fileStoreRepository } from './adapters/firestore/fileStoreRepository';
+import { entitlementsRepository } from './adapters/firestore/entitlementsRepository';
 
 const adapter = (import.meta.env.VITE_DAL_ADAPTER as string | undefined) ?? 'firestore';
 
@@ -72,6 +73,9 @@ export const dal = {
   // Cloud Storage rather than Firestore, but the same rule applies: module
   // code reaches object storage through the DAL or not at all (§5, §10).
   fileStore: fileStoreRepository,
+  // What the tenant bought, as opposed to what the user may do — see
+  // src/auth/modules.ts. Read-only: provisioned server-side.
+  entitlements: entitlementsRepository,
 };
 
 export type { SessionContext, GeoScope, Page, PageRequest } from './ports/session';

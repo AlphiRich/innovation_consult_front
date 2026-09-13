@@ -1577,6 +1577,51 @@ second canvasser fails 2. All reverted clean.
 **Verified:** `check:all` green — **294 tests** (up from 268), lint,
 typecheck, `check:hex`; `npm run build` succeeds.
 
+**Session 24 (13 Sep 2026) — the tenancy question closed: entitlements
+built.** Five early commercial planning notes, mostly superseded (five-tier
+roles, PPFA R80k/R100k, Postgres tenancy, T-7 permit alerts — none
+revisited). One insight in them was load-bearing.
+
+**Entitlements are not all tenant-wide.** The material prices
+Ward-Sentiment per *ward* per cycle, Incident Pro per *party*, casework
+per ward per month — because parties buy their strongest wards, not whole
+municipalities. A model assuming tenant-wide purchase would have been
+wrong on the first real sale. `EntitlementScope` is part of the module
+definition and `resolveAccess` refuses a ward-scoped question without the
+ward.
+
+Built: `src/auth/modules.ts` (catalogue), `src/dal/ports/entitlements.ts`
++ adapter (read-only), `src/auth/entitlements.ts` (resolver),
+`firestore.rules` entitlements block. 27 tests.
+
+- **Permission and subscription fail differently.** NOT_PERMITTED /
+  MODULE_NOT_SUBSCRIBED / MODULE_EXPIRED / WARD_NOT_SUBSCRIBED /
+  TENANT_NOT_PROVISIONED, each with a sentence the person can act on.
+  Collapsing them sends a Finance Officer to an administrator who cannot
+  help.
+- **Capability is checked first**, so commercial state never explains a
+  permissions failure — asserted by test.
+- **No price anywhere near a tenant record.** Sold to competing parties on
+  published, flat, identical terms; a per-tenant price is the appearance of
+  differential terms whatever the number says. A test fails on any price,
+  cost, amount, fee, discount or ZAR field.
+- **Written server-side only** — no port write method, `allow write: if
+  false`, same shape as auditLog.
+- **Modules may exist before their surfaces.** `ward-sentiment`,
+  `incident-pro` and `casework` gate nothing today and say so.
+- **An unprovisioned tenant still works** — core and the bundled diary
+  stay on.
+
+Proved by injection: making a ward-bought module tenant-wide fails 3
+tests, letting the tenant write its own entitlements fails 1, leaking
+commercial state into a permissions failure fails 2, and adding a price
+field fails 1 — that last only after fixing my own guard, whose `/\bprice\b/`
+could not match `priceZAR`, the identical trailing-boundary mistake the
+hash guard made with `otpCode`.
+
+**Verified:** `check:all` green — **321 tests** (up from 294), lint,
+typecheck, `check:hex`; `npm run build` succeeds.
+
 ---
 
 ## DECISION — seven roles; Compliance Officer stays (13 Sep 2026)

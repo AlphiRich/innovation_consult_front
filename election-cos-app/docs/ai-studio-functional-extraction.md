@@ -273,3 +273,108 @@ seeding the Campaign Diary with the IEC timetable we already hold,
 canvasser safety notes, out-of-band escalation, and field diagnostic
 guidance.
 
+---
+
+# Third pass — commercial planning outputs; tenancy closed (session 24)
+
+Five early planning notes: Incident-Pro pricing, an architecture/revenue
+strategy, the commercial and operational architecture, the hierarchical
+access model, and a field operations manual. Flagged on upload as possibly
+redundant, and mostly they are — the five-tier role model with a
+"Provincial Coordinator", PPFA at R80,000/R100,000, Postgres RLS tenancy,
+and T-7 permit notifications are all superseded by decisions already
+taken. Not revisited.
+
+**But one insight in them was load-bearing, and would have been got wrong
+without it.**
+
+## Entitlements are not all tenant-wide
+
+The commercial material prices **Ward-Sentiment Intelligence per ward per
+cycle** and **Incident-Management Pro per party per cycle**, with casework
+at **per ward per month**. The positioning paper read earlier is explicit
+about why: à-la-carte ward pricing "is the market's buying behaviour, not
+a pricing convenience layered on top of it" — South African parties buy
+their strongest-support wards, not full municipal coverage.
+
+An entitlement model that assumed every module was bought tenant-wide
+would have been wrong on its first real sale. `EntitlementScope` is
+therefore part of the module definition, `TenantEntitlement.wardCode`
+carries the ward, and `resolveAccess` refuses to answer a ward-scoped
+question without knowing which ward. A test pins the scope of each module
+so the assumption cannot creep back.
+
+That is the salvage, and it was worth the read.
+
+## Built: the entitlement layer
+
+- `src/auth/modules.ts` — the catalogue: key, label, scope, bundled, and
+  the capabilities each module gates.
+- `src/dal/ports/entitlements.ts` + Firestore adapter — read-only.
+- `src/auth/entitlements.ts` — `isModuleActive`, `activeModules`,
+  `subscribedWards`, `resolveAccess`.
+- `firestore.rules` — `entitlements` readable by any tenant member,
+  `allow write: if false`.
+- 27 tests.
+
+**Permission and subscription fail differently, and say so.** "Your role
+does not include this" and "this campaign did not buy that module" are
+different problems with different remedies. Collapsing them into one
+"access denied" sends a Finance Officer to an administrator who cannot
+help. `AccessOutcome` separates NOT_PERMITTED, MODULE_NOT_SUBSCRIBED,
+MODULE_EXPIRED, WARD_NOT_SUBSCRIBED and TENANT_NOT_PROVISIONED, each with
+a sentence the person can act on.
+
+**Capability is checked first, deliberately.** Someone who was never
+permitted near the donor ledger is told about their permissions, not
+handed the campaign's billing position as the explanation. A test asserts
+the NOT_PERMITTED reason mentions no commercial state at all.
+
+**No price is stored against a tenant, anywhere.** The platform is sold to
+competing parties in the same municipality on published, flat, identical
+terms, and the commercial material is emphatic that packaging "must never
+create even the appearance that one party gets better terms". A price on a
+tenant record is that appearance whatever the number says. An entitlement
+records what was bought and until when. A test fails on any price, cost,
+amount, fee, discount or ZAR field.
+
+**Entitlements are written server-side only.** A tenant admin who could
+grant themselves a paid module would make the commercial model as
+meaningless as a client-side capability check makes the security model.
+The port has no write method and the rules deny client writes — the same
+shape as `auditLog`.
+
+**Modules can exist before their surfaces do.** `ward-sentiment`,
+`incident-pro` and `casework` gate no capabilities today because the
+features are not built here. Declaring the entitlement first is the right
+order; listing capabilities they do not actually govern would be a claim
+rather than a fact, and a test holds them empty and their descriptions
+honest.
+
+**An unprovisioned tenant is a distinct state.** Zero entitlement records
+means the paid modules are off and the core platform and bundled diary
+still work — not a dead application.
+
+## Also salvaged, into the record rather than the code
+
+- **Incident Pro is the out-of-band escalation tier.** Backlog item 5 now
+  has a commercial home: per-message costs sit with the parties that
+  generate them rather than being spread across every ward licence. When
+  that feature is built it gates behind `incident-pro`.
+- **No in-app advertising, ever.** Third-party ad SDKs would break the
+  neutrality position, open unverified external connections, and consume
+  memory and data on the low-RAM phones volunteers actually carry. Worth
+  recording as a standing constraint so it is not re-proposed.
+- **The low-RAM/metered-data constraint** is why `resolveAccess` is a
+  synchronous function over an already-loaded array rather than a network
+  check per render.
+
+## One place we are already better
+
+The access model describes canvassers caching photographs "encoded as
+Base64 strings" on-device. Our Dexie `photoQueue` stores a `Blob`. Base64
+is about a third larger for the same image, which cuts against that same
+document's low-RAM, low-data argument. §6.4's "never Base64 in the
+document" already covers the Firestore side; the offline side was already
+right too.
+

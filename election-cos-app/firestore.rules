@@ -173,6 +173,20 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ---- tenant entitlements — what the campaign bought ---------------------
+
+    // A billing fact, not a tenant setting. Everyone in the tenant needs
+    // to read it (the UI has to know which modules are on), and nobody in
+    // the tenant may write it: an admin who could grant themselves a paid
+    // module would make the commercial model meaningless, the same way a
+    // client-side capability check would make the security model
+    // meaningless. Provisioned server-side only, like auditLog.
+    match /tenants/{tid}/entitlements/{entitlementId} {
+      allow read: if tenantOK(tid);
+      allow write: if false;
+      allow delete: if false;
+    }
+
     // ---- documents ----------------------------------------------------------
 
     // Referral records (documentId `referral-{incidentId}`, see
