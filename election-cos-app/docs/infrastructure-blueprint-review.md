@@ -254,3 +254,47 @@ filler.
 never read. The upload directory was cleared before it could be opened and
 no content from it reached this session. It is not assessed here in either
 direction — re-upload it if it matters.
+
+---
+
+## 9. `tenant_isolation.sql` (session 21, uploaded separately)
+
+A Postgres RLS policy for `voters`, presented as a correction of four
+issues in its own earlier draft. **Not adopted** — it targets the Postgres
+migration closed on 13 Sep. But two of its four corrections describe real
+isolation bug classes, and this repo had **no test covering `inScope()` or
+`geoScopeConstraints()` at all**, which is exactly where those bugs would
+have lived. `src/dal/adapters/firestore/geoScope.test.ts` is the result.
+
+**Its two substantive points, audited against our rules:**
+
+| Its correction | This build |
+|---|---|
+| Narrowing on bare `ward_number` collides across municipalities — every municipality has a Ward 12 | **Clean.** `inScope()` compares `data.wardCode`, and `geoScopeConstraints()` narrows on `wardCode`. Codes carry the municipality (`NW405012` vs `JHB012`). |
+| VD-level roles were getting whole-ward access because the policy had only a ward branch | **Clean.** `inScope()` has a distinct `scope == 'VD' && data.vdCode` branch, and `vd-captain`/`canvasser` are `geoScope: 'VD'` in the seed. |
+
+**Where we are deliberately tighter.** Its bypass list grants
+`FINANCE_OFFICER` tenant-wide access to `voters`, justified because "the
+household policy elsewhere in this project already grants the same
+bypass" — propagating an existing grant rather than questioning it. Our
+Finance Officer has no `voters.*` capability at all, so the voters rule
+fails at `cap('voters.view')` before scope is ever considered. Funding
+compliance needs donors, not the voter roll; that is POPIA data
+minimisation and it is now asserted by test.
+
+**A gap in the file itself, worth passing back.** It never issues
+`ALTER TABLE voters FORCE ROW LEVEL SECURITY`, and never says which role
+the API must connect as. PostgreSQL table owners **bypass row security by
+default** — `FORCE` is what makes policies apply to the owner too. If the
+API connects as the owner of `voters`, this entire policy is silently a
+no-op. That is a larger hole than any of the four issues the file sets out
+to correct.
+
+Credit where due: `current_setting(..., true)` returns NULL when the GUC
+is unset, so every branch evaluates NULL and the row is excluded — it
+fails closed, which is the right default and is easy to get wrong.
+
+Its first correction (VARCHAR(36) vs `::UUID`) is moot here twice over:
+Postgres is closed, and this app's ids come from `crypto.randomUUID()`
+anyway, so "never a native UUID" does not describe this codebase.
+
