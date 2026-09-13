@@ -6,6 +6,7 @@ import { HAZARD_LABEL, HAZARD_ORDER, PAIR_UP_HAZARDS } from '@/modules/voters/ho
 import { assembleManual, groupByArea, type Sop } from './manualModel';
 import { PLANNED_SOPS, SOPS } from './sops';
 import { CANVASSER_SOP } from './sops/canvasserSop';
+import { DOORSTEP_ERASURE_ANSWER } from '@/modules/settings/dataSubjectErasure';
 import { buildManualPdf, manualFileName, MANUAL_STATUS_NOTE } from './manualPdf';
 
 const NOW = new Date('2026-06-01T00:00:00.000Z');
@@ -185,10 +186,35 @@ describe('SOP-01 describes what the code actually does', () => {
   });
 
   it('repeats the erasure position rather than promising a purge', () => {
-    // The tutorial's doorstep script promised data would be "permanently
-    // purged post-election". This build hard-deletes nothing.
+    // The source material's doorstep script promised data would be
+    // "permanently purged post-election". This build hard-deletes nothing.
     expect(text).toMatch(/suppresses records; it does not destroy or de-identify them/i);
-    expect(text).not.toMatch(/permanently purged|will be deleted after the election/i);
+  });
+
+  it('gives the canvasser the true answer, not only the prohibition', () => {
+    // A rule that says only what may not be said leaves a canvasser
+    // improvising at a gate, which is how the overclaim was written in the
+    // first place. The answer comes from the module that owns the erasure
+    // position, so the two cannot drift apart.
+    const consent = JSON.stringify(CANVASSER_SOP.sections.find((s) => s.heading.includes('consent')));
+    expect(consent).toContain(DOORSTEP_ERASURE_ANSWER);
+    expect(DOORSTEP_ERASURE_ANSWER).toMatch(/taken out of the app/i);
+    expect(DOORSTEP_ERASURE_ANSWER).toMatch(/logged and answered/i);
+    expect(DOORSTEP_ERASURE_ANSWER).toMatch(/do not tell them the record is wiped/i);
+  });
+
+  it('never promises destruction, in this or any future SOP', () => {
+    // Scanned over the whole register, so a promise reintroduced in SOP-05
+    // is caught too. Phrased as promise *shapes* rather than banned words:
+    // "a phone that is wiped before the queue drains" is true and has to
+    // survive, and a guard that trips on accurate prose gets reverted
+    // rather than obeyed.
+    const register = JSON.stringify(SOPS);
+    expect(register, 'no SOP may use the language of purging at all').not.toMatch(/purg/i);
+    expect(register).not.toMatch(/\bpermanently (?:deleted|erased|destroyed|removed)\b/i);
+    expect(register).not.toMatch(
+      /\b(?:will be|gets?|is|are) (?:deleted|erased|destroyed|wiped)\b[^.]{0,60}\belection\b/i,
+    );
   });
 
   it('tells the canvasser consent comes before capture, not after', () => {

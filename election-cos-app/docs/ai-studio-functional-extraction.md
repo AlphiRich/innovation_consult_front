@@ -149,7 +149,7 @@ it prevents the one failure mode that loses a canvasser's entire shift.
 
 ---
 
-## One claim to correct before it ships
+## One claim to correct before it ships — CORRECTED, session 27
 
 The tutorial's doorstep POPIA script has the canvasser tell a voter her
 details "will be **permanently purged** post-election." This build hard-
@@ -167,6 +167,18 @@ The subscriber identity policy, by contrast, already applies exactly this
 discipline to itself, and says so: *"it is not the same claim as 'no data
 leaves South Africa', and that broader claim is never made about this
 Platform."* That document is the model; the tutorial should follow it.
+
+**Done.** SOP-01's doorstep script now carries the true answer rather than
+the false one. Forbidding the sentence was not enough on its own: a
+canvasser at a gate is going to be asked "so will you delete it?", and a
+rule that says only what may not be answered leaves them improvising —
+which is how the overclaim came to be written. So `DOORSTEP_ERASURE_ANSWER`
+in `dataSubjectErasure.ts` holds the replacement, short enough to say out
+loud, and SOP-01 imports it from the module that owns the erasure
+position so the two cannot drift. `manual.test.ts` asserts the SOP carries
+it, and scans the whole SOP register for promises of destruction — as
+promise *shapes*, not banned words, so that "a phone that is wiped before
+the queue drains" survives, because it is true.
 
 ---
 

@@ -13,6 +13,7 @@
  */
 import { NO_ANSWER_COOLOFF_HOURS, INACCESSIBLE_COOLOFF_HOURS } from '@/modules/voters/canvassQueue';
 import { ACCESS_CODE_BASIS, SAFETY_NOTE_BASIS } from '@/modules/voters/householdSafety';
+import { DOORSTEP_ERASURE_ANSWER } from '@/modules/settings/dataSubjectErasure';
 import type { Sop } from '../manualModel';
 
 export const CANVASSER_SOP: Sop = {
@@ -68,10 +69,12 @@ export const CANVASSER_SOP: Sop = {
         'Explain what you would like to record and why, before you record it.',
         'Tell the person: their contact number is stored masked; their information is held in South Africa; they can ask what is held about them, ask for it to be corrected, and ask not to be contacted again.',
         'Only if they agree, mark consent given and capture the record. If they do not agree, do not capture anything about their views.',
+        'If they ask how long the campaign keeps it: while it is campaigning. They can ask at any time to see what is held, to have it corrected, or not to be contacted again — and "do not contact me again" is permanent, so their door is never offered to anyone.',
+        DOORSTEP_ERASURE_ANSWER,
       ],
       warnings: [
         'The app refuses to save a voter record without consent recorded. That refusal is the point of it — do not work around it by recording the household instead.',
-        'Do not tell anyone their data will be deleted or purged after the election. This system suppresses records; it does not destroy or de-identify them, and promising otherwise is a promise the campaign cannot keep.',
+        'Never promise erasure at a door. This system suppresses records; it does not destroy or de-identify them, so an assurance that it all disappears once the election is over is an assurance the campaign cannot honour — and it is made to the one person entitled to hold the campaign to it.',
       ],
     },
     {

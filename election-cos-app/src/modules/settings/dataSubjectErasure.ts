@@ -90,6 +90,32 @@ export function erasurePosition(subjectType: DataSubjectType): ErasurePosition {
 }
 
 /**
+ * WHAT A CANVASSER SAYS AT A DOOR WHEN ASKED ABOUT DELETION
+ *
+ * The source material this project was handed carried a doorstep script
+ * telling a voter her details would be "permanently purged post-election".
+ * That is false here — nothing hard-deletes, there is no de-identification
+ * routine, and `erasurePosition()` above returns SUPPRESSION_ONLY for
+ * every non-donor subject.
+ *
+ * Forbidding the sentence is not enough on its own. A canvasser standing
+ * at a gate is going to be asked "so will you delete it?", and a rule that
+ * only says what they may not answer leaves them improvising — which is
+ * how the overclaim got written in the first place. So this is the
+ * replacement: the true answer, short enough to say out loud.
+ *
+ * It lives here rather than in the SOP because this module owns the
+ * erasure position. If the product ever gains real de-identification,
+ * `canRecordFulfilled` and this sentence change together, and SOP-01 picks
+ * up the new wording without being edited.
+ */
+export const DOORSTEP_ERASURE_ANSWER =
+  'If they ask for their details to be deleted, say what is true: their details are taken out of ' +
+  'the app so nobody in the campaign works from them again, and their request is logged and answered ' +
+  'by the campaign in writing. Do not tell them the record is wiped — it is not, and that is the ' +
+  'campaign’s promise to keep, not yours to make at a gate.';
+
+/**
  * Prefilled refusal reason for a donor erasure request, so the compliance
  * record carries the legal basis rather than a bare "rejected".
  *
