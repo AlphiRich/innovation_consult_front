@@ -104,6 +104,18 @@ export type HouseholdDraft = Omit<
 export interface HouseholdRepository {
   getById(ctx: SessionContext, id: string): Promise<Household | null>;
   listByVD(ctx: SessionContext, vdCode: string, page: PageRequest): Promise<Page<Household>>;
+  /**
+   * Every door in a ward, for a ward lead reading their own coverage.
+   *
+   * Deliberately not gated on `wards.view`, which no field role holds: a
+   * ward lead reads their own ward's households under `voters.view` and
+   * the geographic narrowing the rules already apply, and the voting
+   * district codes come off those records rather than out of the
+   * reference table. A VD-scoped caller gets their own district back,
+   * because `geoScopeConstraints` narrows them further — which is the
+   * behaviour wanted, not a limitation to work around.
+   */
+  listByWard(ctx: SessionContext, wardCode: string, page: PageRequest): Promise<Page<Household>>;
   upsert(ctx: SessionContext, household: HouseholdDraft): Promise<UpsertResult>;
   softDelete(ctx: SessionContext, id: string, reason: string): Promise<void>;
 }

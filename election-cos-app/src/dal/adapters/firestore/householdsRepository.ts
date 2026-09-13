@@ -44,6 +44,16 @@ export const householdsRepository: HouseholdRepository = {
     );
   },
 
+  async listByWard(ctx: SessionContext, wardCode: string, page: PageRequest): Promise<Page<Household>> {
+    return listPageGeneric(
+      ctx,
+      'households',
+      [where('wardCode', '==', wardCode), ...geoScopeConstraints(ctx)],
+      page,
+      fromFirestore,
+    );
+  },
+
   async upsert(ctx: SessionContext, household: HouseholdDraft) {
     return upsertGeneric(ctx, 'households', household.id, household, false);
   },

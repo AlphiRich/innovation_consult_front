@@ -111,8 +111,8 @@ a contract.
 
 ## Sequence
 
-1. SOP-01 through SOP-04 are issued (`src/modules/manual/sops/`).
-2. SOP-05 … SOP-12 are written (`PLANNED_SOPS` carries the register).
+1. SOP-01 through SOP-05 are issued (`src/modules/manual/sops/`).
+2. SOP-06 … SOP-12 are written (`PLANNED_SOPS` carries the register).
 3. The completed manual goes to an attorney **with this file**, which
    tells them what is safe to rely on and what must not be said.
 4. The instruments are drafted against it.
@@ -361,3 +361,58 @@ grant `wards.view` to the field roles — but that changes the token for
 four roles and touches `roleModel.test.ts` and `geoScope.test.ts`, which is
 not something to fold into an SOP commit. Recorded here so it is not found
 twice.
+
+---
+
+## SOP-05, and the queue that had no screen (session 27)
+
+SOP-05 is the supervisor's counterpart to SOP-01: how to send a round out,
+which doors the platform offers next and why, and what the coverage figure
+counts.
+
+**The whole canvassing queue was unreachable.** `canvassQueue.ts` was
+complete and tested — six door states, two cool-offs, a deliberately
+terminal refusal, a coverage definition that excludes refusals from the
+denominator — and not one line of it was referenced from any component.
+`Household.contactStatus` was written by no code path at all.
+
+The consequences, none of which raised an error anywhere: every door read
+as never contacted for ever, so the queue offered all of them on every
+round; coverage was permanently zero; and a household asking not to be
+contacted again could not be recorded, which is the one thing in that
+module POPIA's objection right actually turns on.
+
+It also means **SOP-01 was overclaiming**. It has told canvassers since it
+was written that "every door ends in one of six states, and the state you
+leave decides whether the next round offers it to someone again." Until
+`RoundPage.tsx`, a door ended in one state and the next round offered it
+regardless.
+
+### What was built
+
+`RoundPage.tsx` — queue summary, coverage, every door by state, the next
+twenty-five doors with their access notes, and the four outcomes a
+canvasser records. Transitions go through `canTransition()`, so the
+refusal the module makes terminal stays terminal at the screen too.
+
+`HouseholdRepository.listByWard()` — so a ward lead can read their own
+ward's doors. Deliberately *not* a fix to the `wards.view` gap noted under
+SOP-04: a ward lead reads households under `voters.view` with the
+geographic narrowing the rules already apply, and the voting-district
+codes come off those records rather than out of the reference table. A
+VD-scoped caller gets their own district back, because
+`geoScopeConstraints` narrows them further — the behaviour wanted, not a
+limitation.
+
+Reached from Voters rather than the primary nav: §3.2 specifies nine nav
+items and `nav.test.ts` holds the build to them.
+
+### A guard that was testing itself
+
+The first version of the "lists the outcomes a canvasser can record" test
+built its expectation from `CONTACT_STATUS_LABEL` — the same map the SOP
+builds its list from. Deleting a label shortened both sides equally and
+the test passed while the printed procedure silently lost a step. Found by
+injection rather than by review. The outcomes are now named explicitly,
+and a second test asserts the map still covers every state the queue can
+be in.

@@ -51,6 +51,18 @@ export function VotersPage() {
           <h1 className="text-headline-md font-display text-ink mt-1">Voters</h1>
         </div>
         <div className="flex gap-2">
+          {/*
+           * Reached from here rather than from the primary nav: §3.2
+           * specifies nine nav items and `nav.test.ts` holds the build to
+           * them. A round is work done on the voter roll, so this is where
+           * it belongs anyway.
+           */}
+          <Link
+            to="/round"
+            className="border border-ink/20 rounded px-4 py-2 text-label-caps font-display uppercase text-ink"
+          >
+            Work a round
+          </Link>
           <Link
             to="/voters/import"
             className="border border-ink/20 rounded px-4 py-2 text-label-caps font-display uppercase text-ink"

@@ -11,6 +11,15 @@ import { CANVASSER_SOP } from './sops/canvasserSop';
 import { ROLE_PURPOSE, TENANT_SETUP_SOP } from './sops/tenantSetupSop';
 import { WARD_SEEDING_SOP } from './sops/wardSeedingSop';
 import { REGISTER_IMPORT_SOP } from './sops/registerImportSop';
+import { WARD_ROUND_SOP } from './sops/wardRoundSop';
+import {
+  CONTACT_STATUS_LABEL,
+  INACCESSIBLE_COOLOFF_HOURS as INACCESSIBLE_HOURS,
+  NO_ANSWER_COOLOFF_HOURS as NO_ANSWER_HOURS,
+  isQueueable,
+  summariseQueue,
+} from '@/modules/voters/canvassQueue';
+import type { ContactStatus, Household } from '@/dal/ports/households';
 import { MIN_REFERENCE_LENGTH, holdingAddressLine, planImport } from '@/modules/voters/bulkImport';
 import { RECONCILIATION_BASIS, reconcileSeed } from '@/modules/wards/seedReconciliation';
 import { EMPTY_DRAFT, provisioningProblems, SIGN_IN_ID_BASIS } from '@/modules/settings/staffProvisioning';
@@ -681,5 +690,134 @@ describe('SOP-04 describes the import that actually exists', () => {
     const warnings = (REGISTER_IMPORT_SOP.sections.find((s) => s.heading.includes('before you write anything'))?.warnings ?? []).join(' ');
     expect(warnings).toMatch(/errs towards holding a name back/i);
     expect(warnings).toMatch(/the rest is masked/i);
+  });
+});
+
+
+/**
+ * SOP-05 is the supervisor's counterpart to SOP-01, and its central claim
+ * is the coverage definition — the number a campaign quotes at itself all
+ * season. It is checked by running the queue, not by reading the prose.
+ */
+describe('SOP-05 describes the round that actually exists', () => {
+  const text = JSON.stringify(WARD_ROUND_SOP);
+
+  const door = (over: Partial<Household> = {}): Household => ({
+    id: Math.random().toString(36).slice(2),
+    tenantId: 't',
+    vdCode: '86910587',
+    wardCode: 'NW405-W1',
+    addressLine: '1 Main Road',
+    dwellingType: 'FORMAL',
+    createdAt: '',
+    updatedAt: '',
+    updatedBy: 'system',
+    deletedAt: null,
+    schemaVersion: 1,
+    ...over,
+  });
+
+  it('reaches the two roles that run rounds', () => {
+    expect(WARD_ROUND_SOP.roles).toEqual(['ward-lead', 'vd-captain']);
+    for (const roleId of WARD_ROUND_SOP.roles) {
+      const role = SEED_ROLES.find((r) => r.id === roleId)!;
+      expect(role.defaultCaps, roleId).toContain('voters.view');
+      // Both can also close a door out; the SOP says the supervisor reads
+      // and the canvasser records, so view is what gates the document.
+      expect(role.defaultCaps, roleId).toContain('voters.edit');
+    }
+    expect(WARD_ROUND_SOP.requiresAnyCapability).toEqual(['voters.view']);
+  });
+
+  it('quotes the real cool-off periods', () => {
+    expect(text).toContain(`${NO_ANSWER_HOURS} hours`);
+    expect(text).toContain(`${INACCESSIBLE_HOURS} hours`);
+  });
+
+  it('lists the outcomes a canvasser can actually record', () => {
+    const section = WARD_ROUND_SOP.sections.find((s) => s.heading.includes('Closing a door out'))!;
+    // Named explicitly rather than derived from CONTACT_STATUS_LABEL. The
+    // SOP builds its list from that map, so comparing against the same
+    // derivation compares the map to itself — deleting a label passed this
+    // test while silently shortening the printed procedure. Found by
+    // injection, not by review.
+    expect(section.steps).toEqual([
+      'Contacted',
+      'No answer',
+      'Could not reach the door',
+      'Asked not to be contacted again',
+    ]);
+    // And the map is still the source: the SOP must not have drifted off it.
+    for (const label of section.steps!) {
+      expect(Object.values(CONTACT_STATUS_LABEL), label).toContain(label);
+    }
+  });
+
+  it('keeps a label for every state the queue can be in', () => {
+    // The same defect from the other side: a state with no label vanishes
+    // from the SOP and from the round page's breakdown together.
+    const states: ContactStatus[] = [
+      'NOT_CONTACTED',
+      'IN_PROGRESS',
+      'CONTACTED',
+      'NO_ANSWER',
+      'INACCESSIBLE',
+      'REFUSED_RECONTACT',
+    ];
+    for (const state of states) expect(CONTACT_STATUS_LABEL[state], state).toBeTruthy();
+    expect(Object.keys(CONTACT_STATUS_LABEL).sort()).toEqual([...states].sort());
+  });
+
+  it('states the coverage definition the code computes, refusals excluded', () => {
+    const body = (WARD_ROUND_SOP.sections.find((s) => s.heading.includes('coverage figure counts'))?.body ?? []).join(' ');
+    expect(body).toMatch(/taken out of the denominator/i);
+
+    // Four doors, one refused. Two worked. If refusals counted, coverage
+    // would be 50%; excluded, it is 66.7%. The SOP describes the latter.
+    const summary = summariseQueue([
+      door({ contactStatus: 'CONTACTED' }),
+      door({ contactStatus: 'NO_ANSWER', lastContactedAt: new Date().toISOString() }),
+      door({ contactStatus: 'NOT_CONTACTED' }),
+      door({ contactStatus: 'REFUSED_RECONTACT' }),
+    ]);
+    expect(summary.refused).toBe(1);
+    expect(summary.coveragePct).toBe(66.7);
+    expect(summary.coveragePct).not.toBe(50);
+  });
+
+  it('is right that a refusal is never offered again, at any interval', () => {
+    const longAgo = new Date('2020-01-01').toISOString();
+    expect(isQueueable(door({ contactStatus: 'REFUSED_RECONTACT', lastContactedAt: longAgo }))).toBe(false);
+    expect(text).toMatch(/never offered to anyone, at any interval/i);
+  });
+
+  it('is right that a door being worked now is not offered to anyone else', () => {
+    expect(isQueueable(door({ contactStatus: 'IN_PROGRESS' }))).toBe(false);
+    expect(text).toMatch(/not offered to anyone else/i);
+  });
+
+  it('is right that an untouched door is always offered', () => {
+    expect(isQueueable(door({ contactStatus: 'NOT_CONTACTED' }))).toBe(true);
+    expect(isQueueable(door())).toBe(true); // absent status reads as untouched
+  });
+
+  it('calls the cool-offs operational rather than legal, as the code does', () => {
+    const warnings = (WARD_ROUND_SOP.sections.find((s) => s.heading.includes('when they come back'))?.warnings ?? []).join(' ');
+    expect(warnings).toMatch(/not legal ones/i);
+    expect(warnings).toMatch(/Nothing in law says/i);
+  });
+
+  it('refuses to let coverage be read as support or turnout', () => {
+    expect(text).toMatch(/measure of ground walked, not of support won/i);
+    expect(text).toMatch(/Do not present a coverage percentage as a turnout projection/i);
+  });
+
+  it('tells the reader the figures are only as current as the last sync', () => {
+    expect(text).toMatch(/only ever as current as the last phone to come back into signal/i);
+  });
+
+  it('connects the address-less import back to SOP-04', () => {
+    expect(text).toMatch(/holding record and never enter a round/i);
+    expect(text).toContain('SOP-04');
   });
 });
