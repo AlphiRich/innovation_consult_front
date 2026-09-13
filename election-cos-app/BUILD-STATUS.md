@@ -1535,6 +1535,48 @@ sentence is not.
 **Verified:** `check:all` green — **268 tests** (up from 244), lint,
 typecheck, `check:hex`; `npm run build` succeeds.
 
+**Session 23 (13 Sep 2026) — master code stack audited; the canvassing
+work queue built.** A replication blueprint plus an AI Studio transcript
+of one build step. Detail in `docs/ai-studio-functional-extraction.md`.
+
+**The real gap it surfaced:** this build could record *that* canvassing
+happened — the diary's `CANVASS` entry with a `householdsVisited` count —
+but not **which doors were left**. No per-door state existed, so two
+canvassers in one VD had no way to avoid the same gate.
+`Household.contactStatus` + `src/modules/voters/canvassQueue.ts` close it:
+statuses, legal transitions, cool-offs, a queue summary, and
+`nextDoors()` sweeping oldest-attempt-first. 26 tests.
+
+**Refusal is terminal.** The status set this is modelled on has no way to
+record "asked us not to come back", so a refusal is indistinguishable from
+a no-answer and returns to the queue next round. `REFUSED_RECONTACT` here
+has no transition out, no expiring cool-off, and is never offered however
+short the queue. Ordinary courtesy first, and the safer reading of POPIA's
+objection right second. Refusals are also excluded from the coverage
+denominator — a VD reported 80% covered when the other 20% asked not to be
+visited misrepresents both the work and the households.
+
+`DwellingType` gains `FLAT` and `CAMPUS_RES` — one structure, many voters,
+high turnover, canvassed differently from a house; Ward 28 is the NWU
+campus. TypeScript caught both consumers the moment the union widened.
+
+**Declined, with reasons:** the blueprint's eight voting-station
+coordinates are keyed on `vdCode` alone, reproducing the split-VD
+collision this repo already found and fixed (**26 of 108 NW405 VDs are
+split across wards**, so `id` is `${wardCode}::${vdCode}`) — and they are
+unsourced, which is not acceptable for data that sends a person to a
+place. Its client-side metering client debits without server enforcement
+and strands a debit if the tab closes. Its `firestore.rules` open
+`/test/` and `/field_diary/` world-readable, and it is a document that
+tells the reader to deploy them.
+
+Proved by injection: turning refusal into a long cool-off fails 3 tests,
+counting refusals as covered fails 1, handing an in-progress door to a
+second canvasser fails 2. All reverted clean.
+
+**Verified:** `check:all` green — **294 tests** (up from 268), lint,
+typecheck, `check:hex`; `npm run build` succeeds.
+
 ---
 
 ## DECISION — seven roles; Compliance Officer stays (13 Sep 2026)

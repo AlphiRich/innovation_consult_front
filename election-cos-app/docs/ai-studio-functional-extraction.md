@@ -167,3 +167,109 @@ The subscriber identity policy, by contrast, already applies exactly this
 discipline to itself, and says so: *"it is not the same claim as 'no data
 leaves South Africa', and that broader claim is never made about this
 Platform."* That document is the model; the tutorial should follow it.
+
+---
+
+# Second pass — master code stack + AI Studio transcript (session 23)
+
+`MASTER_CODE_STACK_12_sept_2026.md` (a replication blueprint) and an AI
+Studio session export. The transcript covers one build step — the
+`FieldMapWidget` — and is the same content as the blueprint's §10.2, so
+the two are read together.
+
+## Built: the canvassing work queue
+
+The blueprint's household point carries `contactStatus`, `lastContactedAt`
+and `volunteerName`. Checking ours against it found the real gap: **this
+build could record that canvassing happened but not which doors were
+left.** The field diary logs a `CANVASS` entry with a `householdsVisited`
+count — an aggregate written after the fact, carrying no per-door state.
+Two canvassers in the same VD had no way to avoid the same gate.
+
+`Household.contactStatus` and `src/modules/voters/canvassQueue.ts` close
+that: statuses, legal transitions, cool-offs, a queue summary, and
+`nextDoors()` which sweeps oldest-attempt-first rather than circling the
+same few. 26 tests.
+
+**Refusal is terminal, and that is the part worth keeping.** The status
+set this is modelled on — CANVASSED / IN_PROGRESS / PENDING /
+UNREACHABLE — has no way to record *"this household asked us not to come
+back"*. Without it a refusal is indistinguishable from a no-answer and the
+door returns to the queue next round. `REFUSED_RECONTACT` is terminal
+here: no transition leads out of it, no cool-off expires it, and
+`nextDoors()` will not offer it however short the queue. Reopening is a
+deliberate act by someone holding `voters.edit`.
+
+That is ordinary courtesy before it is anything else, and it is also the
+safer reading of POPIA's objection right — a party that keeps knocking
+after being told not to is processing information the subject objected
+to, and losing the doorstep argument as well.
+
+**Refusals are excluded from the coverage denominator.** Reporting a VD as
+80% covered when the remaining 20% asked not to be visited misrepresents
+both the work and the households. A test pins the arithmetic.
+
+The cool-offs (6h for no-answer, 48h for an inaccessible door) are
+campaign-operations defaults, overridable per tenant, and are never
+described as statutory.
+
+## Also taken
+
+`DwellingType` gains `FLAT` and `CAMPUS_RES`. Not cosmetic: a block of
+flats or a student residence is one structure holding many voters with
+high turnover, canvassed and counted differently from a house — and
+NW405's Ward 28 is the NWU campus, so `CAMPUS_RES` is a real local case.
+TypeScript caught both consumers the moment the union widened, which is
+the port discipline doing its job.
+
+## Not taken, with reasons
+
+**`JB_MARKS_STATIONS_GEO` — the eight voting-station coordinates.** This
+is the one genuinely tempting data asset in the blueprint, and it is
+declined on two independent grounds.
+
+First, shape: it is a `Record` keyed on `vdCode` alone, with one
+`wardCode` per station. This repository already found and fixed exactly
+that bug — the real NW405 gazette flags **26 of 108 voting districts
+(~19%)** as split across two or more wards, so a vdCode is not unique to
+one ward. `VotingDistrict.id` is `${wardCode}::${vdCode}` for that reason
+(`docs/nw405-seed-data.md`). Importing that map would silently drop one
+ward's portion for a fifth of the municipality.
+
+Second, provenance: our verified seed carries no VD register to check
+those eight codes or their coordinates against, and they are not sourced
+in the blueprint. Voting-station locations are not a place to accept
+unverified data — sending a canvasser, or a voter, to the wrong place is
+a real harm. Our `VotingDistrict.centroid` field already exists for
+coordinates that arrive with a source.
+
+**`MeteringClient.withMeteredAction`.** The *function* — meter an
+expensive action, debit before it runs, reverse on failure — is real and
+this build has no equivalent. The implementation is not adoptable: it
+checks the balance and debits **client-side**, which is not enforcement,
+and it reverses only when the action throws, so a debit is stranded if the
+tab closes between debit and completion. If metering is built here it
+belongs behind the same server-side line as the PPFA aggregation and the
+ID unmask.
+
+**The blueprint's `firestore.rules`.** It is a replication document that
+instructs the reader to deploy them, so this is worth one line: the
+version printed there opens `/test/{docId}` and `/field_diary/{entryId}`
+with `allow read: if true` — outside tenant scoping, world-readable. Ours
+are unaffected; do not deploy theirs.
+
+**Its `seatCalculator`** uses a Droop quota (`floor(total/seats)+1`). Ours
+does not, deliberately — see `seatCalculator.ts`, which was verified
+against the real NW405 IEC result. Noted only because the blueprint would
+reintroduce it as a regression.
+
+## Still on the backlog from the first pass
+
+Tenant module entitlements remains the highest-leverage unbuilt item, and
+this blueprint reinforces it: the map widget prints
+`map.household.geospatial • 25 tokens` on its own header, which is a
+tenant-level commercial gate with nothing behind it here. Also still open:
+seeding the Campaign Diary with the IEC timetable we already hold,
+canvasser safety notes, out-of-band escalation, and field diagnostic
+guidance.
+

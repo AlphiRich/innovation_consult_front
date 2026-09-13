@@ -21,6 +21,8 @@ const DWELLING_TYPE_LABEL: Record<Household['dwellingType'], string> = {
   FORMAL: 'Formal',
   INFORMAL: 'Informal settlement',
   BACKYARD: 'Backyard dwelling',
+  FLAT: 'Flat / apartment block',
+  CAMPUS_RES: 'Student residence',
   OTHER: 'Other',
 };
 

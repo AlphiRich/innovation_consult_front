@@ -29,6 +29,10 @@ const DWELLING_PIN_COLOR: Record<Household['dwellingType'], string> = {
   FORMAL: tokens.color.teal,
   INFORMAL: tokens.color.gold,
   BACKYARD: tokens.color.slate,
+  // One structure, many voters, high turnover — distinct from a house on
+  // the map because it is canvassed differently.
+  FLAT: tokens.color.ink,
+  CAMPUS_RES: tokens.color.maroon,
   OTHER: tokens.color.slate,
 };
 
