@@ -40,7 +40,15 @@ import type { ContactStatus, Household } from '@/dal/ports/households';
 import { MIN_REFERENCE_LENGTH, holdingAddressLine, planImport } from '@/modules/voters/bulkImport';
 import { RECONCILIATION_BASIS, reconcileSeed } from '@/modules/wards/seedReconciliation';
 import { EMPTY_DRAFT, provisioningProblems, SIGN_IN_ID_BASIS } from '@/modules/settings/staffProvisioning';
-import { DOORSTEP_ERASURE_ANSWER } from '@/modules/settings/dataSubjectErasure';
+import { DATA_SUBJECT_REQUEST_SOP } from './sops/dataSubjectRequestSop';
+import {
+  blocksFulfilment,
+  DONOR_ERASURE_REFUSAL_REASON,
+  DOORSTEP_ERASURE_ANSWER,
+  ERASURE_CAPABILITY_BASIS,
+} from '@/modules/settings/dataSubjectErasure';
+import { RESPONSE_TARGET_BASIS } from '@/modules/settings/dataSubjectRequestSla';
+import { COMPLETENESS_NOTICE, UNSEARCHED_SOURCES } from '@/modules/settings/subjectAccess';
 import { buildManualPdf, manualFileName, MANUAL_STATUS_NOTE } from './manualPdf';
 
 const NOW = new Date('2026-06-01T00:00:00.000Z');
@@ -1094,5 +1102,93 @@ describe('SOP-08 describes the war room honestly', () => {
   it('says plainly what the platform does not track', () => {
     expect(text).toMatch(/no volunteer presence tracking/i);
     expect(text).toMatch(/does not know what the other parties are doing/i);
+  });
+});
+
+
+/**
+ * SOP-09 is the only procedure whose output goes to a member of the
+ * public who has no way to check it. These guards are about the three
+ * things it could get wrong and nobody outside would ever find out: an
+ * answer that looks complete and is not, a working target presented as
+ * law, and a promise of erasure this product cannot keep.
+ */
+describe('SOP-09 handles a data subject request honestly', () => {
+  const text = JSON.stringify(DATA_SUBJECT_REQUEST_SOP);
+
+  it('goes to the roles that can open the request log', () => {
+    expect(DATA_SUBJECT_REQUEST_SOP.roles).toEqual(['compliance-officer', 'party-hq-admin']);
+    expect(DATA_SUBJECT_REQUEST_SOP.requiresAnyCapability).toEqual(['dsr.view']);
+    for (const roleId of DATA_SUBJECT_REQUEST_SOP.roles) {
+      expect(SEED_ROLES.find((r) => r.id === roleId)!.defaultCaps, roleId).toContain('dsr.view');
+    }
+    // And the search it instructs them to run needs voters.view, which
+    // both of them hold — a procedure whose central step its own audience
+    // cannot perform is the defect this SOP exists to have fixed.
+    for (const roleId of DATA_SUBJECT_REQUEST_SOP.roles) {
+      expect(SEED_ROLES.find((r) => r.id === roleId)!.defaultCaps, roleId).toContain('voters.view');
+    }
+  });
+
+  it('names every source the response could not search', () => {
+    for (const source of UNSEARCHED_SOURCES) {
+      expect(text).toContain(source.label);
+      expect(text).toContain(source.reason);
+    }
+    expect(text).toMatch(/worse than no response at all/i);
+  });
+
+  it('quotes the completeness notice rather than paraphrasing it', () => {
+    expect(text).toContain(COMPLETENESS_NOTICE);
+  });
+
+  it('never describes the response target as statutory', () => {
+    expect(text).toContain(RESPONSE_TARGET_BASIS);
+    expect(text).not.toMatch(/\bstatutory (deadline|turnaround|window|limit)\b/i);
+    expect(text).not.toMatch(/\b(POPIA|the Act) (requires|gives you|allows) \d+ days\b/i);
+    expect(text).toMatch(/not a legal deadline/i);
+  });
+
+  it('refuses to describe a deletion as something this platform fulfils', () => {
+    expect(text).toContain(ERASURE_CAPABILITY_BASIS);
+    expect(text).toContain(DONOR_ERASURE_REFUSAL_REASON);
+    expect(text).toMatch(/suppression is not destruction/i);
+    expect(text).not.toMatch(/\b(permanently|fully) (purged|deleted|erased|destroyed)\b/i);
+    expect(text).not.toMatch(/\bmark (it|the request) fulfilled\b.{0,80}\bdeletion\b/i);
+  });
+
+  it('agrees with the code about which deletions can be marked fulfilled', () => {
+    // Every subject type, every deletion — the SOP's central claim.
+    for (const subjectType of ['VOTER', 'STAFF', 'CANDIDATE', 'DONOR'] as const) {
+      expect(blocksFulfilment(subjectType, 'DELETION'), subjectType).toBe(true);
+      expect(blocksFulfilment(subjectType, 'ACCESS'), subjectType).toBe(false);
+      expect(blocksFulfilment(subjectType, 'CORRECTION'), subjectType).toBe(false);
+    }
+    // …and the SOP says "fulfilled" is the true word for the other two.
+    expect(text).toMatch(/for a correction, that word is true/i);
+  });
+
+  it('gives the canvasser the same answer as the compliance officer', () => {
+    expect(text).toContain(DOORSTEP_ERASURE_ANSWER);
+    expect(JSON.stringify(CANVASSER_SOP)).toContain(DOORSTEP_ERASURE_ANSWER);
+  });
+
+  it('insists somebody verifies who is asking', () => {
+    expect(text).toMatch(/does not verify identity/i);
+    expect(text).toMatch(/that you verify is not optional/i);
+  });
+
+  it('does not let a nil search read as a nil holding', () => {
+    expect(text).toMatch(/nil search result, not a finding that the campaign holds nothing/i);
+    expect(text).toMatch(/exact match/i);
+  });
+
+  it('claims no transmission', () => {
+    expect(text).toMatch(/platform sends nothing/i);
+    expect(text).toMatch(/Downloading the draft has not answered anybody/i);
+  });
+
+  it('keeps a gate code out of a subject access response', () => {
+    expect(text).toMatch(/never disclosed to anybody, including the data subject/i);
   });
 });

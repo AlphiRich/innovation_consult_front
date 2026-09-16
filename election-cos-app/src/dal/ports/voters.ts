@@ -42,6 +42,20 @@ export type VoterDraft = Omit<Voter, 'createdAt' | 'updatedAt' | 'updatedBy' | '
 export interface VoterRepository {
   getById(ctx: SessionContext, id: string): Promise<Voter | null>;
   listByVD(ctx: SessionContext, vdCode: string, page: PageRequest): Promise<Page<Voter>>;
+  /**
+   * Find a person by name, for a POPIA access or correction request.
+   *
+   * Added session 27. Until then the only way into the roll was by voting
+   * district, so a compliance officer handed "Thandi Mokoena wants to
+   * know what you hold about her" had no way to find her unless the
+   * request happened to include a VD code — which is not something a data
+   * subject knows or should have to supply.
+   *
+   * Narrowed by the caller's geographic scope like every other read, so a
+   * ward-scoped user searching finds only their own ward. A tenant-scoped
+   * compliance officer searches the tenant, which is the point.
+   */
+  findByName(ctx: SessionContext, firstName: string, lastName: string): Promise<Voter[]>;
   upsert(ctx: SessionContext, voter: VoterDraft): Promise<UpsertResult>;
   softDelete(ctx: SessionContext, id: string, reason: string): Promise<void>;
 }

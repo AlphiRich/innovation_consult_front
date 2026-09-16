@@ -111,8 +111,8 @@ a contract.
 
 ## Sequence
 
-1. SOP-01 through SOP-08 are issued (`src/modules/manual/sops/`).
-2. SOP-09 … SOP-12 are written (`PLANNED_SOPS` carries the register).
+1. SOP-01 through SOP-09 are issued (`src/modules/manual/sops/`).
+2. SOP-10 … SOP-12 are written (`PLANNED_SOPS` carries the register).
 3. The completed manual goes to an attorney **with this file**, which
    tells them what is safe to rely on and what must not be said.
 4. The instruments are drafted against it.
@@ -573,3 +573,65 @@ A door with no status dropping out of the count; the open-incident rule
 drifting from the workflow model; SOP-08 rewritten to present sentiment as
 a projected vote share; and SOP-08 rewritten to say the two percentages
 are interchangeable.
+
+---
+
+## SOP-09, and an access request that could not be answered (session 27)
+
+SOP-09 covers handling a data subject request. It is the only procedure in
+the manual whose output goes to a member of the public who has no way to
+check it: a ward lead handed a wrong number can go and look, a municipality
+that receives a referral has its own records, and a data subject has the
+sentence the campaign wrote them.
+
+**An ACCESS request could not be answered at all.** The log recorded that
+one had arrived and offered a button marking it fulfilled. Between those
+two acts there was nothing. There was no way to find a person — the only
+route into the roll was `listByVD`, and a voting district code is not
+something a data subject knows or should have to supply — and nothing
+assembled what was found or produced a document to send. "Fulfilled" meant
+somebody had done the work in a spreadsheet, if they had done it at all.
+
+`VoterRepository.findByName` is the search, narrowed by the caller's
+geographic scope like every other read. `subjectAccess.ts` assembles the
+response. `SubjectAccessModal.tsx` is the screen. Both roles that hold
+`dsr.view` also hold `voters.view`, which is asserted in `manual.test.ts` —
+a procedure whose central step its own audience cannot perform is the class
+of defect this SOP exists to have fixed.
+
+### What the response discloses about itself
+
+Donor and candidate identity numbers are encrypted and staff records are
+keyed by sign-in identifier, so none of those collections can be searched
+by name. `UNSEARCHED_SOURCES` names all four, with the reason, **on the
+document the data subject receives** — not in a comment and not in a note
+to the officer. A subject access response that quietly omits a collection
+is worse than no response: the person reads a complete-looking answer and
+stops asking. `COMPLETENESS_NOTICE` is the sentence that says so, and the
+guards fail if either stops being emitted.
+
+A nil result is rendered as a nil result. "No record was found under that
+name" is followed, in the same paragraph, by "That does not mean this
+campaign holds nothing about you."
+
+### What it refuses to disclose
+
+A household access note is information about the people at an address, so
+it is in scope — but the draft says one exists and does not reproduce it,
+because deciding what to disclose from it is a person's job. The gate or
+intercom code on such a note reaches nobody, including the data subject.
+
+### What it does not change
+
+The deletion position was already correct and is quoted verbatim rather
+than paraphrased: `ERASURE_CAPABILITY_BASIS`, `DONOR_ERASURE_REFUSAL_REASON`
+and `RESPONSE_TARGET_BASIS`. The response document goes out as
+`DRAFT_PENDING_REVIEW`, nothing is sent from the platform, and nothing
+marks a request fulfilled.
+
+### Guards proven by injection
+
+The completeness notice dropped from the document; the not-searched section
+stopped being rendered; the access note reproduced into the callout (which
+carried the gate code with it); and SOP-09 rewritten to call the 30-day
+internal target a statutory POPIA deadline.

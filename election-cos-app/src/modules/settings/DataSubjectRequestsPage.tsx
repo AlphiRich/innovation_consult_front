@@ -14,6 +14,7 @@ import type {
   DataSubjectType,
 } from '@/dal/ports/dataSubjectRequests';
 import { isOverdue, RESPONSE_TARGET_BASIS } from './dataSubjectRequestSla';
+import { SubjectAccessModal } from './SubjectAccessModal';
 import {
   blocksFulfilment,
   DONOR_ERASURE_REFUSAL_REASON,
@@ -45,6 +46,7 @@ export function DataSubjectRequestsPage() {
   const [requesterContact, setRequesterContact] = useState('');
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [preparingId, setPreparingId] = useState<string | null>(null);
 
   const requestsQuery = useQuery({
     queryKey: ['dataSubjectRequests', session?.tenantId],
@@ -242,6 +244,15 @@ export function DataSubjectRequestsPage() {
               )}
 
               <div className="flex items-center gap-2 flex-wrap">
+                {req.requestType === 'ACCESS' && (
+                  <button
+                    type="button"
+                    onClick={() => setPreparingId(req.id)}
+                    className="px-3 py-1.5 border border-gold rounded text-label-caps font-display uppercase text-ink"
+                  >
+                    Prepare response
+                  </button>
+                )}
                 {req.status === 'RECEIVED' && (
                   <button
                     type="button"
@@ -301,6 +312,13 @@ export function DataSubjectRequestsPage() {
           );
         })}
       </div>
+
+      {preparingId &&
+        (() => {
+          const req = requests.find((r) => r.id === preparingId);
+          if (!req) return null;
+          return <SubjectAccessModal ctx={session} request={req} onClose={() => setPreparingId(null)} />;
+        })()}
     </div>
   );
 }

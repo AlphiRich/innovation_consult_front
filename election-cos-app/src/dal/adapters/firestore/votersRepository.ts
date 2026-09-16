@@ -2,10 +2,18 @@
  * Election Campaign OS — Firestore adapter: voters
  * IC-ECOS-BUILD-2026-V2 §5, §6.2.
  */
-import { where } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import type { Page, PageRequest, SessionContext } from '@/dal/ports/session';
 import type { Voter, VoterDraft, VoterRepository } from '@/dal/ports/voters';
-import { getByIdGeneric, geoScopeConstraints, listPageGeneric, toISO, upsertGeneric } from './base';
+import {
+  db,
+  getByIdGeneric,
+  geoScopeConstraints,
+  listPageGeneric,
+  tenantCollectionPath,
+  toISO,
+  upsertGeneric,
+} from './base';
 
 function fromFirestore(id: string, data: Record<string, unknown>): Voter {
   return {
@@ -44,6 +52,19 @@ export const votersRepository: VoterRepository = {
       page,
       fromFirestore,
     );
+  },
+
+  async findByName(ctx: SessionContext, firstName: string, lastName: string): Promise<Voter[]> {
+    const snap = await getDocs(
+      query(
+        collection(db(), tenantCollectionPath(ctx.tenantId, 'voters')),
+        where('firstName', '==', firstName.trim()),
+        where('lastName', '==', lastName.trim()),
+        where('deletedAt', '==', null),
+        ...geoScopeConstraints(ctx),
+      ),
+    );
+    return snap.docs.map((d) => fromFirestore(d.id, d.data()));
   },
 
   async upsert(ctx: SessionContext, voter: VoterDraft) {
