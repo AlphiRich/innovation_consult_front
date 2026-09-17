@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — sync contract
+ * Election Campaign OS — sync contract
  * IC-ECOS-BUILD-2026-V2 §7.3.
  *
  * "Write the OpenAPI spec before the implementation." This file is that

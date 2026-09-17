@@ -95,8 +95,14 @@ service cloud.firestore {
 
     match /tenants/{tid}/diaryEntries/{entryId} {
       allow read: if tenantOK(tid) && cap('diary.view') && inScope(tid, resource.data);
+      // activityType allow-list added session 9 alongside the field itself
+      // (src/dal/ports/diary.ts) — same defense-in-depth as incidents'
+      // category check above, so a buggy/malicious client can't write an
+      // arbitrary string a UI select wouldn't ever produce.
       allow create, update: if tenantOK(tid) && cap('diary.edit')
-                             && inScope(tid, request.resource.data);
+                             && inScope(tid, request.resource.data)
+                             && request.resource.data.activityType in
+                                ['CANVASS', 'RALLY', 'OBSERVATION', 'OTHER'];
       allow delete: if false;
     }
 
@@ -110,9 +116,31 @@ service cloud.firestore {
                        ['WATER_SANITATION', 'ELECTRICITY', 'ROADS_TRANSPORT', 'PUBLIC_SAFETY'];
       // Triage / escalate are distinct capabilities from create — a
       // canvasser who can log an incident cannot authorise its escalation.
+      // The ESCALATED -> REFERRED transition (markReferred(), recording a
+      // generated referral PDF's Storage path) is authorised by the same
+      // incidents.escalate capability as the escalation itself — §6.4's
+      // "Municipal Lead escalates -> referral PDF" is one authorisation,
+      // not two. Found missing here (session 9) while building the
+      // Incidents UI: IncidentRepository.markReferred() existed since
+      // Phase 3 with no matching allow clause, which would have silently
+      // rejected the write the first time anything called it.
       allow update: if tenantOK(tid) && inScope(tid, resource.data) && (
                        (cap('incidents.triage') && resource.data.status == 'LOGGED')
                     || (cap('incidents.escalate') && resource.data.status == 'TRIAGED')
+                    || (cap('incidents.escalate') && resource.data.status == 'ESCALATED')
+                    // Resolved: something in the world got fixed. Whoever
+                    // triages is close enough to the ground to know, and a
+                    // municipality can act before a referral is issued —
+                    // so this is reachable from triaged onwards.
+                    || (cap('incidents.triage')
+                        && resource.data.status in ['TRIAGED', 'ESCALATED', 'REFERRED']
+                        && request.resource.data.status == 'RESOLVED')
+                    // Closed: the campaign will do nothing further. Ends
+                    // the record, so it takes the same capability that
+                    // authorises escalation. Still not a deletion.
+                    || (cap('incidents.escalate')
+                        && resource.data.status != 'CLOSED'
+                        && request.resource.data.status == 'CLOSED')
                     || (cap('incidents.view') && isUnchanged('status'))
                     );
       allow delete: if false;
@@ -120,9 +148,19 @@ service cloud.firestore {
 
     // ---- logistics ------------------------------------------------------
 
+    // create/update were gated on logistics.view alone until session 9 —
+    // the only module in this codebase to gate a write on a *.view
+    // capability. Fixed: logistics.edit (request/log stock) is now
+    // required to write at all, and moving status to APPROVED
+    // additionally requires logistics.approve — a requester holding only
+    // logistics.edit cannot self-approve via a plain upsert.
     match /tenants/{tid}/logistics/{itemId} {
       allow read: if tenantOK(tid) && cap('logistics.view');
-      allow create, update: if tenantOK(tid) && cap('logistics.view');
+      allow create: if tenantOK(tid) && cap('logistics.edit') && request.resource.data.status != 'APPROVED';
+      allow update: if tenantOK(tid) && (
+                       (cap('logistics.edit') && request.resource.data.status == resource.data.status)
+                    || (cap('logistics.approve') && request.resource.data.status == 'APPROVED')
+                    );
       allow delete: if false;
     }
 
@@ -148,11 +186,46 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ---- tenant entitlements — what the campaign bought ---------------------
+
+    // A billing fact, not a tenant setting. Everyone in the tenant needs
+    // to read it (the UI has to know which modules are on), and nobody in
+    // the tenant may write it: an admin who could grant themselves a paid
+    // module would make the commercial model meaningless, the same way a
+    // client-side capability check would make the security model
+    // meaningless. Provisioned server-side only, like auditLog.
+    match /tenants/{tid}/entitlements/{entitlementId} {
+      allow read: if tenantOK(tid);
+      allow write: if false;
+      allow delete: if false;
+    }
+
     // ---- documents ----------------------------------------------------------
 
+    // Referral records (documentId `referral-{incidentId}`, see
+    // referralDocument.ts) are the one kind of document a Municipal Lead
+    // files without holding team.manage: §6.4 makes escalation and
+    // referral one authorisation, and incidents.escalate is the capability
+    // that carries it. The id prefix is how that narrower allowance is
+    // expressed — a holder of incidents.escalate can create a referral
+    // entry and nothing else in this collection, and cannot amend one
+    // after the fact.
+    function isReferral(documentId) {
+      return documentId.matches('referral-.*');
+    }
+
     match /tenants/{tid}/documents/{documentId} {
-      allow read: if tenantOK(tid) && cap('analytics.view');
-      allow write: if tenantOK(tid) && cap('team.manage');
+      allow read: if tenantOK(tid) && (
+                     cap('analytics.view')
+                  || (cap('incidents.view') && isReferral(documentId))
+                  );
+      allow create: if tenantOK(tid) && (
+                       cap('team.manage')
+                    || (cap('incidents.escalate') && isReferral(documentId)
+                        && request.resource.data.classification == 'CONFIDENTIAL'
+                        && request.resource.data.watermark == 'FINAL')
+                    );
+      allow update: if tenantOK(tid) && cap('team.manage');
       allow delete: if false;
     }
 

@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — unmaskCandidateIdNumber callable function
+ * Election Campaign OS — unmaskCandidateIdNumber callable function
  * IC-ECOS-BUILD-2026-V2 §6.6: "unmask requires an explicit capability and
  * writes an audit event, export requires a second-factor confirmation."
  *

@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — design tokens
+ * Election Campaign OS — design tokens
  * IC-ECOS-BUILD-2026-V2 §3.3
  *
  * This is the ONLY place colour, type, and spacing constants are defined for

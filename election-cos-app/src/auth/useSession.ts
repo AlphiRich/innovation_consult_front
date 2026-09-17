@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — session hooks
+ * Election Campaign OS — session hooks
  * IC-ECOS-BUILD-2026-V2 §4.2, §4.4.
  *
  * Split out of AuthProvider.tsx so that file exports only the provider

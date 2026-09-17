@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — PPFA statutory defaults
+ * Election Campaign OS — PPFA statutory defaults
  * IC-ECOS-BUILD-2026-V2 §0 rule 4, §6.8.2.
  *
  * These are SEED VALUES for a new tenant's first PPFAConfig document, not

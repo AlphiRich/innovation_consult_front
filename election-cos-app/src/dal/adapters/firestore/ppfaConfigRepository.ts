@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: PPFA config
+ * Election Campaign OS — Firestore adapter: PPFA config
  * IC-ECOS-BUILD-2026-V2 §6.8.2. Append-only — `create` is the only write
  * path; firestore.rules additionally denies update/delete server-side.
  */

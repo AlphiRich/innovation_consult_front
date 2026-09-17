@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: audit log (read-only)
+ * Election Campaign OS — Firestore adapter: audit log (read-only)
  * IC-ECOS-BUILD-2026-V2 §7.5, §6.8.4.
  */
 import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore';

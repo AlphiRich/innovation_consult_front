@@ -1,4 +1,4 @@
-# election-cos-app — Election-COS1.0
+# election-cos-app — Election Campaign OS
 
 Multi-tenant, offline-first PWA for South African political campaign field
 operations. Built against `IC-ECOS-BUILD-2026-V2` (governing spec —

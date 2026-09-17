@@ -1,9 +1,9 @@
 {
-  "name": "election-cos-app",
+  "name": "@innovation-consult/ecos-app",
   "private": true,
   "version": "1.0.0-dev",
   "type": "module",
-  "description": "Election-COS1.0 — application shell (election-cos-app). IC-ECOS-BUILD-2026-V2.",
+  "description": "Election Campaign OS \u2014 application shell (election-cos-app). IC-ECOS-BUILD-2026-V2.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -13,10 +13,13 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check:hex": "node scripts/check-no-hex.mjs",
+    "docs:emit": "vite-node scripts/emit-documents.ts --",
+    "gen:roles": "vite-node scripts/gen-roles.ts",
     "check:all": "npm run lint && npm run typecheck && npm run check:hex && npm run test"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.59.0",
+    "@vis.gl/react-google-maps": "^1.10.0",
     "dexie": "^4.0.8",
     "firebase": "^10.13.2",
     "react": "^18.3.1",

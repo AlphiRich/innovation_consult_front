@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Election-COS1.0 — Cloud Storage rules
+// Election Campaign OS — Cloud Storage rules
 // IC-ECOS-BUILD-2026-V2 §0 rule 1: africa-south1 only (set at bucket
 // creation), §6.4: incident photos land here on sync, never as Base64 in
 // Firestore documents.
@@ -25,6 +25,24 @@ service firebase.storage {
       allow write: if tenantOK(tid) && cap('incidents.create')
                    && request.resource.size < 8 * 1024 * 1024
                    && request.resource.contentType.matches('image/.*');
+    }
+
+    // Issued referral PDFs: tenants/{tid}/referrals/{incidentId}/{fileId}
+    // (§6.4). Written by whoever holds incidents.escalate — the same
+    // capability that authorises the escalation the referral records —
+    // and readable by anyone who can see the incident it belongs to.
+    //
+    // No delete and no overwrite of an existing object: the filename is
+    // content-addressed (referral-<first 16 of the SHA-256>.pdf), so a
+    // second issue of the *same* referral resolves to the same path and a
+    // *different* referral cannot land on top of one already sent. An
+    // authorised referral that left the building is a record, not a draft.
+    match /tenants/{tid}/referrals/{incidentId}/{fileId} {
+      allow read: if tenantOK(tid) && cap('incidents.view');
+      allow create: if tenantOK(tid) && cap('incidents.escalate')
+                    && request.resource.size < 2 * 1024 * 1024
+                    && request.resource.contentType == 'application/pdf';
+      allow update, delete: if false;
     }
 
     // Documents: tenants/{tenantId}/documents/{documentId}/{fileId}

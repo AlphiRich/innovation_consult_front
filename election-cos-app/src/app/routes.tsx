@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — route table
+ * Election Campaign OS — route table
  * IC-ECOS-BUILD-2026-V2 §3.2. Mirrors the nav table plus the sub-views
  * absorbed under it (not top-level nav): seat calculator, threshold
  * analyzer, scheduled reports, municipality config, permissions,
@@ -9,7 +9,11 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Shell } from './Shell';
 import { WarRoomPage } from '@/modules/war-room/WarRoomPage';
 import { VotersPage } from '@/modules/voters/VotersPage';
+import { BulkImportPage } from '@/modules/voters/BulkImportPage';
+import { RoundPage } from '@/modules/voters/RoundPage';
+import { ReportIncidentPage } from '@/modules/incidents/ReportIncidentPage';
 import { WardsPage } from '@/modules/wards/WardsPage';
+import { WardDetailPage } from '@/modules/wards/WardDetailPage';
 import { FieldDiaryPage } from '@/modules/field-diary/FieldDiaryPage';
 import { IncidentsPage } from '@/modules/incidents/IncidentsPage';
 import { LogisticsPage } from '@/modules/logistics/LogisticsPage';
@@ -23,7 +27,10 @@ import { MunicipalityConfigPage } from '@/modules/settings/MunicipalityConfigPag
 import { PermissionsPage } from '@/modules/settings/PermissionsPage';
 import { PPFAThresholdsPage } from '@/modules/settings/PPFAThresholdsPage';
 import { DataSubjectRequestsPage } from '@/modules/settings/DataSubjectRequestsPage';
+import { CandidatesPage } from '@/modules/candidates/CandidatesPage';
+import { SubscriptionPage } from '@/modules/settings/SubscriptionPage';
 import { GatheringsAdvisoryPage } from '@/modules/knowledge/GatheringsAdvisoryPage';
+import { ElectionTimetablePage } from '@/modules/knowledge/ElectionTimetablePage';
 
 export const router = createBrowserRouter([
   {
@@ -33,7 +40,11 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/war-room" replace /> },
       { path: 'war-room', element: <WarRoomPage /> },
       { path: 'voters', element: <VotersPage /> },
+      { path: 'voters/import', element: <BulkImportPage /> },
+      { path: 'round', element: <RoundPage /> },
+      { path: 'incidents/new', element: <ReportIncidentPage /> },
       { path: 'wards', element: <WardsPage /> },
+      { path: 'wards/:wardCode', element: <WardDetailPage /> },
       { path: 'diary', element: <FieldDiaryPage /> },
       { path: 'incidents', element: <IncidentsPage /> },
       { path: 'logistics', element: <LogisticsPage /> },
@@ -55,9 +66,12 @@ export const router = createBrowserRouter([
           { path: 'permissions', element: <PermissionsPage /> },
           { path: 'ppfa-thresholds', element: <PPFAThresholdsPage /> },
           { path: 'data-requests', element: <DataSubjectRequestsPage /> },
+          { path: 'candidates', element: <CandidatesPage /> },
+          { path: 'subscription', element: <SubscriptionPage /> },
         ],
       },
       { path: 'knowledge/gatherings-advisory', element: <GatheringsAdvisoryPage /> },
+      { path: 'knowledge/election-timetable', element: <ElectionTimetablePage /> },
     ],
   },
 ]);

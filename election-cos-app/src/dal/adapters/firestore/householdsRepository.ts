@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: households
+ * Election Campaign OS — Firestore adapter: households
  * IC-ECOS-BUILD-2026-V2 §5, §6.2.
  */
 import { where } from 'firebase/firestore';
@@ -15,6 +15,10 @@ function fromFirestore(id: string, data: Record<string, unknown>): Household {
     wardCode: data.wardCode as string,
     addressLine: data.addressLine as string,
     dwellingType: data.dwellingType as Household['dwellingType'],
+    contactStatus: data.contactStatus as Household['contactStatus'] | undefined,
+    lastContactedAt: data.lastContactedAt as string | undefined,
+    lastContactedBy: data.lastContactedBy as string | undefined,
+    accessNote: data.accessNote as Household['accessNote'] | undefined,
     informalDescriptor: data.informalDescriptor as string | undefined,
     geo: data.geo as Household['geo'],
     createdAt: toISO(data.createdAt as string) ?? '',
@@ -35,6 +39,16 @@ export const householdsRepository: HouseholdRepository = {
       ctx,
       'households',
       [where('vdCode', '==', vdCode), ...geoScopeConstraints(ctx)],
+      page,
+      fromFirestore,
+    );
+  },
+
+  async listByWard(ctx: SessionContext, wardCode: string, page: PageRequest): Promise<Page<Household>> {
+    return listPageGeneric(
+      ctx,
+      'households',
+      [where('wardCode', '==', wardCode), ...geoScopeConstraints(ctx)],
       page,
       fromFirestore,
     );

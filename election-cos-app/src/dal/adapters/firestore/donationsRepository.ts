@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: donations (PPFA)
+ * Election Campaign OS — Firestore adapter: donations (PPFA)
  * IC-ECOS-BUILD-2026-V2 §6.8.2, §6.8.3. NEVER blocks on amount — see the
  * port file header. `financialYear` is derived by the caller (module layer)
  * from the current PPFAConfig.financialYearStartMonth, not computed here.
@@ -34,6 +34,16 @@ export const donationsRepository: DonationRepository = {
   async listByDonor(ctx: SessionContext, donorId: string): Promise<Donation[]> {
     const snap = await getDocs(
       query(collection(db(), tenantCollectionPath(ctx.tenantId, 'donations')), where('donorId', '==', donorId)),
+    );
+    return snap.docs.map((d) => fromFirestore(d.id, d.data()));
+  },
+
+  async listByFinancialYear(ctx: SessionContext, financialYear: string): Promise<Donation[]> {
+    const snap = await getDocs(
+      query(
+        collection(db(), tenantCollectionPath(ctx.tenantId, 'donations')),
+        where('financialYear', '==', financialYear),
+      ),
     );
     return snap.docs.map((d) => fromFirestore(d.id, d.data()));
   },

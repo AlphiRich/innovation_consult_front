@@ -2,7 +2,7 @@
   "name": "election-cos-app-functions",
   "private": true,
   "version": "1.0.0-dev",
-  "description": "Election-COS1.0 — Cloud Functions 2nd gen, africa-south1. IC-ECOS-BUILD-2026-V2 §0 rule 1.",
+  "description": "Election Campaign OS — Cloud Functions 2nd gen, africa-south1. IC-ECOS-BUILD-2026-V2 §0 rule 1.",
   "type": "commonjs",
   "engines": { "node": "20" },
   "main": "lib/index.js",

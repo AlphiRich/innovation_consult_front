@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — PPFA configuration port
+ * Election Campaign OS — PPFA configuration port
  * IC-ECOS-BUILD-2026-V2 §6.8.2. APPEND-ONLY — never updated in place.
  * Statutory defaults: R200,000 disclosure threshold, R30,000,000 annual
  * donor cap (Government Gazette No. 53182, 18 Aug 2025). These are tenant

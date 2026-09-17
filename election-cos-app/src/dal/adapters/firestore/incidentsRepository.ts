@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: incidents
+ * Election Campaign OS — Firestore adapter: incidents
  * IC-ECOS-BUILD-2026-V2 §5, §6.4.
  */
 import { where } from 'firebase/firestore';
@@ -63,5 +63,13 @@ export const incidentsRepository: IncidentRepository = {
 
   async markReferred(ctx: SessionContext, id: string, referralPdfPath: string): Promise<void> {
     await upsertGeneric(ctx, 'incidents', id, { status: 'REFERRED' as IncidentStatus, referralPdfPath }, false);
+  },
+
+  async resolve(ctx: SessionContext, id: string): Promise<void> {
+    await upsertGeneric(ctx, 'incidents', id, { status: 'RESOLVED' as IncidentStatus }, false);
+  },
+
+  async close(ctx: SessionContext, id: string, reason: string): Promise<void> {
+    await upsertGeneric(ctx, 'incidents', id, { status: 'CLOSED' as IncidentStatus, closeReason: reason }, false);
   },
 };

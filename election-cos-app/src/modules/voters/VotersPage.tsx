@@ -1,24 +1,28 @@
 /**
- * Election-COS1.0 — Voters module
+ * Election Campaign OS — Voters module
  * IC-ECOS-BUILD-2026-V2 §6.2. List + capture/edit, wired to the real DAL.
  * Layout informed by the Stitch suite's "ELECTION CAMPAIGN OS" shell
  * screens (our actual target shell, not the retired Civic Architect/
  * Authority ones) — reskinned to our tokens throughout.
  */
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { dal } from '@/dal';
 import { useSession } from '@/auth/useSession';
 import type { Voter } from '@/dal/ports/voters';
 import { VoterCard } from './VoterCard';
 import { VoterForm } from './VoterForm';
+import { VoterHouseholdMap } from './VoterHouseholdMap';
 
 type FormState = { mode: 'closed' } | { mode: 'create' } | { mode: 'edit'; voter: Voter };
+type ViewMode = 'list' | 'map';
 
 export function VotersPage() {
   const session = useSession();
   const [vdCode, setVdCode] = useState(session?.vdScope ?? '');
   const [form, setForm] = useState<FormState>({ mode: 'closed' });
+  const [view, setView] = useState<ViewMode>('list');
 
   const votersQuery = useQuery({
     queryKey: ['voters', session?.tenantId, vdCode],
@@ -40,20 +44,40 @@ export function VotersPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className={`space-y-6 ${view === 'map' ? 'max-w-4xl' : 'max-w-2xl'}`}>
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-label-caps font-display uppercase text-slate">/voters</p>
           <h1 className="text-headline-md font-display text-ink mt-1">Voters</h1>
         </div>
-        <button
-          type="button"
-          onClick={() => setForm({ mode: 'create' })}
-          disabled={!vdCode}
-          className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase disabled:opacity-40"
-        >
-          + New voter
-        </button>
+        <div className="flex gap-2">
+          {/*
+           * Reached from here rather than from the primary nav: §3.2
+           * specifies nine nav items and `nav.test.ts` holds the build to
+           * them. A round is work done on the voter roll, so this is where
+           * it belongs anyway.
+           */}
+          <Link
+            to="/round"
+            className="border border-ink/20 rounded px-4 py-2 text-label-caps font-display uppercase text-ink"
+          >
+            Work a round
+          </Link>
+          <Link
+            to="/voters/import"
+            className="border border-ink/20 rounded px-4 py-2 text-label-caps font-display uppercase text-ink"
+          >
+            Import a register
+          </Link>
+          <button
+            type="button"
+            onClick={() => setForm({ mode: 'create' })}
+            disabled={!vdCode}
+            className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase disabled:opacity-40"
+          >
+            + New voter
+          </button>
+        </div>
       </div>
 
       <label className="block space-y-1 max-w-xs">
@@ -71,23 +95,45 @@ export function VotersPage() {
         )}
       </label>
 
-      {votersQuery.isLoading && <p className="text-body-md font-body text-slate">Loading…</p>}
-      {votersQuery.isError && (
+      <div className="flex gap-2">
+        {(['list', 'map'] as const).map((v) => (
+          <button
+            key={v}
+            type="button"
+            onClick={() => setView(v)}
+            className={`px-4 py-1.5 rounded text-label-caps font-display uppercase ${
+              view === v ? 'bg-ink text-paper' : 'border border-ink/20 text-ink'
+            }`}
+          >
+            {v === 'list' ? 'Voter list' : 'Household map'}
+          </button>
+        ))}
+      </div>
+
+      {view === 'map' && vdCode && <VoterHouseholdMap ctx={session} vdCode={vdCode} />}
+      {view === 'map' && !vdCode && (
+        <p className="text-body-md font-body text-slate">Enter a voting district above to see its household map.</p>
+      )}
+
+      {view === 'list' && votersQuery.isLoading && <p className="text-body-md font-body text-slate">Loading…</p>}
+      {view === 'list' && votersQuery.isError && (
         <p className="text-body-md font-body text-maroon">
           {votersQuery.error instanceof Error ? votersQuery.error.message : 'Failed to load voters.'}
         </p>
       )}
-      {votersQuery.data && votersQuery.data.items.length === 0 && (
+      {view === 'list' && votersQuery.data && votersQuery.data.items.length === 0 && (
         <p className="text-body-md font-body text-slate">No voters captured for this VD yet.</p>
       )}
 
-      <div className="space-y-3">
-        {votersQuery.data?.items.map((voter) => (
-          <VoterCard key={voter.id} voter={voter} onLogResponse={(v) => setForm({ mode: 'edit', voter: v })} />
-        ))}
-      </div>
+      {view === 'list' && (
+        <div className="space-y-3">
+          {votersQuery.data?.items.map((voter) => (
+            <VoterCard key={voter.id} voter={voter} onLogResponse={(v) => setForm({ mode: 'edit', voter: v })} />
+          ))}
+        </div>
+      )}
 
-      {votersQuery.data?.nextCursor && (
+      {view === 'list' && votersQuery.data?.nextCursor && (
         <p className="text-body-md font-body text-slate">
           More records exist. Pagination cursor resolution is a known gap — see src/dal/adapters/firestore/base.ts.
         </p>

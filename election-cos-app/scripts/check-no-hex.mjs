@@ -19,6 +19,9 @@ const SRC = path.join(root, 'src');
 const ALLOW_LIST = new Set([
   path.join(SRC, 'design', 'tokens.ts'),
   path.join(SRC, 'design', 'tokens.test.ts'),
+  // Third-party brand mark, not a design-token decision — see that
+  // file's own header. Session 10.
+  path.join(SRC, 'auth', 'GoogleIcon.tsx'),
 ]);
 
 const HEX_RE = /#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?\b/g;

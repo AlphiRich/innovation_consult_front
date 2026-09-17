@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter shared helpers
+ * Election Campaign OS — Firestore adapter shared helpers
  * IC-ECOS-BUILD-2026-V2 §5.2, §5.3
  *
  * Every tenant collection lives at /tenants/{tenantId}/{collection} (§4.1),

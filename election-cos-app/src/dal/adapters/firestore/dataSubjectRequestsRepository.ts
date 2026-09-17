@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: POPIA data subject requests
+ * Election Campaign OS — Firestore adapter: POPIA data subject requests
  * See src/dal/ports/dataSubjectRequests.ts for provenance.
  */
 import { collection, getDocs, query, where } from 'firebase/firestore';

@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — PPFA escalation ladder
+ * Election Campaign OS — PPFA escalation ladder
  * IC-ECOS-BUILD-2026-V2 §6.8.3.
  *
  * Pure function: given a donor's aggregate-to-date and the governing

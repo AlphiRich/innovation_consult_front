@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Voter capture/edit form
+ * Election Campaign OS — Voter capture/edit form
  * IC-ECOS-BUILD-2026-V2 §6.2. Layout informed by the Stitch suite's
  * household_voter_logging / voter_profiling_service_delivery_intake
  * screens (card structure, section rhythm) — reskinned to our real
@@ -15,10 +15,15 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { dal } from '@/dal';
 import type { SessionContext } from '@/dal/ports/session';
+import type { Household } from '@/dal/ports/households';
 import type { Voter, VoterDraft } from '@/dal/ports/voters';
 import { maskPhone } from '@/lib/phone';
+import { useVdWard } from '@/lib/useVdWard';
+import { HouseholdQuickAdd } from './HouseholdQuickAdd';
 import { SENTIMENT_META, SENTIMENT_ORDER } from './sentiment';
-import { TONE_ACTIVE_CLASSES } from './toneClasses';
+import { TONE_ACTIVE_CLASSES } from '@/design/toneClasses';
+
+const NEW_HOUSEHOLD_VALUE = '__new__';
 
 const CONSENT_METHOD_LABEL: Record<Voter['popiaConsentMethod'], string> = {
   VERBAL_DOORSTEP: 'Verbal (doorstep)',
@@ -46,9 +51,26 @@ export function VoterForm({ ctx, voter, defaultHouseholdId, onDone, onCancel }: 
     enabled: vdCode.length > 0,
   });
 
+  // Ward is derived from the VD record, not ctx.wardScope — a VD-scoped
+  // canvasser's token typically has vdScope but not wardScope, and a new
+  // household's wardCode must be correct for §4.2 geographic scoping to
+  // work, not just non-empty. See src/lib/useVdWard.ts for why (split VDs).
+  const {
+    wardOptions,
+    resolved: resolvedVotingDistrict,
+    isLoading: votingDistrictsLoading,
+    setSelectedWardCode,
+  } = useVdWard(ctx, vdCode);
+
   const [firstName, setFirstName] = useState(voter?.firstName ?? '');
   const [lastName, setLastName] = useState(voter?.lastName ?? '');
   const [householdId, setHouseholdId] = useState(voter?.householdId ?? defaultHouseholdId ?? '');
+  const [showHouseholdQuickAdd, setShowHouseholdQuickAdd] = useState(false);
+  // Households query invalidation (triggered on create) races with this
+  // form needing the new household's vdCode/wardCode immediately to build
+  // the voter draft — keep a local copy rather than depend on the refetch
+  // having landed by the time the user hits submit.
+  const [justCreatedHousehold, setJustCreatedHousehold] = useState<Household | null>(null);
   const [phone, setPhone] = useState(''); // raw entry; never pre-filled from phoneMasked
   const [sentiment, setSentiment] = useState<Voter['sentiment']>(voter?.sentiment ?? 'UNDECIDED');
   const [consentGiven, setConsentGiven] = useState(voter?.popiaConsentGiven ?? false);
@@ -64,7 +86,9 @@ export function VoterForm({ ctx, voter, defaultHouseholdId, onDone, onCancel }: 
     },
   });
 
-  const household = householdsQuery.data?.items.find((h) => h.id === householdId);
+  const household =
+    householdsQuery.data?.items.find((h) => h.id === householdId) ??
+    (justCreatedHousehold?.id === householdId ? justCreatedHousehold : undefined);
   const canSubmit =
     firstName.trim().length > 0 && lastName.trim().length > 0 && householdId.length > 0 && consentGiven;
 
@@ -124,9 +148,17 @@ export function VoterForm({ ctx, voter, defaultHouseholdId, onDone, onCancel }: 
           <span className="text-label-caps font-display uppercase text-slate">Household</span>
           <select
             className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
-            value={householdId}
-            onChange={(e) => setHouseholdId(e.target.value)}
+            value={showHouseholdQuickAdd ? NEW_HOUSEHOLD_VALUE : householdId}
+            onChange={(e) => {
+              if (e.target.value === NEW_HOUSEHOLD_VALUE) {
+                setShowHouseholdQuickAdd(true);
+                return;
+              }
+              setShowHouseholdQuickAdd(false);
+              setHouseholdId(e.target.value);
+            }}
             required
+            disabled={!vdCode}
           >
             <option value="" disabled>
               {householdsQuery.isLoading ? 'Loading households…' : 'Select a household'}
@@ -136,6 +168,12 @@ export function VoterForm({ ctx, voter, defaultHouseholdId, onDone, onCancel }: 
                 {h.addressLine || h.informalDescriptor || h.id}
               </option>
             ))}
+            {justCreatedHousehold && !householdsQuery.data?.items.some((h) => h.id === justCreatedHousehold.id) && (
+              <option value={justCreatedHousehold.id}>
+                {justCreatedHousehold.addressLine || justCreatedHousehold.informalDescriptor} (just added)
+              </option>
+            )}
+            <option value={NEW_HOUSEHOLD_VALUE}>+ Add new household…</option>
           </select>
           {!vdCode && (
             <p className="text-body-md text-maroon">
@@ -143,6 +181,52 @@ export function VoterForm({ ctx, voter, defaultHouseholdId, onDone, onCancel }: 
             </p>
           )}
         </label>
+
+        {showHouseholdQuickAdd && vdCode && wardOptions.length > 1 && !resolvedVotingDistrict && (
+          <label className="space-y-1 block">
+            <span className="text-label-caps font-display uppercase text-slate">
+              VD {vdCode} is split across wards — which one is this household in?
+            </span>
+            <select
+              className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
+              value=""
+              onChange={(e) => setSelectedWardCode(e.target.value)}
+            >
+              <option value="" disabled>
+                Select a ward
+              </option>
+              {wardOptions.map((o) => (
+                <option key={o.wardCode} value={o.wardCode}>
+                  {o.wardCode} ({o.registeredVoters.toLocaleString('en-ZA')} registered here)
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+
+        {showHouseholdQuickAdd && vdCode && (
+          resolvedVotingDistrict ? (
+            <HouseholdQuickAdd
+              ctx={ctx}
+              vdCode={vdCode}
+              wardCode={resolvedVotingDistrict.wardCode}
+              onCreated={(created) => {
+                setJustCreatedHousehold(created);
+                setHouseholdId(created.id);
+                setShowHouseholdQuickAdd(false);
+              }}
+              onCancel={() => setShowHouseholdQuickAdd(false)}
+            />
+          ) : (
+            wardOptions.length <= 1 && (
+              <p className="text-body-md font-body text-maroon">
+                {votingDistrictsLoading
+                  ? 'Looking up ward for this VD…'
+                  : `VD ${vdCode} isn't seeded yet — its ward can't be determined, so a household can't be created safely. See §6.1.`}
+              </p>
+            )
+          )
+        )}
 
         <label className="space-y-1 block">
           <span className="text-label-caps font-display uppercase text-slate">Phone</span>

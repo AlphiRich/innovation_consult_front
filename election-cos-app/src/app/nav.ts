@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — navigation model
+ * Election Campaign OS — navigation model
  * IC-ECOS-BUILD-2026-V2 §3.2.
  *
  * One shell, one nav. Items render conditionally on capability grants —
@@ -8,6 +8,8 @@
  * a provincial coordinator see the same structure with different contents.
  */
 import type { Capability } from '@/auth/types';
+import type { TenantEntitlement } from '@/dal/ports/entitlements';
+import { resolveAccess, type AccessDecision } from '@/auth/entitlements';
 
 export interface NavItem {
   label: string;
@@ -30,4 +32,38 @@ export const PRIMARY_NAV: NavItem[] = [
 
 export function isNavItemVisible(item: NavItem, caps: Capability[]): boolean {
   return item.capability === 'always' || caps.includes(item.capability);
+}
+
+/**
+ * Both gates, for a nav item.
+ *
+ * `isNavItemVisible` above answers the capability half and is what every
+ * existing caller and test asks. This answers the whole question, and it
+ * is what `Shell` uses once the tenant's entitlements have arrived.
+ *
+ * `entitlements` is deliberately optional, and `undefined` means "not
+ * known yet" rather than "none". A read still in flight, or one that
+ * failed, falls back to the capability answer — a billing lookup that
+ * times out must not lock a paid-up campaign out of its own platform, and
+ * the authoritative gate is `firestore.rules` either way. See
+ * `useEntitlements`.
+ */
+export function navItemAccess(
+  item: NavItem,
+  caps: Capability[],
+  entitlements?: TenantEntitlement[],
+): AccessDecision {
+  if (item.capability === 'always') {
+    return { outcome: 'ALLOWED', allowed: true, module: null, reason: '' };
+  }
+  if (!entitlements) {
+    const permitted = caps.includes(item.capability);
+    return {
+      outcome: permitted ? 'ALLOWED' : 'NOT_PERMITTED',
+      allowed: permitted,
+      module: null,
+      reason: permitted ? '' : 'Your role does not include this. An administrator can change that.',
+    };
+  }
+  return resolveAccess(caps, entitlements, item.capability);
 }

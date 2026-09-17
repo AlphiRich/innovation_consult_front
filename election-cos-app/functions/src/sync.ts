@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — POST /api/sync Cloud Function
+ * Election Campaign OS — POST /api/sync Cloud Function
  * IC-ECOS-BUILD-2026-V2 §7.3. Implements the contract in openapi/sync.yaml
  * / src/offline/syncTypes.ts (election-cos-app side) — keep all three in lockstep.
  *

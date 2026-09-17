@@ -1,11 +1,11 @@
 /**
- * Election-COS1.0 — voter list card
+ * Election Campaign OS — voter list card
  * Structure informed by the Stitch suite's household_voter_logging screen
  * (name + sentiment pill + Log Response action), reskinned to our tokens.
  */
 import type { Voter } from '@/dal/ports/voters';
 import { SENTIMENT_META } from './sentiment';
-import { TONE_PILL_CLASSES } from './toneClasses';
+import { TONE_PILL_CLASSES } from '@/design/toneClasses';
 
 interface VoterCardProps {
   voter: Voter;

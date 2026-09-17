@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Audit log port (read-only from the client)
+ * Election Campaign OS — Audit log port (read-only from the client)
  * IC-ECOS-BUILD-2026-V2 §7.5, §6.2.1, §6.8.4. Written server-side only
  * (Cloud Functions, Admin SDK) — e.g. on phone-number unmask, on PPFA
  * export, on threshold change. See firestore.rules: client writes denied.

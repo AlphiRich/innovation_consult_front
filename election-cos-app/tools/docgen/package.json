@@ -1,0 +1,12 @@
+{
+  "name": "election-cos-docgen",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Generates the branded .docx deliverables in ../../docs (Privacy Policy draft, Terms of Use draft, App User Guide) from the Innovation Consult letterhead system. Not part of the ecos-app bundle - kept separate deliberately.",
+  "scripts": {
+    "build": "node build-docs.js"
+  },
+  "dependencies": {
+    "docx": "^9.0.0"
+  }
+}

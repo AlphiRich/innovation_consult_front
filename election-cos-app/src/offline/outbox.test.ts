@@ -8,6 +8,9 @@ async function seedVoter(id: string) {
 }
 
 beforeEach(async () => {
+  // Some tests below deliberately close the connection; reopen before
+  // clearing so this suite stays order-independent.
+  await offlineDb.ensureOpen();
   await Promise.all(offlineDb.tables.map((t) => t.clear()));
 });
 
@@ -75,6 +78,40 @@ describe('applySyncResponse (§7.5 conflicts visible, §7.6 rejections actionabl
     });
 
     expect(await drainOutboxBatch(10)).toHaveLength(1);
+  });
+
+  it('enqueue survives the browser having closed the connection (backgrounded tab)', async () => {
+    // The real-world case this covers: a canvasser backgrounds the app,
+    // the browser closes IndexedDB under storage pressure, they return and
+    // log a canvass result. Without ensureOpen() in enqueue() that write
+    // rejects with DatabaseClosedError and the result is lost.
+    await seedVoter('v5');
+    offlineDb.close();
+    expect(offlineDb.isOpen()).toBe(false);
+
+    await enqueue({ entity: 'voter', entityId: 'v5', op: 'upsert', payload: { id: 'v5' }, _localUpdatedAt: new Date().toISOString() });
+
+    const batch = await drainOutboxBatch(10);
+    expect(batch).toHaveLength(1);
+    expect(batch[0].entityId).toBe('v5');
+  });
+
+  it('applySyncResponse survives a closed connection too', async () => {
+    await seedVoter('v6');
+    await enqueue({ entity: 'voter', entityId: 'v6', op: 'upsert', payload: {}, _localUpdatedAt: new Date().toISOString() });
+    const [op] = await drainOutboxBatch(10);
+
+    offlineDb.close();
+
+    await applySyncResponse({
+      accepted: [{ seq: op.seq, serverId: 'v6', serverUpdatedAt: new Date().toISOString() }],
+      rejected: [],
+      conflicts: [],
+      changes: [],
+      nextSince: new Date().toISOString(),
+    });
+
+    expect(await drainOutboxBatch(10)).toHaveLength(0);
   });
 
   it('a genuine conflict is written to the conflicts table, never silently discarded, and marks CONFLICT state', async () => {

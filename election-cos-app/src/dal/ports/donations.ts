@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Donation repository port (PPFA)
+ * Election Campaign OS — Donation repository port (PPFA)
  * IC-ECOS-BUILD-2026-V2 §6.8.2, §6.8.3.
  *
  * Money is integer cents. Never a float — a rounding error on a statutory
@@ -35,6 +35,17 @@ export type DonationDraft = Pick<
 export interface DonationRepository {
   getById(ctx: SessionContext, id: string): Promise<Donation | null>;
   listByDonor(ctx: SessionContext, donorId: string): Promise<Donation[]>;
+  /**
+   * Every donation recorded in one financial year, across donors.
+   *
+   * Added session 28 for the disclosure register. Until then the only
+   * read was per-donor, so the question the module exists to answer —
+   * which donations must be disclosed and which have not been — could
+   * only be assembled by opening every donor in turn and keeping the
+   * running picture somewhere outside the product. `financialYear` is
+   * stored on the record precisely so this read is one query.
+   */
+  listByFinancialYear(ctx: SessionContext, financialYear: string): Promise<Donation[]>;
   /** Never rejects on amount. See file header. */
   record(ctx: SessionContext, donation: DonationDraft): Promise<UpsertResult>;
   markDisclosed(ctx: SessionContext, id: string, iecReference: string): Promise<void>;

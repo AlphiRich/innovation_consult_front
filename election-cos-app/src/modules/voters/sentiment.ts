@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — voter sentiment display metadata
+ * Election Campaign OS — voter sentiment display metadata
  * IC-ECOS-BUILD-2026-V2 §6.2. Maps the 5-tier `Voter.sentiment` enum to a
  * label and a tone token, ordered opposition-to-support for use in
  * segmented pickers (matches the reference screens' left-to-right

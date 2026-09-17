@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — PPFA aggregation & alerting
+ * Election Campaign OS — PPFA aggregation & alerting
  * IC-ECOS-BUILD-2026-V2 §6.8.1, §6.8.3.
  *
  * DELIBERATELY NOT EXPORTED / NOT DEPLOYED. Build spec §6.8.1: "Build the

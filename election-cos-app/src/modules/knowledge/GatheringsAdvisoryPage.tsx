@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Gatherings advisory
+ * Election Campaign OS — Gatherings advisory
  * IC-ECOS-BUILD-2026-V2 §6.7.
  *
  * "Build a single static page. No tracking, no alerts, no workflow, no
@@ -41,7 +41,7 @@ export function GatheringsAdvisoryPage() {
         </p>
 
         <p className="font-medium">
-          Election-COS1.0 does not file notices, track permits, or monitor compliance on
+          Election Campaign OS does not file notices, track permits, or monitor compliance on
           your behalf. This advisory is general information, not legal advice. Consult your
           party's legal officer.
         </p>

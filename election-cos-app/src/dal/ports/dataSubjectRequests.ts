@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — POPIA data subject request port
+ * Election Campaign OS — POPIA data subject request port
  *
  * NEW SCOPE, added in a follow-up session — not in the original
  * 01-claude-code-build-spec-v2.md. Source: 04-legal-compliance-workstream.md

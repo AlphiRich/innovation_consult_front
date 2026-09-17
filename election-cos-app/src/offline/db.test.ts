@@ -27,3 +27,38 @@ describe('offline schema (§7.2) contains no PPFA data', () => {
     expect(() => assertNoFinancialTables(bad)).toThrow(/§7.1|forbidden/);
   });
 });
+
+// Session 14. The premise these tests protect is that Dexie does NOT
+// transparently reopen a closed connection — the first test below proves
+// that premise against the real Dexie version rather than assuming it, so
+// if a future Dexie release changes the behaviour this suite says so
+// instead of silently protecting nothing.
+describe('connection lifecycle — ensureOpen()', () => {
+  it('a closed connection really does reject writes (the failure ensureOpen exists for)', async () => {
+    await offlineDb.open();
+    offlineDb.close();
+    expect(offlineDb.isOpen()).toBe(false);
+
+    await expect(
+      offlineDb.voters.put({ id: 'closed-1', vdCode: 'VD1', _syncState: 'LOCAL_ONLY', _localUpdatedAt: 'x' }),
+    ).rejects.toThrow(/closed/i);
+  });
+
+  it('ensureOpen() reopens a closed connection and writes succeed again', async () => {
+    await offlineDb.open();
+    offlineDb.close();
+    expect(offlineDb.isOpen()).toBe(false);
+
+    await offlineDb.ensureOpen();
+
+    expect(offlineDb.isOpen()).toBe(true);
+    await offlineDb.voters.put({ id: 'reopened-1', vdCode: 'VD1', _syncState: 'LOCAL_ONLY', _localUpdatedAt: 'x' });
+    expect(await offlineDb.voters.get('reopened-1')).toBeDefined();
+  });
+
+  it('ensureOpen() is a no-op on an already-open connection', async () => {
+    await offlineDb.open();
+    await offlineDb.ensureOpen();
+    expect(offlineDb.isOpen()).toBe(true);
+  });
+});

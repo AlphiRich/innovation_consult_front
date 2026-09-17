@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firebase app singleton
+ * Election Campaign OS — Firebase app singleton
  * IC-ECOS-BUILD-2026-V2 §1, §4.3
  *
  * The ONLY place `initializeApp` is called. Firestore/Storage/Auth clients

@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — Firestore adapter: documents
+ * Election Campaign OS — Firestore adapter: documents
  * IC-ECOS-BUILD-2026-V2 §8.4.
  */
 import { collection, getDocs, query } from 'firebase/firestore';
@@ -15,6 +15,7 @@ function fromFirestore(id: string, data: Record<string, unknown>): CampaignDocum
     classification: data.classification as CampaignDocument['classification'],
     storagePath: data.storagePath as string,
     integrityHashSha256: data.integrityHashSha256 as string,
+    canonicalPayload: data.canonicalPayload as string | undefined,
     watermark: (data.watermark as CampaignDocument['watermark']) ?? null,
     signedBy: data.signedBy as string | undefined,
     signedAt: data.signedAt as string | undefined,

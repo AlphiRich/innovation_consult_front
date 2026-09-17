@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — generic module placeholder
+ * Election Campaign OS — generic module placeholder
  * IC-ECOS-BUILD-2026-V2 §3.4, §3.4.5.
  *
  * Renders where a module's real screen would go. Used because no Stitch

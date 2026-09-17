@@ -1,5 +1,5 @@
 /**
- * Election-COS1.0 — session context provider
+ * Election Campaign OS — session context provider
  * IC-ECOS-BUILD-2026-V2 §4.2, §4.4.
  *
  * Reads tenantId/roleId/caps/geoScope/wardScope/vdScope from the verified
