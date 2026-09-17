@@ -1,7 +1,8 @@
 /**
  * Election Campaign OS — Settings index
- * IC-ECOS-BUILD-2026-V2 §3.2. Landing page for the five sub-views, all
- * real as of session 9.
+ * IC-ECOS-BUILD-2026-V2 §3.2. Landing page for the sub-views, all real.
+ * Candidates joined them in session 29 — see CandidatesPage.tsx for why a
+ * party-list screen lives here rather than in the nine-item primary nav.
  */
 import { Link } from 'react-router-dom';
 
@@ -17,6 +18,11 @@ const SUB_VIEWS = [
     to: '/settings/data-requests',
     label: 'Data Subject Requests',
     description: 'POPIA Condition 8 — access, correction, and deletion requests.',
+  },
+  {
+    to: '/settings/candidates',
+    label: 'Candidates & party list',
+    description: 'Capture candidates and check a PR list before it is submitted. Files nothing.',
   },
 ] as const;
 

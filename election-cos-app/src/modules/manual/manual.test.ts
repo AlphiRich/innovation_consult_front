@@ -58,6 +58,15 @@ import {
 } from '@/modules/finance/donorExposure';
 import { defaultPPFAConfig, PPFA_GAZETTE_CITATION } from '@/modules/finance/ppfaDefaults';
 import type { PPFAConfig } from '@/dal/ports/ppfaConfig';
+import { PR_LIST_SOP } from './sops/prListSop';
+import {
+  checkPrList,
+  GENDER_BASIS,
+  PR_LIST_CITATIONS,
+  PR_LIST_EXPORT_BASIS,
+  type PrListIssueCode,
+} from '@/modules/candidates/prList';
+import { ID_CAPTURE_BASIS } from '@/modules/candidates/candidateCapture';
 import { buildManualPdf, manualFileName, MANUAL_STATUS_NOTE } from './manualPdf';
 
 const NOW = new Date('2026-06-01T00:00:00.000Z');
@@ -1310,5 +1319,118 @@ describe('SOP-10 describes the funding module honestly', () => {
     const manual = assembleManual(SOPS, audience('finance-officer', { entitlements: [] }));
     expect(manual.sops.map((s) => s.number)).not.toContain('SOP-10');
     expect(manual.withheld.map((w) => w.number)).toContain('SOP-10');
+  });
+});
+
+
+/**
+ * SOP-11's two failure modes are both mis-citations of a kind that has
+ * already been made in published material about this product: treating a
+ * party list as a ward nomination, and treating an export as a filing.
+ * The third guard is newer — it holds the line against a "correction" to
+ * the ward count that arrived with a provincial candidate list and was
+ * an artifact of how that file was built.
+ */
+describe('SOP-11 describes preparing a party list honestly', () => {
+  const text = JSON.stringify(PR_LIST_SOP);
+  /**
+   * The SOP's strings as written, not JSON-escaped. `ID_CAPTURE_BASIS`
+   * contains a quoted word, so searching the stringified SOP for it would
+   * fail on the backslashes rather than on anything real.
+   */
+  const lines = PR_LIST_SOP.sections.flatMap((section) => [
+    section.heading,
+    ...(section.body ?? []),
+    ...(section.steps ?? []),
+    ...(section.warnings ?? []),
+  ]);
+
+  it('goes to the role that can reach the screen', () => {
+    expect(PR_LIST_SOP.roles).toEqual(['party-hq-admin']);
+    expect(PR_LIST_SOP.requiresAnyCapability).toEqual(['team.manage']);
+    // team.manage is what firestore.rules gates the candidates collection
+    // on, so the audience and the security rule agree.
+    expect(SEED_ROLES.find((r) => r.id === 'party-hq-admin')!.defaultCaps).toContain('team.manage');
+    const rules = readFileSync(path.join(REPO_ROOT, 'firestore.rules'), 'utf8');
+    expect(rules).toMatch(/candidates\/\{candidateId\}[\s\S]{0,200}cap\('team\.manage'\)/);
+  });
+
+  it('cites the party-list sections and never section 17', () => {
+    expect(text).toContain(PR_LIST_CITATIONS.submission);
+    expect(text).toContain(PR_LIST_CITATIONS.composition);
+    expect(text).toContain(PR_LIST_CITATIONS.removal);
+    // s17 governs ward nominations, not party lists. The SOP mentions
+    // ward candidates as a separate process without citing it as the
+    // authority for a list.
+    expect(text).not.toMatch(/section\s*17[^)]{0,80}(party )?list/i);
+  });
+
+  it('refuses to let the export read as a filing', () => {
+    expect(lines).toContain(PR_LIST_EXPORT_BASIS);
+    expect(text).toMatch(/Downloading the list has not submitted anything/i);
+    expect(text).toMatch(/does not know your cut-off date/i);
+    expect(text).not.toMatch(/\b(submits|files|lodges) (it |the list )?(to|with) the (IEC|Commission)\b/i);
+  });
+
+  it('keeps the gender position aspirational, as the Act words it', () => {
+    expect(lines).toContain(GENDER_BASIS);
+    expect(text).toMatch(/standard to aim at, not a threshold to pass/i);
+    expect(text).toMatch(/an undeclared gender is not a man/i);
+    expect(text).not.toMatch(/\b(must|required to) (be|have) 50%\b/i);
+    // …and the code agrees: no gender finding is ever blocking.
+    const genderCodes: PrListIssueCode[] = ['GENDER_SHORTFALL', 'GENDER_CLUSTERED', 'GENDER_UNDECLARED'];
+    const skewed = checkPrList({
+      candidates: [1, 2, 3, 4].map((n) => ({
+        id: `g${n}`,
+        tenantId: 't',
+        fullName: `C${n}`,
+        affiliation: 'PR' as const,
+        listRank: n,
+        gender: 'MALE' as const,
+        idNumberEncrypted: '',
+        idNumberMasked: `•••• ${1000 + n}`,
+        verificationStatus: 'VERIFIED' as const,
+        createdAt: '',
+        updatedAt: '',
+        updatedBy: 'u',
+        deletedAt: null,
+        schemaVersion: 1,
+      })),
+      prSeats: 10,
+    });
+    expect(skewed.issues.filter((i) => genderCodes.includes(i.code)).length).toBeGreaterThan(0);
+    expect(skewed.blocking.filter((i) => genderCodes.includes(i.code))).toEqual([]);
+    expect(skewed.canExport).toBe(true);
+  });
+
+  it('never claims the platform verifies a candidate against anything', () => {
+    expect(text).toMatch(/does not verify anybody against the voters roll/i);
+    expect(text).toMatch(/records that a person checked, not that a system did/i);
+    expect(text).not.toMatch(/\b(automatically )?verif(ies|ied) (against|with) the (IEC|Commission|voters? roll)\b/i);
+  });
+
+  it('carries the identity-number position the form actually takes', () => {
+    expect(lines).toContain(ID_CAPTURE_BASIS);
+    expect(ID_CAPTURE_BASIS).toMatch(/stores no encrypted copy/i);
+    expect(text).toMatch(/masked on the export as they are on every screen/i);
+  });
+
+  it('rejects the ward count that arrived with the provincial list', () => {
+    // A column of per-party ordinals counted as wards gave "32" for JB
+    // Marks. The gazette-sourced seed says 34 and stays at 34; the SOP
+    // says why, and this fails if the seed is ever quietly changed to
+    // match the artifact.
+    const seed = JSON.parse(
+      readFileSync(path.join(REPO_ROOT, 'seed-data', 'jb-marks-nw405-wards-vds.json'), 'utf-8'),
+    ) as unknown[];
+    expect(seed).toHaveLength(34);
+    expect(text).toMatch(/the gazette says 34, and the gazette is right/i);
+    expect(text).toMatch(/Counting distinct values in a column is not counting wards/i);
+  });
+
+  it('warns that a published list is not a seed source', () => {
+    expect(text).toMatch(/not a way to populate this screen/i);
+    expect(text).toMatch(/order of preference — the thing that decides who takes a seat — was gone/i);
+    expect(text).toMatch(/full date of birth readable/i);
   });
 });

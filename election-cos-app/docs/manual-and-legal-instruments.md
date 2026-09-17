@@ -111,8 +111,8 @@ a contract.
 
 ## Sequence
 
-1. SOP-01 through SOP-10 are issued (`src/modules/manual/sops/`).
-2. SOP-11 and SOP-12 are written (`PLANNED_SOPS` carries the register).
+1. SOP-01 through SOP-11 are issued (`src/modules/manual/sops/`).
+2. SOP-12 is written (`PLANNED_SOPS` carries the register).
 3. The completed manual goes to an attorney **with this file**, which
    tells them what is safe to rely on and what must not be said.
 4. The instruments are drafted against it.
@@ -706,3 +706,65 @@ The strategy interface regressed to always-cumulative; orphaned donations
 dropped from the year's total; the SOP quoting the gazetted threshold in
 its own prose; and the restricted-donor flag narrowed to the FOREIGN donor
 type, dropping anonymous donors and juristic donors ticked foreign.
+
+
+---
+
+## SOP-11, and a compliance module nothing could reach (session 29)
+
+SOP-11 covers preparing a PR candidate list. Writing it found that none of
+the procedure could be performed.
+
+**`prList.ts` had no way in.** The module carried the entire compliance
+check — list length, positions, duplicates, verification, the Schedule 1
+gender position — fully written and fully tested since the session it was
+built. The port existed, the Firestore adapter existed, `firestore.rules`
+gated the collection on `team.manage`. There was no route, no page and no
+form, so a party could not add a candidate, run the check, or produce
+anything to submit. Every step of the procedure named a screen that did
+not exist.
+
+`CandidatesPage`, `CandidateForm` and `prListDocument` ship with the SOP,
+at `/settings/candidates` rather than in the primary nav, which §3.2 fixes
+at nine items and `nav.test.ts` holds there.
+
+### What the capture form refuses to do
+
+The identity number is typed in full, checked against its own check digit
+with `parseSaIdNumber`, and stored only as `maskSaIdNumber` produces.
+`idNumberEncrypted` stays empty — the KMS-backed key exchange that would
+make the word "encrypted" true is not provisioned, and a field named that
+holding something else is worse than an empty one. Same stance `VoterForm`
+takes on phone numbers.
+
+Gender is asked, never derived. An SA identity number carries a sex marker
+in digits 7–10, and reading it into `CandidateGender` would fill the field
+for every candidate without anyone being asked. `SaIdSexMarker` is a
+separate type precisely so that assignment does not compile.
+
+### What the export refuses to do
+
+It prints `PR_LIST_EXPORT_BASIS` as the first block on the page, because a
+PDF with a party name and an ordered list of candidates is what an
+official document looks like and the sentence that says otherwise belongs
+on the paper. It prints outstanding warnings, because a warning that does
+not block will be exported, which means the person signing it has to see
+it. It prints masked identity numbers, because an export is the easiest
+place for a mask to be quietly bypassed.
+
+### The provincial candidate list that arrived with the request
+
+Audited in full in `docs/nw-candidate-list-2026-review.md`. Nothing was
+seeded from it. The finding that mattered most: the workbook proposed
+correcting JB Marks' ward count from 34 to 32, and that "correction" was
+an artifact of its own construction — the column it counted as wards is a
+per-party ordinal, proved decisively by DC37, a district municipality with
+no wards at all showing 48 of them. The gazette-sourced seed stays at 34,
+and `manual.test.ts` now asserts its length so the artifact cannot be
+applied later.
+
+### Guards proven by injection
+
+The export printing identity numbers in full; the warnings section dropped
+from the export; and the seed cut to 32 wards to match the workbook (which
+also trips SOP-03's pre-existing split-VD guard).
