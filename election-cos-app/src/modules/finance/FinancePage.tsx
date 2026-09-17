@@ -19,6 +19,7 @@ import { useSession } from '@/auth/useSession';
 import type { Donor } from '@/dal/ports/donors';
 import { DonorForm } from './DonorForm';
 import { DonorDetail } from './DonorDetail';
+import { DisclosureRegisterPanel } from './DisclosureRegisterPanel';
 
 export function FinancePage() {
   const session = useSession();
@@ -85,6 +86,14 @@ export function FinancePage() {
           cap {(config.annualDonorCapZAR / 100).toLocaleString('en-ZA')} ZAR · effective{' '}
           {new Date(config.effectiveDate).toLocaleDateString('en-ZA')} · {config.sourceCitation}
         </p>
+      )}
+
+      {config && (
+        <DisclosureRegisterPanel
+          ctx={session}
+          config={config}
+          onSelectDonor={(donorId) => setSelectedDonor(donors.find((d) => d.id === donorId) ?? null)}
+        />
       )}
 
       {showDonorForm && (

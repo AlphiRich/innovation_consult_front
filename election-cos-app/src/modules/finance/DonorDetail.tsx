@@ -20,8 +20,13 @@ import type { SessionContext } from '@/dal/ports/session';
 import type { Donor } from '@/dal/ports/donors';
 import type { PPFAConfig } from '@/dal/ports/ppfaConfig';
 import { formatZAR } from '@/lib/money';
-import { levelForAggregate } from './escalation';
-import { deriveFinancialYear } from './financialYear';
+import {
+  exposureForDonor,
+  otherRule,
+  Q1_UNRESOLVED,
+  RESTRICTED_DONOR_BASIS,
+  RULE_BASIS,
+} from './donorExposure';
 import { DonationForm } from './DonationForm';
 
 const LEVEL_LABEL: Record<string, string> = {
@@ -68,9 +73,11 @@ export function DonorDetail({ ctx, donor, config }: DonorDetailProps) {
   });
 
   const donations = donationsQuery.data ?? [];
-  const currentFY = deriveFinancialYear(new Date(), config.financialYearStartMonth);
-  const currentFYTotal = donations.filter((d) => d.financialYear === currentFY).reduce((sum, d) => sum + d.amountZAR, 0);
-  const provisionalLevel = levelForAggregate(currentFYTotal, config);
+  // The tenant's own configured rule decides which figure is tested —
+  // see donorExposure.ts. This screen used to sum cumulatively whatever
+  // the configuration said.
+  const exposure = exposureForDonor(donations, config, new Date());
+  const restricted = donor.donorType === 'FOREIGN' || donor.donorType === 'ANONYMOUS' || donor.isForeign;
   const openAlerts = (alertsQuery.data ?? []).filter((a) => !a.acknowledgedAt);
 
   return (
@@ -78,19 +85,41 @@ export function DonorDetail({ ctx, donor, config }: DonorDetailProps) {
       <div>
         <p className="text-headline-md font-display text-ink">{donor.displayName}</p>
         <p className="text-data-mono font-mono text-slate">
-          {currentFY} total: {formatZAR(currentFYTotal)}
+          {exposure.financialYear} · cumulative {formatZAR(exposure.cumulativeZAR)} · largest single{' '}
+          {formatZAR(exposure.largestSingleZAR)}
         </p>
+        <p className="text-body-md font-body text-slate">{RULE_BASIS[exposure.rule]}</p>
       </div>
 
-      {provisionalLevel && (
+      {restricted && (
+        <div className="border-l-4 border-maroon bg-white p-3">
+          <p className="text-label-caps font-display uppercase text-maroon">Flagged donor</p>
+          <p className="text-body-md font-body text-slate">{RESTRICTED_DONOR_BASIS}</p>
+        </div>
+      )}
+
+      {exposure.level && (
         <div className="border-l-4 border-gold bg-white p-3 space-y-1">
           <p className="text-label-caps font-display uppercase text-maroon">
-            Provisional: {LEVEL_LABEL[provisionalLevel]}
+            Provisional: {LEVEL_LABEL[exposure.level]}
           </p>
           <p className="text-body-md font-body text-slate">
-            Computed client-side for visibility only — not the official aggregation, which is held pending §6.8.1
-            legal confirmation. Never blocks recording a donation.
+            Tested against {formatZAR(exposure.governingAmountZAR)}, the figure your configured rule uses.
+            Computed client-side for visibility only — not the official aggregation, which is held pending
+            §6.8.1 legal confirmation. Never blocks recording a donation.
           </p>
+        </div>
+      )}
+
+      {exposure.rulesDisagree && (
+        <div className="border-l-4 border-teal bg-white p-3 space-y-1">
+          <p className="text-label-caps font-display uppercase text-ink">The two readings disagree here</p>
+          <p className="text-body-md font-body text-slate">
+            Under {otherRule(exposure.rule) === 'PER_DONATION' ? 'per donation' : 'cumulative per donor per year'}
+            {' '}this donor would read as{' '}
+            {exposure.levelUnderOtherRule ? LEVEL_LABEL[exposure.levelUnderOtherRule] : 'below every threshold'}.
+          </p>
+          <p className="text-body-md font-body text-slate">{Q1_UNRESOLVED}</p>
         </div>
       )}
 

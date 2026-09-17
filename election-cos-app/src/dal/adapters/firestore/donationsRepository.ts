@@ -38,6 +38,16 @@ export const donationsRepository: DonationRepository = {
     return snap.docs.map((d) => fromFirestore(d.id, d.data()));
   },
 
+  async listByFinancialYear(ctx: SessionContext, financialYear: string): Promise<Donation[]> {
+    const snap = await getDocs(
+      query(
+        collection(db(), tenantCollectionPath(ctx.tenantId, 'donations')),
+        where('financialYear', '==', financialYear),
+      ),
+    );
+    return snap.docs.map((d) => fromFirestore(d.id, d.data()));
+  },
+
   async record(ctx: SessionContext, donation: DonationDraft) {
     // Deliberately: no threshold/cap check here. See §6.8.3 — flag, never block.
     return upsertGeneric(ctx, 'donations', donation.id, donation, true);

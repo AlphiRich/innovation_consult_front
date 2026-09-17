@@ -49,9 +49,19 @@ import {
 } from '@/modules/settings/dataSubjectErasure';
 import { RESPONSE_TARGET_BASIS } from '@/modules/settings/dataSubjectRequestSla';
 import { COMPLETENESS_NOTICE, UNSEARCHED_SOURCES } from '@/modules/settings/subjectAccess';
+import { DONATIONS_SOP } from './sops/donationsSop';
+import {
+  exposureForDonor,
+  Q1_UNRESOLVED,
+  RESTRICTED_DONOR_BASIS,
+  RULE_BASIS,
+} from '@/modules/finance/donorExposure';
+import { defaultPPFAConfig, PPFA_GAZETTE_CITATION } from '@/modules/finance/ppfaDefaults';
+import type { PPFAConfig } from '@/dal/ports/ppfaConfig';
 import { buildManualPdf, manualFileName, MANUAL_STATUS_NOTE } from './manualPdf';
 
 const NOW = new Date('2026-06-01T00:00:00.000Z');
+const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 const ent = (module: string, over: Partial<TenantEntitlement> = {}): TenantEntitlement => ({
   id: module,
@@ -1190,5 +1200,115 @@ describe('SOP-09 handles a data subject request honestly', () => {
 
   it('keeps a gate code out of a subject access response', () => {
     expect(text).toMatch(/never disclosed to anybody, including the data subject/i);
+  });
+});
+
+
+/**
+ * SOP-10 is written against a statute with three open questions and a
+ * threshold that moves by gazette. Its two failure modes are quoting a
+ * figure (which becomes a second copy that drifts) and implying the
+ * platform decides something it does not.
+ */
+describe('SOP-10 describes the funding module honestly', () => {
+  const text = JSON.stringify(DONATIONS_SOP);
+
+  it('goes to the role and the subscription that can open it', () => {
+    expect(DONATIONS_SOP.roles).toEqual(['finance-officer']);
+    expect(DONATIONS_SOP.requiresModule).toBe('ppfa-disclosure');
+    expect(DONATIONS_SOP.requiresAnyCapability).toEqual(['ppfa.view']);
+    expect(SEED_ROLES.find((r) => r.id === 'finance-officer')!.defaultCaps).toContain('ppfa.view');
+  });
+
+  it('quotes no threshold figure of its own', () => {
+    // A manual that repeated R200,000 or R30,000,000 would be a second
+    // copy of a gazetted figure, and the two would disagree the moment
+    // the gazette moved. Only the citation appears.
+    expect(text).not.toMatch(/R\s?\d{2,3}[ ,]?\d{3}/);
+    expect(text).not.toMatch(/\b200[ ,]?000\b/);
+    expect(text).not.toMatch(/\b30[ ,]?000[ ,]?000\b/);
+    expect(text).toContain(PPFA_GAZETTE_CITATION);
+    expect(text).toMatch(/no number is quoted in this procedure/i);
+  });
+
+  it('is right that a donation is flagged and never blocked', () => {
+    expect(text).toMatch(/never refuse a donation/i);
+    expect(text).toMatch(/It flags; it does not block/i);
+    // And the code agrees: neither the classifier nor the register has a
+    // rejection path, and the port says so in its own header.
+    const port = readFileSync(path.join(REPO_ROOT, 'src/dal/ports/donations.ts'), 'utf8');
+    expect(port.replace(/\s*\*?\s+/g, ' ')).toMatch(/NEVER blocks a write on amount or threshold/i);
+  });
+
+  it('presents the aggregation rule as a question, not an answer', () => {
+    expect(text).toContain(Q1_UNRESOLVED);
+    expect(text).toContain(RULE_BASIS.CUMULATIVE_PER_DONOR_PER_YEAR);
+    expect(text).toContain(RULE_BASIS.PER_DONATION);
+    expect(text).not.toMatch(/\bthe (Act|PPFA) requires (cumulative|per-donation)\b/i);
+  });
+
+  it('names all three open statutory questions', () => {
+    expect(text).toMatch(/financial year actually is/i);
+    expect(text).toMatch(/per party or across all parties/i);
+    expect(text).toMatch(/aggregation that would raise a formal alert is deliberately not built/i);
+  });
+
+  it('agrees with the code that the rule actually decides the answer', () => {
+    // The defect this SOP was written on top of: a config field nobody
+    // read. If the strategy interface regresses, the SOP's claim that
+    // your configuration picks a reading becomes false.
+    const config: PPFAConfig = { id: 'c', createdAt: '', ...defaultPPFAConfig('t', 'u') };
+    const split = [80_000_00, 80_000_00, 80_000_00].map((amountZAR, i) => ({
+      id: `d${i}`,
+      tenantId: 't',
+      donorId: 'donor-1',
+      amountZAR,
+      receivedAt: '2026-06-01T00:00:00.000Z',
+      financialYear: '2026/27',
+      quarter: 1 as const,
+      inKind: false,
+      recordedBy: 'u',
+    }));
+    const when = new Date('2026-09-15T00:00:00.000Z');
+    const cumulative = exposureForDonor(split, { ...config, aggregationRule: 'CUMULATIVE_PER_DONOR_PER_YEAR' }, when);
+    const perDonation = exposureForDonor(split, { ...config, aggregationRule: 'PER_DONATION' }, when);
+    expect(cumulative.level).not.toBe(perDonation.level);
+    expect(text).toMatch(/Your configuration picks one/i);
+  });
+
+  it('refuses to let the register read as a return', () => {
+    expect(text).toMatch(/It is not a filing system/i);
+    expect(text).toMatch(/nothing on this screen files one/i);
+    expect(text).toMatch(/Never mark a donation disclosed in advance/i);
+    expect(text).not.toMatch(/\b(submits|files|lodges) (it |the return )?(to|with) the (IEC|Electoral Commission)\b/i);
+  });
+
+  it('tells the officer about money with no donor attached to it', () => {
+    expect(text).toMatch(/donations with no donor record/i);
+    expect(text).toMatch(/short by exactly that amount/i);
+  });
+
+  it('carries the flagged-donor position without inventing the restriction', () => {
+    expect(text).toContain(RESTRICTED_DONOR_BASIS);
+    expect(RESTRICTED_DONOR_BASIS).toMatch(/does not decide what the restriction requires/i);
+    expect(text).not.toMatch(/\b(must|may not) (accept|refuse) (a |any )?foreign donation\b/i);
+  });
+
+  it('describes the separation of duties the role model actually has', () => {
+    const caps = (id: string) => SEED_ROLES.find((r) => r.id === id)!.defaultCaps;
+    expect(caps('compliance-officer')).toContain('ppfa.edit');
+    expect(caps('compliance-officer')).not.toContain('ppfa.manage_thresholds');
+    expect(caps('compliance-officer')).not.toContain('ppfa.export');
+    expect(caps('party-hq-admin')).toContain('ppfa.manage_thresholds');
+    expect(caps('party-hq-admin')).not.toContain('ppfa.edit');
+    expect(caps('finance-officer')).not.toContain('dsr.view');
+    expect(text).toMatch(/cannot see or action data subject requests/i);
+    expect(text).toMatch(/You are the only role that does both/i);
+  });
+
+  it('does not offer the funding procedure to a tenant without the module', () => {
+    const manual = assembleManual(SOPS, audience('finance-officer', { entitlements: [] }));
+    expect(manual.sops.map((s) => s.number)).not.toContain('SOP-10');
+    expect(manual.withheld.map((w) => w.number)).toContain('SOP-10');
   });
 });

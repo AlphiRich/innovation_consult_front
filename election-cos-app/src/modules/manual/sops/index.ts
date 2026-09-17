@@ -1,7 +1,7 @@
 /**
  * Election Campaign OS — the SOP register
  *
- * SOP-01 through SOP-09 are written. The rest are declared as the manual's
+ * SOP-01 through SOP-10 are written. The rest are declared as the manual's
  * intended structure with the area, audience and gating each will carry,
  * and are not shipped until written — an SOP stub that printed as a
  * heading with nothing under it would be worse than an honest gap, because
@@ -23,6 +23,7 @@ import { INCIDENT_SOP } from './incidentSop';
 import { REFERRAL_SOP } from './referralSop';
 import { WAR_ROOM_SOP } from './warRoomSop';
 import { DATA_SUBJECT_REQUEST_SOP } from './dataSubjectRequestSop';
+import { DONATIONS_SOP } from './donationsSop';
 
 export const SOPS: Sop[] = [
   CANVASSER_SOP,
@@ -34,6 +35,7 @@ export const SOPS: Sop[] = [
   REFERRAL_SOP,
   WAR_ROOM_SOP,
   DATA_SUBJECT_REQUEST_SOP,
+  DONATIONS_SOP,
 ];
 
 export interface PlannedSop {
@@ -46,7 +48,6 @@ export interface PlannedSop {
 
 /** Written next, in this order. */
 export const PLANNED_SOPS: PlannedSop[] = [
-  { number: 'SOP-10', title: 'Recording donations and disclosure thresholds', area: 'FUNDING', roles: ['finance-officer'], requiresModule: 'ppfa-disclosure' },
   { number: 'SOP-11', title: 'Preparing a PR candidate list', area: 'ADMINISTRATION', roles: ['party-hq-admin'] },
   { number: 'SOP-12', title: 'Roles, permissions and what your subscription includes', area: 'ADMINISTRATION', roles: ['party-hq-admin'] },
 ];

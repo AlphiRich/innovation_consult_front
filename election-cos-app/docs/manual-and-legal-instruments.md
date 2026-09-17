@@ -111,8 +111,8 @@ a contract.
 
 ## Sequence
 
-1. SOP-01 through SOP-09 are issued (`src/modules/manual/sops/`).
-2. SOP-10 … SOP-12 are written (`PLANNED_SOPS` carries the register).
+1. SOP-01 through SOP-10 are issued (`src/modules/manual/sops/`).
+2. SOP-11 and SOP-12 are written (`PLANNED_SOPS` carries the register).
 3. The completed manual goes to an attorney **with this file**, which
    tells them what is safe to rely on and what must not be said.
 4. The instruments are drafted against it.
@@ -635,3 +635,74 @@ The completeness notice dropped from the document; the not-searched section
 stopped being rendered; the access note reproduced into the callout (which
 carried the gate code with it); and SOP-09 rewritten to call the 30-day
 internal target a statutory POPIA deadline.
+
+
+---
+
+## SOP-10, and a strategy interface that was never built (session 28)
+
+SOP-10 covers recording donations and reading the disclosure register. It
+is the procedure with the sharpest consequence — PPFA exposure is the
+party's, not the platform's — and the one written against a statute with
+three questions this build has deliberately refused to answer.
+
+**`PPFAConfig.aggregationRule` was read by nothing.**
+`functions/src/ppfaAggregation.ts` states that the classification logic
+sits behind that field "so answering Q1 is a configuration choice, not a
+rewrite". There was no such interface. The rule was settable on the
+thresholds page, printed back there and on the funding page, stored as
+evidential configuration — and the only code that computed a threshold
+level, `DonorDetail.tsx`, summed the donor's financial year
+unconditionally. A tenant configured `PER_DONATION` saw a cumulative
+answer with its own configuration printed above it saying otherwise.
+
+`donorExposure.ts` is the interface that was promised. It returns both
+readings always, names the configured one as governing, and sets
+`rulesDisagree` when answering Q1 the other way would move a donor across
+a line — which the screen then shows, because Q1 is open and a finance
+officer who can see only one reading cannot tell what the answer would
+cost them.
+
+**There was no register.** `DonationRepository` had `listByDonor` and
+nothing else. The one tenant-wide path was the alert list, fed by the
+aggregation Cloud Function that is deliberately held pending §6.8.1 — so
+that list is empty and will stay empty. The question the module exists to
+answer, *which donations must be disclosed and which have not been*, could
+only be assembled by opening every donor in turn and keeping the total
+outside the product. At the point where that spreadsheet exists, the
+compliance value of the product is in the spreadsheet.
+
+`listByFinancialYear` is one read; `disclosureRegister.ts` assembles it.
+
+**The flagged-donor flag went nowhere.** `DonorForm` tells the operator
+that "PPFA foreign-funding restrictions apply" and then the flag appears
+on no other screen. It now follows the money to the donor detail and the
+register. `RESTRICTED_DONOR_BASIS` surfaces the flag and explicitly does
+not implement the restriction: what may be accepted, and what must be done
+about what has been, is on the open list beside §6.8.1 Q1–Q3.
+
+### What the register refuses to drop
+
+A donation whose donor record cannot be read is listed separately and
+counted in the year's total. It is the one omission a register must never
+make quietly, because the table has a total above it and a return built
+off the table alone would be short by exactly that amount. The year is
+also derived inside `buildDisclosureRegister`, so the total is the sum of
+what the rows show and nothing else.
+
+### What SOP-10 does not say
+
+It quotes no threshold figure. A manual that repeated R200,000 would be a
+second copy of a gazetted number, and the two would disagree the moment
+the gazette moved; only `PPFA_GAZETTE_CITATION` appears, and
+`manual.test.ts` fails on any Rand figure in the SOP text. It also does
+not claim the platform files anything, and it states all three open
+questions — the aggregation rule, the financial year, and whether the cap
+is per party or across all parties.
+
+### Guards proven by injection
+
+The strategy interface regressed to always-cumulative; orphaned donations
+dropped from the year's total; the SOP quoting the gazetted threshold in
+its own prose; and the restricted-donor flag narrowed to the FOREIGN donor
+type, dropping anonymous donors and juristic donors ticked foreign.
