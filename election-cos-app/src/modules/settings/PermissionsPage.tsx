@@ -34,6 +34,7 @@ import { dal } from '@/dal';
 import { useSession } from '@/auth/useSession';
 import { SEED_ROLES } from '@/auth/seedRoles';
 import { ALL_CAPABILITIES } from '@/auth/allCapabilities';
+import { resolveEffectiveCapabilities } from '@/auth/capabilities';
 import type { StaffProfile, Capability } from '@/auth/types';
 import {
   EMPTY_DRAFT,
@@ -44,6 +45,7 @@ import {
   type ProvisioningField,
   type StaffDraft,
 } from './staffProvisioning';
+import { CONCENTRATION_BASIS, dutyConcentrations, withholdingBreaches } from './dutyConcentration';
 
 function toggle<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
@@ -95,6 +97,19 @@ export function PermissionsPage() {
 
   const staff = staffQuery.data ?? [];
   const roleLabel = (id: string) => SEED_ROLES.find((r) => r.id === id)?.label ?? id;
+
+  /*
+   * What the person being edited would actually end up holding — the
+   * role's defaults, plus grants, minus revocations, resolved by the same
+   * function the Cloud Function uses. Separations of duty are a property
+   * of that set, not of the checkboxes, so they are checked against it.
+   */
+  const editedCaps = resolveEffectiveCapabilities(
+    { defaultCaps: SEED_ROLES.find((r) => r.id === roleId)?.defaultCaps ?? [] },
+    { granted, revoked },
+  );
+  const concentrations = dutyConcentrations(editedCaps);
+  const withheld = withholdingBreaches(roleId, editedCaps);
 
   function startEdit(profile: StaffProfile) {
     setEditingUid(profile.uid);
@@ -370,6 +385,37 @@ export function PermissionsPage() {
                     </div>
                   </div>
                 </div>
+
+                {concentrations.length > 0 && (
+                  <div className="border-l-4 border-maroon bg-white p-3 space-y-2">
+                    <p className="text-label-caps font-display uppercase text-maroon">
+                      This combination concentrates a duty that is meant to be split
+                    </p>
+                    <ul className="space-y-1">
+                      {concentrations.map((c) => (
+                        <li key={c.rule.label} className="text-body-md font-body text-ink">
+                          <span className="font-semibold">{c.rule.label}</span> — {c.rule.reason}{' '}
+                          <span className="text-data-mono font-mono text-slate">({c.held.join(' + ')})</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="text-body-md font-body text-slate">{CONCENTRATION_BASIS}</p>
+                  </div>
+                )}
+
+                {withheld.length > 0 && (
+                  <div className="border-l-4 border-gold bg-white p-3 space-y-1">
+                    <p className="text-label-caps font-display uppercase text-ink">
+                      A departure from what this role is deliberately denied
+                    </p>
+                    {withheld.map((breach) => (
+                      <p key={breach.withholding.roleId} className="text-body-md font-body text-ink">
+                        {breach.withholding.reason}{' '}
+                        <span className="text-data-mono font-mono text-slate">({breach.held.join(', ')})</span>
+                      </p>
+                    ))}
+                  </div>
+                )}
 
                 {saveMutation.isError && (
                   <p className="text-body-md text-maroon">Save failed — check you hold team.manage.</p>

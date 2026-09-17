@@ -94,6 +94,21 @@ export function manualToDocument(manual: Manual, meta: ManualDocumentMeta): Prin
     kind: 'bullets',
     items: register.map((r) => `${r.number} — ${r.title} (${AREA_LABEL[r.area]}) · ${r.state}`),
   });
+  // An empty register is the finished state, and saying so is part of the
+  // same promise the paragraph above makes. A reader who has been told
+  // that unwritten procedures are listed needs to be told, once there are
+  // none, that the absence means completeness rather than a dropped list.
+  blocks.push({
+    kind: 'para',
+    muted: true,
+    text:
+      PLANNED_SOPS.length === 0
+        ? `All ${SOPS.length} procedures in this manual's structure are written and issued. Nothing above is ` +
+          'awaiting drafting; anything not in your copy is another role\u2019s, or outside your subscription, ' +
+          'and the reason is given beside it.'
+        : `${PLANNED_SOPS.length} procedure(s) above are not yet issued. They are named so that the shape of ` +
+          'the manual is visible, and they will arrive in a later version.',
+  });
 
   return {
     title: 'Onboarding & Operations Manual',

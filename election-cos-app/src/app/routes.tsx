@@ -28,6 +28,7 @@ import { PermissionsPage } from '@/modules/settings/PermissionsPage';
 import { PPFAThresholdsPage } from '@/modules/settings/PPFAThresholdsPage';
 import { DataSubjectRequestsPage } from '@/modules/settings/DataSubjectRequestsPage';
 import { CandidatesPage } from '@/modules/candidates/CandidatesPage';
+import { SubscriptionPage } from '@/modules/settings/SubscriptionPage';
 import { GatheringsAdvisoryPage } from '@/modules/knowledge/GatheringsAdvisoryPage';
 import { ElectionTimetablePage } from '@/modules/knowledge/ElectionTimetablePage';
 
@@ -66,6 +67,7 @@ export const router = createBrowserRouter([
           { path: 'ppfa-thresholds', element: <PPFAThresholdsPage /> },
           { path: 'data-requests', element: <DataSubjectRequestsPage /> },
           { path: 'candidates', element: <CandidatesPage /> },
+          { path: 'subscription', element: <SubscriptionPage /> },
         ],
       },
       { path: 'knowledge/gatherings-advisory', element: <GatheringsAdvisoryPage /> },

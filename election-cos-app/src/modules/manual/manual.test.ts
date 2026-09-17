@@ -5,7 +5,7 @@ import type { TenantEntitlement } from '@/dal/ports/entitlements';
 import { SEED_ROLES } from '@/auth/seedRoles';
 import { NO_ANSWER_COOLOFF_HOURS, INACCESSIBLE_COOLOFF_HOURS } from '@/modules/voters/canvassQueue';
 import { HAZARD_LABEL, HAZARD_ORDER, PAIR_UP_HAZARDS } from '@/modules/voters/householdSafety';
-import { assembleManual, groupByArea, type Sop } from './manualModel';
+import { assembleManual, AREA_ORDER, groupByArea, type Sop } from './manualModel';
 import { PLANNED_SOPS, SOPS } from './sops';
 import { CANVASSER_SOP } from './sops/canvasserSop';
 import { ROLE_PURPOSE, TENANT_SETUP_SOP } from './sops/tenantSetupSop';
@@ -67,10 +67,28 @@ import {
   type PrListIssueCode,
 } from '@/modules/candidates/prList';
 import { ID_CAPTURE_BASIS } from '@/modules/candidates/candidateCapture';
+import { PERMISSIONS_SOP } from './sops/permissionsSop';
+import { PRIMARY_NAV, navItemAccess } from '@/app/nav';
+import { MODULES } from '@/auth/modules';
+import {
+  CONCENTRATION_BASIS,
+  ROLE_WITHHOLDINGS,
+  SEPARATION_RULES,
+} from '@/modules/settings/dutyConcentration';
+import { SUBSCRIPTION_PRICE_BASIS, UNBUILT_MODULE_BASIS } from '@/modules/settings/subscriptionView';
 import { buildManualPdf, manualFileName, MANUAL_STATUS_NOTE } from './manualPdf';
 
 const NOW = new Date('2026-06-01T00:00:00.000Z');
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
+const ENT_PPFA: TenantEntitlement = {
+  id: 'ppfa-disclosure',
+  tenantId: 't',
+  module: 'ppfa-disclosure',
+  activeFrom: '2026-01-01T00:00:00.000Z',
+  createdAt: '',
+  updatedAt: '',
+  updatedBy: 'system',
+};
 
 const ent = (module: string, over: Partial<TenantEntitlement> = {}): TenantEntitlement => ({
   id: module,
@@ -357,10 +375,20 @@ describe('the printed manual', () => {
     expect(text).toContain('nothing is silently missing');
   });
 
-  it('shows the shape of the full manual without pretending it is written', () => {
+  it('says whether anything is still unwritten, either way', () => {
+    // Until session 30 this asserted the words "not yet issued", which
+    // stopped being printed the moment the twelfth SOP shipped — and an
+    // appendix that had promised to name unwritten procedures would then
+    // have said nothing at all about there being none. Both states are
+    // now stated, and this asserts whichever one is true.
     const text = printed(buildManualPdf(manual, meta));
-    expect(text).toContain('not yet issued');
     expect(text).toContain('SOP-09');
+    if (PLANNED_SOPS.length === 0) {
+      expect(text).toContain('are written and issued');
+      expect(text).not.toContain('not yet issued');
+    } else {
+      expect(text).toContain('not yet issued');
+    }
   });
 
   it('lists every procedure in the appendix, written ones included, each with its state', () => {
@@ -1432,5 +1460,143 @@ describe('SOP-11 describes preparing a party list honestly', () => {
     expect(text).toMatch(/not a way to populate this screen/i);
     expect(text).toMatch(/order of preference — the thing that decides who takes a seat — was gone/i);
     expect(text).toMatch(/full date of birth readable/i);
+  });
+});
+
+
+/**
+ * SOP-12 is the one that explains the two gates, so its guards check that
+ * both gates actually exist — the entitlement half was described by a
+ * module nothing imported until this SOP was written — and that the
+ * separations it prints are the ones this build holds rather than
+ * plausible-sounding ones.
+ */
+describe('SOP-12 describes roles, permissions and the subscription honestly', () => {
+  const text = JSON.stringify(PERMISSIONS_SOP);
+  const lines = PERMISSIONS_SOP.sections.flatMap((section) => [
+    section.heading,
+    ...(section.body ?? []),
+    ...(section.steps ?? []),
+    ...(section.warnings ?? []),
+  ]);
+
+  it('goes to the role that holds the permissions page', () => {
+    expect(PERMISSIONS_SOP.roles).toEqual(['party-hq-admin']);
+    expect(PERMISSIONS_SOP.requiresAnyCapability).toEqual(['settings.permissions']);
+    expect(SEED_ROLES.find((r) => r.id === 'party-hq-admin')!.defaultCaps).toContain('settings.permissions');
+  });
+
+  it('keeps permission and subscription apart, and so does the code', () => {
+    expect(text).toMatch(/A permission problem you can fix yourself/i);
+    expect(text).toMatch(/it is a purchase/i);
+    // The claim is only true because the gate is wired in. Same item, same
+    // caps, two tenants: the outcomes and the reasons must differ.
+    const finance = PRIMARY_NAV.find((i) => i.route === '/finance')!;
+    const unsubscribed = navItemAccess(finance, ['ppfa.view'], []);
+    const unpermitted = navItemAccess(finance, [], [ENT_PPFA]);
+    expect(unsubscribed.allowed).toBe(false);
+    expect(unpermitted.outcome).toBe('NOT_PERMITTED');
+    expect(unsubscribed.reason).not.toBe(unpermitted.reason);
+  });
+
+  it('is right that granting a capability cannot buy a module', () => {
+    expect(text).toMatch(/Granting a capability does not buy a module/i);
+    const finance = PRIMARY_NAV.find((i) => i.route === '/finance')!;
+    // Every PPFA capability in the catalogue, and still no.
+    expect(navItemAccess(finance, ['ppfa.view', 'ppfa.edit', 'ppfa.export', 'ppfa.manage_thresholds'], []).allowed).toBe(
+      false,
+    );
+  });
+
+  it('prints only separations this build actually holds', () => {
+    for (const rule of SEPARATION_RULES) {
+      expect(lines.some((line) => line.includes(rule.reason)), rule.label).toBe(true);
+      // …and no seed role breaches what the SOP prints as a rule, or the
+      // manual would be telling administrators their own roles are wrong.
+      for (const role of SEED_ROLES) {
+        expect(rule.capabilities.every((c) => role.defaultCaps.includes(c)), role.id).toBe(false);
+      }
+    }
+    for (const withholding of ROLE_WITHHOLDINGS) {
+      expect(lines.some((line) => line.includes(withholding.reason)), withholding.roleId).toBe(true);
+    }
+  });
+
+  it('presents the concentration warning as a warning', () => {
+    expect(lines).toContain(CONCENTRATION_BASIS);
+    expect(text).not.toMatch(/\bthe platform (will )?(refuses?|blocks?|prevents?) (you|this)\b/i);
+  });
+
+  it('carries the no-prices position rather than restating it', () => {
+    expect(lines).toContain(SUBSCRIPTION_PRICE_BASIS);
+    expect(lines).toContain(UNBUILT_MODULE_BASIS);
+    // No figure and no rate anywhere in the SOP. Scanned with the two
+    // shared constants removed, because SUBSCRIPTION_PRICE_BASIS is the
+    // one place the word "prices" legitimately appears — preceded by "It
+    // carries no".
+    const body = [SUBSCRIPTION_PRICE_BASIS, UNBUILT_MODULE_BASIS].reduce(
+      (acc, sentence) => acc.split(JSON.stringify(sentence).slice(1, -1)).join(''),
+      text,
+    );
+    expect(body).not.toMatch(/R\s?\d/);
+    expect(body).not.toMatch(/\b(per month|per annum|per ward per|price|pricing|tariff)\b/i);
+  });
+
+  it('is right that nobody inside a campaign can grant themselves a module', () => {
+    expect(text).toMatch(/Nobody inside a campaign can change a subscription, including you/i);
+    const rules = readFileSync(path.join(REPO_ROOT, 'firestore.rules'), 'utf8');
+    expect(rules).toMatch(/entitlements\/\{entitlementId\}[\s\S]{0,120}allow write: if false/);
+  });
+
+  it('never presents hiding a nav item as security', () => {
+    expect(text).toMatch(/Hiding a nav item is not security/i);
+    expect(text).toMatch(/rendering convenience/i);
+  });
+
+  it('says plainly what the permission model does not do', () => {
+    expect(text).toMatch(/does not log who looked at what/i);
+    expect(text).toMatch(/It does not expire anybody/i);
+    expect(text).toMatch(/Permissions are per capability, not per record/i);
+  });
+});
+
+/**
+ * The manual is complete at twelve. This is the guard that the register
+ * says so rather than quietly printing a shorter list.
+ */
+describe('the finished manual', () => {
+  it('has written every procedure its own structure declares', () => {
+    expect(PLANNED_SOPS).toEqual([]);
+    expect(SOPS.map((s) => s.number)).toEqual([
+      'SOP-01',
+      'SOP-02',
+      'SOP-03',
+      'SOP-04',
+      'SOP-05',
+      'SOP-06',
+      'SOP-07',
+      'SOP-08',
+      'SOP-09',
+      'SOP-10',
+      'SOP-11',
+      'SOP-12',
+    ]);
+  });
+
+  it('covers every area the manual model declares', () => {
+    const covered = new Set(SOPS.map((s) => s.area));
+    for (const area of AREA_ORDER) {
+      expect(covered.has(area), area).toBe(true);
+    }
+  });
+
+  it('gives every seed role at least one procedure of its own', () => {
+    for (const role of SEED_ROLES) {
+      const manual = assembleManual(SOPS, {
+        ...audience(role.id),
+        entitlements: MODULES.map((m) => ent(m.key)),
+      });
+      expect(manual.sops.length, `${role.id} receives no procedure`).toBeGreaterThan(0);
+    }
   });
 });

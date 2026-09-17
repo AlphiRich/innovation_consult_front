@@ -23,10 +23,16 @@ import { useAuthState } from '@/auth/useSession';
 import { SignInPage } from '@/auth/SignInPage';
 import { signOut } from '@/auth/firebaseAuth';
 import { NAV_FOOTER_LINE, PRODUCT_NAME_SHORT } from '@/lib/legalText';
-import { PRIMARY_NAV, isNavItemVisible } from './nav';
+import { useEntitlements } from '@/auth/useEntitlements';
+import { PRIMARY_NAV, navItemAccess } from './nav';
 
 export function Shell() {
   const { session, status, user } = useAuthState();
+  // Both gates, once the billing read lands. Until then `entitlements` is
+  // undefined and the nav falls back to capability alone — see
+  // `useEntitlements`, which is emphatic that loading is not "nothing
+  // subscribed".
+  const { entitlements } = useEntitlements();
 
   if (status === 'loading') {
     return (
@@ -93,7 +99,7 @@ export function Shell() {
          */}
         <div className="font-display text-lg tracking-wide mb-6">{PRODUCT_NAME_SHORT}</div>
         <ul className="space-y-1">
-          {PRIMARY_NAV.filter((item) => isNavItemVisible(item, caps)).map((item) => (
+          {PRIMARY_NAV.filter((item) => navItemAccess(item, caps, entitlements).allowed).map((item) => (
             <li key={item.route}>
               <NavLink
                 to={item.route}

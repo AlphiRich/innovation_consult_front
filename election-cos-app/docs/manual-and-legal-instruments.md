@@ -111,8 +111,9 @@ a contract.
 
 ## Sequence
 
-1. SOP-01 through SOP-11 are issued (`src/modules/manual/sops/`).
-2. SOP-12 is written (`PLANNED_SOPS` carries the register).
+1. SOP-01 through SOP-12 are issued (`src/modules/manual/sops/`). The
+   manual is complete: `PLANNED_SOPS` is empty, and `manual.test.ts`
+   asserts it.
 3. The completed manual goes to an attorney **with this file**, which
    tells them what is safe to rely on and what must not be said.
 4. The instruments are drafted against it.
@@ -768,3 +769,80 @@ applied later.
 The export printing identity numbers in full; the warnings section dropped
 from the export; and the seed cut to 32 wards to match the workbook (which
 also trips SOP-03's pre-existing split-VD guard).
+
+
+---
+
+## SOP-12, and a gate that was described but never built (session 30)
+
+SOP-12 is the last procedure, and the one explaining the two questions
+every other SOP quietly depends on: may this person do this, and did this
+campaign buy this. Writing it found that the product could not tell them
+apart.
+
+**The entitlement gate was not wired into the application.**
+`src/auth/entitlements.ts` exists, is tested, and says in its own header
+that "collapsing the two into one 'access denied' is the failure this
+module exists to prevent". Nothing imported it. `resolveAccess`,
+`activeModules` and `subscribedWards` were reached only by their own test
+file — no `.tsx` in the repository referenced the module at all. So the
+failure it was written to prevent was the product's actual behaviour.
+
+The clearest symptom was two shipped artifacts disagreeing about the same
+fact: `assembleManual()` does honour entitlements, so a tenant without the
+PPFA module received a manual with SOP-10 withheld and an application that
+let them use the whole donor ledger.
+
+`navItemAccess()` is the gate, `useEntitlements()` the read. The
+distinction it is most careful about is that **loading is not "nothing
+subscribed"**: `undefined` means the billing read has not landed and falls
+back to the capability answer, `[]` is a real answer that turns paid
+modules off. Hiding Funding for the first second of every session would
+teach people the screen flickers, which is how a real entitlement message
+gets ignored. A failed read falls back the same way — locking a paid-up
+campaign out over a network blip is the worse of the two outcomes, and the
+subscription page says so when it happens.
+
+**A subscriber could not see what they had bought.** The records, the
+port, the adapter and a rule letting every tenant member read them all
+existed; no screen did. `SubscriptionPage` lists every module, what is on,
+until when, and which wards for the two that are bought ward by ward. It
+carries no prices, because `TenantEntitlement` carries none by design.
+
+**Per-user overrides could rebuild a separation of duty in silence.**
+`roleModel.test.ts` asserts no role holds the whole disclosure chain plus
+`dsr.manage`; the Permissions page offered every capability as a checkbox,
+and one tick on a Compliance Officer assembled exactly that.
+`dutyConcentration.ts` checks the *resolved* set — role defaults plus
+grants minus revocations — and warns rather than blocking, because a small
+campaign may genuinely have one person doing several jobs. What it must
+not be is accidental.
+
+### A rule that was wrong, caught by its own guard
+
+The first draft of `dutyConcentration.ts` declared three general
+separations. Two of them were invented: `dsr.manage` +
+`ppfa.manage_thresholds`, which `party-hq-admin` holds by design, and the
+full funding set, which `finance-officer` holds by design. Its own "is
+breached by no seed role" test failed within a minute of being written.
+
+The module now distinguishes two kinds of rule — combinations **no role
+may have** (there is exactly one) and capabilities a **specific role** is
+deliberately denied (two, from `roleModel.test.ts`'s own reasoning). The
+failure mode is worth recording: a warning that fires on a correct
+configuration teaches an administrator to ignore warnings.
+
+### The manual is finished
+
+Twelve procedures, every area covered, every seed role receiving at least
+one. `PLANNED_SOPS` is empty, and the printed appendix now says the
+register is complete rather than silently dropping the "not yet issued"
+line it had promised to show — a guard that had asserted those exact words
+was rewritten to assert whichever state is true.
+
+### Guards proven by injection
+
+The entitlement gate un-wired back to a capability-only check; a
+separation rule narrowed so that two seed roles breach it; and a
+thirteenth procedure declared and never written after the register was
+called complete.

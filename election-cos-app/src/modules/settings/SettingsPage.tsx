@@ -24,6 +24,11 @@ const SUB_VIEWS = [
     label: 'Candidates & party list',
     description: 'Capture candidates and check a PR list before it is submitted. Files nothing.',
   },
+  {
+    to: '/settings/subscription',
+    label: 'Subscription',
+    description: 'Which modules this campaign has bought, and until when. No prices — see the header there.',
+  },
 ] as const;
 
 export function SettingsPage() {
