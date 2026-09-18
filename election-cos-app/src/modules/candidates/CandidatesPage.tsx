@@ -32,6 +32,7 @@ import type { Candidate } from '@/dal/ports/candidates';
 import { documentFileStem } from '@/lib/document/model';
 import { renderDocumentPdf } from '@/lib/document/pdfRenderer';
 import { checkPrList, PR_LIST_EXPORT_BASIS, type PrListIssue } from './prList';
+import { buildWardRoll, COVERAGE_BASIS, DOUBLE_NOMINATION_BASIS } from './wardRoll';
 import { prListDocument } from './prListDocument';
 import { CandidateForm } from './CandidateForm';
 
@@ -85,6 +86,11 @@ export function CandidatesPage() {
     queryFn: () => dal.staff.getByUid(session!, session!.uid),
     enabled: Boolean(session),
   });
+  const wardsQuery = useQuery({
+    queryKey: ['wards', session?.tenantId],
+    queryFn: () => dal.wards.listAll(session!),
+    enabled: Boolean(session),
+  });
 
   if (!session) {
     return (
@@ -104,7 +110,10 @@ export function CandidatesPage() {
   const canManage = session.caps.includes('team.manage');
 
   const result = checkPrList({ candidates, prSeats: profile?.prSeats ?? 0 });
-  const wardCandidates = candidates.filter((c) => c.affiliation === 'WARD' && c.deletedAt === null);
+  const wardRoll = buildWardRoll(
+    candidates,
+    (wardsQuery.data ?? []).filter((w) => w.deletedAt === null).map((w) => w.wardCode),
+  );
 
   function handleExport() {
     setExportError(null);
@@ -216,25 +225,75 @@ export function CandidatesPage() {
         ))}
       </section>
 
-      {wardCandidates.length > 0 && (
-        <section className="space-y-2">
+      <section className="space-y-2">
+        <div className="flex items-baseline justify-between gap-3 flex-wrap">
           <h2 className="text-headline-md font-display text-ink">Ward candidates</h2>
-          <p className="text-body-md font-body text-slate">
-            Nominated under section 17 of the Municipal Electoral Act, which is a different process from the
-            party list above. None of the list checks apply to them and they are not on the exported list.
+          <p className="text-data-mono font-mono text-slate">
+            {wardRoll.covered.length} of {wardRoll.wardCount} wards have exactly one candidate
           </p>
-          {wardCandidates.map((candidate) => (
-            <div key={candidate.id} className="bg-white border border-ink/10 rounded p-3">
-              <p className="text-body-md font-body text-ink">
-                {candidate.fullName} — ward {candidate.wardCode}
+        </div>
+        <p className="text-body-md font-body text-slate">
+          Nominated under section 17 of the Municipal Electoral Act, which is a different process from the
+          party list above. None of the list checks apply to them and they are not on the exported list.
+        </p>
+        <p className="text-body-md font-body text-slate">{COVERAGE_BASIS}</p>
+
+        {wardRoll.wardCount === 0 && (
+          <p className="text-body-md font-body text-maroon border-l-4 border-maroon bg-white p-3">
+            No wards are loaded for this campaign, so there is nothing to count coverage against. Seed the
+            wards first — SOP-03 covers it.
+          </p>
+        )}
+
+        {wardRoll.missing.length > 0 && (
+          <div className="border-l-4 border-maroon bg-white p-3 space-y-1">
+            <p className="text-label-caps font-display uppercase text-maroon">
+              {wardRoll.missing.length} ward(s) with no candidate
+            </p>
+            <p className="text-data-mono font-mono text-slate">{wardRoll.missing.join(', ')}</p>
+          </div>
+        )}
+
+        {wardRoll.doubled.length > 0 && (
+          <div className="border-l-4 border-maroon bg-white p-3 space-y-1">
+            <p className="text-label-caps font-display uppercase text-maroon">
+              {wardRoll.doubled.length} ward(s) with more than one candidate
+            </p>
+            <p className="text-data-mono font-mono text-slate">{wardRoll.doubled.join(', ')}</p>
+            <p className="text-body-md font-body text-slate">{DOUBLE_NOMINATION_BASIS}</p>
+          </div>
+        )}
+
+        {wardRoll.unplaceable.length > 0 && (
+          <div className="border-l-4 border-maroon bg-white p-3 space-y-1">
+            <p className="text-label-caps font-display uppercase text-maroon">
+              {wardRoll.unplaceable.length} candidate(s) in a ward this campaign has not loaded
+            </p>
+            {wardRoll.unplaceable.map((candidate) => (
+              <p key={candidate.id} className="text-body-md font-body text-ink">
+                {candidate.fullName} —{' '}
+                <span className="text-data-mono font-mono text-slate">{candidate.wardCode || 'no ward code'}</span>
               </p>
-              <p className="text-data-mono font-mono text-slate">
-                {candidate.idNumberMasked} · {candidate.verificationStatus}
-              </p>
+            ))}
+          </div>
+        )}
+
+        {wardRoll.entries
+          .filter((entry) => entry.candidates.length > 0)
+          .map((entry) => (
+            <div key={entry.wardCode} className="bg-white border border-ink/10 rounded p-3">
+              <p className="text-data-mono font-mono text-slate">{entry.wardCode}</p>
+              {entry.candidates.map((candidate) => (
+                <p key={candidate.id} className="text-body-md font-body text-ink">
+                  {candidate.fullName}{' '}
+                  <span className="text-data-mono font-mono text-slate">
+                    {candidate.idNumberMasked} · {candidate.verificationStatus}
+                  </span>
+                </p>
+              ))}
             </div>
           ))}
-        </section>
-      )}
+      </section>
 
       <section className="space-y-3 border-t border-ink/10 pt-4">
         <label className="space-y-1 block max-w-sm">

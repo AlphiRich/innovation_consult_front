@@ -38,6 +38,17 @@ export type IncidentDraft = Omit<
 export interface IncidentRepository {
   getById(ctx: SessionContext, id: string): Promise<Incident | null>;
   listByStatus(ctx: SessionContext, status: IncidentStatus, page: PageRequest): Promise<Page<Incident>>;
+  /**
+   * Every incident logged between two instants, across statuses.
+   *
+   * Added session 31 for the municipal incident report. `listByStatus`
+   * answers "what is waiting on us now", which is the incidents board's
+   * question; a report answers "what did this ward live with last
+   * month", which is a different one and could not be asked. Narrowed by
+   * the caller's geographic scope like every other read, so a ward lead
+   * reports on their own ward.
+   */
+  listByDateRange(ctx: SessionContext, fromIso: string, toIso: string): Promise<Incident[]>;
   create(ctx: SessionContext, incident: IncidentDraft): Promise<UpsertResult>;
   triage(ctx: SessionContext, id: string, severity: IncidentSeverity): Promise<void>;
   escalate(ctx: SessionContext, id: string): Promise<void>;

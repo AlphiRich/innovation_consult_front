@@ -2,7 +2,7 @@
  * Election Campaign OS — Firestore adapter: incidents
  * IC-ECOS-BUILD-2026-V2 §5, §6.4.
  */
-import { where } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import type { Page, PageRequest, SessionContext } from '@/dal/ports/session';
 import type {
   Incident,
@@ -11,7 +11,15 @@ import type {
   IncidentSeverity,
   IncidentStatus,
 } from '@/dal/ports/incidents';
-import { geoScopeConstraints, getByIdGeneric, listPageGeneric, toISO, upsertGeneric } from './base';
+import {
+  db,
+  geoScopeConstraints,
+  getByIdGeneric,
+  listPageGeneric,
+  tenantCollectionPath,
+  toISO,
+  upsertGeneric,
+} from './base';
 
 function fromFirestore(id: string, data: Record<string, unknown>): Incident {
   return {
@@ -47,6 +55,19 @@ export const incidentsRepository: IncidentRepository = {
       page,
       fromFirestore,
     );
+  },
+
+  async listByDateRange(ctx: SessionContext, fromIso: string, toIso: string): Promise<Incident[]> {
+    const snap = await getDocs(
+      query(
+        collection(db(), tenantCollectionPath(ctx.tenantId, 'incidents')),
+        where('createdAt', '>=', fromIso),
+        where('createdAt', '<=', toIso),
+        where('deletedAt', '==', null),
+        ...geoScopeConstraints(ctx),
+      ),
+    );
+    return snap.docs.map((d) => fromFirestore(d.id, d.data()));
   },
 
   async create(ctx: SessionContext, incident: IncidentDraft) {

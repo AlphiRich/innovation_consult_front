@@ -29,6 +29,11 @@ const SUB_VIEWS = [
     label: 'Subscription',
     description: 'Which modules this campaign has bought, and until when. No prices — see the header there.',
   },
+  {
+    to: '/settings/audit',
+    label: 'Audit log',
+    description: 'Acts the platform recorded — unmasking, exports, threshold changes. Read-only, and says what it is not.',
+  },
 ] as const;
 
 export function SettingsPage() {

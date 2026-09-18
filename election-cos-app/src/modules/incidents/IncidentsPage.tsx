@@ -18,6 +18,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { dal } from '@/dal';
 import { useSession } from '@/auth/useSession';
+import { Link } from 'react-router-dom';
 import type { IncidentStatus } from '@/dal/ports/incidents';
 import { IncidentCard } from './IncidentCard';
 import { IncidentForm } from './IncidentForm';
@@ -55,13 +56,26 @@ export function IncidentsPage() {
           <p className="text-label-caps font-display uppercase text-slate">/incidents</p>
           <h1 className="text-headline-md font-display text-ink mt-1">Incidents</h1>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowForm(true)}
-          className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase whitespace-nowrap"
-        >
-          + Log incident
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          {/*
+           * The report lives off this page rather than in the primary
+           * nav, which §3.2 fixes at nine items and nav.test.ts holds
+           * there. Same arrangement as the canvassing round off Voters.
+           */}
+          <Link
+            to="/incidents/report"
+            className="border border-ink/20 text-ink rounded px-4 py-2 text-label-caps font-display uppercase whitespace-nowrap"
+          >
+            Report
+          </Link>
+          <button
+            type="button"
+            onClick={() => setShowForm(true)}
+            className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase whitespace-nowrap"
+          >
+            + Log incident
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-1 flex-wrap border-b border-ink/10 pb-2">
