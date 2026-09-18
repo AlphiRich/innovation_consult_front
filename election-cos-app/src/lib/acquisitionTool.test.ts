@@ -17,7 +17,7 @@
  *   python3 tools/source-acquisition/acquire.py --self-test
  */
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
@@ -66,6 +66,60 @@ describe('the acquisition script cannot claim a completion it did not reach', ()
     expect(script).not.toMatch(/C:\\+Users/i);
     expect(script).not.toMatch(/\b(api[_-]?key|token)\s*=\s*["'][A-Za-z0-9]{8,}/i);
     expect(script).toMatch(/os\.environ\.get\(source\.auth_env/);
+  });
+});
+
+describe('discovery proposes and never acquires', () => {
+  it('writes every proposed row as unconfirmed, with the human decisions left blank', () => {
+    expect(script).toMatch(/"status": "UNCONFIRMED"/);
+    expect(script).toMatch(/REPLACE_ME/);
+    expect(script).toMatch(/discovery proposes, it does not acquire/i);
+  });
+
+  it('scans one page rather than crawling a government portal', () => {
+    expect(script).toMatch(/a link scan and not a crawler/i);
+    // No recursion into discovered links: run_discovery reads one URL.
+    expect(script).not.toMatch(/def\s+crawl|while\s+queue|frontier/);
+  });
+
+  it('proposes only things that look like datasets', () => {
+    expect(script).toMatch(/DATASET_SUFFIXES/);
+    expect(script).toMatch(/mailto:/);
+  });
+});
+
+describe('the skill matches the tool it documents', () => {
+  const skill = readFileSync(
+    path.join(REPO_ROOT, '.claude', 'skills', 'iec-data-ingestion', 'SKILL.md'),
+    'utf8',
+  );
+
+  it('documents only flags the script actually has', () => {
+    // A skill naming a flag that does not exist sends the next session
+    // down a path the tool cannot walk.
+    for (const flag of ['--self-test', '--discover', '--probe', '--fetch', '--only', '--suggest-to']) {
+      expect(skill, `skill mentions ${flag}`).toContain(flag);
+      expect(script, `script implements ${flag}`).toContain(flag);
+    }
+  });
+
+  it('carries the refusal that governs this whole area', () => {
+    expect(skill).toMatch(/Nothing is reported as done unless it was done/i);
+    expect(skill).toMatch(/Never sentiment/i);
+  });
+
+  it('points at modules that exist', () => {
+    for (const file of [
+      'src/modules/ingest/electionResultSchema.ts',
+      'src/modules/ingest/ingestResult.ts',
+      'src/modules/ingest/mappings.ts',
+      'src/lib/saIdNumber.ts',
+      'docs/design-decision-and-change-log.md',
+      'tools/source-acquisition/acquire.py',
+    ]) {
+      expect(skill, `skill cites ${file}`).toContain(path.basename(file));
+      expect(existsSync(path.join(REPO_ROOT, file)), `${file} exists`).toBe(true);
+    }
   });
 });
 

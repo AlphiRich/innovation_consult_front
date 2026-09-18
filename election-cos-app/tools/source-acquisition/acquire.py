@@ -74,6 +74,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html
+import re
 import json
 import os
 import shutil
@@ -93,6 +95,11 @@ from typing import Any
 HERE = Path(__file__).resolve().parent
 DEFAULT_OUT = Path.cwd() / "07_Geospatial_and_Electoral_Data"
 USER_AGENT = "ElectionCampaignOS-source-acquisition/1.0 (+operator-run; contact your administrator)"
+
+# Extensions worth proposing as a dataset. Deliberately narrow: a portal
+# links hundreds of things, and a discovery run that proposed every one
+# would be a list nobody reads.
+DATASET_SUFFIXES = (".csv", ".xlsx", ".xls", ".zip", ".json", ".geojson", ".pdf", ".shp")
 
 # Leading bytes that prove a payload is the kind of file it claims to be.
 # A portal that answers an unknown path with an HTML error page returns
@@ -417,6 +424,119 @@ def sha256_of(path: Path) -> str:
 
 
 # --------------------------------------------------------------------------
+# discovery
+# --------------------------------------------------------------------------
+
+LINK_RE = re.compile(r"""<a\s[^>]*?href\s*=\s*["\']([^"\']+)["\'][^>]*>(.*?)</a>""", re.I | re.S)
+TAG_RE = re.compile(r"<[^>]+>")
+
+
+def discover_links(page_html: str, base_url: str) -> list[dict[str, str]]:
+    """Every link on a page that looks like a downloadable dataset.
+
+    Deliberately a link scan and not a crawler. It reads the one page it
+    is given, proposes what it found, and stops. A crawler turned loose on
+    a government portal is a way to get a campaign's IP blocked during an
+    election, and the operator only needs the download index anyway.
+
+    Nothing here is fetched. Discovery proposes; a person decides what
+    goes in the registry.
+    """
+    from urllib.parse import urljoin, urlparse
+
+    found: dict[str, dict[str, str]] = {}
+    for match in LINK_RE.finditer(page_html):
+        href = html.unescape(match.group(1).strip())
+        if not href or href.startswith(("#", "mailto:", "javascript:", "tel:")):
+            continue
+        absolute = urljoin(base_url, href)
+        if urlparse(absolute).scheme not in ("http", "https"):
+            continue
+        path = urlparse(absolute).path.lower()
+        if not path.endswith(DATASET_SUFFIXES):
+            continue
+        text = html.unescape(TAG_RE.sub(" ", match.group(2)))
+        text = " ".join(text.split())[:160]
+        # First mention wins; portals repeat the same link in a sidebar.
+        found.setdefault(absolute, {"url": absolute, "text": text, "suffix": Path(path).suffix.lstrip(".")})
+    return sorted(found.values(), key=lambda item: item["url"])
+
+
+def suggest_registry_rows(links: list[dict[str, str]]) -> list[dict[str, Any]]:
+    """Turn discovered links into registry rows a person can edit.
+
+    Every row comes out UNCONFIRMED with a note saying it was proposed by
+    a discovery run and never fetched. Province and category are left as
+    placeholders on purpose: guessing "NW" from a filename is the class of
+    inference that put generated coordinates in a ward file.
+    """
+    expectations = {
+        "pdf": {"content_type": "application/pdf", "min_bytes": 51200, "magic": "pdf"},
+        "zip": {"content_type": "application/zip", "min_bytes": 102400, "magic": "zip"},
+        "xlsx": {"content_type": "application", "min_bytes": 8192, "magic": "zip"},
+        "csv": {"content_type": "text/csv", "min_bytes": 1024, "reject_html": True},
+        "json": {"min_bytes": 512, "json": True, "reject_html": True},
+        "geojson": {"min_bytes": 512, "json": True, "reject_html": True},
+    }
+    rows: list[dict[str, Any]] = []
+    for link in links:
+        name = Path(link["url"]).name or "download"
+        rows.append(
+            {
+                "id": f"discovered-{re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-')}",
+                "province": "REPLACE_ME",
+                "category": "REPLACE_ME",
+                "filename": name,
+                "url": link["url"],
+                "status": "UNCONFIRMED",
+                "note": f"Proposed by a discovery run. Link text: {link['text'] or '(none)'}. "
+                "Never fetched. Set province and category, check the expectations, then probe it.",
+                "expect": expectations.get(link["suffix"], {"min_bytes": 512, "reject_html": True}),
+            }
+        )
+    return rows
+
+
+def run_discovery(page_url: str, timeout: int, out: Path | None) -> int:
+    request = urllib.request.Request(page_url, headers={"User-Agent": USER_AGENT})
+    try:
+        with urllib.request.urlopen(request, timeout=timeout, context=ssl.create_default_context()) as response:
+            charset = response.headers.get_content_charset() or "utf-8"
+            page = response.read().decode(charset, errors="replace")
+    except Exception as exc:  # noqa: BLE001
+        print(f"Could not read {page_url}: {type(exc).__name__}: {exc}", file=sys.stderr)
+        print("Nothing was discovered. This run did not complete.", file=sys.stderr)
+        return 1
+
+    links = discover_links(page, page_url)
+    print(f"\n  {len(links)} candidate dataset link(s) on {page_url}\n")
+    for link in links:
+        print(f"  {link['suffix']:<8} {link['url']}")
+        if link["text"]:
+            print(f"           {link['text']}")
+
+    if not links:
+        print("  No links ending in a dataset extension. That is a page of navigation, not of downloads —")
+        print("  find the portal's download index and point --discover at that.")
+        return 1
+
+    rows = suggest_registry_rows(links)
+    if out:
+        out.write_text(json.dumps({"sources": rows}, indent=2), encoding="utf-8")
+        print(f"\n  {len(rows)} proposed registry row(s) written to {out}")
+    else:
+        print("\n  Proposed registry rows (pass --suggest-to FILE to write them):")
+        print(json.dumps({"sources": rows[:3]}, indent=2))
+        if len(rows) > 3:
+            print(f"  … and {len(rows) - 3} more.")
+
+    print()
+    print("  Every row is UNCONFIRMED and has REPLACE_ME where a person must decide. Nothing was")
+    print("  downloaded — discovery proposes, it does not acquire.")
+    return 0
+
+
+# --------------------------------------------------------------------------
 # reporting
 # --------------------------------------------------------------------------
 
@@ -582,6 +702,12 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--probe", action="store_true", help="check reachability; write nothing")
     mode.add_argument("--fetch", action="store_true", help="download and verify")
     mode.add_argument("--self-test", action="store_true", help="prove the verifier locally; no network")
+    mode.add_argument(
+        "--discover",
+        metavar="URL",
+        help="scan one page for dataset links and propose registry rows; downloads nothing",
+    )
+    parser.add_argument("--suggest-to", type=Path, help="write proposed registry rows to this file")
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT, help="destination directory")
     parser.add_argument("--registry", type=Path, default=HERE / "sources.json")
     parser.add_argument("--province", action="append", help="limit to a province code; repeatable")
@@ -593,6 +719,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.self_test:
         return self_test()
+
+    if args.discover:
+        return run_discovery(args.discover, args.timeout, args.suggest_to)
 
     try:
         sources = load_sources(args.registry)

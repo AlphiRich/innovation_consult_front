@@ -792,3 +792,148 @@ corrects. A guard asserts it stays out.
 failure return; a source promoted to `CONFIRMED` that nobody fetched; and
 the rename moved ahead of verification so an unverified payload takes the
 real filename. All three fail.
+
+---
+
+## Session 34 — IEC dataset acquisition and ingestion
+
+### Entry 34.1 — elections.org.za is unreachable from this build
+
+**Asked for.** Rag all pertinent datasets from
+`https://www.elections.org.za/pw/` and ingest the IEC's latest
+publications.
+
+**Could not be done, and this is the finding rather than an apology.**
+The build environment's egress proxy denies the host at CONNECT. Tested
+both ways available:
+
+| Attempt | Result |
+|---|---|
+| `curl https://www.elections.org.za/pw/` | `CONNECT tunnel failed, response 403` |
+| `WebFetch` on the same URL | `EGRESS_BLOCKED` |
+| `elections.org.za`, `www.elections.org.za` | both refused at CONNECT |
+
+Not one byte was fetched. **No dataset from that site has been ingested,
+and none is in the repository.** Anything presented as IEC data in this
+build would therefore be invented, and this register exists partly to make
+that statement checkable later.
+
+What *was* built is everything that runs the moment the site is reachable
+— by an operator, on a machine that can reach it. That is the larger half
+of the request and the half that survives this session.
+
+---
+
+### Entry 34.2 — Discovery: harvesting the dataset links
+
+**Built.** `--discover URL` in `tools/source-acquisition/acquire.py`,
+with `--suggest-to FILE`.
+
+It scans one page for links ending in a dataset extension, de-duplicates
+them, resolves relative URLs, decodes HTML entities, skips anchors,
+`mailto:` and navigation, and writes proposed registry rows.
+
+**A link scan, not a crawler.** A crawler turned loose on a government
+portal during an election is a way to get a campaign's IP blocked, and the
+operator only needs the download index. It reads the one page it is given
+and stops.
+
+**Every proposed row is `UNCONFIRMED` with `REPLACE_ME` where a person
+must decide** province and category. Inferring `NW` from a filename is the
+class of inference that put generated coordinates in a ward file (entry
+32.1), so it is not done.
+
+**Proven against a local fixture**, since the real portal is unreachable:
+an eight-link page yields four datasets, with the duplicate sidebar link
+collapsed and the three non-dataset links dropped. Downloads nothing.
+
+---
+
+### Entry 34.3 — Ingestion: schema, mapping registry, validator
+
+**Built.** `src/modules/ingest/` — `electionResultSchema.ts`,
+`ingestResult.ts`, `mappings.ts`, and 29 guards.
+
+**The gap it closes.** This build holds exactly one municipal election
+result: JB Marks 2021, transcribed **by hand** in session 8 from an IEC
+"Seat Calculation Detail" report and hardcoded in `nw405Example.ts` as the
+seat calculator's starter data. A second municipality, or the same one in
+2016, meant somebody transcribing a PDF again. There was no schema, no
+provenance and no validation — the figures were a TypeScript literal.
+
+**Why the ingester is mapping-driven rather than format-aware.** The
+obvious design is a parser that knows the IEC's column names. Nobody here
+has seen an IEC results file (entry 34.1), so a parser hardcoding
+`PARTY_NAME,VALID_VOTES,WARD_SEATS` would be a guess wearing the shape of
+knowledge — and the first real file would either fail loudly (lucky) or
+map the wrong column onto votes (not).
+
+So columns are declared once per publication format in a `ColumnMapping`,
+and a file with no mapping **reports every column heading it carries and
+stops**. That is what makes writing a mapping a two-minute job instead of
+a guess. Slower on the first file of a format, identical on every one
+after, and the only version that survives the IEC renaming a heading.
+
+**The registry ships one entry** — the report format this build has
+actually seen — and says why it is nearly empty. Six plausible untested
+mappings would be worse than one honest entry: one would match a file by
+accident, map the wrong column onto votes, and produce a result that
+validated.
+
+**Proven against the real result, end to end.** The tests write
+`NW405_2021_EXAMPLE` out as a delimited file, ingest it, and assert that
+what comes back feeds `allocateSeats()` to **the same quota, the same
+final council size and the same per-party seat totals** the IEC's own
+report printed. An ingester proven against invented data proves nothing
+about the data it will meet.
+
+**What it refuses:** an unmapped file; a cell that is not a number
+(`Number('')` is `0`, which is how a blank cell becomes a party with no
+votes that validates and is false); party votes missing the published
+total by more than 0.5%; more ward seats than the council has; a record
+marked confirmed with nobody named; a stored result that does not say what
+it is for.
+
+**Nothing arrives confirmed.** Parsing is not checking. A person compares
+the record against the published source and signs it, and
+`CONFIRMED_WITHOUT_SIGNATORY` blocks a flag set without a name.
+
+**`ResultUse` is a closed list of two** — seat-calculator inputs a person
+chooses, and reference reconciliation. **Sentiment is not on it and cannot
+be added quietly**: a guard asserts the list and fails on a third member.
+This is the refusal from entry 33.1 made structural rather than
+documentary.
+
+---
+
+### Entry 34.4 — The skill
+
+**Built.** `.claude/skills/iec-data-ingestion/SKILL.md`.
+
+Covers both stages, the refusals, how to add a mapping, and a
+**judging-a-supplied-dataset** section listing the failure modes this
+project has actually met: generated geometry on a lattice (32.1),
+ordinals sold as ward identifiers (NW candidate list §1), a figure bounded
+suspiciously tightly (33.2), an over-wide ID mask, and arithmetic that
+does not close. Three of the four datasets supplied to this project failed
+one of those checks.
+
+A guard asserts the skill only documents flags `acquire.py` actually
+implements, and only cites files that exist — a skill naming a flag the
+tool does not have sends the next session down a path it cannot walk.
+
+**Guards proven by injection:** fuzzy column matching (the guess the
+design refuses); ingest marking its own output CONFIRMED; `SENTIMENT_BASELINE`
+added to the permitted uses; and an untested mapping added to the
+registry. All four fail.
+
+### What an operator does next
+
+```bash
+python3 tools/source-acquisition/acquire.py --self-test
+python3 tools/source-acquisition/acquire.py --discover https://www.elections.org.za/pw/ --suggest-to rows.json
+# edit rows.json into sources.json — province, category, expectations
+python3 tools/source-acquisition/acquire.py --probe
+python3 tools/source-acquisition/acquire.py --fetch
+# then ingest: no mapping yet, so it prints the file's columns; add one; ingest again; sign it off
+```
