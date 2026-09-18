@@ -515,13 +515,15 @@ noted-but-unfixed since the ward seed was built.
 **The defect.** `inScope()` in `firestore.rules` narrowed a
 voting-district-scoped user on `data.vdCode == token.vdScope` **alone**.
 A voting district is a polling station's roll, and a station's roll can be
-split across wards — **24 of NW405's 95 station codes are**, and code
-`86910239` (Lesego Primary School) across **three** wards: 8, 12 and 16.
+split across wards — **26 of NW405's 108 station codes are** (corrected
+in session 33; this entry originally read 24 of 95 — see entry 33.2), and
+code `86910239` (Lesego Primary School) across **three** wards: 8, 12
+and 16.
 
 So a canvasser assigned to ward 8's portion of Lesego Primary matched, and
-could read, every voter at that station in wards 12 and 16 as well. For a
-quarter of this municipality's stations the VD code was not a narrowing at
-all. `VotingDistrict.id` has been `${wardCode}::${vdCode}` since the seed
+could read, every voter at that station in wards 12 and 16 as well. For
+close to a quarter of this municipality's stations the VD code was not a
+narrowing at all. `VotingDistrict.id` has been `${wardCode}::${vdCode}` since the seed
 was built for exactly this reason; the access rule had not followed.
 
 **What made it unfixable until now.** `staffProvisioning.ts` actively
@@ -553,3 +555,155 @@ provisioning validator and the manual.
 not retroactively change what anyone has already read, and there is no
 audit record of past reads to check against — ordinary reads are not
 logged (see entry 31.5).
+
+
+---
+
+## Session 33 — Computational Source Item Control Sheet & Repository Index
+
+### Entry 33.1 — A source-acquisition plan, and an ETL script that fetches nothing
+
+**What arrived.** A planning document for a data-acquisition exercise: six
+provinces (NW, GP, FS, LP, EC, KZN) × five LGE cycles (2000, 2006, 2011,
+2016, 2021) of IEC ward- and VD-level results, plus Municipal Demarcation
+Board delimitation gazettes and shapefiles for the 2024/2026 cycle. A
+folder nomenclature (`07_Geospatial_&_Electoral_Historical_Data_Repository`,
+`{PROV}_07_Electoral_Data/{MDB_Gazettes,IEC_Results}`), a target data
+schema, and a Python ETL script.
+
+**Decision.** Nothing built from the pipeline. One idea extracted and
+built — entry 33.2. The plan itself is a data-acquisition programme for a
+person to run, not a build task, and it is recorded here so it is not
+mistaken for one.
+
+**The script does not do what it prints.** `setup_directory_structure()`
+creates folders and works. `scrape_iec_historical_data()` and
+`scrape_mdb_gazettes()` each loop over the provinces and years, print a
+`> Fetching …` line per item, and `pass`. Every network call is commented
+out. Run as given, it prints thirty "Fetching" lines and
+`ETL Pipeline complete. The local folder is ready for Drive
+synchronization.` — and downloads nothing at all.
+
+That shape matters more than the missing code. A pipeline that announces
+per-item progress and then declares completion is one somebody runs, sees
+green, and believes. Anyone picking this up should treat the two scrape
+functions as unwritten, because they are.
+
+**Unverified in it, and left unverified.**
+
+- `https://api.elections.org.za/results/{year}/LGE/{prov}` — commented
+  out, never called, and the script's own note says the IEC API needs
+  credentials. This build did not confirm the endpoint exists or has that
+  shape, and does not repeat it as fact.
+- The MDB "Spatial Hub" as a programmatic source. Plausible; unconfirmed
+  from here.
+- **The "15% maximum deviation norm"** — extracted and used, but as a
+  configured and cited default rather than an asserted rule. See 33.2.
+
+**One objective refused outright.** The plan gives its purpose as a
+historical baseline "for the Election Campaign OS sentiment and seat
+projection mathematical algorithms."
+
+- **Sentiment.** Past election results are not sentiment and must never be
+  blended into it. SOP-08 is explicit that sentiment in this product is
+  the sum of doorstep conversations, with no sampling frame and no
+  weighting. Feeding results into it would produce a number that looked
+  like a poll, was neither, and could not be defended. Refused.
+- **Seat projection.** Genuinely useful — but as *inputs a person
+  chooses*, not as an automatic baseline. `seatCalculator.ts` is a
+  what-if tool that takes party vote figures and shows the allocation; it
+  deliberately does not forecast. Historical results would be good
+  starting values for that form. That is a data-entry convenience, and it
+  needs the data first.
+
+**Scope note.** Six provinces of historical results is a much larger
+undertaking than this build's reference municipality, and none of it is
+personal information (election results are public aggregates), so there is
+no POPIA question here. There is a provenance question: whatever arrives
+needs the same treatment the NW candidate list and the ward GeoJSON got.
+
+**Not added to the repository.** The script targets a hardcoded Windows
+desktop path on a named user's machine. It is a local utility, and the
+repo is not where it belongs.
+
+---
+
+### Entry 33.2 — The deviation norm, built as a real check
+
+**What was extracted.** The document's "Control Metric: Verification
+against the 15% maximum deviation norm from the municipal average." It is
+the one computational idea in the file, and it is arithmetic over data the
+tenant already holds — which is exactly the standard
+`seedReconciliation.ts` is built to.
+
+**Why it was worth building.** `reconcileSeed()` checks the ward *count*
+and the ward *codes*. It says nothing about ward *sizes*. A seed can have
+all 34 wards, no duplicates and correct codes while one ward carries four
+times another's voters — which is either a transcription error or a real
+fact about the municipality, and a campaign needs to know which, because
+it decides how many canvassers a ward needs.
+
+**How the threshold is treated.** The 15% figure is taken from the
+supplied note and has **not** been confirmed against the Municipal
+Structures Act or the Demarcation Board's published delimitation
+methodology; those sources were not reachable from this environment. So it
+is a parameter with a stated default and a stated basis, every finding is
+a warning, and nothing blocks. Same treatment `prList.ts` gives the party
+list-length cap, for the same reason: a wrong hard threshold that flagged
+a lawful demarcation would be worse than no check.
+
+**What it found in our own seed, reported without a conclusion.** Run
+against `seed-data/jb-marks-nw405-wards-vds.json`:
+
+- 34 wards, 122,059 registered voters, mean **3,590.0** per ward.
+- Range **3,052 to 4,127**. The ±15% band is [3,051.5, 4,128.5].
+- **Every ward passes**, and the two extremes sit **0.5 and 1.5 voters
+  inside the bounds**.
+- Three wards share a total of 4,121 (W2, W3, W23) and two share 3,380
+  (W15, W28).
+
+That tightness is worth a second look by whoever holds the gazette. It is
+what a demarcation drawn to a norm looks like; it is also what generated
+figures look like. The module reports the arithmetic and draws no
+conclusion about which — the same restraint applied to the ward geometry
+in entry 32.1. The distribution across the band is lumpy rather than flat,
+which argues against a naive uniform draw, so this is flagged as a
+question and not as a finding.
+
+**Where it landed.** `src/modules/wards/wardSizeDeviation.ts`,
+`wardSizeDeviation.test.ts` (16 guards), and a panel on the Wards page
+beside the seed check.
+
+**Guard proven by injection:** the boundary comparison flipped from `>` to
+`>=`, so a ward drawn exactly to the norm's limit reads as a breach.
+
+---
+
+### Entry 33.3 — Correction: the split-station figures shipped wrong
+
+**What was wrong.** Session 32's `SPLIT_VD_BASIS`, the `inScope()` comment
+in `firestore.rules`, and entry 32.2 above all said **"24 of 95 station
+codes"**. The seed actually holds **108 distinct station codes, of which
+26 are split** across wards.
+
+**How it happened, because the mechanism is the useful part.** The figure
+was read off a test failure message during the session-32 injection run —
+at a moment when the seed had been deliberately truncated to 32 wards to
+prove a different guard. The truncated seed really did contain 24 of 95.
+SOP-03's own text was never wrong: it says 26 of 108, and
+`manual.test.ts` computes both numbers from the seed rather than trusting
+the prose, which is why it stayed right while the hand-written strings
+drifted.
+
+**Corrected**, in all three places, and the lesson applied:
+`wardSizeDeviation.test.ts` now recomputes the counts from the seed and
+asserts that `staffProvisioning.ts` and `firestore.rules` both quote them.
+A figure quoted in prose is a figure that drifts; a figure a test derives
+is not.
+
+**Guard proven by injection:** the strings reverted to "24 of the 95".
+Fails.
+
+**No behaviour changed.** The rule fixed in 32.2 is unaffected — the
+narrowing was always on both codes, and only the sentence describing how
+common the problem is was wrong. It was understated, not overstated.

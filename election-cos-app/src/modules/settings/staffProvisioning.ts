@@ -40,7 +40,7 @@
  * role is narrowed on the VD, not the ward. Clear it." That was wrong for
  * the data this product actually runs on. A voting district is a polling
  * station's roll, and a station's roll can be split across wards: 24 of
- * NW405's 95 station codes are, and one of them across three. The VD code
+ * NW405's 108 station codes are, and one of them across three. The VD code
  * alone therefore does not identify which portion a canvasser works, and
  * `inScope()` narrowing on it alone showed them the other wards' voters.
  *
@@ -82,7 +82,7 @@ export interface StaffDraft {
  * `staffProvisioning.test.ts`.
  */
 export const SPLIT_VD_BASIS =
-  'A voting district needs its ward too. A polling station\u2019s roll can be split across wards — 24 of the 95 ' +
+  'A voting district needs its ward too. A polling station\u2019s roll can be split across wards — 26 of the 108 ' +
   'station codes in this build\u2019s reference municipality are, and one across three — so the district code on ' +
   'its own does not say which portion of it this person works. Without the ward they would see the other ' +
   'wards\u2019 voters at the same station.';

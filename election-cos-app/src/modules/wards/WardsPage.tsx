@@ -15,6 +15,12 @@ import type { Ward } from '@/dal/ports/wards';
 import { WardForm } from './WardForm';
 import { defaultMunicipalityCode, totalsFor } from './wardStats';
 import { RECONCILIATION_BASIS, reconcileSeed } from './seedReconciliation';
+import {
+  analyseWardSizes,
+  DEVIATION_BASIS,
+  formatDeviation,
+  WORKLOAD_BASIS,
+} from './wardSizeDeviation';
 
 export function WardsPage() {
   const session = useSession();
@@ -52,6 +58,7 @@ export function WardsPage() {
   const wards = wardsQuery.data ?? [];
   const totals = totalsFor(wards);
   const reconciliation = profileQuery.isLoading ? null : reconcileSeed(wards, profileQuery.data ?? null);
+  const sizes = analyseWardSizes(wards);
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -111,6 +118,67 @@ export function WardsPage() {
             ))}
           </ul>
           <p className="text-body-md font-body text-slate">{RECONCILIATION_BASIS}</p>
+        </div>
+      )}
+
+      {/*
+        * Ward size against the municipal average. Not a seed check in the
+        * reconciliation sense — nothing here contradicts anything — but a
+        * ward well above the average is both a possible transcription
+        * error and a real canvassing-workload fact. See
+        * `wardSizeDeviation.ts` for why the threshold is borrowed rather
+        * than asserted.
+        */}
+      {sizes.wardCount > 0 && sizes.mean > 0 && (
+        <div className="bg-white border border-ink/10 rounded-lg p-4 space-y-2">
+          <div className="flex items-baseline justify-between gap-3 flex-wrap">
+            <h2 className="text-label-caps font-display uppercase text-slate">Ward size against the average</h2>
+            <p className="text-data-mono font-mono text-slate">
+              {Math.round(sizes.mean).toLocaleString('en-ZA')} registered voters per ward ·{' '}
+              {sizes.wards[0].registeredVoters.toLocaleString('en-ZA')} to{' '}
+              {sizes.wards[sizes.wards.length - 1].registeredVoters.toLocaleString('en-ZA')}
+            </p>
+          </div>
+
+          {sizes.outliers.length === 0 ? (
+            <p className="text-body-md font-body text-ink">
+              Every ward is within {Math.round(sizes.allowance * 100)}% of the average.
+            </p>
+          ) : (
+            <div className="border-l-4 border-gold pl-3 space-y-1">
+              <p className="text-label-caps font-display uppercase text-ink">
+                {sizes.outliers.length} ward(s) more than {Math.round(sizes.allowance * 100)}% from the average
+              </p>
+              {sizes.outliers.slice(0, 8).map((outlier) => (
+                <p key={outlier.wardCode} className="text-data-mono font-mono text-slate">
+                  {outlier.wardCode} · {outlier.registeredVoters.toLocaleString('en-ZA')} ·{' '}
+                  {formatDeviation(outlier.deviation, sizes.mean)}
+                </p>
+              ))}
+            </div>
+          )}
+
+          {sizes.emptyWards.length > 0 && (
+            <p className="text-body-md font-body text-maroon">
+              {sizes.emptyWards.length} ward(s) carry no registered voters at all:{' '}
+              <span className="text-data-mono font-mono">{sizes.emptyWards.join(', ')}</span>. That drags the
+              average down for every other ward on this panel.
+            </p>
+          )}
+
+          {sizes.repeatedTotals.length > 0 && (
+            <p className="text-body-md font-body text-slate">
+              Same total on more than one ward:{' '}
+              {sizes.repeatedTotals
+                .map((r) => `${r.registeredVoters.toLocaleString('en-ZA')} (${r.wardCodes.join(', ')})`)
+                .join('; ')}
+              . Two wards can genuinely hold the same number — worth a second look against the notice all the
+              same.
+            </p>
+          )}
+
+          <p className="text-body-md font-body text-slate">{WORKLOAD_BASIS}</p>
+          <p className="text-body-md font-body text-slate">{DEVIATION_BASIS}</p>
         </div>
       )}
 
