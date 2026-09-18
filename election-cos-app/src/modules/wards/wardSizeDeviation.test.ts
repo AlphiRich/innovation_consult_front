@@ -124,11 +124,21 @@ describe('the arithmetic', () => {
 });
 
 describe('what the threshold says about itself', () => {
-  it('is borrowed, and says so', () => {
+  it('names the document it now comes from', () => {
     expect(DEFAULT_DEVIATION_ALLOWANCE).toBe(0.15);
-    expect(DEVIATION_BASIS).toMatch(/not confirmed against the Municipal Structures Act/i);
+    // Session 35: promoted from "taken from a supplied note" to a
+    // citation, because Annexure A publishes the band as columns and
+    // every warded row in it satisfies the arithmetic.
+    expect(DEVIATION_BASIS).toMatch(/Annexure A to Circular 1 of 2025/);
     expect(DEVIATION_BASIS).toMatch(/Nothing here blocks anything/i);
-    expect(DEVIATION_BASIS).not.toMatch(/\b(statutory|required by law|the Act requires)\b/i);
+  });
+
+  it('still refuses to claim the statute it has not read', () => {
+    // The circular cites no provision, so neither does this. A basis that
+    // said "as required by the Municipal Structures Act" would be the
+    // overclaim the promotion above is one step away from.
+    expect(DEVIATION_BASIS).toMatch(/not quoted here/i);
+    expect(DEVIATION_BASIS).not.toMatch(/\b(required by law|the Act requires|in terms of section)\b/i);
   });
 
   it('explains why the number matters operationally, not only as a check', () => {

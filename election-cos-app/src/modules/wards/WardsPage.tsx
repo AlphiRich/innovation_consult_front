@@ -21,6 +21,7 @@ import {
   formatDeviation,
   WORKLOAD_BASIS,
 } from './wardSizeDeviation';
+import { MunicipalRegisterPanel } from '@/modules/reference/MunicipalRegisterPanel';
 
 export function WardsPage() {
   const session = useSession();
@@ -122,12 +123,28 @@ export function WardsPage() {
       )}
 
       {/*
+        * The only check on this page whose other side is outside this
+        * tenant. Placed above the average-based one deliberately: where
+        * the IEC publishes a band for this municipality, that band is the
+        * better answer and the ±15%-of-the-mean panel below is a close
+        * approximation of it.
+        */}
+      {wards.length > 0 && (
+        <MunicipalRegisterPanel
+          municipalityCode={profileQuery.data?.municipalityCode ?? defaultMunicipalityCode(wards)}
+          wardCount={totals.wardCount}
+          registeredVoters={totals.registeredVoters}
+          totalCouncilSeats={profileQuery.data?.totalCouncilSeats}
+          wards={wards.map((w) => ({ wardCode: w.wardCode, registeredVoters: w.registeredVoters }))}
+        />
+      )}
+
+      {/*
         * Ward size against the municipal average. Not a seed check in the
         * reconciliation sense — nothing here contradicts anything — but a
         * ward well above the average is both a possible transcription
-        * error and a real canvassing-workload fact. See
-        * `wardSizeDeviation.ts` for why the threshold is borrowed rather
-        * than asserted.
+        * error and a real canvassing-workload fact. The 15% is the IEC's
+        * own published allowance — see `wardSizeDeviation.ts`.
         */}
       {sizes.wardCount > 0 && sizes.mean > 0 && (
         <div className="bg-white border border-ink/10 rounded-lg p-4 space-y-2">

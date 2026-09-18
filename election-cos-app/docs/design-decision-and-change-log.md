@@ -937,3 +937,162 @@ python3 tools/source-acquisition/acquire.py --probe
 python3 tools/source-acquisition/acquire.py --fetch
 # then ingest: no mapping yet, so it prints the file's columns; add one; ingest again; sign it off
 ```
+
+---
+
+## Session 35 — IEC Circular 1 of 2025, Annexure A
+
+Supplied: `Annexure-A-Number_of_Voters-Councillors-Wards_Circular_1_2025.pdf`,
+with the note "Per the IEC Official Announcement yesterday."
+
+### Entry 35.1 — The first primary IEC source the build holds
+
+**Accepted, extracted, verified, and wired in.**
+
+Seven pages, 273,729 bytes, SHA-256 `fe3361c7…5a78`, produced from Excel
+on 27 February 2025 and last modified 10 March 2025. It lists **258
+municipalities** — every metro, local and district in the country — with
+registered voters as at 2024, the councillors the MEC determined, and for
+the **214 that have wards**, a Norm, a Min_Norm, a Max_Norm and a
+15%_Deviation.
+
+It is the first primary IEC source in this build covering more than one
+municipality, and it did not have to be fetched. Sessions 33 and 34
+established that this environment denies `elections.org.za` at CONNECT and
+shipped a four-row acquisition registry with every entry `UNCONFIRMED`.
+This document bypassed that entirely by being handed over.
+
+**What is recorded about it, and what is not.** Its hash, size, page
+count, document dates and the date it arrived are in `sources.json` under
+a new `suppliedDocuments` key. **No URL is recorded.** The location it was
+published at is not known here, and a guessed URL in an acquisition
+registry is indistinguishable from a confirmed one six months later —
+which is the failure the whole registry exists to correct (entry 33.1).
+
+`tools/annexure/extract-annexure-a.py` does the extraction. It verifies
+the SHA-256 before reading, so a re-run against a different document fails
+rather than silently producing a different dataset, and it refuses to
+write anything unless the document holds together against **five**
+relations on every row:
+
+```
+norm       == registeredVoters // wards
+deviation  == floor(norm * 0.15)
+minNorm    == norm - deviation
+maxNorm    == norm + deviation
+wards      == ceil(councillors / 2)
+```
+
+All 214 warded rows satisfy all five, without one exception. The
+`--self-test` breaks each relation in turn and asserts the corresponding
+check fires.
+
+**A sixth check, at the level of the whole table.** Every local sits
+inside exactly one district and no metro does, so the district column and
+the local column describe the same voters. They total the same to the
+voter (16,546,428 each; DC40's 352,259 is exactly NW403 + NW404 + NW405).
+That identity is what would catch a dropped or duplicated page, and it is
+asserted both in the extractor and in the test suite.
+
+It also catches a number this build would otherwise have published.
+Summing all 258 rows gives **44,270,103** registered voters — a plausible
+sounding "national roll" that counts every voter outside a metro twice.
+The dataset records 27,723,675 (metros and locals) and 16,546,428
+(districts) as separate figures with a basis sentence saying they are
+never added.
+
+### Entry 35.2 — The 15% band: promoted from borrowed to cited
+
+**Corrected.** `src/modules/wards/wardSizeDeviation.ts`.
+
+Session 33 built the ward-size check around ±15% of the municipal average
+on the authority of a supplied planning note that cited nothing, and
+`DEVIATION_BASIS` said so in as many words: *"taken from a supplied
+source-acquisition note and not confirmed against the Municipal Structures
+Act or the Demarcation Board's published methodology in this build."*
+
+Annexure A publishes that band as columns, and the arithmetic holds on all
+214 warded municipalities. The basis now cites the circular.
+
+**What is still refused.** Which provision of the Municipal Structures Act
+or which Demarcation Board methodology the IEC is applying. The circular
+does not cite one and this build has not read the Act. `DEVIATION_BASIS`
+says the statutory provision is not quoted here, and a guard fails on
+`required by law`, `the Act requires` or `in terms of section` appearing
+in it. The promotion is one step, not two.
+
+Everything else stays: the allowance is still a parameter, every finding
+is still a WARNING, nothing blocks.
+
+### Entry 35.3 — Entry 33.2's open question, answered
+
+**Resolved for the totals. Still open for the split.**
+
+Entry 33.2 recorded that NW405's seed looked equally like a demarcation
+drawn to a norm and like generated figures, and deliberately drew no
+conclusion. The seed was parsed from the North West provincial gazette
+(Provincial Notice 1300 of 2025): 34 wards, 122,059 registered voters,
+range 3,052 to 4,127.
+
+Annexure A, produced by a different body from a different source, gives
+NW405 **122,059 registered voters, 34 wards and 67 councillors**. Neither
+figure was derived from the other. Two documents agreeing to the voter is
+the corroboration that entry was waiting for, and
+`municipalRegister.test.ts` asserts it by reading both files rather than
+describing it in a comment.
+
+The published band for NW405 is 3,051 to 4,127. Every gazetted ward falls
+inside it; the largest sits **exactly on** the published maximum and the
+smallest one voter above the published minimum. That tightness now reads
+as a demarcation drawn to the IEC's ceiling rather than as a warning sign.
+
+**What is not resolved.** The per-ward split still rests on the provincial
+gazette alone — Annexure A gives municipal totals, not ward-level figures.
+The modules still draw no conclusion about it.
+
+### Entry 35.4 — The first check whose other side is outside the tenant
+
+**Built.** `src/modules/reference/municipalRegister.ts` and
+`MunicipalRegisterPanel.tsx`, on the Wards page.
+
+`reconcileSeed()` compares a tenant against itself and says so in
+`RECONCILIATION_BASIS`: agreement means the two are consistent, not that
+either is correct. Nothing in the build could say more than that, because
+nothing in the build held an outside figure to compare against.
+
+`checkAgainstRegister()` can. It compares ward count, council seats,
+registered voters and per-ward sizes against the IEC's published figures,
+and **reports agreement as prominently as disagreement** — a campaign that
+can see the IEC publishing the same 34 wards and 122,059 voters it seeded
+has something no amount of internal consistency gives it.
+
+Design decisions worth recording:
+
+- **Nothing is blocking.** The table is 2024 and a roll moves every week;
+  an MEC may re-determine before 2026. A disagreement is a question about
+  which figure is current. `VINTAGE_BASIS` says this and a guard holds it.
+- **The published bounds are inclusive.** A ward carrying exactly
+  Max_Norm is the demarcation the IEC published. Treating the IEC's own
+  ceiling as a breach would flag NW405's largest ward.
+- **A disagreement names its consequence.** The council-seats finding does
+  not say "these differ" — it says the seat calculator divides by this
+  number, so the difference changes every projection it produces.
+- **A district council is refused rather than approximated.** Districts
+  have no wards; the check says so and does not invent a comparison.
+- **No new route.** §3.2 fixes navigation at nine items; the panel sits
+  beside the wards it is checking.
+
+**Guards proven by injection:** a one-voter hand-patch to `maxNorm` on a
+single row (the derived-columns check and the NW405 band check both fail);
+and a dropped municipality row (the coverage count, the roll identity, the
+`all 214` claim in `DEVIATION_BASIS`, and the 258-code message all fail).
+Reverted clean; 863 tests pass.
+
+### Entry 35.5 — What the document is not
+
+Stated because the covering message called it yesterday's announcement.
+The annexure is dated February–March 2025, its voter column is headed
+`RegVoters_2024`, and its councillor column is the MEC's 2024
+determination. Whatever was announced this week, **this file is not a 2026
+register and not a 2026 determination**, and the build does not present it
+as one.

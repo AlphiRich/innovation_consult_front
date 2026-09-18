@@ -79,6 +79,50 @@ anything `CONFIRMED` to make a run go green. The build environment denies
 CONNECT — that is why every registry entry ships `UNCONFIRMED` and why the
 ingester is mapping-driven rather than format-aware.
 
+### When a document is handed over instead
+
+That is not a lesser path — it is how the only primary IEC source in this
+build arrived. Record it under `suppliedDocuments` in `sources.json` with
+its SHA-256, byte count and the date it came in, and **do not invent the
+URL it was published at**. A guessed URL in a registry is indistinguishable
+from a confirmed one six months later.
+
+## Stage 1b — extracting a published reference table
+
+For a table rather than a results file: `tools/annexure/extract-annexure-a.py`,
+which reads Annexure A to IEC Circular 1 of 2025 into
+`src/data/iec/circular-1-2025-annexure-a.json`.
+
+```bash
+python3 tools/annexure/extract-annexure-a.py --self-test
+python3 tools/annexure/extract-annexure-a.py --pdf Annexure-A.pdf
+```
+
+The pattern to copy for the next table:
+
+1. **Check the SHA-256 against a recorded one.** Re-running against a
+   different document must fail, not silently produce a different dataset.
+2. **Verify the document against its own arithmetic before writing
+   anything.** Annexure A prints four derived columns; the extractor
+   recomputes all four, plus `wards == ceil(councillors / 2)`, on every
+   row, and writes nothing if one fails. A published table that does not
+   close has been read wrong.
+3. **Find a whole-table identity and assert it.** Here, every local's
+   voters appear again on its district, so the two columns must total the
+   same roll — which is what catches a dropped page.
+4. **Re-verify in the test suite, over the shipped JSON.** The extractor
+   protects the extraction; `municipalRegister.test.ts` protects the file
+   anybody could hand-edit afterwards.
+5. **Never sum a column without checking for double counting.** Adding
+   all 258 rows of Annexure A gives a 44.3-million "national roll". The
+   real figure is 27.7 million; districts repeat their locals.
+
+Consuming it: `src/modules/reference/municipalRegister.ts`.
+`checkAgainstRegister()` reports agreement as well as disagreement — it is
+the only check in the build whose other side is outside the tenant. Its
+findings are never blocking: the table is 2024 and a tenant's roll is
+today's.
+
 ## Stage 2 — ingest
 
 `src/modules/ingest/`.
@@ -142,9 +186,13 @@ failure modes this project has already met:
 - **Ordinals sold as identifiers.** If every party's "ward numbers" run
   `1..N`, that column is a per-party position, not a ward
   (`docs/nw-candidate-list-2026-review.md` §1).
-- **A figure bounded suspiciously tightly.** Run
-  `analyseWardSizes()`; report the arithmetic and draw no conclusion about
-  why (entry 33.2).
+- **A figure bounded suspiciously tightly.** Run `analyseWardSizes()` and
+  `compareToPublishedBand()`; report the arithmetic and draw no conclusion
+  about why. NW405's wards sit inside the IEC's published band with the
+  largest exactly on its ceiling, which looked like generated data in
+  session 33 and turned out to be a demarcation drawn to the norm — the
+  restraint was right and so was waiting for a second document
+  (entries 33.2, 35.1).
 - **An over-wide ID mask.** Anything showing more than the last four
   digits, and especially anything leading with a date of birth, is refused
   — `src/lib/saIdNumber.ts`.

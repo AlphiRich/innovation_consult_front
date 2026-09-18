@@ -28,6 +28,35 @@
 
   "targetFolderName": "07_Geospatial_and_Electoral_Data",
 
+  "$suppliedDocumentsComment": [
+    "Documents this build holds that did NOT come through this tool. They",
+    "were handed over directly, which is why the hosts being unreachable",
+    "did not stop them arriving. They are listed here because 'what",
+    "primary sources does this build actually hold' is a question the",
+    "acquisition registry should be able to answer, and a fetch registry",
+    "of URLs nobody has reached answers it with 'none'.",
+    "",
+    "No URL is recorded for these. The URL each was published at is not",
+    "known here and inventing a plausible one is the exact failure this",
+    "registry exists to correct. Whoever finds the real published location",
+    "should add an ordinary source row and compare the SHA-256."
+  ],
+
+  "suppliedDocuments": [
+    {
+      "id": "iec-circular-1-2025-annexure-a",
+      "filename": "Annexure-A-Number_of_Voters-Councillors-Wards_Circular_1_2025.pdf",
+      "sha256": "fe3361c7006d47210084a6b80005ec40b77cf9529e226dd6e3cf7cc061395a78",
+      "bytes": 273729,
+      "receivedOn": "2026-09-18",
+      "note": "Annexure A to IEC Circular 1 of 2025: registered voters (2024), councillors determined by the MEC, and ward counts for all 258 municipalities, with the Norm/Min/Max/15% band for the 214 that have wards. Produced from Excel 2025-02-27, last modified 2025-03-10, seven pages. Extracted by tools/annexure/extract-annexure-a.py into src/data/iec/circular-1-2025-annexure-a.json, with every derived column checked against the document's own arithmetic before anything was written. This is the first primary IEC source in the build covering more than one municipality, and it independently confirms NW405's 122,059 voters and 34 wards.",
+      "usedBy": [
+        "src/modules/reference/municipalRegister.ts",
+        "src/modules/wards/wardSizeDeviation.ts"
+      ]
+    }
+  ],
+
   "sources": [
     {
       "id": "mdb-nw405-gazette-8929",

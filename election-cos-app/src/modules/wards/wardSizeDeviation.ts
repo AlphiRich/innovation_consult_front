@@ -19,18 +19,31 @@
  * fact about the municipality, and a campaign needs to know which because
  * it decides how many canvassers a ward needs.
  *
- * THE THRESHOLD IS CONFIGURED AND CITED, NOT ASSERTED
+ * THE THRESHOLD WAS BORROWED. IT IS NOW SOURCED.
  *
- * The supplied document gives the norm as 15% of the municipal average.
- * This build has **not verified that figure against the Municipal
- * Structures Act or the Municipal Demarcation Board's published
- * delimitation methodology**, and the sources were not reachable from the
- * build environment — the same position `prList.ts` takes on the party
- * list-length cap, and for the same reason: a wrong hard threshold that
- * flagged a lawful demarcation would be worse than no check.
+ * The supplied document gave the norm as 15% of the municipal average and
+ * cited nothing, so sessions 33 and 34 shipped it as a parameter whose
+ * own basis text admitted it was unverified.
  *
- * So the threshold is a parameter with a stated default and a stated
- * basis, every finding is a WARNING, and nothing here blocks anything.
+ * Session 35 received Annexure A to IEC Circular 1 of 2025, which prints
+ * a Norm, a Min_Norm, a Max_Norm and a 15%_Deviation for every one of the
+ * 214 warded municipalities in South Africa. The extraction
+ * (`tools/annexure/extract-annexure-a.py`) checks that
+ * `norm == voters // wards`, `deviation == floor(norm * 0.15)` and the
+ * two bounds are `norm -/+ deviation` on every row, and all 214 hold
+ * without an exception. The 15% is the IEC's own published arithmetic.
+ *
+ * What is still *not* claimed: which provision of the Municipal
+ * Structures Act or which Demarcation Board methodology the IEC is
+ * applying. The circular does not cite one and this build has not read
+ * the Act. So the threshold stays a parameter, every finding stays a
+ * WARNING, and nothing here blocks anything — the same position
+ * `prList.ts` holds on the party list-length cap.
+ *
+ * `municipalRegister.ts` compares wards against the published integer
+ * band directly, which is exact where this module's ±15% of an exact mean
+ * is a close approximation of it. Both are shown; they answer slightly
+ * different questions and a campaign should see when they differ.
  *
  * WHAT THE REFERENCE MUNICIPALITY ACTUALLY DOES
  *
@@ -40,27 +53,32 @@
  * bounds. `wardSizeDeviation.test.ts` computes that from the seed rather
  * than trusting this comment.
  *
- * That tightness is worth a second look by whoever holds the gazette. It
- * is what a demarcation drawn to a norm looks like; it is also what
- * generated figures look like. This module reports the arithmetic and
- * draws no conclusion about which — the same restraint applied to the
- * ward geometry in entry 32.1.
+ * Session 33 flagged that tightness as ambiguous — a demarcation drawn to
+ * a norm and generated figures look the same from inside. Annexure A
+ * resolves it as far as the totals go: the IEC independently publishes
+ * NW405 as 122,059 voters across 34 wards, which is what the gazette
+ * parser produced to the voter, from a different document issued by a
+ * different body. The per-ward split still rests on the provincial
+ * gazette alone, and this module still draws no conclusion about it.
  */
 import type { Ward } from '@/dal/ports/wards';
 
 /**
  * Default deviation allowance, as a fraction of the municipal average.
  *
- * NOT independently verified — see the header. Overridable so that a
- * corrected figure is an argument, not a code change.
+ * The figure the IEC publishes — see the header. Still overridable, so a
+ * municipality working to a different band is an argument rather than a
+ * code change.
  */
 export const DEFAULT_DEVIATION_ALLOWANCE = 0.15;
 
 export const DEVIATION_BASIS =
   'Wards are compared against the average number of registered voters per ward in this municipality. The ' +
-  'allowance used here is 15% of that average, taken from a supplied source-acquisition note and not ' +
-  'confirmed against the Municipal Structures Act or the Demarcation Board’s published methodology in ' +
-  'this build. Treat an outlier as a question for whoever holds the gazette, not as a finding that the ' +
+  'allowance is 15% of that average, which is the band the IEC itself publishes: Annexure A to Circular 1 ' +
+  'of 2025 prints a Norm, a 15% deviation and a minimum and maximum either side of it for every warded ' +
+  'municipality in the country, and the four columns hold together exactly on all 214 of them. Which ' +
+  'provision of the Municipal Structures Act sits behind the 15% is not quoted here — the circular does ' +
+  'not cite one. Treat an outlier as a question for whoever holds the gazette, not as a finding that the ' +
   'demarcation is wrong. Nothing here blocks anything.';
 
 export const WORKLOAD_BASIS =
