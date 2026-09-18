@@ -57,13 +57,32 @@ describe('geoScopeConstraints', () => {
     expect(String(c.value)).not.toMatch(/^\d{1,3}$/);
   });
 
-  it('narrows a VD role on the voting district, not on its ward', () => {
-    const captured = constraints(ctx({ geoScope: 'VD', vdScope: '32900123', wardScope: 'NW405012' }));
+  it('narrows a VD role on the voting district AND its ward', () => {
+    // Session 32. This used to assert a single vdCode constraint, on the
+    // reasoning that a VD role must not be widened to its whole ward.
+    // That concern is right and is still asserted below — but a split
+    // station's code appears in more than one ward, so the code alone was
+    // not a narrowing at all for a quarter of NW405's stations.
+    const captured = constraints(ctx({ geoScope: 'VD', vdScope: '86910239', wardScope: 'NW405-W8' }));
+    expect(captured).toHaveLength(2);
+    expect(captured.find((c) => c.field === 'vdCode')?.value).toBe('86910239');
+    expect(captured.find((c) => c.field === 'wardCode')?.value).toBe('NW405-W8');
+  });
+
+  it('never narrows a VD role on the ward alone', () => {
+    // The original defect, still guarded: replacing the district test
+    // with a ward test would widen a canvasser to the whole ward.
+    const captured = constraints(ctx({ geoScope: 'VD', vdScope: '86910239', wardScope: 'NW405-W8' }));
+    expect(captured.some((c) => c.field === 'vdCode')).toBe(true);
+  });
+
+  it('still narrows on the district when a token carries no ward', () => {
+    // A token stamped before session 32. The rules deny it outright —
+    // fail-closed — and the client-side query stays as narrow as it can
+    // rather than dropping the only constraint it has.
+    const captured = constraints(ctx({ geoScope: 'VD', vdScope: '86910239' }));
     expect(captured).toHaveLength(1);
     expect(captured[0].field).toBe('vdCode');
-    expect(captured[0].value).toBe('32900123');
-    // The specific defect: a VD role must not be widened to its whole ward.
-    expect(captured.some((c) => c.field === 'wardCode')).toBe(false);
   });
 
   it('does not narrow tenant- or municipality-scoped roles', () => {
@@ -77,7 +96,7 @@ describe('geoScopeConstraints', () => {
     // compares wardCode against nothing and denies — it fails closed, so
     // an unnarrowed query returns nothing rather than everything.
     expect(constraints(ctx({ geoScope: 'WARD' }))).toHaveLength(0);
-    expect(constraints(ctx({ geoScope: 'VD' }))).toHaveLength(0);
+    expect(constraints(ctx({ geoScope: 'VD', wardScope: 'NW405-W8' }))).toHaveLength(0);
   });
 });
 
@@ -93,9 +112,12 @@ describe('firestore.rules inScope() still matches what the DAL mirrors', () => {
   it('keeps a VD branch distinct from the ward branch', () => {
     expect(inScope).toMatch(/scope == 'WARD'/);
     expect(inScope).toMatch(/scope == 'VD'/);
-    // The VD branch must test vdCode — if it tested wardCode, a VD role
-    // would see the whole ward, which is bug (2) above.
-    expect(inScope).toMatch(/scope == 'VD' && data\.vdCode/);
+    // The VD branch must test vdCode — if it tested wardCode alone, a VD
+    // role would see the whole ward, which is bug (2) above.
+    expect(inScope).toMatch(/scope == 'VD'[\s\S]{0,120}data\.vdCode == request\.auth\.token\.vdScope/);
+    // …and it must test the ward as well, or a split station's code
+    // matches every ward that station's roll reaches. Session 32.
+    expect(inScope).toMatch(/scope == 'VD'[\s\S]{0,240}data\.wardCode == request\.auth\.token\.wardScope/);
   });
 
   it('narrows on no numeric ward field', () => {

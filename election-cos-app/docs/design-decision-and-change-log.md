@@ -446,3 +446,110 @@ reopen them.
   gated on the entitlement, sourced from door records.
 - Remote Config rules (entry 31.6) and edge headers (entry 31.7) — when
   there is a project and a deployment target.
+
+---
+
+## Session 32 — NW405 ward/VD GeoJSON export
+
+### Entry 32.1 — The payload is our own seed; the geometry is generated
+
+**What arrived.** A GeoJSON `FeatureCollection` for JB Marks (NW405):
+34 wards claimed in the metadata, each feature carrying ward number,
+code, registered voters, a voting-district list with per-VD voter counts
+and `split` flags, and a `Point` geometry. Metadata cites *North West
+Provincial Gazette No. 8929*. The paste truncated partway through ward 21,
+so wards 1–20 were compared in full.
+
+**Decision.** No re-seed. Geometry rejected. Nothing imported.
+
+**Reason 1 — the data is already ours, exactly.** Every ward total, every
+VD code, every per-VD voter count and every `split` flag in wards 1–20
+matches `seed-data/jb-marks-nw405-wards-vds.json` byte for byte. The
+per-ward totals are also internally consistent: each ward's
+`registeredVoters` equals the sum of its VDs' counts, in all twenty. This
+is a re-export of the seed this build already parsed from Gazette 8929,
+with geometry added. The gazette citation is likewise already recorded, in
+`docs/nw405-seed-data.md` and `docs/dha-idvs-and-provincial-scale-review.md`.
+
+**Reason 2 — the geometry is a lattice, not a set of centroids.** Every
+one of the twenty points satisfies, exactly:
+
+```
+lon = 27.097 + 0.05 × (wardNumber mod 6)
+lat = −26.7145 + 0.05 × floor(wardNumber / 6)
+```
+
+Six distinct longitudes, four distinct latitudes, 0.05° spacing on both
+axes, no exceptions. Real ward centroids do not fall on a grid derived
+from the ward's own number. These are placeholder positions generated from
+the index.
+
+They are also geographically wrong, which is the part that matters if
+anybody were tempted to use them as "close enough". The lattice spans
+roughly 25 km × 17 km east and north of Potchefstroom. JB Marks is the
+merged Tlokwe–Ventersdorp municipality; Ventersdorp sits roughly 60 km
+north-west and falls outside the box entirely. Ikageng and Promosa wards
+land in a neat row out in open country.
+
+**Consequence for the map.** Three of last session's supplied designs had
+map panels, and each was refused for want of real geometry (entries 31.3,
+31.4). This file would have been that geometry. It is not, so the map
+stays unbuilt and the reason is now specific rather than general: **this
+build has no ward boundaries and no ward centroids.** `Household.geo`
+holds real GPS captured at doors by canvassers, which is the only true
+coordinate data in the product, and it is not a boundary set.
+
+**What would actually close this.** The Municipal Demarcation Board
+publishes ward boundary shapefiles. Nothing short of those, or a
+comparable primary source, should populate a ward geometry field — and
+when one arrives, the lattice test above is worth running on it first.
+
+---
+
+### Entry 32.2 — Split voting districts: an isolation hole closed
+
+**What the file prompted.** Its `split` flags are the whole subject of the
+export, and they pointed at a defect this register had carried as
+noted-but-unfixed since the ward seed was built.
+
+**The defect.** `inScope()` in `firestore.rules` narrowed a
+voting-district-scoped user on `data.vdCode == token.vdScope` **alone**.
+A voting district is a polling station's roll, and a station's roll can be
+split across wards — **24 of NW405's 95 station codes are**, and code
+`86910239` (Lesego Primary School) across **three** wards: 8, 12 and 16.
+
+So a canvasser assigned to ward 8's portion of Lesego Primary matched, and
+could read, every voter at that station in wards 12 and 16 as well. For a
+quarter of this municipality's stations the VD code was not a narrowing at
+all. `VotingDistrict.id` has been `${wardCode}::${vdCode}` since the seed
+was built for exactly this reason; the access rule had not followed.
+
+**What made it unfixable until now.** `staffProvisioning.ts` actively
+*refused* a ward code on a VD role — *"A voting-district role is narrowed
+on the VD, not the ward. Clear it."* That rule was written before the
+significance of split stations was understood, and it was enforced by a
+test and repeated in SOP-02.
+
+**The fix, at all three layers.**
+
+| Layer | Change |
+|---|---|
+| `firestore.rules` | The VD branch of `inScope()` now requires `data.vdCode == token.vdScope` **and** `data.wardCode == token.wardScope`. A token with no `wardScope` fails against every real record — fail-closed, which is what a stale token should do. |
+| `src/dal/adapters/firestore/base.ts` | `geoScopeConstraints` mirrors it, and keeps the district constraint alone when a token carries no ward rather than dropping its only narrowing. |
+| `staffProvisioning.ts` | A VD role now requires both codes; the "clear the ward" rule is gone; `toStaffProfile` carries the ward through to the record, which is what the Cloud Function stamps onto the token. |
+| `PermissionsPage` | Shows the ward field for VD roles and explains why. |
+| SOP-02 and SOP-12 | Both carry `SPLIT_VD_BASIS` verbatim. A procedure still telling an administrator to leave the ward blank would produce accounts the rules deny. |
+
+**The original concern is preserved.** The rule this replaced existed to
+stop a VD role being *widened* to its whole ward, and `geoScope.test.ts`
+still asserts the district test is present. Adding the ward is a further
+narrowing, not a substitution.
+
+**Guard proven by injection.** Reverting all three layers to
+district-only fails four tests across the adapter, the rules scan, the
+provisioning validator and the manual.
+
+**Honest limit.** This narrows what a VD-scoped user may *read*. It does
+not retroactively change what anyone has already read, and there is no
+audit record of past reads to check against — ordinary reads are not
+logged (see entry 31.5).

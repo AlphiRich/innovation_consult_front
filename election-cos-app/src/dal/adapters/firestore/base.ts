@@ -55,7 +55,14 @@ export function geoScopeConstraints(
     case 'WARD':
       return ctx.wardScope ? [where(wardField, '==', ctx.wardScope)] : [];
     case 'VD':
-      return ctx.vdScope ? [where(vdField, '==', ctx.vdScope)] : [];
+      // Both, where both are known — see the note on inScope() in
+      // firestore.rules. A split voting district is one code in more than
+      // one ward, so the code alone does not identify a canvasser's
+      // portion of it.
+      if (!ctx.vdScope) return [];
+      return ctx.wardScope
+        ? [where(vdField, '==', ctx.vdScope), where(wardField, '==', ctx.wardScope)]
+        : [where(vdField, '==', ctx.vdScope)];
     case 'TENANT':
     case 'MUNICIPALITY':
     default:

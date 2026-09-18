@@ -38,7 +38,7 @@
  * configuration teaches an administrator to ignore warnings.
  */
 import { CONCENTRATION_BASIS, ROLE_WITHHOLDINGS, SEPARATION_RULES } from '@/modules/settings/dutyConcentration';
-import { SIGN_IN_ID_BASIS } from '@/modules/settings/staffProvisioning';
+import { SIGN_IN_ID_BASIS, SPLIT_VD_BASIS } from '@/modules/settings/staffProvisioning';
 import { SUBSCRIPTION_PRICE_BASIS, UNBUILT_MODULE_BASIS } from '@/modules/settings/subscriptionView';
 import type { Sop } from '../manualModel';
 
@@ -74,6 +74,7 @@ export const PERMISSIONS_SOP: Sop = {
       ],
       warnings: [
         'A role with a ward or voting-district scope and no code filled in is denied every record, and the screen will look empty rather than refused. The form will not let you save one, which is the only reason that is not a support call every week.',
+        SPLIT_VD_BASIS,
       ],
     },
     {

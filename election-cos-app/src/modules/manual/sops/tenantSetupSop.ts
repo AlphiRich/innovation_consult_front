@@ -16,6 +16,7 @@
  */
 import { SEED_ROLES } from '@/auth/seedRoles';
 import { SIGN_IN_ID_BASIS } from '@/modules/settings/staffProvisioning';
+import { SPLIT_VD_BASIS } from '@/modules/settings/staffProvisioning';
 import type { Sop } from '../manualModel';
 
 /**
@@ -105,10 +106,11 @@ export const TENANT_SETUP_SOP: Sop = {
       steps: [
         'Paste the sign-in ID exactly as they sent it. If you paste an email address the form will tell you so — the two are different things and the mistake is a common one.',
         'Enter first name, last name and a contact number. A field team that cannot be reached is not a team.',
-        'Choose the role. The form then asks for a ward code, or a voting district code, or neither — whichever that role actually uses.',
+        'Choose the role. The form then asks for a ward code, or a voting district code and its ward, or neither — whichever that role actually uses.',
         'Add to the team. Their permissions are worked out on the server and written into their account; they may need to reload the application to pick them up.',
       ],
       warnings: [
+        SPLIT_VD_BASIS,
         'The form refuses a ward or VD role saved without a code, and refuses a code on a role that has no geographic scope. Both refusals are there because the result is the same and it is silent: the person signs in successfully and sees an empty application, with nothing on screen to explain why.',
         'If someone reports that they can sign in but the application is empty, check their role and scope here first. It is almost always this.',
       ],

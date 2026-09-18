@@ -46,6 +46,7 @@ import {
   type StaffDraft,
 } from './staffProvisioning';
 import { CONCENTRATION_BASIS, dutyConcentrations, withholdingBreaches } from './dutyConcentration';
+import { SPLIT_VD_BASIS } from './staffProvisioning';
 
 function toggle<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
@@ -179,6 +180,9 @@ export function PermissionsPage() {
         {adding && (
           <div className="bg-white border border-gold/60 rounded-lg p-4 space-y-3">
             <p className="text-body-md font-body text-slate">{SIGN_IN_ID_BASIS}</p>
+            {newStaffScope === 'VD' && (
+              <p className="text-body-md font-body text-slate">{SPLIT_VD_BASIS}</p>
+            )}
 
             <label className="space-y-1 block">
               <span className="text-label-caps font-display uppercase text-slate">Sign-in ID</span>
@@ -240,7 +244,7 @@ export function PermissionsPage() {
                * applied, and a ward role with no code is denied every
                * record by inScope(). Both are refused in staffProvisioning.
                */}
-              {newStaffScope === 'WARD' && (
+              {(newStaffScope === 'WARD' || newStaffScope === 'VD') && (
                 <label className="space-y-1 block">
                   <span className="text-label-caps font-display uppercase text-slate">Ward code</span>
                   <input

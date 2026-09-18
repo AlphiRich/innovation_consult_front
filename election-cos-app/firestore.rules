@@ -33,7 +33,17 @@ service cloud.firestore {
       return scope == 'TENANT'
         || scope == 'MUNICIPALITY'
         || (scope == 'WARD' && data.wardCode == request.auth.token.wardScope)
-        || (scope == 'VD' && data.vdCode == request.auth.token.vdScope);
+        // A VD-scoped user is narrowed on BOTH the voting district and
+        // the ward. Not belt-and-braces: 24 of NW405's 95 station codes
+        // are split across wards, and one — 86910239, Lesego Primary —
+        // across three. Narrowing on vdCode alone would show a canvasser
+        // assigned to one ward's portion of a split station the other
+        // wards' voters too. A token with no wardScope fails this
+        // comparison against every real record, which is fail-closed and
+        // is what a stale token should do.
+        || (scope == 'VD'
+            && data.vdCode == request.auth.token.vdScope
+            && data.wardCode == request.auth.token.wardScope);
     }
 
     function isUnchanged(field) {

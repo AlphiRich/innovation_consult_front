@@ -7,6 +7,7 @@ import {
   scopeRequirement,
   toStaffProfile,
   type StaffDraft,
+  SPLIT_VD_BASIS,
 } from './staffProvisioning';
 
 const draft = (over: Partial<StaffDraft> = {}): StaffDraft => ({
@@ -79,12 +80,22 @@ describe('geographic scope is required exactly where the role has one', () => {
 
   it('refuses a VD role with no VD code', () => {
     const problems = provisioningProblems(draft({ roleId: 'canvasser' }), []);
-    expect(fieldsIn(problems)).toEqual(['vdScope']);
+    expect(fieldsIn(problems)).toContain('vdScope');
+  });
+
+  it('refuses a VD role with a district but no ward', () => {
+    // Session 32. A station's roll can be split across wards, so the
+    // district code alone does not say which portion this person works.
+    const problems = provisioningProblems(draft({ roleId: 'canvasser', vdScope: '86910239' }), []);
+    expect(fieldsIn(problems)).toEqual(['wardScope']);
+    expect(problems[0].message).toBe(SPLIT_VD_BASIS);
   });
 
   it('accepts each role once its own scope is supplied', () => {
     expect(provisioningProblems(draft({ roleId: 'ward-lead', wardScope: 'NW405-W12' }), [])).toEqual([]);
-    expect(provisioningProblems(draft({ roleId: 'canvasser', vdScope: '86910138' }), [])).toEqual([]);
+    expect(
+      provisioningProblems(draft({ roleId: 'canvasser', vdScope: '86910138', wardScope: 'NW405-W10' }), []),
+    ).toEqual([]);
   });
 
   it('refuses a scope on a role that sees the whole tenant', () => {
@@ -96,12 +107,27 @@ describe('geographic scope is required exactly where the role has one', () => {
     expect(
       fieldsIn(provisioningProblems(draft({ roleId: 'ward-lead', wardScope: 'NW405-W12', vdScope: '869' }), [])),
     ).toEqual(['vdScope']);
-    // A VD role narrows on the voting district and deliberately not on its
-    // ward — geoScope.test.ts asserts that branch is distinct, so a ward
-    // code here would be stamped on the token and never consulted.
+    // A VD role now takes both, and the ward is consulted rather than
+    // decorative — see geoScope.test.ts and firestore.rules.
     expect(
       fieldsIn(provisioningProblems(draft({ roleId: 'canvasser', vdScope: '869', wardScope: 'NW405-W12' }), [])),
-    ).toEqual(['wardScope']);
+    ).toEqual([]);
+  });
+
+  it('carries a VD role’s ward onto the staff record, not only its district', () => {
+    // The token is what inScope() reads. A ward dropped here is a ward
+    // the rules never see, and the fix would be silently undone.
+    const profile = toStaffProfile(
+      draft({ roleId: 'canvasser', vdScope: '86910239', wardScope: 'NW405-W8' }),
+      't',
+    );
+    expect(profile.vdScope).toBe('86910239');
+    expect(profile.wardScope).toBe('NW405-W8');
+  });
+
+  it('says why the ward is needed, in terms of split stations', () => {
+    expect(SPLIT_VD_BASIS).toMatch(/split across wards/i);
+    expect(SPLIT_VD_BASIS).toMatch(/see the other wards/i);
   });
 
   it('derives the requirement from the role table rather than a second list', () => {

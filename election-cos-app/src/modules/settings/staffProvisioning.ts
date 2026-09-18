@@ -33,6 +33,20 @@
  *     reads as a restriction that is not applied. Refused, because a
  *     staff record that appears to limit someone and does not is worse
  *     than one that plainly does not limit them.
+ *
+ * A VD ROLE NOW NEEDS ITS WARD TOO (session 32)
+ *
+ * This file used to refuse a ward code on a voting-district role — "a VD
+ * role is narrowed on the VD, not the ward. Clear it." That was wrong for
+ * the data this product actually runs on. A voting district is a polling
+ * station's roll, and a station's roll can be split across wards: 24 of
+ * NW405's 95 station codes are, and one of them across three. The VD code
+ * alone therefore does not identify which portion a canvasser works, and
+ * `inScope()` narrowing on it alone showed them the other wards' voters.
+ *
+ * So both are required now, `inScope()` checks both, and
+ * `VotingDistrict.id` has been `${wardCode}::${vdCode}` since the seed was
+ * built for exactly this reason. See `SPLIT_VD_BASIS`.
  */
 import { SEED_ROLES } from '@/auth/seedRoles';
 import type { GeoScope, StaffProfile } from '@/auth/types';
@@ -60,6 +74,18 @@ export interface StaffDraft {
   wardScope: string;
   vdScope: string;
 }
+
+/**
+ * Why a voting-district role needs a ward as well as a district.
+ *
+ * Shown on the form, quoted by SOP-02 and SOP-12, and guarded by
+ * `staffProvisioning.test.ts`.
+ */
+export const SPLIT_VD_BASIS =
+  'A voting district needs its ward too. A polling station\u2019s roll can be split across wards — 24 of the 95 ' +
+  'station codes in this build\u2019s reference municipality are, and one across three — so the district code on ' +
+  'its own does not say which portion of it this person works. Without the ward they would see the other ' +
+  'wards\u2019 voters at the same station.';
 
 export type ProvisioningField = 'signInId' | 'firstName' | 'lastName' | 'phone' | 'roleId' | 'wardScope' | 'vdScope';
 
@@ -128,6 +154,9 @@ export function provisioningProblems(draft: StaffDraft, existingUids: string[]):
       message: 'This role is scoped to a voting district, so it needs a VD code. Without one they will sign in to an empty application.',
     });
   }
+  if (geoScope === 'VD' && wardScope === '') {
+    problems.push({ field: 'wardScope', message: SPLIT_VD_BASIS });
+  }
   if (geoScope !== 'WARD' && geoScope !== 'VD' && (wardScope !== '' || vdScope !== '')) {
     problems.push({
       field: 'wardScope',
@@ -137,13 +166,9 @@ export function provisioningProblems(draft: StaffDraft, existingUids: string[]):
   if (geoScope === 'WARD' && vdScope !== '') {
     problems.push({ field: 'vdScope', message: 'A ward role is not narrowed by a VD code. Clear it.' });
   }
-  // A VD role is narrowed on the voting district and deliberately not on
-  // its ward — `geoScope.test.ts` asserts that branch is distinct. A ward
-  // code here would be stamped on the token and never consulted, which is
+  // A VD role is narrowed on the voting district AND its ward — see the
+  // header. A ward code here is consulted, not decorative, which is
   // the same recorded-but-not-applied problem refused above.
-  if (geoScope === 'VD' && wardScope !== '') {
-    problems.push({ field: 'wardScope', message: 'A voting-district role is narrowed on the VD, not the ward. Clear it.' });
-  }
 
   return problems;
 }
@@ -164,7 +189,9 @@ export function toStaffProfile(draft: StaffDraft, tenantId: string): StaffProfil
     lastName: draft.lastName.trim(),
     phone: draft.phone.trim(),
     roleId: draft.roleId,
-    wardScope: geoScope === 'WARD' ? wardScope || undefined : undefined,
+    // A VD role carries its ward as well — the token is what inScope()
+    // reads, and the VD branch now checks both.
+    wardScope: geoScope === 'WARD' || geoScope === 'VD' ? wardScope || undefined : undefined,
     vdScope: geoScope === 'VD' ? vdScope || undefined : undefined,
     capOverrides: { granted: [], revoked: [] },
     active: true,
