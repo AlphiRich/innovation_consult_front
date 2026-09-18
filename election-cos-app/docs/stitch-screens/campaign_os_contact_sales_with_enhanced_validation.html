@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Contact Sales | Campaign OS Provincial/Metro Tier</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#76767f",
+                        "secondary-fixed-dim": "#ebc169",
+                        "soft-teal": "#E6F4F1",
+                        "tertiary-fixed": "#ffdadb",
+                        "inverse-primary": "#bdc4f1",
+                        "on-tertiary-fixed": "#40000d",
+                        "secondary-container": "#fdd178",
+                        "on-tertiary-fixed-variant": "#832331",
+                        "muted-navy": "#484E6B",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e1e3e4",
+                        "on-surface-variant": "#46464e",
+                        "secondary-fixed": "#ffdea1",
+                        "on-secondary-container": "#785805",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary": "#290006",
+                        "on-error": "#ffffff",
+                        "secondary": "#795907",
+                        "on-primary-fixed-variant": "#3d456b",
+                        "accent-teal": "#2A7D7E",
+                        "surface-container-high": "#e7e8e9",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "surface-tint": "#545c84",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#c6c5cf",
+                        "on-primary-container": "#8289b4",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#bdc4f1",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f8f9fa",
+                        "primary-container": "#1a2246",
+                        "primary-fixed": "#dde1ff",
+                        "on-primary-fixed": "#10193c",
+                        "surface-container-low": "#f3f4f5",
+                        "tertiary-container": "#510013",
+                        "inverse-surface": "#2e3132",
+                        "surface-container": "#edeeef",
+                        "on-background": "#191c1d",
+                        "on-tertiary-container": "#dc6672",
+                        "on-secondary": "#ffffff",
+                        "primary": "#040c30",
+                        "soft-amber": "#FDF6E9",
+                        "on-surface": "#191c1d",
+                        "on-secondary-fixed": "#261900",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#d9dadb",
+                        "surface": "#f8f9fa",
+                        "tertiary-fixed-dim": "#ffb2b7",
+                        "brand-gold": "#B7913F"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-desktop": "10vw",
+                        "content-inset": "2rem",
+                        "margin-mobile": "1rem",
+                        "gutter": "1.5rem",
+                        "step-gap": "4rem"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Archivo Narrow"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Archivo Narrow"],
+                        "step-number": ["Archivo Narrow"],
+                        "headline-lg": ["Archivo Narrow"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["32px", {"lineHeight": "38px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "30px", "fontWeight": "600"}],
+                        "step-number": ["64px", {"lineHeight": "1", "fontWeight": "700"}],
+                        "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .form-input-focus:focus {
+            outline: none;
+            border-color: #B7913F;
+            box-shadow: 0 0 0 1px #B7913F;
+        }
+        .step-active-indicator {
+            box-shadow: 0px 12px 24px rgba(26, 34, 70, 0.08);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-20 bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<img alt="Campaign OS Logo" class="h-10 w-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtz6VRrdByQSJbGbdK1bva0G93YTRvb-n636eLiirUP4a1iqW2qdEoDYkMjdOFyJ-UHNVNGKksqnExo7WOVxgtWdP7xEE8esvZbdJ9oA4korOjf8GyvFevC8KkApF5H-XbodMNfEx-BRHxQD95YaA7nZH7DZpkDbFcciFs4qal4hTD_RGmwti_ICOseXsRS8yn2gQ0EneGcwrnOhnAy9bX-MUu1TMrx8-EgPAmrq5sqjYPNa0xR5e30Z0IQVWNR6vmSG8qPhbFmA"/>
+<span class="font-headline-md text-headline-md font-bold text-primary">Campaign OS</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant font-body-md hover:text-secondary transition-colors" href="#">Platform</a>
+<a class="text-on-surface-variant font-body-md hover:text-secondary transition-colors" href="#">Solutions</a>
+<a class="text-on-surface-variant font-body-md hover:text-secondary transition-colors" href="#">Resources</a>
+<a class="text-on-surface-variant font-body-md hover:text-secondary transition-colors" href="#">Pricing</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="hidden md:block font-body-md text-on-surface-variant hover:text-primary transition-colors">Login</button>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-body-md font-bold hover:bg-primary-container transition-all active:scale-95">Contact Sales</button>
+</div>
+</nav>
+<main class="mt-20">
+<!-- Hero Section -->
+<section class="relative py-24 px-margin-mobile md:px-margin-desktop overflow-hidden bg-surface-bright">
+<div class="absolute inset-0 opacity-5 pointer-events-none">
+<div class="h-full w-full" style="background-image: radial-gradient(#1A2246 1px, transparent 1px); background-size: 40px 40px;"></div>
+</div>
+<div class="relative z-10 max-w-4xl mx-auto text-center">
+<div class="inline-flex items-center gap-2 bg-soft-amber border border-secondary-fixed text-primary px-4 py-1 rounded-full mb-6">
+<span class="material-symbols-outlined text-[18px]">workspace_premium</span>
+<span class="font-label-caps text-label-caps uppercase tracking-widest">Provincial &amp; Metro Tier</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary mb-6 md:text-[56px] md:leading-tight">
+                    Secure Your Mandate at Scale.
+                </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+                    Institutional-grade campaign operations for Metros, Provinces, and National parties. Centralize intelligence, automate compliance, and mobilize at scale.
+                </p>
+</div>
+</section>
+<!-- Main Content (Split Layout) -->
+<section class="py-16 px-margin-mobile md:px-margin-desktop bg-white">
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
+<!-- Left Side: Form -->
+<div class="lg:col-span-7">
+<div class="mb-10">
+<h2 class="font-headline-md text-headline-md text-primary mb-2">Institutional Inquiry</h2>
+<p class="text-on-surface-variant">Please provide your official credentials for priority tier verification.</p>
+</div>
+<form class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-muted-navy uppercase">Full Name</label>
+<input class="w-full bg-surface-container-low border border-outline-variant px-4 py-3 rounded-lg form-input-focus transition-all text-on-surface font-body-md" placeholder="e.g., Sizwe Dhlamini" required="true" type="text"/><p class="validation-error">This field is required</p>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-muted-navy uppercase">Official Email</label>
+<input class="w-full bg-surface-container-low border border-outline-variant px-4 py-3 rounded-lg form-input-focus transition-all text-on-surface font-body-md" placeholder="name@organization.gov.za" required="true" type="email"/><p class="validation-error">Please enter a valid official email</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-muted-navy uppercase">Political Party / Organization</label>
+<input class="w-full bg-surface-container-low border border-outline-variant px-4 py-3 rounded-lg form-input-focus transition-all text-on-surface font-body-md" placeholder="Registered Entity Name" required="true" type="text"/><p class="validation-error">This field is required</p>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-muted-navy uppercase">Role</label>
+<select class="w-full bg-surface-container-low border border-outline-variant px-4 py-3 rounded-lg form-input-focus transition-all text-on-surface font-body-md" required="true">
+<option>Provincial Secretary</option>
+<option>Metro Lead</option>
+<option>National Strategist</option>
+<option>Operations Director</option>
+<option>Other</option>
+</select>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-muted-navy uppercase">Target Municipality/Region</label>
+<input class="w-full bg-surface-container-low border border-outline-variant px-4 py-3 rounded-lg form-input-focus transition-all text-on-surface font-body-md" placeholder="Select Jurisdiction" required="true" type="text"/><p class="validation-error">This field is required</p>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-muted-navy uppercase">Strategic Requirements</label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant px-4 py-3 rounded-lg form-input-focus transition-all text-on-surface font-body-md" placeholder="Describe your data integration and scale requirements..." required="true" rows="4"></textarea><p class="validation-error">This field is required</p>
+</div>
+<button class="w-full bg-primary text-on-primary py-4 rounded-lg font-headline-md text-headline-md flex items-center justify-center gap-3 hover:bg-primary-container shadow-lg transition-all active:scale-[0.98]" type="submit">
+                            Request Strategic Briefing
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<p class="text-center text-on-surface-variant text-[14px]">
+                            Secure transmission guaranteed. End-to-end encrypted.
+                        </p>
+</form>
+</div>
+<!-- Right Side: Benefits Card -->
+<div class="lg:col-span-5">
+<div class="bg-primary-container text-on-primary-container rounded-xl p-8 sticky top-32 border border-primary shadow-xl">
+<div class="mb-8">
+<h3 class="font-headline-md text-headline-md text-on-primary-fixed mb-2">Enterprise Benefits</h3>
+<div class="h-1 w-16 bg-brand-gold"></div>
+</div>
+<div class="space-y-8">
+<!-- Benefit 1 -->
+<div class="flex gap-4">
+<div class="bg-primary/20 p-2 h-fit rounded border border-on-primary-container/20">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">policy</span>
+</div>
+<div>
+<h4 class="font-bold text-lg text-on-primary mb-1">Dedicated PLO Support</h4>
+<p class="text-on-primary-container/80 text-sm">Direct liaison for IEC compliance and legal mediation during critical windows.</p>
+</div>
+</div>
+<!-- Benefit 2 -->
+<div class="flex gap-4">
+<div class="bg-primary/20 p-2 h-fit rounded border border-on-primary-container/20">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">account_tree</span>
+</div>
+<div>
+<h4 class="font-bold text-lg text-on-primary mb-1">Multi-Team Oversight</h4>
+<p class="text-on-primary-container/80 text-sm">Centralized command and control dashboard for managing hundreds of individual ward ops.</p>
+</div>
+</div>
+<!-- Benefit 3 -->
+<div class="flex gap-4">
+<div class="bg-primary/20 p-2 h-fit rounded border border-on-primary-container/20">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<div>
+<h4 class="font-bold text-lg text-on-primary mb-1">Priority Security</h4>
+<p class="text-on-primary-container/80 text-sm">Air-gapped server options and end-to-end encryption for sensitive voter intelligence.</p>
+</div>
+</div>
+<!-- Benefit 4 -->
+<div class="flex gap-4">
+<div class="bg-primary/20 p-2 h-fit rounded border border-on-primary-container/20">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">api</span>
+</div>
+<div>
+<h4 class="font-bold text-lg text-on-primary mb-1">Custom API Access</h4>
+<p class="text-on-primary-container/80 text-sm">Native integration protocols for national party datasets and historical analytics.</p>
+</div>
+</div>
+</div>
+<div class="mt-10 pt-10 border-t border-white/10 text-center">
+<p class="text-label-caps text-secondary-fixed-dim font-bold mb-2">TRUSTED BY</p>
+<div class="flex justify-center gap-6 opacity-60 grayscale hover:grayscale-0 transition-all">
+<span class="font-headline-md text-on-primary tracking-tighter">INNOVATION CONSULT</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Trust Section -->
+<section class="py-16 bg-surface-container-low border-y border-outline-variant">
+<div class="max-w-4xl mx-auto px-margin-mobile text-center">
+<blockquote class="font-headline-md text-headline-md text-primary italic mb-6">
+                    "Campaign OS is the infrastructure that allows us to treat a province like a community and a community like a family."
+                </blockquote>
+<p class="font-bold text-on-surface">Regional Operational Director</p>
+<p class="text-on-surface-variant">Metro Strategic Group</p>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-8 bg-primary dark:bg-primary-container">
+<div class="flex flex-col items-center md:items-start gap-4">
+<span class="font-headline-md text-headline-md text-on-primary">Campaign OS</span>
+<p class="font-body-md text-body-md text-surface-variant text-center md:text-left max-w-xs">
+                © 2024 Campaign OS. An Innovation Consult Enterprise Solution.
+            </p>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="font-label-caps text-label-caps text-surface-variant hover:text-on-primary-fixed-variant transition-colors uppercase" href="#">Privacy Policy</a>
+<a class="font-label-caps text-label-caps text-surface-variant hover:text-on-primary-fixed-variant transition-colors uppercase" href="#">Terms of Service</a>
+<a class="font-label-caps text-label-caps text-surface-variant hover:text-on-primary-fixed-variant transition-colors uppercase" href="#">Security</a>
+<a class="font-label-caps text-label-caps text-surface-variant hover:text-on-primary-fixed-variant transition-colors uppercase" href="#">Accessibility</a>
+<a class="font-label-caps text-label-caps text-surface-variant hover:text-on-primary-fixed-variant transition-colors uppercase" href="#">SLA</a>
+</div>
+</footer>
+<script>
+        // Micro-interactions for form
+        const form = document.querySelector('form');
+        const inputs = form.querySelectorAll('input, select, textarea');
+
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.querySelector('label').classList.replace('text-muted-navy', 'text-brand-gold');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.querySelector('label').classList.replace('text-brand-gold', 'text-muted-navy');
+            });
+        });
+
+        // Submit animation
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = form.querySelector('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> Processing Request...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.classList.replace('bg-primary', 'bg-accent-teal');
+                btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Request Received';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.replace('bg-accent-teal', 'bg-primary');
+                    btn.disabled = false;
+                    form.reset();
+                }, 3000);
+            }, 2000);
+        });
+    </script>
+</body></html>

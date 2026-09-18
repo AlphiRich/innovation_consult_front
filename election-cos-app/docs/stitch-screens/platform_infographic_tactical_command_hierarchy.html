@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tactical Command Hierarchy | Campaign OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#001313",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#edeeef",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-container": "#ffbf00",
+                        "background": "#f8f9fa",
+                        "primary-fixed": "#dde1ff",
+                        "primary-fixed-dim": "#bdc4f1",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "secondary": "#795900",
+                        "tertiary-fixed": "#93f2f2",
+                        "surface-container-highest": "#e1e3e4",
+                        "inverse-primary": "#bdc4f1",
+                        "secondary-fixed-dim": "#fbbc00",
+                        "surface-container-low": "#f3f4f5",
+                        "on-tertiary-fixed": "#002020",
+                        "on-tertiary-container": "#349a9a",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-container": "#002a2a",
+                        "surface-dim": "#d9dadb",
+                        "secondary-fixed": "#ffdfa0",
+                        "on-surface-variant": "#46464e",
+                        "primary": "#040c30",
+                        "primary-container": "#1a2246",
+                        "inverse-surface": "#2e3132",
+                        "surface-tint": "#545c84",
+                        "on-surface": "#191c1d",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#76d6d5",
+                        "on-primary-fixed-variant": "#3d456b",
+                        "outline": "#76767f",
+                        "surface": "#f8f9fa",
+                        "on-tertiary-fixed-variant": "#004f4f",
+                        "on-primary-fixed": "#10193c",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#261a00",
+                        "on-secondary-container": "#6d5000",
+                        "on-background": "#191c1d",
+                        "outline-variant": "#c6c5cf",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#8289b4"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-desktop": "2rem",
+                        "stack-sm": "0.5rem",
+                        "stack-lg": "2rem",
+                        "gutter": "1.5rem",
+                        "container-max": "1280px",
+                        "margin-mobile": "1rem",
+                        "stack-md": "1rem"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Archivo Narrow"],
+                        "display-lg-mobile": ["Archivo Narrow"],
+                        "headline-sm": ["Archivo Narrow"],
+                        "headline-md": ["Archivo Narrow"],
+                        "label-sm": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "letterSpacing": "0em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "600" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "letterSpacing": "0em", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .infographic-connector {
+            background: linear-gradient(to bottom, transparent, #ffbf00, #1a2246, transparent);
+            width: 2px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+        .data-dot {
+            width: 8px;
+            height: 8px;
+            background: #ffbf00;
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: moveDown 4s infinite linear;
+        }
+        .strategy-dot {
+            width: 8px;
+            height: 8px;
+            background: #1a2246;
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: moveUp 4s infinite linear;
+        }
+        @keyframes moveDown {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        @keyframes moveUp {
+            0% { bottom: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { bottom: 100%; opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md">
+<!-- TopNavBar -->
+<nav class="w-full top-0 sticky z-50 bg-surface-bright dark:bg-tertiary border-b border-outline-variant dark:border-outline">
+<div class="flex justify-between items-center max-w-container-max mx-auto px-margin-desktop h-20">
+<div class="flex items-center gap-4">
+<img alt="Campaign OS Logo" class="h-10 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAONidhwBsrXgycss0epHXPuWTCQZBAy6NedCQY9D5poT55np3n9OvxUORNhoG0vLvx4COVpFliDXR0H9jE5hC0CrXtNghhpMk7Bj8hsSZ-krE59Sr6q9uxrDAV3PvQ3PQjLIQsJNU0vxy5EKhw_EbBBaZxWcvJGuQ37LBVnjAJbtS2JEqgi3ImvMxr1Hjn5YJHT9vSIlIIV_FqfCZKiRo63JItP0TpBONg8HqzUrsSF4PkThsqx4wqwNKbnTVQVUr_yCrRJtFMeA"/>
+<span class="font-display-lg text-display-lg text-primary dark:text-primary-fixed tracking-tight">Campaign OS</span>
+</div>
+<div class="hidden md:flex gap-gutter items-center">
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors" href="#">Product</a>
+<a class="font-body-md text-body-md text-primary dark:text-secondary-fixed-dim font-bold border-b-2 border-secondary-container" href="#">Solutions</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors" href="#">Pricing</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-surface-variant hover:text-secondary dark:hover:text-secondary-fixed transition-colors" href="#">Case Studies</a>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2 border border-primary text-primary font-display-lg text-body-md font-bold uppercase hover:bg-surface-container transition-all">Login</button>
+<button class="px-6 py-2 bg-primary text-on-primary font-display-lg text-body-md font-bold uppercase hover:opacity-90 transition-all">Get Started</button>
+</div>
+</div>
+</nav>
+<main class="flex-grow">
+<section class="max-w-container-max mx-auto px-margin-desktop py-stack-lg">
+<!-- Header Section -->
+<div class="mb-stack-lg border-l-4 border-secondary-container pl-6">
+<h1 class="font-display-lg text-display-lg text-primary mb-2 uppercase">Tactical Command Hierarchy</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                    Our institutional-grade infrastructure orchestrates the flow of data from individual voter sentiment to metropolitan-scale strategic intelligence.
+                </p>
+</div>
+<!-- Main Infographic Container -->
+<div class="relative grid grid-cols-1 gap-12 py-12">
+<!-- Vertical Connectors with Animation -->
+<div class="absolute inset-0 hidden md:block">
+<div class="infographic-connector h-full opacity-20"></div>
+<!-- Animated Data Flowing Up -->
+<div class="strategy-dot" style="animation-delay: 0s;"></div>
+<div class="strategy-dot" style="animation-delay: 1.5s;"></div>
+<!-- Animated Strategy Flowing Down -->
+<div class="data-dot" style="animation-delay: 0.5s;"></div>
+<div class="data-dot" style="animation-delay: 2s;"></div>
+</div>
+<!-- Tier 1: Strategic War Room -->
+<div class="relative z-10 flex flex-col md:flex-row items-center gap-gutter md:justify-center">
+<div class="md:w-1/3 text-right hidden md:block">
+<span class="font-label-sm text-label-sm text-secondary font-bold bg-secondary-fixed px-3 py-1 rounded">EXECUTIVE LEVEL</span>
+</div>
+<div class="w-full md:w-5/12 bg-surface-container-lowest border border-outline-variant p-gutter shadow-sm hover:border-primary transition-all">
+<div class="flex items-center gap-4 mb-stack-sm">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="hub">hub</span>
+<h2 class="font-headline-md text-headline-md text-primary uppercase">Strategic War Room</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">The 'Brain' for metro-wide analytics and predictive coalition modeling. High-level dashboard for executive decision making.</p>
+<div class="border-t border-outline-variant pt-3">
+<span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">TACTICAL BENEFIT:</span>
+<p class="font-body-md text-body-md text-primary italic">Coalition Risk Assessment & Resource Optimization</p>
+</div>
+</div>
+<div class="md:w-1/3 hidden md:block"></div>
+</div>
+<!-- Tier 2: Municipal Command -->
+<div class="relative z-10 flex flex-col md:flex-row items-center gap-gutter md:justify-center">
+<div class="md:w-1/3 hidden md:block"></div>
+<div class="w-full md:w-5/12 bg-surface-container-lowest border border-outline-variant p-gutter shadow-sm hover:border-primary transition-all">
+<div class="flex items-center gap-4 mb-stack-sm">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="corporate_fare">corporate_fare</span>
+<h2 class="font-headline-md text-headline-md text-primary uppercase">Municipal Command</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Centralized management for hundreds of wards and regional field leads. Logistics, staffing, and regional performance tracking.</p>
+<div class="border-t border-outline-variant pt-3">
+<span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">TACTICAL BENEFIT:</span>
+<p class="font-body-md text-body-md text-primary italic">Operational Scalability & Performance Benchmarking</p>
+</div>
+</div>
+<div class="md:w-1/3 text-left hidden md:block">
+<span class="font-label-sm text-label-sm text-secondary font-bold bg-secondary-fixed px-3 py-1 rounded">OPERATIONAL LEVEL</span>
+</div>
+</div>
+<!-- Tier 3: Ward Field App -->
+<div class="relative z-10 flex flex-col md:flex-row items-center gap-gutter md:justify-center">
+<div class="md:w-1/3 text-right hidden md:block">
+<span class="font-label-sm text-label-sm text-secondary font-bold bg-secondary-fixed px-3 py-1 rounded">FIELD LEVEL</span>
+</div>
+<div class="w-full md:w-5/12 bg-surface-container-lowest border border-outline-variant p-gutter shadow-sm hover:border-primary transition-all">
+<div class="flex items-center gap-4 mb-stack-sm">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="smartphone">smartphone</span>
+<h2 class="font-headline-md text-headline-md text-primary uppercase">Ward Field App</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">Real-time doorstep data entry tool for thousands of volunteers. Geofenced canvassing routes and automated intake forms.</p>
+<div class="border-t border-outline-variant pt-3">
+<span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">TACTICAL BENEFIT:</span>
+<p class="font-body-md text-body-md text-primary italic">Zero-Latency Reporting & Error Reduction</p>
+</div>
+</div>
+<div class="md:w-1/3 hidden md:block"></div>
+</div>
+<!-- Tier 4: Voter Intelligence -->
+<div class="relative z-10 flex flex-col md:flex-row items-center gap-gutter md:justify-center">
+<div class="md:w-1/3 hidden md:block"></div>
+<div class="w-full md:w-5/12 bg-surface-container-lowest border border-outline-variant p-gutter shadow-sm hover:border-primary transition-all">
+<div class="flex items-center gap-4 mb-stack-sm">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="person_search">person_search</span>
+<h2 class="font-headline-md text-headline-md text-primary uppercase">Voter Intelligence</h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">The hyper-local layer where individual sentiment is captured. Deep profiles of community needs and historical engagement patterns.</p>
+<div class="border-t border-outline-variant pt-3">
+<span class="font-label-sm text-label-sm text-on-tertiary-container font-semibold">TACTICAL BENEFIT:</span>
+<p class="font-body-md text-body-md text-primary italic">Real-time Sentiment Capture & Personalized Outreach</p>
+</div>
+</div>
+<div class="md:w-1/3 text-left hidden md:block">
+<span class="font-label-sm text-label-sm text-secondary font-bold bg-secondary-fixed px-3 py-1 rounded">GRASSROOTS LEVEL</span>
+</div>
+</div>
+</div>
+<!-- Summary Analysis Section -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mt-stack-lg">
+<div class="bg-surface-container border border-outline-variant p-6">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-2 uppercase">Bi-Directional Flow</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Strategy flows down to ensure uniform messaging, while data flows up to provide high-fidelity situational awareness.</p>
+</div>
+<div class="bg-surface-container border border-outline-variant p-6">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-2 uppercase">Data Integrity</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Validated intake at the voter level prevents institutional hallucination at the war room level.</p>
+</div>
+<div class="bg-surface-container border border-outline-variant p-6">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-2 uppercase">Institutional Trust</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Architected for security and absolute precision in complex political and municipal landscapes.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-auto bg-primary dark:bg-tertiary-container">
+<div class="flex flex-col md:flex-row justify-between items-center py-stack-lg px-margin-desktop gap-gutter">
+<div class="flex items-center gap-3">
+<span class="font-headline-sm text-headline-sm text-on-primary">Campaign OS</span>
+<span class="font-label-sm text-label-sm text-on-primary-container opacity-80">|</span>
+<p class="font-label-sm text-label-sm text-on-primary opacity-80 uppercase tracking-widest">Institutional Systems</p>
+</div>
+<div class="flex gap-gutter">
+<a class="font-label-sm text-label-sm text-on-primary-container opacity-80 hover:opacity-100 transition-opacity cursor-pointer" href="#">Privacy Policy</a>
+<a class="font-label-sm text-label-sm text-on-primary-container opacity-80 hover:opacity-100 transition-opacity cursor-pointer" href="#">Terms of Service</a>
+<a class="font-label-sm text-label-sm text-on-primary-container opacity-80 hover:opacity-100 transition-opacity cursor-pointer" href="#">Security Architecture</a>
+<a class="font-label-sm text-label-sm text-on-primary-container opacity-80 hover:opacity-100 transition-opacity cursor-pointer" href="#">Technical Support</a>
+</div>
+<p class="font-label-sm text-label-sm text-on-primary opacity-60">
+                © 2024 Campaign OS Institutional Systems. All rights reserved.
+            </p>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for cards
+        document.querySelectorAll('.bg-surface-container-lowest').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-4px)';
+                card.style.boxShadow = '0 10px 15px -3px rgba(4, 12, 48, 0.1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = 'none';
+            });
+        });
+    </script>
+</body></html>

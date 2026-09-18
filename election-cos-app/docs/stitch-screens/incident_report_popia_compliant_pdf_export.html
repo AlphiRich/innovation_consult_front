@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Civic Architect | Municipal Incident Report Export</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700&amp;family=Archivo+Narrow:wght@400;600;700&amp;family=IBM+Plex+Mono:wght@500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Mrs+Saint+Delafield&display=swap');
+        
+        body {
+            font-family: 'Public Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .signature-font {
+            font-family: 'Mrs Saint Delafield', cursive;
+        }
+        .a4-preview {
+            aspect-ratio: 1 / 1.414;
+            width: 210mm;
+            max-width: 100%;
+        }
+        .archivo-narrow {
+            font-family: 'Archivo Narrow', sans-serif;
+        }
+        @media print {
+            .no-print { display: none; }
+            body { background: white; }
+            .a4-preview { 
+                box-shadow: none !important; 
+                border: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #eff4ff;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #76767f;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1A2246",
+                        "brand-gold": "#B7913F",
+                        "brand-maroon": "#7E1F2E",
+                        "tertiary-container": "#252521",
+                        "surface-dim": "#cbdbf5",
+                        "secondary-fixed": "#ffdea1",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "surface-container-low": "#eff4ff",
+                        "secondary-fixed-dim": "#ebc169",
+                        "surface-container-high": "#dce9ff",
+                        "on-tertiary-container": "#8d8c87",
+                        "on-surface-variant": "#46464e",
+                        "surface-variant": "#d3e4fe",
+                        "on-secondary": "#ffffff",
+                        "secondary-container": "#fdd178",
+                        "background": "#f8f9ff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary": "#10100d",
+                        "surface-container": "#e5eeff",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "secondary": "#795907",
+                        "tertiary-fixed": "#e5e2dc",
+                        "surface-container-highest": "#d3e4fe",
+                        "inverse-primary": "#bdc4f1",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#bdc4f1",
+                        "primary-fixed": "#dde1ff",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#10193c",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#8289b4",
+                        "on-secondary-container": "#785805",
+                        "on-background": "#0b1c30",
+                        "on-secondary-fixed": "#261900",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c6c5cf",
+                        "surface-tint": "#545c84",
+                        "on-surface": "#0b1c30",
+                        "primary-container": "#1a2246",
+                        "inverse-surface": "#213145",
+                        "on-primary-fixed-variant": "#3d456b",
+                        "surface": "#f8f9ff",
+                        "outline": "#76767f",
+                        "on-tertiary-fixed-variant": "#474743",
+                        "tertiary-fixed-dim": "#c9c6c1",
+                        "on-error": "#ffffff"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "unit": "4px",
+                        "max-width": "1440px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "margin-desktop": "32px"
+                    },
+                    fontFamily: {
+                        "body-md": ["Public Sans"],
+                        "label-caps": ["Archivo Narrow"],
+                        "body-lg": ["Public Sans"],
+                        "headline-md": ["Archivo Narrow"],
+                        "display-lg-mobile": ["Archivo Narrow"],
+                        "data-mono": ["IBM Plex Mono"],
+                        "display-lg": ["Archivo Narrow"]
+                    },
+                    fontSize: {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface-container-low text-on-surface">
+<!-- Top Navigation Bar -->
+<header class="bg-primary text-on-primary font-body-md text-body-md docked full-width top-0 border-b border-white/10 flex justify-between items-center w-full px-margin-desktop h-16 z-50 no-print">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md font-bold text-brand-gold">CIVIC ARCHITECT</span>
+<div class="h-6 w-[1px] bg-white/20 mx-2"></div>
+<div class="flex gap-6 items-center">
+<button class="text-on-primary/70 hover:text-on-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                Back to Dashboard
+            </button>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-4 py-2 border border-white/30 font-label-caps text-label-caps hover:bg-white/10 transition-colors uppercase tracking-widest">Export CSV</button>
+<button class="px-6 py-2 bg-brand-gold text-white font-label-caps text-label-caps hover:opacity-90 transition-opacity uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+            Generate PDF
+        </button>
+<div class="h-6 w-[1px] bg-white/20 mx-2"></div>
+<span class="material-symbols-outlined cursor-pointer">notifications</span>
+<span class="material-symbols-outlined cursor-pointer">help_outline</span>
+<img alt="Profile" class="w-8 h-8 rounded-full border border-white/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8cDNge9f9S1a1D9WuUSDpIsMu2iUPR6Qdi5aoANKDQMhzGnNt0xS9aV7mXogUOvW6aJvAHy_dzqIB7EEmYzuyR6QnDcFf_7d78tvVKsVCgduchDM8pv7GVAfUr1J7YveTzpd_cqFdv5jhyx9675i0lUOwT-38KsDZ1KuFqlPxRINgQl7aZvyjP7EaE8d_B1Vvuu1fm7ECwnz4qK30ekiN_ea8DO1CzleOIpGKSqyk02TqMbBWXqclT2wYa6N1Dk-PySZCyVmxXQ"/>
+</div>
+</header>
+<div class="flex min-h-[calc(100vh-64px)] overflow-hidden">
+<!-- Sidebar: Report Configuration -->
+<aside class="w-80 bg-white border-r border-outline-variant/30 flex flex-col no-print">
+<div class="p-6 border-b border-outline-variant/30">
+<h2 class="font-headline-md text-headline-md text-primary mb-1 uppercase">Report Config</h2>
+<p class="text-on-surface-variant font-body-md text-sm">Define export parameters</p>
+</div>
+<div class="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
+<section class="pb-4 border-b border-outline-variant/20">
+<label class="block font-label-caps text-label-caps text-primary mb-4 uppercase">Document Security</label>
+<div class="flex items-center justify-between">
+<span class="text-sm font-body-md text-on-surface">Confidential Watermark</span>
+<button aria-checked="true" class="relative inline-flex h-6 w-11 items-center rounded-full bg-brand-gold transition-colors focus:outline-none" id="watermarkToggle" role="switch">
+<span class="inline-block h-4 w-4 translate-x-6 transform rounded-full bg-white transition-transform"></span>
+</button>
+</div>
+<p class="mt-2 text-[11px] text-on-surface-variant italic">Enables high-visibility security overlays on all exported pages.</p>
+</section>
+<!-- Date Range -->
+<section>
+<label class="block font-label-caps text-label-caps text-primary mb-2 uppercase">Date Range</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-outline-variant/40 p-3 text-sm font-data-mono focus:ring-1 focus:ring-brand-gold outline-none transition-all" type="text" value="10/01/2023 to 10/31/2023"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">calendar_today</span>
+</div>
+</section>
+<!-- Wards -->
+<section>
+<label class="block font-label-caps text-label-caps text-primary mb-2 uppercase">Ward Selection</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant/40 p-3 text-sm font-body-md focus:ring-1 focus:ring-brand-gold outline-none">
+<option>All Wards (01-12)</option>
+<option>Ward 05 - Central Business</option>
+<option>Ward 08 - Industrial North</option>
+</select>
+</section>
+<!-- Categories -->
+<section>
+<label class="block font-label-caps text-label-caps text-primary mb-3 uppercase">Incident Categories</label>
+<div class="space-y-3">
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 text-brand-gold border-outline focus:ring-brand-gold rounded-none" type="checkbox"/>
+<span class="text-sm font-body-md text-on-surface group-hover:text-primary transition-colors">Water &amp; Sanitation</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 text-brand-gold border-outline focus:ring-brand-gold rounded-none" type="checkbox"/>
+<span class="text-sm font-body-md text-on-surface group-hover:text-primary transition-colors">Electricity</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<input checked="" class="w-4 h-4 text-brand-gold border-outline focus:ring-brand-gold rounded-none" type="checkbox"/>
+<span class="text-sm font-body-md text-on-surface group-hover:text-primary transition-colors">Roads &amp; Transport</span>
+</label>
+</div>
+</section>
+</div>
+<div class="p-6 bg-surface-container-low border-t border-outline-variant/30">
+<button class="w-full py-4 bg-primary text-white font-label-caps text-label-caps uppercase tracking-widest hover:opacity-90 transition-opacity">Apply Changes</button>
+</div>
+</aside>
+<!-- Main Document Canvas -->
+<main class="flex-1 overflow-y-auto p-12 bg-surface-container-low custom-scrollbar flex flex-col items-center">
+<!-- A4 Document Page -->
+<div class="a4-preview bg-white shadow-2xl border border-outline-variant/10 p-[20mm] flex flex-col relative overflow-hidden text-primary archivo-narrow" id="documentPage">
+<!-- Watermark Overlay -->
+<div class="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none rotate-[-45deg] select-none z-0" id="watermark">
+<span class="font-bold text-[120px] uppercase">CONFIDENTIAL</span>
+</div>
+<!-- Header -->
+<div class="flex justify-between items-start border-b-[2px] border-primary pb-6 mb-8 relative z-10">
+<div class="flex gap-5">
+<img alt="Innovation Consult Logo" class="w-20 h-20 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhSlo6-t9K09sT0rWe8wDarN1tgGUfNXoF-UueeKLWiVpr37_T5Z3xTFvYAcAiKEsSLODRvEwwJ7Q_bNU8M1BK4b22XrnXcUQL7i06z7SwiKjR2vRdKu8JJN1daPjpSTGr5TkCxDv1uaKvDOSycvOo9-GRsdA7oaiBhTI4HmCdpMtHRzeFMcfmfTXn6um0lw_sSW9i02q_j7L9LlwcsUkYCxSl93Qk8xm3crJA7p3kGb_S4YrwvcVtYsUFgGwzcnHbZTjx67nSiw"/>
+<div>
+<h1 class="font-bold text-[12px] text-brand-gold uppercase mb-1 tracking-[0.2em]">Innovation Consult</h1>
+<h2 class="font-bold text-3xl text-primary tracking-tight uppercase">Municipal Incident Report</h2>
+<p class="font-data-mono text-[11px] text-on-surface-variant uppercase mt-1">Reference No: LGE-IR-2023-104</p>
+</div>
+</div>
+<div class="text-right">
+<div class="font-bold text-[10px] uppercase text-on-surface-variant tracking-wider">Report Issued</div>
+<div class="font-data-mono text-sm text-primary font-bold">2023-10-31 14:45</div>
+<div class="mt-2 inline-block px-3 py-1 bg-brand-maroon/10 border border-brand-maroon/20 font-bold text-[10px] uppercase text-brand-maroon">Classification: CONFIDENTIAL</div>
+</div>
+</div>
+<!-- Summary Bar -->
+<div class="grid grid-cols-3 gap-0 border border-primary/20 mb-10 relative z-10 shadow-sm">
+<div class="p-6 border-r border-primary/10 bg-white">
+<span class="block font-bold text-[10px] text-on-surface-variant uppercase mb-2 tracking-widest">Total Reports</span>
+<span class="block text-4xl font-bold text-primary">142</span>
+</div>
+<div class="p-6 border-r border-primary/10 bg-white">
+<span class="block font-bold text-[10px] text-on-surface-variant uppercase mb-2 tracking-widest">Urgent Actions</span>
+<span class="block text-4xl font-bold text-brand-maroon">28</span>
+</div>
+<div class="p-6 bg-white">
+<span class="block font-bold text-[10px] text-on-surface-variant uppercase mb-2 tracking-widest">Regional Reach</span>
+<span class="block text-4xl font-bold text-brand-gold">05</span>
+</div>
+</div>
+<!-- Content Body -->
+<div class="flex-1 relative z-10">
+<h3 class="font-bold text-[12px] text-primary border-b border-outline-variant/30 pb-2 mb-4 uppercase tracking-widest">Incident Ledger Summary</h3>
+<table class="w-full text-left border-collapse mb-8 text-[12px]">
+<thead>
+<tr class="bg-primary text-white font-bold uppercase text-[10px] tracking-wider">
+<th class="p-3 border border-primary/10">ID</th>
+<th class="p-3 border border-primary/10">Date</th>
+<th class="p-3 border border-primary/10 text-center">Ward</th>
+<th class="p-3 border border-primary/10">Category</th>
+<th class="p-3 border border-primary/10">Primary Description</th>
+</tr>
+</thead>
+<tbody class="text-primary">
+<tr class="border-b border-outline-variant/20">
+<td class="p-3 font-data-mono font-bold">#4092</td>
+<td class="p-3">2023-10-30</td>
+<td class="p-3 text-center">05</td>
+<td class="p-3">
+<span class="px-2 py-1 bg-brand-gold/10 text-brand-gold font-bold uppercase text-[9px] rounded">Water</span>
+</td>
+<td class="p-3 italic">Main line burst on 4th Ave, significant pressure loss...</td>
+</tr>
+<tr class="border-b border-outline-variant/20 bg-surface-container-low/30">
+<td class="p-3 font-data-mono font-bold">#4088</td>
+<td class="p-3">2023-10-29</td>
+<td class="p-3 text-center">08</td>
+<td class="p-3">
+<span class="px-2 py-1 bg-brand-maroon/10 text-brand-maroon font-bold uppercase text-[9px] rounded">Electricity</span>
+</td>
+<td class="p-3 italic">Transformer failure reported in industrial park B...</td>
+</tr>
+<tr class="border-b border-outline-variant/20">
+<td class="p-3 font-data-mono font-bold">#4085</td>
+<td class="p-3">2023-10-28</td>
+<td class="p-3 text-center">05</td>
+<td class="p-3">
+<span class="px-2 py-1 bg-primary/10 text-primary font-bold uppercase text-[9px] rounded">Safety</span>
+</td>
+<td class="p-3 italic">Increased petty crime incidents near Central Mall...</td>
+</tr>
+<tr class="border-b border-outline-variant/20 bg-surface-container-low/30">
+<td class="p-3 font-data-mono font-bold">#4082</td>
+<td class="p-3">2023-10-27</td>
+<td class="p-3 text-center">12</td>
+<td class="p-3">
+<span class="px-2 py-1 bg-brand-gold/10 text-brand-gold font-bold uppercase text-[9px] rounded">Roads</span>
+</td>
+<td class="p-3 italic">Pothole damage causing traffic delays on main arterial...</td>
+</tr>
+</tbody>
+</table>
+<div class="mb-10">
+<h3 class="font-bold text-[12px] text-primary border-b border-outline-variant/30 pb-2 mb-3 uppercase tracking-widest">Authorized Remarks</h3>
+<div class="p-5 bg-surface-container-low/50 border-l-4 border-brand-gold text-[13px] italic text-primary leading-relaxed">
+                        "No official remarks appended to this document iteration. Automated system log confirms all data points verified against municipal telemetry."
+                    </div>
+</div>
+</div>
+<!-- Footer & Signatures -->
+<div class="mt-auto relative z-10">
+<div class="grid grid-cols-2 gap-16 mb-8">
+<div>
+<div class="font-bold text-[10px] uppercase text-on-surface-variant mb-2 tracking-widest">Authorization Workflow</div>
+<div class="border-b-2 border-primary/20 pb-2 relative h-16 flex items-end">
+<span class="signature-font text-5xl text-primary opacity-90">D. Sterling</span>
+<span class="absolute right-0 bottom-2 text-[9px] font-data-mono text-on-surface-variant">E-SIGNED ID: 88219-X</span>
+</div>
+<div class="mt-2">
+<div class="font-bold text-sm text-primary">David Sterling</div>
+<div class="font-bold text-[10px] uppercase text-brand-gold tracking-widest">Director of Operations</div>
+</div>
+</div>
+<div>
+<div class="font-bold text-[10px] uppercase text-on-surface-variant mb-2 tracking-widest">Validation Timestamp</div>
+<div class="border-b-2 border-primary/20 pb-2 h-16 flex items-end">
+<span class="font-data-mono text-lg font-bold text-primary">2023-10-31 15:12:08</span>
+</div>
+<div class="mt-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-brand-gold">verified</span>
+<span class="font-bold text-[9px] uppercase text-primary tracking-tighter">Blockchain Ledger Confirmed</span>
+</div>
+</div>
+</div>
+<div class="mb-2 text-[9px] text-on-surface-variant/70 leading-tight archivo-narrow">
+    POPIA COMPLIANCE: This document contains personal information processed in accordance with the Protection of Personal Information Act. Data is used strictly for municipal incident management and service delivery improvement. Unauthorized distribution is prohibited.
+</div><div class="flex justify-between items-center text-[9px] font-bold uppercase text-on-surface-variant pt-4 border-t border-outline-variant/30 tracking-widest">
+<span>© 2023 Innovation Consult - Civic Architect Platform</span>
+<span>Document ID: 99x-IR-001 | Page 1 of 8</span>
+</div>
+</div>
+<!-- Top Corner Branding -->
+<div class="absolute top-0 right-0 w-20 h-20 overflow-hidden">
+<div class="absolute -right-10 -top-10 w-20 h-20 bg-brand-gold rotate-45"></div>
+<div class="absolute -right-12 -top-12 w-20 h-20 bg-primary rotate-45"></div>
+</div>
+</div>
+<!-- Page Navigation (Floating) -->
+<div class="mt-8 flex gap-4 no-print">
+<button class="w-10 h-10 rounded-full border border-outline-variant/30 bg-white flex items-center justify-center hover:bg-surface-container transition-colors shadow-md text-primary">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="px-6 py-2 bg-white border border-outline-variant/30 rounded-full shadow-md flex items-center gap-3 font-data-mono text-sm text-primary">
+<span>Page</span>
+<input class="w-8 h-8 text-center bg-transparent border-none focus:ring-0 p-0 font-bold" type="text" value="1"/>
+<span>of 8</span>
+</div>
+<button class="w-10 h-10 rounded-full border border-outline-variant/30 bg-white flex items-center justify-center hover:bg-surface-container transition-colors shadow-md text-primary">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</main>
+</div>
+<script>
+    // Watermark toggle logic
+    const watermarkToggle = document.getElementById('watermarkToggle');
+    const watermark = document.getElementById('watermark');
+    
+    watermarkToggle.addEventListener('click', () => {
+        const isChecked = watermarkToggle.getAttribute('aria-checked') === 'true';
+        watermarkToggle.setAttribute('aria-checked', !isChecked);
+        
+        const circle = watermarkToggle.querySelector('span');
+        if (isChecked) {
+            watermarkToggle.classList.replace('bg-brand-gold', 'bg-outline-variant');
+            circle.classList.replace('translate-x-6', 'translate-x-1');
+            watermark.style.display = 'none';
+        } else {
+            watermarkToggle.classList.replace('bg-outline-variant', 'bg-brand-gold');
+            circle.classList.replace('translate-x-1', 'translate-x-6');
+            watermark.style.display = 'flex';
+        }
+    });
+
+    // PDF generation simulation
+    document.querySelector('button.bg-brand-gold').addEventListener('click', () => {
+        window.print();
+    });
+</script>
+</body></html>

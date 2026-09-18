@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Voter Profile | Johan de Beer</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Public+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#c6c5cf",
+                    "tertiary-fixed": "#e5e2dc",
+                    "primary-container": "#1a2246",
+                    "tertiary-container": "#252521",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-background": "#0b1c30",
+                    "inverse-on-surface": "#eaf1ff",
+                    "secondary": "#795907",
+                    "surface-bright": "#f8f9ff",
+                    "surface-tint": "#545c84",
+                    "on-primary-container": "#8289b4",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "on-surface": "#0b1c30",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#213145",
+                    "on-tertiary-container": "#8d8c87",
+                    "tertiary-fixed-dim": "#c9c6c1",
+                    "inverse-primary": "#bdc4f1",
+                    "surface-container-high": "#dce9ff",
+                    "secondary-fixed": "#ffdea1",
+                    "background": "#f8f9ff",
+                    "primary": "#040c30",
+                    "on-secondary-fixed": "#261900",
+                    "on-surface-variant": "#46464e",
+                    "on-error-container": "#93000a",
+                    "surface-dim": "#cbdbf5",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "surface": "#f8f9ff",
+                    "surface-variant": "#d3e4fe",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "error": "#ba1a1a",
+                    "outline": "#76767f",
+                    "tertiary": "#10100d",
+                    "secondary-container": "#fdd178",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#ebc169",
+                    "on-tertiary-fixed-variant": "#474743",
+                    "surface-container": "#e5eeff",
+                    "primary-fixed": "#dde1ff",
+                    "on-primary-fixed": "#10193c",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-container": "#785805",
+                    "surface-container-low": "#eff4ff",
+                    "on-error": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-desktop": "32px",
+                    "max-width": "1440px",
+                    "unit": "4px",
+                    "margin-mobile": "16px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "label-caps": ["Archivo Narrow"],
+                    "body-md": ["Public Sans"],
+                    "headline-md": ["Archivo Narrow"],
+                    "display-lg-mobile": ["Archivo Narrow"],
+                    "display-lg": ["Archivo Narrow"],
+                    "data-mono": ["Public Sans"],
+                    "body-lg": ["Public Sans"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #f8f9ff;
+            color: #0b1c30;
+            -webkit-font-smoothing: antialiased;
+        }
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 24px;
+            bottom: -24px;
+            width: 1px;
+            background-color: #c6c5cf;
+        }
+        .timeline-item:last-child .timeline-line::before {
+            display: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c6c5cf;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md min-h-screen pb-20">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-40 bg-surface border-b border-outline-variant/20 flex items-center justify-between px-margin-mobile h-14">
+<div class="flex items-center gap-3">
+<button class="hover:bg-surface-container-low transition-colors p-2 rounded-full active:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile text-primary">Voter Profile</h1>
+</div>
+<div class="flex items-center gap-1">
+<button class="hover:bg-surface-container-low transition-colors p-2 rounded-full active:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-primary">more_vert</span>
+</button>
+</div>
+</header>
+<main class="max-w-md mx-auto px-margin-mobile pt-6 space-y-6">
+<!-- Header Section -->
+<section class="space-y-2">
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-primary leading-tight">Johan de Beer</h2>
+<div class="flex items-start gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px] mt-0.5">location_on</span>
+<p class="font-body-md text-body-md">148 Oakwood Dr, Sector 4</p>
+</div>
+<div class="flex flex-wrap gap-2 pt-2">
+<!-- Sentiment Pill -->
+<div class="flex items-center gap-1.5 px-3 py-1 bg-surface-container-highest text-primary border border-primary/10 rounded-full">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+<span class="font-label-caps text-label-caps uppercase">Lean Support</span>
+</div>
+<!-- Status Pill -->
+<div class="flex items-center gap-1.5 px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] border border-[#2E7D32]/10 rounded-full">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span class="font-label-caps text-label-caps uppercase">Registered</span>
+</div>
+</div>
+</section>
+<!-- Quick Actions Grid -->
+<section class="grid grid-cols-2 gap-3">
+<button class="flex flex-col items-center justify-center p-4 bg-primary text-on-primary rounded border border-primary active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined mb-2 text-[28px]">edit_note</span>
+<span class="font-label-caps text-label-caps text-center">LOG RESPONSE</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface border border-outline rounded active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined mb-2 text-[28px] text-secondary">signpost</span>
+<span class="font-label-caps text-label-caps text-center text-primary">REQUEST SIGN</span>
+</button>
+</section>
+<!-- Demographics & Contact -->
+<section class="bg-surface border border-outline-variant/30 p-4 space-y-4">
+<div class="grid grid-cols-2 gap-y-4">
+<div class="space-y-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant">VOTER ID</span>
+<p class="font-data-mono text-data-mono text-primary">ZA-992-0481</p>
+</div>
+<div class="space-y-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant">DEMOGRAPHICS</span>
+<p class="font-body-md text-body-md text-primary">54 / Male</p>
+</div>
+<div class="space-y-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant">PHONE</span>
+<p class="font-body-md text-body-md text-primary underline decoration-secondary">+27 82 555 0192</p>
+</div>
+<div class="space-y-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant">EMAIL</span>
+<p class="font-body-md text-body-md text-primary truncate underline decoration-secondary">johan.db@netmail.co.za</p>
+</div>
+</div>
+</section>
+<!-- Primary Concerns -->
+<section class="space-y-3">
+<div class="flex items-center justify-between">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant">PRIMARY CONCERNS</h3>
+<span class="material-symbols-outlined text-outline cursor-pointer">add_circle</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<div class="px-3 py-2 bg-surface-container border-l-4 border-secondary flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+<span class="font-body-md text-body-md">Electricity Grid</span>
+</div>
+<div class="px-3 py-2 bg-surface-container border-l-4 border-secondary flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">shield</span>
+<span class="font-body-md text-body-md">Crime &amp; Safety</span>
+</div>
+<div class="px-3 py-2 bg-surface-container border-l-4 border-outline flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">water_drop</span>
+<span class="font-body-md text-body-md">Water Infrastructure</span>
+</div>
+</div>
+</section>
+<!-- Engagement History -->
+<section class="space-y-4">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant">ENGAGEMENT HISTORY</h3>
+<div class="space-y-6 ml-2">
+<!-- History Item 1 -->
+<div class="relative timeline-item timeline-line pl-6">
+<div class="absolute left-0 top-1 w-4 h-4 rounded-full bg-secondary border-2 border-surface z-10"></div>
+<div class="space-y-1">
+<div class="flex justify-between items-start">
+<span class="font-data-mono text-data-mono text-primary">2023-11-14 16:40</span>
+<span class="font-label-caps text-[10px] px-1.5 py-0.5 bg-primary text-on-primary">CANVASS</span>
+</div>
+<p class="font-body-md text-body-md text-primary font-medium">In-person Visit</p>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">Voter expressed concern about local substation reliability. Requested yard sign but wants more info on safety plan.</p>
+</div>
+</div>
+<!-- History Item 2 -->
+<div class="relative timeline-item timeline-line pl-6">
+<div class="absolute left-0 top-1 w-4 h-4 rounded-full bg-outline border-2 border-surface z-10"></div>
+<div class="space-y-1">
+<div class="flex justify-between items-start">
+<span class="font-data-mono text-data-mono text-primary">2023-10-21 11:15</span>
+<span class="font-label-caps text-[10px] px-1.5 py-0.5 border border-outline text-on-surface-variant">PHONE</span>
+</div>
+<p class="font-body-md text-body-md text-primary font-medium">Outbound Call</p>
+<p class="font-body-md text-body-md text-on-surface-variant">No answer. Left voicemail regarding Ward 4 town hall meeting.</p>
+</div>
+</div>
+<!-- History Item 3 -->
+<div class="relative timeline-item pl-6">
+<div class="absolute left-0 top-1 w-4 h-4 rounded-full bg-outline border-2 border-surface z-10"></div>
+<div class="space-y-1">
+<div class="flex justify-between items-start">
+<span class="font-data-mono text-data-mono text-primary">2023-09-05 09:30</span>
+<span class="font-label-caps text-[10px] px-1.5 py-0.5 border border-outline text-on-surface-variant">SMS</span>
+</div>
+<p class="font-body-md text-body-md text-primary font-medium">Registration Drive</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Confirmed registration details. Opted-in for SMS alerts.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Map Quick-view (Visual context) -->
+<section class="mt-8">
+<div class="relative w-full h-32 bg-surface-container overflow-hidden border border-outline-variant/30">
+<div class="absolute inset-0 grayscale opacity-40" data-alt="A clean, minimalist grayscale map showing a suburban residential neighborhood layout with precise architectural lines and a single highlighted plot. The style is professional and data-oriented, resembling a government planning document or high-end logistics interface." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAySxp160ROrm4ULij512vAS4EzAGQ7fLSVFzVgLdEjAqL2OH8x3p4Js2o1gdvsoF-JOtAgrnnahO_JmW3jWnizjAYoHfqd6OxeqJR-h8s4wdaBQZbjEWZWLQK0INOC66kiEHqefb7nmqp2iM8jo3YaPq2wX5ZS74gBnXlNBhKdqHSDA-j_mJrTz3_0nlX85Pibzos7r5CJNvtlm7M824s2YH5PR5fWoZSqPy1recD0R_6LhUsFmZVlcj-7zIJX0FmbQicR8fYrJg')"></div>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-secondary text-[40px]" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<div class="bg-primary text-on-primary font-label-caps text-[10px] px-2 py-1 mt-1">148 OAKWOOD</div>
+</div>
+</div>
+<div class="absolute bottom-2 right-2">
+<button class="bg-surface p-2 rounded-full shadow-sm flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-primary">navigation</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface border-t border-outline-variant/20 flex justify-around items-center h-16 px-margin-mobile">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60 active:scale-95 transition-transform hover:bg-surface-container-low transition-colors w-full h-full" href="#">
+<span class="material-symbols-outlined">format_list_bulleted</span>
+<span class="font-label-caps text-label-caps">Walk List</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60 active:scale-95 transition-transform hover:bg-surface-container-low transition-colors w-full h-full" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-caps text-label-caps">Map</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-secondary active:scale-95 transition-transform hover:bg-surface-container-low transition-colors w-full h-full" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_search</span>
+<span class="font-label-caps text-label-caps">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60 active:scale-95 transition-transform hover:bg-surface-container-low transition-colors w-full h-full" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('touchstart', function() {
+                this.classList.add('opacity-70');
+            });
+            button.addEventListener('touchend', function() {
+                this.classList.remove('opacity-70');
+            });
+        });
+    </script>
+</body></html>

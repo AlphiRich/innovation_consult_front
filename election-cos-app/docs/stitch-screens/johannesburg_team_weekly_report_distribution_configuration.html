@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Weekly Report Distribution | Innovation Consult</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#040c30",
+                    "on-surface": "#141a31",
+                    "on-secondary-fixed": "#261900",
+                    "tertiary": "#290006",
+                    "on-error": "#ffffff",
+                    "surface-container": "#ebedff",
+                    "on-background": "#141a31",
+                    "inverse-surface": "#292f47",
+                    "on-secondary": "#ffffff",
+                    "surface-container-highest": "#dce1ff",
+                    "on-tertiary-container": "#dc6672",
+                    "surface-tint": "#545c84",
+                    "surface-dim": "#d3d9f7",
+                    "surface-bright": "#faf8ff",
+                    "tertiary-fixed-dim": "#ffb2b7",
+                    "on-primary-container": "#8289b4",
+                    "inverse-on-surface": "#eff0ff",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "on-error-container": "#93000a",
+                    "surface": "#faf8ff",
+                    "outline-variant": "#c6c5cf",
+                    "secondary": "#795907",
+                    "surface-container-high": "#e4e7ff",
+                    "surface-container-lowest": "#ffffff",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "tertiary-fixed": "#ffdadb",
+                    "primary-container": "#1a2246",
+                    "on-tertiary": "#ffffff",
+                    "background": "#faf8ff",
+                    "on-tertiary-fixed": "#40000d",
+                    "inverse-primary": "#bdc4f1",
+                    "outline": "#76767f",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "secondary-fixed-dim": "#ebc169",
+                    "error-container": "#ffdad6",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#dce1ff",
+                    "on-surface-variant": "#46464e",
+                    "tertiary-container": "#510013",
+                    "secondary-fixed": "#ffdea1",
+                    "on-secondary-container": "#785805",
+                    "primary-fixed": "#dde1ff",
+                    "on-primary-fixed": "#10193c",
+                    "surface-container-low": "#f3f2ff",
+                    "on-tertiary-fixed-variant": "#832331",
+                    "secondary-container": "#fdd178"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "margin-desktop": "64px",
+                    "unit": "4px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Archivo Narrow"],
+                    "headline-sm": ["Archivo Narrow"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Archivo Narrow"],
+                    "display-lg": ["Archivo Narrow"],
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .font-archivo { font-family: 'Archivo Narrow', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid #E2E4E9;
+        }
+        .sidebar-active {
+            background-color: #fdd178 !important; /* secondary-container */
+            color: #785805 !important; /* on-secondary-container */
+        }
+        .custom-toggle:checked + .toggle-bg {
+            background-color: #1A2246;
+        }
+        .custom-toggle:checked + .toggle-bg .toggle-dot {
+            transform: translateX(100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen">
+<!-- SideNavBar Anchor -->
+<aside class="fixed left-0 top-0 h-screen w-64 bg-primary text-on-primary flex flex-col py-6 px-4 z-50">
+<div class="flex items-center gap-3 mb-10 px-2">
+<div class="w-10 h-10 bg-on-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">analytics</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm leading-tight">Innovation Consult</h1>
+<p class="text-[10px] uppercase tracking-widest opacity-70">Campaign Command</p>
+</div>
+</div>
+<nav class="flex-grow flex flex-col gap-1">
+<a class="text-on-primary/70 hover:bg-on-primary/10 hover:text-on-primary flex items-center gap-3 px-4 py-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">War Room</span>
+</a>
+<a class="sidebar-active flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-md text-label-md">Team</span>
+</a>
+<a class="text-on-primary/70 hover:bg-on-primary/10 hover:text-on-primary flex items-center gap-3 px-4 py-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="font-label-md text-label-md">Incidents</span>
+</a>
+<a class="text-on-primary/70 hover:bg-on-primary/10 hover:text-on-primary flex items-center gap-3 px-4 py-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">volunteer_activism</span>
+<span class="font-label-md text-label-md">Volunteers</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-on-primary/10 pt-4 flex flex-col gap-1">
+<a class="text-on-primary/70 hover:bg-on-primary/10 hover:text-on-primary flex items-center gap-3 px-4 py-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="text-on-primary/70 hover:bg-on-primary/10 hover:text-on-primary flex items-center gap-3 px-4 py-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">Archive</span>
+</a>
+</div>
+</aside>
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar Anchor -->
+<header class="w-full h-16 sticky top-0 z-40 bg-surface flex justify-between items-center px-gutter border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md text-primary">Johannesburg Operations</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-outline">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container-low border border-outline-variant rounded-full text-body-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none w-64 transition-all" placeholder="Search parameters..." type="text"/>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<button class="hover:bg-surface-container-low p-2 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="hover:bg-surface-container-low p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a senior executive in a dark blue suit against a clean, architectural office background. The lighting is sophisticated and directional, highlighting features with a warm, corporate tone. Minimalist aesthetic with high contrast and sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqqm3e_1cM0MZIDKtDum-lqTbPLtCoifiUTnZ_WTC7wQkrEE9azGPx9sr2aU_-Hnddg3KZt209RolCl4bPNAgu3lMzBQd7Icqs6_fjuHfse7v6iTc7H_uxC8SjALWmJM3TW3q4UAtEohAKAeM6ft7cLzcNAK8Nn4DbUosecBhgdF7iCI3c8dRkGdZ4MLugChIRH8MelioPY-LRT_38waQUcyMyC2aao21j3ZCofssp2XzAAxvbY707dNOQhvqMaWfy8_EMAwXBXg"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<div class="p-margin-desktop max-w-container-max mx-auto">
+<!-- Configuration Header -->
+<section class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<nav class="flex items-center gap-2 text-body-sm text-outline mb-4">
+<span>Campaigns</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Johannesburg</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-medium">Reporting</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-primary flex items-center gap-3">
+                        Weekly Distribution Configuration
+                        <span class="bg-secondary-fixed text-on-secondary-fixed px-3 py-1 rounded-full text-label-md font-label-md">AUTOMATED</span>
+</h2>
+<p class="text-body-md text-on-surface-variant mt-2 max-w-2xl">
+                        Strategic intelligence dissemination for the Johannesburg regional leadership team. Reports are compiled from real-time field data and voter sentiment analytics.
+                    </p>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-3 border border-secondary text-secondary font-archivo font-semibold rounded hover:bg-secondary/5 transition-colors uppercase tracking-wider text-sm">
+                        Send Test Report
+                    </button>
+<button class="px-6 py-3 bg-primary text-on-primary font-archivo font-semibold rounded hover:bg-primary-container transition-transform active:scale-95 uppercase tracking-wider text-sm shadow-lg">
+                        Finalize Distribution
+                    </button>
+</div>
+</section>
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Recipient Management Table (Left Column) -->
+<div class="col-span-12 lg:col-span-8 space-y-gutter">
+<div class="bg-white border border-[#E2E4E9] rounded-lg overflow-hidden">
+<div class="px-6 py-4 border-b border-[#E2E4E9] flex justify-between items-center bg-surface-container-low/30">
+<h3 class="font-headline-sm text-headline-sm text-primary">Recipient Management</h3>
+<button class="text-primary hover:text-primary-container flex items-center gap-1 font-medium text-body-sm">
+<span class="material-symbols-outlined text-[18px]">add_circle</span> Add Recipient
+                            </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead class="bg-surface-container-low text-left">
+<tr>
+<th class="px-6 py-3 font-archivo font-semibold text-label-md text-on-surface-variant uppercase tracking-wider">Recipient Name</th>
+<th class="px-6 py-3 font-archivo font-semibold text-label-md text-on-surface-variant uppercase tracking-wider">Role</th>
+<th class="px-6 py-3 font-archivo font-semibold text-label-md text-on-surface-variant uppercase tracking-wider">Email</th>
+<th class="px-6 py-3 font-archivo font-semibold text-label-md text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="px-6 py-3"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#E2E4E9]">
+<tr class="hover:bg-surface-container-low/20 transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center text-xs font-bold">ZM</div>
+<span class="font-medium text-primary">Zanele Mthembu</span>
+</td>
+<td class="px-6 py-4 text-body-sm">Strategic Lead</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">z.mthembu@innovation.za</td>
+<td class="px-6 py-4">
+<span class="bg-green-100 text-green-800 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-outline hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/20 transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary text-on-primary flex items-center justify-center text-xs font-bold">DN</div>
+<span class="font-medium text-primary">David Nkosi</span>
+</td>
+<td class="px-6 py-4 text-body-sm">Infrastructure Specialist</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">d.nkosi@innovation.za</td>
+<td class="px-6 py-4">
+<span class="bg-green-100 text-green-800 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-outline hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/20 transition-colors">
+<td class="px-6 py-4 flex items-center gap-3 opacity-50">
+<div class="w-8 h-8 rounded-full bg-outline text-on-primary flex items-center justify-center text-xs font-bold">TM</div>
+<span class="font-medium text-primary">Thabo Molefe</span>
+</td>
+<td class="px-6 py-4 text-body-sm opacity-50">Comms Director</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant opacity-50">t.molefe@innovation.za</td>
+<td class="px-6 py-4">
+<span class="bg-outline-variant text-on-surface-variant px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">Paused</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-outline hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Intelligence Scope -->
+<div class="bg-white border border-[#E2E4E9] rounded-lg">
+<div class="px-6 py-4 border-b border-[#E2E4E9] bg-surface-container-low/30">
+<h3 class="font-headline-sm text-headline-sm text-primary">Intelligence Scope</h3>
+</div>
+<div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex items-center justify-between p-4 bg-surface rounded-lg border border-[#E2E4E9]">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-primary/5 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">sentiment_satisfied</span>
+</div>
+<div>
+<h4 class="font-archivo font-semibold text-primary">Ward Sentiment Index</h4>
+<p class="text-[11px] text-on-surface-variant">Real-time public opinion tracking per ward.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only custom-toggle" type="checkbox"/>
+<div class="toggle-bg w-11 h-6 bg-outline-variant rounded-full transition-colors">
+<div class="toggle-dot absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform border border-outline-variant"></div>
+</div>
+</label>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface rounded-lg border border-[#E2E4E9]">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-primary/5 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">report</span>
+</div>
+<div>
+<h4 class="font-archivo font-semibold text-primary">High-Priority Incidents</h4>
+<p class="text-[11px] text-on-surface-variant">Critical infrastructure and safety reports.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only custom-toggle" type="checkbox"/>
+<div class="toggle-bg w-11 h-6 bg-outline-variant rounded-full transition-colors">
+<div class="toggle-dot absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform border border-outline-variant"></div>
+</div>
+</label>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface rounded-lg border border-[#E2E4E9]">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-primary/5 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">speed</span>
+</div>
+<div>
+<h4 class="font-archivo font-semibold text-primary">Voter Contact Velocity</h4>
+<p class="text-[11px] text-on-surface-variant">Campaign efficiency and outreach metrics.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only custom-toggle" type="checkbox"/>
+<div class="toggle-bg w-11 h-6 bg-outline-variant rounded-full transition-colors">
+<div class="toggle-dot absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform border border-outline-variant"></div>
+</div>
+</label>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface rounded-lg border border-[#E2E4E9]">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-primary/5 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">public</span>
+</div>
+<div>
+<h4 class="font-archivo font-semibold text-primary">Social Impact Metrics</h4>
+<p class="text-[11px] text-on-surface-variant">Community growth and program efficacy.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only custom-toggle" type="checkbox"/>
+<div class="toggle-bg w-11 h-6 bg-outline-variant rounded-full transition-colors">
+<div class="toggle-dot absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform border border-outline-variant"></div>
+</div>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (Delivery Schedule & Analytics) -->
+<div class="col-span-12 lg:col-span-4 space-y-gutter">
+<!-- Delivery Schedule Card -->
+<div class="bg-primary text-on-primary rounded-lg p-6 shadow-xl relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-headline-sm text-headline-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined">schedule</span> Delivery Schedule
+                            </h3>
+<div class="space-y-6">
+<div>
+<label class="font-archivo text-label-md text-on-primary/60 uppercase block mb-2">Day of week</label>
+<div class="grid grid-cols-7 gap-1">
+<button class="w-full py-2 rounded text-xs font-bold border border-on-primary/20 hover:bg-on-primary/10">M</button>
+<button class="w-full py-2 rounded text-xs font-bold bg-secondary-container text-on-secondary-container">T</button>
+<button class="w-full py-2 rounded text-xs font-bold border border-on-primary/20 hover:bg-on-primary/10">W</button>
+<button class="w-full py-2 rounded text-xs font-bold border border-on-primary/20 hover:bg-on-primary/10">T</button>
+<button class="w-full py-2 rounded text-xs font-bold border border-on-primary/20 hover:bg-on-primary/10">F</button>
+<button class="w-full py-2 rounded text-xs font-bold border border-on-primary/20 hover:bg-on-primary/10 opacity-30 cursor-not-allowed">S</button>
+<button class="w-full py-2 rounded text-xs font-bold border border-on-primary/20 hover:bg-on-primary/10 opacity-30 cursor-not-allowed">S</button>
+</div>
+<p class="text-[11px] mt-2 text-on-primary/50">Next run: Monday, 08:00 AM</p>
+</div>
+<div>
+<label class="font-archivo text-label-md text-on-primary/60 uppercase block mb-2">Delivery Time</label>
+<div class="flex items-center gap-4">
+<select class="bg-primary-container border border-on-primary/20 rounded-lg px-4 py-2 text-on-primary focus:ring-secondary focus:border-secondary outline-none w-full appearance-none font-archivo">
+<option>08:00 AM</option>
+<option>09:00 AM</option>
+<option>10:00 AM</option>
+<option>05:00 PM</option>
+</select>
+<span class="material-symbols-outlined text-on-primary/40">expand_more</span>
+</div>
+</div>
+<div class="p-4 bg-on-primary/5 rounded border border-on-primary/10">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary">info</span>
+<p class="text-xs leading-relaxed text-on-primary/80">
+                                            Scheduled reports are generated at UTC+2 (Johannesburg Standard Time). Ensure all regional data entry is finalized by 06:00 AM.
+                                        </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Subtle Background Pattern -->
+<div class="absolute -right-4 -bottom-4 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-[160px]">assessment</span>
+</div>
+</div>
+<!-- Regional Overview Map Placeholder -->
+<div class="bg-white border border-[#E2E4E9] rounded-lg overflow-hidden h-[300px] relative group cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" data-location="Johannesburg" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAdlG5pXhSIL4yFO_lIBnXUAWX4Qn43mo3QsmzjLrzq4v6sWGEDmSGdrZt7irUAdiZtP3D6eTJzzrOjRj6oCX0x1oBUr4njxVX8jGX1_4oFCF0RfyZkVXxms0kqkxRxnNH-OuA8CF86dTc2DxxoG3K1ULS7yDyq5kRuZ9nN_RWX6C_q2_3H20jrk9j68kWPS8pBGJwhpGoUM_Sy-9pPxzDEcW6hXRdVjSEfPpP9iI6yw7Hg6H89eXwL6s6mIyL2aFvR4TLOZNDfbg')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<h4 class="text-white font-archivo font-bold text-lg">Johannesburg Central</h4>
+<div class="flex items-center gap-2 text-white/70 text-xs">
+<span class="material-symbols-outlined text-[14px]">pin_drop</span>
+<span>Target: Region F Distribution Cluster</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- List Logic for High-Level Objectives -->
+<section class="mt-margin-desktop border-t border-[#E2E4E9] pt-8">
+<h3 class="font-archivo font-bold text-primary mb-6 uppercase tracking-[0.2em] text-sm">Strategic Goals: Q3 Reporting</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">assured_workload</span>
+<div>
+<h5 class="font-archivo font-semibold text-primary">Governance Compliance</h5>
+<p class="text-body-sm text-on-surface-variant">Ensuring all intelligence distribution meets regional data privacy protocols.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<div>
+<h5 class="font-archivo font-semibold text-primary">Data Integrity</h5>
+<p class="text-body-sm text-on-surface-variant">Validated 99.8% accuracy on sentiment velocity indices for the current cycle.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">groups</span>
+<div>
+<h5 class="font-archivo font-semibold text-primary">Stakeholder Alignment</h5>
+<p class="text-body-sm text-on-surface-variant">Distribution reaches 100% of top-tier regional leadership by EOW.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<script>
+        // Simple Interaction logic
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.classList.add('scale-95');
+                setTimeout(() => this.classList.remove('scale-95'), 100);
+            });
+        });
+
+        // Search Input Glow Effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('shadow-[0_0_0_2px_rgba(4,12,48,0.1)]');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('shadow-[0_0_0_2px_rgba(4,12,48,0.1)]');
+        });
+    </script>
+</body></html>

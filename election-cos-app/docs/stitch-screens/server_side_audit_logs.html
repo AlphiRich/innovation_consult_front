@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sync Audit Logs | Election Campaign OS</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#040c30",
+                    "on-secondary-fixed": "#261900",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed": "#ffdadb",
+                    "inverse-surface": "#292f47",
+                    "tertiary-fixed-dim": "#ffb2b7",
+                    "secondary": "#795907",
+                    "on-tertiary-fixed-variant": "#832331",
+                    "on-tertiary-container": "#dc6672",
+                    "background": "#faf8ff",
+                    "on-tertiary-fixed": "#40000d",
+                    "on-error": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#ffdea1",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-container": "#785805",
+                    "on-background": "#141a31",
+                    "surface-tint": "#545c84",
+                    "on-surface-variant": "#46464e",
+                    "inverse-on-surface": "#eff0ff",
+                    "outline": "#76767f",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "on-surface": "#141a31",
+                    "surface-variant": "#dce1ff",
+                    "on-primary-container": "#8289b4",
+                    "tertiary": "#290006",
+                    "surface-dim": "#d3d9f7",
+                    "primary-container": "#1a2246",
+                    "secondary-container": "#fdd178",
+                    "surface-container": "#ebedff",
+                    "tertiary-container": "#510013",
+                    "surface-container-highest": "#dce1ff",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "surface": "#faf8ff",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "outline-variant": "#c6c5cf",
+                    "error-container": "#ffdad6",
+                    "surface-container-high": "#e4e7ff",
+                    "secondary-fixed-dim": "#ebc169",
+                    "surface-bright": "#faf8ff",
+                    "primary-fixed": "#dde1ff",
+                    "inverse-primary": "#bdc4f1",
+                    "surface-container-low": "#f3f2ff",
+                    "on-primary-fixed": "#10193c",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-sm": ["Archivo Narrow"],
+                    "headline-lg-mobile": ["Archivo Narrow"],
+                    "body-md": ["Inter"],
+                    "label-md": ["JetBrains Mono"],
+                    "headline-md": ["Archivo Narrow"],
+                    "headline-lg": ["Archivo Narrow"],
+                    "display-lg": ["Archivo Narrow"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .audit-line::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 40px;
+            bottom: -20px;
+            width: 1px;
+            background-color: #E2E4E9;
+        }
+        .audit-entry:last-child .audit-line::before {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-24">
+<!-- Top App Bar -->
+<header class="w-full top-0 sticky z-50 bg-surface border-b border-outline-variant/20 flex items-center justify-between px-margin-mobile h-14 md:px-margin-desktop">
+<div class="flex items-center gap-4">
+<button class="hover:bg-surface-container-low transition-colors p-2 rounded-full flex items-center justify-center active:opacity-80">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile text-primary">Sync Audit Logs</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="hover:bg-surface-container-low transition-colors p-2 rounded-full flex items-center justify-center active:opacity-80">
+<span class="material-symbols-outlined text-primary">more_vert</span>
+</button>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-8">
+<!-- Reconciliation Overview Section -->
+<section class="mb-16">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<h2 class="font-headline-sm text-headline-sm text-primary uppercase tracking-wider">Reconciliation Overview</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Stat Card 1 -->
+<div class="bg-surface border border-outline-variant/20 p-6 flex flex-col justify-between relative overflow-hidden group">
+<div class="relative z-10">
+<p class="text-on-surface-variant font-label-md text-label-md uppercase mb-1">Total Syncs</p>
+<p class="font-display-lg text-display-lg text-primary">1,248</p>
+</div>
+<div class="mt-4 flex items-center text-secondary gap-1">
+<span class="material-symbols-outlined text-[18px]">trending_up</span>
+<span class="font-label-md text-label-md">+12.4% vs prev week</span>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[120px]">sync</span>
+</div>
+</div>
+<!-- Stat Card 2 -->
+<div class="bg-surface border border-outline-variant/20 p-6 flex flex-col justify-between relative overflow-hidden group">
+<div class="relative z-10">
+<p class="text-on-surface-variant font-label-md text-label-md uppercase mb-1">Conflicts Resolved</p>
+<p class="font-display-lg text-display-lg text-secondary">42</p>
+</div>
+<div class="mt-4 flex items-center text-primary gap-1">
+<span class="material-symbols-outlined text-[18px]">rule</span>
+<span class="font-label-md text-label-md">Manual intervention: 0</span>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[120px]">mediation</span>
+</div>
+</div>
+<!-- Stat Card 3 -->
+<div class="bg-surface border border-outline-variant/20 p-6 flex flex-col justify-between relative overflow-hidden group">
+<div class="relative z-10">
+<p class="text-on-surface-variant font-label-md text-label-md uppercase mb-1">System Integrity</p>
+<p class="font-display-lg text-display-lg text-primary">100%</p>
+</div>
+<div class="mt-4 flex items-center text-green-600 gap-1">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+<span class="font-label-md text-label-md">Validated 2m ago</span>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-[120px]">security</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Filters Section -->
+<section class="mb-12 bg-surface-container-low p-6 border border-outline-variant/20">
+<div class="flex flex-col md:flex-row gap-6 items-end">
+<div class="flex-1 w-full">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2 uppercase">Search Node ID / Device</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none text-body-md font-body-md" placeholder="e.g. node-7721-delta" type="text"/>
+</div>
+</div>
+<div class="w-full md:w-48">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2 uppercase">Ward Filter</label>
+<select class="w-full px-4 py-3 bg-surface border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none text-body-md font-body-md appearance-none">
+<option>All Wards</option>
+<option>Ward 01 - Central</option>
+<option>Ward 02 - North</option>
+<option>Ward 03 - Harbor</option>
+</select>
+</div>
+<div class="w-full md:w-auto">
+<button class="w-full md:w-auto px-8 py-3.5 bg-primary text-on-primary font-label-md text-label-md uppercase tracking-widest hover:bg-primary/90 transition-all active:scale-[0.98]">
+                        Apply Parameters
+                    </button>
+</div>
+</div>
+</section>
+<!-- Chronological Audit Log List -->
+<section class="space-y-4">
+<div class="flex justify-between items-center mb-6 border-b border-outline-variant/20 pb-4">
+<h3 class="font-headline-sm text-headline-sm text-primary">Event Stream</h3>
+<div class="flex items-center gap-4 text-on-surface-variant font-label-md text-label-md">
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Success</span>
+<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-secondary"></span> Conflict</span>
+</div>
+</div>
+<!-- Log Entries -->
+<div class="relative space-y-8">
+<!-- Entry 1 -->
+<div class="audit-entry relative flex gap-6 pl-1 audit-line">
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-white ring-4 ring-background">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+</div>
+</div>
+<div class="flex-1 bg-surface border border-outline-variant/20 p-5 hover:border-secondary/30 transition-colors">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+<div class="space-y-1">
+<span class="bg-secondary/10 text-secondary px-2 py-0.5 font-label-md text-[10px] uppercase tracking-wider font-bold">Conflict Resolved</span>
+<h4 class="font-headline-sm text-headline-sm text-primary">Sync Collision: Ward 02</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant max-w-2xl">
+                                    Concurrent write detected on record <code class="bg-surface-container text-primary px-1 rounded font-label-md text-label-md">VOTER_ID_88219</code>. Automated resolution applied: Node A prioritized (+142ms delta) based on master clock verification.
+                                </p>
+</div>
+<div class="text-right flex flex-col items-end gap-2 shrink-0">
+<span class="font-label-md text-label-md text-primary bg-surface-container-high px-3 py-1 border border-outline-variant/40">2023-11-20T14:22:01.442Z</span>
+<div class="flex gap-4">
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant uppercase font-label-md">Device ID</p>
+<p class="font-label-md text-label-md text-primary">MOBILE-U77</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant uppercase font-label-md">Ward</p>
+<p class="font-label-md text-label-md text-primary">W-02</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Entry 2 -->
+<div class="audit-entry relative flex gap-6 pl-1 audit-line">
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-6 h-6 rounded-full bg-green-600 flex items-center justify-center text-white ring-4 ring-background">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+</div>
+<div class="flex-1 bg-surface border border-outline-variant/20 p-5 hover:border-primary/10 transition-colors">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+<div class="space-y-1">
+<span class="bg-primary/5 text-primary-fixed-variant px-2 py-0.5 font-label-md text-[10px] uppercase tracking-wider font-bold">Record Synced</span>
+<h4 class="font-headline-sm text-headline-sm text-primary">Batch Update: Canvas List</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant max-w-2xl">
+                                    Successfully processed 14 voter profile updates. Checksum validated for all payloads. Integrity hash: <code class="bg-surface-container text-primary px-1 rounded font-label-md text-label-md">sha256:f72...a11</code>.
+                                </p>
+</div>
+<div class="text-right flex flex-col items-end gap-2 shrink-0">
+<span class="font-label-md text-label-md text-primary bg-surface-container-high px-3 py-1 border border-outline-variant/40">2023-11-20T14:21:55.901Z</span>
+<div class="flex gap-4">
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant uppercase font-label-md">Device ID</p>
+<p class="font-label-md text-label-md text-primary">DEKSTOP-A01</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant uppercase font-label-md">Ward</p>
+<p class="font-label-md text-label-md text-primary">W-01</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Entry 3 -->
+<div class="audit-entry relative flex gap-6 pl-1 audit-line">
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white ring-4 ring-background">
+<span class="material-symbols-outlined text-[14px]">handshake</span>
+</div>
+</div>
+<div class="flex-1 bg-surface border border-outline-variant/20 p-5 hover:border-primary/10 transition-colors">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+<div class="space-y-1">
+<span class="bg-primary/5 text-primary-fixed-variant px-2 py-0.5 font-label-md text-[10px] uppercase tracking-wider font-bold">Handshake Validated</span>
+<h4 class="font-headline-sm text-headline-sm text-primary">Gateway Authorization</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant max-w-2xl">
+                                    Secure peering established between Local Sync Node and Central Election DB. Latency: 42ms. TLS 1.3 encryption handshake successful.
+                                </p>
+</div>
+<div class="text-right flex flex-col items-end gap-2 shrink-0">
+<span class="font-label-md text-label-md text-primary bg-surface-container-high px-3 py-1 border border-outline-variant/40">2023-11-20T14:18:22.003Z</span>
+<div class="flex gap-4">
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant uppercase font-label-md">Device ID</p>
+<p class="font-label-md text-label-md text-primary">GATEWAY-HQ</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant uppercase font-label-md">Ward</p>
+<p class="font-label-md text-label-md text-primary">N/A</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Entry 4 -->
+<div class="audit-entry relative flex gap-6 pl-1 audit-line">
+<div class="relative z-10 flex flex-col items-center">
+<div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-white ring-4 ring-background">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+</div>
+</div>
+<div class="flex-1 bg-surface border border-outline-variant/20 p-5 hover:border-secondary/30 transition-colors">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+<div class="space-y-1">
+<span class="bg-secondary/10 text-secondary px-2 py-0.5 font-label-md text-[10px] uppercase tracking-wider font-bold">Conflict Resolved</span>
+<h4 class="font-headline-sm text-headline-sm text-primary">Sync Collision: Ward 01</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant max-w-2xl">
+                                    Partial data overlap in <code class="bg-surface-container text-primary px-1 rounded font-label-md text-label-md">GEO_BOUNDARY_DATA</code>. Merged using LWW (Last-Write-Wins) protocol. 
+                                </p>
+</div>
+<div class="text-right flex flex-col items-end gap-2 shrink-0">
+<span class="font-label-md text-label-md text-primary bg-surface-container-high px-3 py-1 border border-outline-variant/40">2023-11-20T14:10:12.775Z</span>
+<div class="flex gap-4">
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant uppercase font-label-md">Device ID</p>
+<p class="font-label-md text-label-md text-primary">TABLET-V09</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-on-surface-variant uppercase font-label-md">Ward</p>
+<p class="font-label-md text-label-md text-primary">W-01</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Load More Button -->
+<div class="pt-8 flex justify-center">
+<button class="px-12 py-3 border border-outline text-primary font-label-md text-label-md uppercase tracking-widest hover:bg-surface-container-low transition-colors active:opacity-80">
+                    Load Archive Logs
+                </button>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (as per Shared Components JSON) -->
+<!-- Determined 'Settings' as active since Audit Logs is a technical/admin function usually found under settings -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface border-t border-outline-variant/20 flex justify-around items-center h-16 px-margin-mobile">
+<!-- Walk List -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60 hover:bg-surface-container-low transition-colors active:scale-95" href="#">
+<span class="material-symbols-outlined">format_list_bulleted</span>
+<span class="font-label-caps text-[10px] uppercase tracking-tighter">Walk List</span>
+</a>
+<!-- Map -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60 hover:bg-surface-container-low transition-colors active:scale-95" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-caps text-[10px] uppercase tracking-tighter">Map</span>
+</a>
+<!-- Search -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60 hover:bg-surface-container-low transition-colors active:scale-95" href="#">
+<span class="material-symbols-outlined">person_search</span>
+<span class="font-label-caps text-[10px] uppercase tracking-tighter">Search</span>
+</a>
+<!-- Settings (ACTIVE) -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim border-t-2 border-secondary h-full px-4 hover:bg-surface-container-low transition-colors active:scale-95" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-caps text-[10px] uppercase tracking-tighter font-bold">Settings</span>
+</a>
+</nav>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('.audit-entry').forEach(entry => {
+            entry.addEventListener('mouseenter', () => {
+                entry.querySelector('.bg-surface').classList.add('shadow-sm');
+            });
+            entry.addEventListener('mouseleave', () => {
+                entry.querySelector('.bg-surface').classList.remove('shadow-sm');
+            });
+        });
+    </script>
+</body></html>

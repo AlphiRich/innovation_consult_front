@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Innovation Consult - Ward 18 Intelligence Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;600;700&amp;family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        // Innovation Consult Palette: Navy, Gold, Maroon
+                        "primary": "#1a2b4b", // Corporate Navy
+                        "secondary": "#c5a059", // Corporate Gold
+                        "tertiary": "#800000", // Corporate Maroon
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#1a2b4b",
+                        "surface": "#ffffff",
+                        "background": "#f4f7f9",
+                        "outline": "#d1d5db",
+                        "outline-variant": "#e5e7eb",
+                        "surface-container": "#f8fafc",
+                        "error": "#b91c1c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "max-width": "1440px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "margin-desktop": "32px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Archivo Narrow"],
+                        "display-lg": ["Archivo Narrow"],
+                        "data-mono": ["Public Sans"],
+                        "label-caps": ["Archivo Narrow"],
+                        "body-md": ["Public Sans"],
+                        "body-lg": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #f4f7f9;
+            color: #1a2b4b;
+            -webkit-print-color-adjust: exact;
+        }
+        .report-canvas {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .brand-stripe {
+            background: linear-gradient(90deg, #1a2b4b 0%, #c5a059 50%, #800000 100%);
+        }
+        @media print {
+            body { background: white; }
+            .no-print { display: none; }
+            .report-canvas { border: none; width: 100%; max-width: 100%; box-shadow: none; }
+        }
+    </style>
+</head>
+<body class="font-body-md py-8">
+<!-- TOP NAVIGATION SHELL -->
+<header class="bg-primary text-on-primary fixed top-0 w-full z-50 h-16 flex items-center justify-between px-8 border-b border-white/10 no-print">
+<div class="flex items-center gap-4">
+<img alt="Innovation Consult Logo" class="h-10 w-10 object-contain brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhSlo6-t9K09sT0rWe8wDarN1tgGUfNXoF-UueeKLWiVpr37_T5Z3xTFvYAcAiKEsSLODRvEwwJ7Q_bNU8M1BK4b22XrnXcUQL7i06z7SwiKjR2vRdKu8JJN1daPjpSTGr5TkCxDv1uaKvDOSycvOo9-GRsdA7oaiBhTI4HmCdpMtHRzeFMcfmfTXn6um0lw_sSW9i02q_j7L9LlwcsUkYCxSl93Qk8xm3crJA7p3kGb_S4YrwvcVtYsUFgGwzcnHbZTjx67nSiw"/>
+<span class="font-headline-md text-headline-md font-bold tracking-tight">INNOVATION CONSULT</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 px-3 py-1 bg-white/10 rounded">
+<span class="material-symbols-outlined text-sm">notifications</span>
+<span class="font-label-caps text-label-caps">2 Strategic Alerts</span>
+</div>
+<button class="bg-secondary text-primary px-4 py-2 font-label-caps text-label-caps font-bold hover:opacity-90 transition-opacity" onclick="window.print()">GENERATE DOSSIER</button>
+</div>
+</header>
+<div class="flex min-h-screen pt-16">
+<!-- SIDE NAVIGATION -->
+<aside class="w-64 bg-white border-r border-outline-variant flex flex-col h-[calc(100vh-4rem)] sticky top-16 no-print">
+<div class="p-6 border-b border-outline-variant">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded-sm shadow-sm">
+<img alt="IC" class="w-6 h-6 brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhSlo6-t9K09sT0rWe8wDarN1tgGUfNXoF-UueeKLWiVpr37_T5Z3xTFvYAcAiKEsSLODRvEwwJ7Q_bNU8M1BK4b22XrnXcUQL7i06z7SwiKjR2vRdKu8JJN1daPjpSTGr5TkCxDv1uaKvDOSycvOo9-GRsdA7oaiBhTI4HmCdpMtHRzeFMcfmfTXn6um0lw_sSW9i02q_j7L9LlwcsUkYCxSl93Qk8xm3crJA7p3kGb_S4YrwvcVtYsUFgGwzcnHbZTjx67nSiw"/>
+</div>
+<div>
+<div class="font-headline-md text-[16px] leading-tight text-primary font-bold">Election Intelligence</div>
+<div class="font-label-caps text-[10px] text-gray-500">Global Strategy Group</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 py-4">
+<div class="px-6 py-3 font-label-caps text-gray-400 text-[10px] uppercase tracking-widest">Analysis Portals</div>
+<a class="flex items-center gap-4 px-6 py-3 text-gray-600 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="font-label-caps text-label-caps">Overview</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-primary bg-slate-100 border-l-4 border-secondary font-bold" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-label-caps text-label-caps">Ward Analytics</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-gray-600 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined">report_gmailerrorred</span>
+<span class="font-label-caps text-label-caps">Threat Assessment</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 text-gray-600 hover:bg-slate-50 transition-colors" href="#">
+<span class="material-symbols-outlined">supervised_user_circle</span>
+<span class="font-label-caps text-label-caps">Demographics</span>
+</a>
+</nav>
+<div class="p-6 border-t border-outline-variant">
+<button class="w-full bg-primary text-on-primary py-3 font-label-caps text-label-caps tracking-widest hover:bg-opacity-90 transition-colors">INITIATE ACTION</button>
+</div>
+</aside>
+<!-- MAIN REPORT CANVAS -->
+<main class="flex-1 p-8 overflow-y-auto">
+<div class="report-canvas p-12 shadow-xl relative overflow-hidden">
+<!-- Institutional Watermark -->
+<div class="absolute top-0 right-0 p-8 pointer-events-none opacity-[0.03]">
+<img alt="" class="w-[300px] h-[300px] grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhSlo6-t9K09sT0rWe8wDarN1tgGUfNXoF-UueeKLWiVpr37_T5Z3xTFvYAcAiKEsSLODRvEwwJ7Q_bNU8M1BK4b22XrnXcUQL7i06z7SwiKjR2vRdKu8JJN1daPjpSTGr5TkCxDv1uaKvDOSycvOo9-GRsdA7oaiBhTI4HmCdpMtHRzeFMcfmfTXn6um0lw_sSW9i02q_j7L9LlwcsUkYCxSl93Qk8xm3crJA7p3kGb_S4YrwvcVtYsUFgGwzcnHbZTjx67nSiw"/>
+</div>
+<!-- Brand Header -->
+<header class="flex justify-between items-start border-b-4 border-primary pb-8 mb-8">
+<div>
+<div class="font-label-caps text-label-caps text-tertiary font-bold tracking-[0.2em] mb-2 uppercase">Proprietary Insight Report</div>
+<h1 class="font-display-lg text-display-lg text-primary leading-none uppercase tracking-tight">Ward 18: Strategic Sentiment</h1>
+<p class="font-body-md text-gray-600 mt-3 max-w-xl">
+                        Comprehensive sentiment matrix and risk assessment for Municipal Sector 18. This briefing is classified for Strategic Analysts and Field Leads only.
+                    </p>
+</div>
+<div class="text-right flex flex-col items-end">
+<img alt="Innovation Consult Logo" class="h-16 w-16 object-contain mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhSlo6-t9K09sT0rWe8wDarN1tgGUfNXoF-UueeKLWiVpr37_T5Z3xTFvYAcAiKEsSLODRvEwwJ7Q_bNU8M1BK4b22XrnXcUQL7i06z7SwiKjR2vRdKu8JJN1daPjpSTGr5TkCxDv1uaKvDOSycvOo9-GRsdA7oaiBhTI4HmCdpMtHRzeFMcfmfTXn6um0lw_sSW9i02q_j7L9LlwcsUkYCxSl93Qk8xm3crJA7p3kGb_S4YrwvcVtYsUFgGwzcnHbZTjx67nSiw"/>
+<div class="font-headline-md text-headline-md text-primary font-bold tracking-tighter">INNOVATION CONSULT</div>
+<div class="mt-4 px-3 py-1 bg-slate-50 border border-outline inline-block">
+<span class="font-data-mono text-xs text-primary">ID: IC-2024-W18-SR</span>
+</div>
+</div>
+</header>
+<!-- KPI Summary Dashboard -->
+<section class="grid grid-cols-12 gap-px bg-outline mb-10 border border-outline">
+<div class="col-span-4 p-8 bg-white">
+<div class="font-label-caps text-[11px] text-gray-500 mb-3 uppercase font-bold tracking-wider">Net Sentiment Index</div>
+<div class="flex items-center gap-4">
+<span class="text-5xl font-display-lg text-tertiary">-14.2</span>
+<div class="px-3 py-1 bg-tertiary text-white font-label-caps text-[10px] rounded-sm">CRITICAL RANGE</div>
+</div>
+</div>
+<div class="col-span-4 p-8 bg-white border-l border-outline">
+<div class="font-label-caps text-[11px] text-gray-500 mb-3 uppercase font-bold tracking-wider">48h Sentiment Delta</div>
+<div class="flex items-end gap-1 h-10">
+<div class="w-3 bg-slate-200 h-4"></div>
+<div class="w-3 bg-slate-200 h-6"></div>
+<div class="w-3 bg-secondary h-8"></div>
+<div class="w-3 bg-secondary h-5"></div>
+<div class="w-3 bg-tertiary h-10"></div>
+<span class="ml-4 font-data-mono text-sm text-tertiary font-bold tracking-tight">+12.4% Volatility</span>
+</div>
+</div>
+<div class="col-span-4 p-8 bg-primary text-white flex flex-col justify-center items-end text-right">
+<div class="font-label-caps text-[11px] text-white/60 mb-1 uppercase tracking-widest">Asset Priority</div>
+<div class="font-headline-md text-headline-md text-secondary font-bold">URGENT RESPONSE</div>
+</div>
+</section>
+<div class="grid grid-cols-12 gap-12">
+<!-- Data Columns: Issues -->
+<section class="col-span-7">
+<h3 class="font-label-caps text-label-caps text-primary border-b-2 border-primary mb-8 pb-3 flex justify-between items-center">
+<span>PRIORITY FRICTION POINTS</span>
+<span class="text-tertiary text-[10px]">ANALYSIS UPDATED 08:45 UTC</span>
+</h3>
+<div class="space-y-8">
+<div class="flex gap-8 items-start">
+<div class="w-14 h-14 bg-slate-50 flex items-center justify-center flex-shrink-0 border border-outline">
+<span class="material-symbols-outlined text-primary text-2xl">policy</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-baseline mb-2">
+<h4 class="font-headline-md text-[20px] text-primary font-bold">Public Security Gap</h4>
+<span class="font-data-mono text-tertiary font-bold text-sm">64% Concern</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 overflow-hidden">
+<div class="bg-tertiary h-full" style="width: 64%"></div>
+</div>
+<p class="font-body-md text-gray-600 text-sm mt-3 leading-relaxed">
+                                    Strategic failure in visible patrol frequency across Sector B. Resident sentiment is deteriorating rapidly due to perceived neglect by municipal services.
+                                </p>
+</div>
+</div>
+<div class="flex gap-8 items-start">
+<div class="w-14 h-14 bg-slate-50 flex items-center justify-center flex-shrink-0 border border-outline">
+<span class="material-symbols-outlined text-primary text-2xl">engineering</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-baseline mb-2">
+<h4 class="font-headline-md text-[20px] text-primary font-bold">Service Infrastructure</h4>
+<span class="font-data-mono text-primary font-bold text-sm">41% Concern</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 overflow-hidden">
+<div class="bg-primary h-full" style="width: 41%"></div>
+</div>
+<p class="font-body-md text-gray-600 text-sm mt-3 leading-relaxed">
+                                    Infrastructure maintenance backlog is creating a leverage point for opposition narratives. Lighting and road quality are the primary tangible complaints.
+                                </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Data Columns: Distribution -->
+<section class="col-span-5 bg-slate-50 p-8 border border-outline">
+<h3 class="font-label-caps text-label-caps text-primary mb-8 text-center font-bold tracking-widest">SEGMENT DISTRIBUTION</h3>
+<div class="space-y-5">
+<div class="flex items-center gap-4">
+<div class="w-12 font-data-mono text-xs text-primary font-bold">22%</div>
+<div class="flex-1 h-8 bg-primary flex items-center px-4">
+<span class="text-[10px] font-label-caps text-white uppercase tracking-wider">Loyal Base</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 font-data-mono text-xs text-primary font-bold">18%</div>
+<div class="flex-1 h-8 bg-primary/40 flex items-center px-4">
+<span class="text-[10px] font-label-caps text-primary uppercase tracking-wider">Soft Lean</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 font-data-mono text-xs text-primary font-bold">35%</div>
+<div class="flex-1 h-8 bg-secondary flex items-center px-4">
+<span class="text-[10px] font-label-caps text-primary uppercase tracking-wider">Uncertain</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 font-data-mono text-xs text-primary font-bold">25%</div>
+<div class="flex-1 h-8 bg-tertiary flex items-center px-4">
+<span class="text-[10px] font-label-caps text-white uppercase tracking-wider">Opposed</span>
+</div>
+</div>
+</div>
+<div class="mt-10 pt-6 border-t border-outline">
+<div class="flex justify-between items-center text-[10px] font-label-caps text-gray-500 tracking-wider">
+<span>TOTAL SAMPLE SIZE</span>
+<span class="font-data-mono font-bold text-primary">4,102 UNITS</span>
+</div>
+<div class="flex justify-between items-center text-[10px] font-label-caps text-gray-500 mt-2 tracking-wider">
+<span>RELIABILITY COEFFICIENT</span>
+<span class="font-data-mono font-bold text-primary">97.9%</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Strategic Action Plan -->
+<section class="mt-12">
+<div class="bg-white border-2 border-primary p-10 relative">
+<div class="absolute top-0 left-0 brand-stripe h-1.5 w-full"></div>
+<div class="flex items-center gap-5 mb-8">
+<span class="material-symbols-outlined text-tertiary text-4xl">strategy</span>
+<h3 class="font-display-lg text-headline-md text-primary uppercase">Executive Recommendations</h3>
+</div>
+<div class="grid grid-cols-2 gap-12">
+<div class="flex gap-6">
+<span class="font-display-lg text-secondary text-5xl opacity-40">01</span>
+<div>
+<div class="font-label-caps text-primary font-bold mb-2 tracking-wide uppercase border-b border-secondary pb-1 inline-block">Tactical Mobilization</div>
+<p class="font-body-md text-sm text-gray-600 leading-relaxed">Implement a high-visibility engagement strategy in blocks 4-12. Transition from passive monitoring to active field presence within a 12-hour window.</p>
+</div>
+</div>
+<div class="flex gap-6">
+<span class="font-display-lg text-secondary text-5xl opacity-40">02</span>
+<div>
+<div class="font-label-caps text-primary font-bold mb-2 tracking-wide uppercase border-b border-secondary pb-1 inline-block">Narrative Alignment</div>
+<p class="font-body-md text-sm text-gray-600 leading-relaxed">Direct messaging to connect infrastructure restoration with improved security. Demonstrate tangible results to capture the "Uncertain" segment.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Formal Certification Footer -->
+<footer class="mt-16 pt-12 border-t border-outline grid grid-cols-3 gap-12">
+<div>
+<div class="font-label-caps text-[10px] text-gray-400 mb-2 uppercase tracking-widest">Certified By</div>
+<div class="border-b border-primary/20 pb-2 font-headline-md text-[20px] text-primary font-bold">Dir. Marcus Thorne</div>
+<div class="font-label-caps text-[9px] text-gray-500 mt-2">Principal Strategic Advisor</div>
+</div>
+<div>
+<div class="font-label-caps text-[10px] text-gray-400 mb-2 uppercase tracking-widest">Seal / Signature</div>
+<div class="border-b border-primary/20 h-[42px] flex items-center">
+<span class="font-serif italic text-primary/40 text-xl tracking-tighter">M. Thorne - Innovation Consult</span>
+</div>
+</div>
+<div>
+<div class="font-label-caps text-[10px] text-gray-400 mb-2 uppercase tracking-widest">Verification Timestamp</div>
+<div class="border-b border-primary/20 pb-2 font-data-mono text-sm text-primary font-bold">2024-10-12 // 08:45:02 UTC</div>
+<div class="font-label-caps text-[9px] text-gray-500 mt-2">GLOBAL INTELLIGENCE NETWORK SYNCED</div>
+</div>
+</footer>
+<!-- Confidential Banner -->
+<div class="mt-12 py-4 border-y-2 border-slate-100 flex justify-between items-center text-[9px] font-label-caps tracking-[0.3em] text-gray-400 font-bold">
+<span>PROPERTY OF INNOVATION CONSULT GLOBAL</span>
+<span class="text-tertiary">RESTRICTED - LEVEL 4 ACCESS ONLY</span>
+<span>END OF INTELLIGENCE BRIEF</span>
+</div>
+</div>
+</main>
+</div>
+<!-- Background Interactions (Micro) -->
+<script>
+    document.addEventListener('mousemove', (e) => {
+        // Subtle interaction for modern consult feel
+    });
+</script>
+<div class="fixed bottom-8 right-8 z-[100] bg-primary text-white p-6 shadow-2xl border-l-4 border-secondary flex items-center gap-4" id="pdf-success-overlay">
+<span class="material-symbols-outlined text-secondary text-3xl">verified</span>
+<div>
+<div class="font-headline-md text-sm font-bold">INTEL PACK READY</div>
+<div class="text-xs opacity-70">Strategic dossier compiled and encrypted.</div>
+</div>
+<button class="ml-4 opacity-50 hover:opacity-100" onclick="this.parentElement.remove()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</body></html>

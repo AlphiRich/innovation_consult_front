@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Voter Profiling &amp; Intake - Innovation Consult</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Public+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#1A2246", // Deep Navy
+                    "secondary": "#B7913F", // Gold
+                    "brand-maroon": "#7E1F2E", // Brand Maroon
+                    "on-tertiary-fixed": "#1c1c18",
+                    "on-primary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#e5e2dc",
+                    "surface-container-highest": "#d3e4fe",
+                    "tertiary-fixed-dim": "#c9c6c1",
+                    "surface-tint": "#1A2246",
+                    "secondary-fixed-dim": "#ebc169",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#c6c5cf",
+                    "tertiary-container": "#252521",
+                    "on-tertiary-container": "#8d8c87",
+                    "surface-dim": "#cbdbf5",
+                    "outline": "#76767f",
+                    "on-surface-variant": "#46464e",
+                    "surface-container": "#e5eeff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "primary-container": "#1a2246",
+                    "on-primary-fixed": "#10193c",
+                    "inverse-surface": "#213145",
+                    "error-container": "#ffdad6",
+                    "on-surface": "#0b1c30",
+                    "surface-container-low": "#eff4ff",
+                    "surface-container-high": "#dce9ff",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed": "#ffdea1",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "secondary-container": "#fdd178",
+                    "on-primary-container": "#8289b4",
+                    "inverse-primary": "#bdc4f1",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "on-secondary-container": "#785805",
+                    "surface-bright": "#f8f9ff",
+                    "surface": "#f8f9ff",
+                    "tertiary": "#10100d",
+                    "on-background": "#0b1c30",
+                    "background": "#f8f9ff",
+                    "surface-variant": "#d3e4fe",
+                    "on-tertiary-fixed-variant": "#474743",
+                    "primary-fixed": "#dde1ff",
+                    "on-secondary-fixed": "#261900"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "margin-mobile": "16px",
+                    "gutter": "16px",
+                    "max-width": "1440px",
+                    "margin-desktop": "32px"
+            },
+            "fontFamily": {
+                    "body-md": ["Public Sans"],
+                    "display-lg-mobile": ["Archivo Narrow"],
+                    "display-lg": ["Archivo Narrow"],
+                    "label-caps": ["Archivo Narrow"],
+                    "headline-md": ["Archivo Narrow"],
+                    "data-mono": ["Public Sans"],
+                    "body-lg": ["Public Sans"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .voter-card {
+            border-left: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .voter-card:focus-within {
+            border-left: 2px solid #B7913F; /* Gold secondary color */
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #B7913F !important;
+            box-shadow: none !important;
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-20">
+<!-- TopAppBar with Branding -->
+<header class="bg-primary text-on-primary font-headline-md w-full top-0 sticky z-50 flex items-center justify-between px-margin-mobile h-16 shadow-md">
+<div class="flex items-center gap-3">
+<button class="material-symbols-outlined active:opacity-80 transition-opacity">arrow_back</button>
+<div class="flex items-center gap-2">
+<img alt="Logo" class="w-8 h-8 rounded-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5nH_Ss4-FYooT3CPzIYFvy7RbMO1kAS2ida8y8b81-sw1YWyLIRlpPMSZeegsPJaNHOAJ8kIXOlxV0hxaKnqcmIwFc_f9B6BRPYJyJn-7npmcXquTC-INQcxDN2-wb_-_mzr9T-KovzFlXd1XDY6ua7yH3sz79Rb6rvY61VcxnsEI7-f28_KPC0BiAlKTWRTyTGObbTXcP3sHJCIerUpFlfE6SSnaRz5770o4m6NIVx5eWUD7v4d_fmLRQo6rwMuoYFt8s5OWPA"/>
+<h1 class="font-bold text-lg">Voter Intake</h1>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-[10px] font-label-caps opacity-60 uppercase hidden sm:block">Innovation Consult</span>
+<button class="material-symbols-outlined active:opacity-80 transition-opacity">more_vert</button>
+</div>
+</header>
+<main class="px-margin-mobile py-6 space-y-6 max-w-lg mx-auto">
+<!-- Section 1: Demographic Profile -->
+<section class="space-y-4">
+<div class="flex items-center gap-2 mb-2 border-l-4 border-secondary pl-3">
+<span class="font-label-caps text-label-caps text-primary font-bold uppercase tracking-wider">Demographic Profile</span>
+</div>
+<div class="bg-surface-container-lowest p-4 border border-outline/10 voter-card space-y-4 shadow-sm">
+<div class="flex flex-col">
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Age Group</label>
+<select class="bg-transparent border border-outline/20 p-3 rounded-none font-body-md focus:border-secondary">
+<option>Select Range</option>
+<option>18 - 24</option>
+<option>25 - 34</option>
+<option>35 - 54</option>
+<option>55+</option>
+</select>
+</div>
+<div class="flex flex-col">
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Employment Status</label>
+<select class="bg-transparent border border-outline/20 p-3 rounded-none font-body-md focus:border-secondary">
+<option>Select Status</option>
+<option>Employed - Full Time</option>
+<option>Employed - Part Time</option>
+<option>Self-Employed</option>
+<option>Unemployed</option>
+<option>Student</option>
+<option>Retired</option>
+</select>
+</div>
+<div class="flex flex-col">
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Primary Language</label>
+<input class="bg-transparent border border-outline/20 p-3 rounded-none font-body-md focus:border-secondary" placeholder="e.g. English, Zulu, Afrikaans" type="text"/>
+</div>
+</div>
+</section>
+<!-- Section 2: Psychological & Alignment -->
+<section class="space-y-4">
+<div class="flex items-center gap-2 mb-2 border-l-4 border-secondary pl-3">
+<span class="font-label-caps text-label-caps text-primary font-bold uppercase tracking-wider">Psychological &amp; Alignment</span>
+</div>
+<div class="bg-surface-container-lowest p-4 border border-outline/10 voter-card space-y-6 shadow-sm">
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-4 block uppercase">Current Sentiment toward Government</label>
+<div class="grid grid-cols-5 gap-1">
+<button class="h-10 border border-outline/20 flex items-center justify-center hover:bg-surface-container-high font-data-mono transition-colors">1</button>
+<button class="h-10 border border-outline/20 flex items-center justify-center hover:bg-surface-container-high font-data-mono transition-colors">2</button>
+<button class="h-10 border border-primary/20 flex items-center justify-center bg-primary text-on-primary font-data-mono">3</button>
+<button class="h-10 border border-outline/20 flex items-center justify-center hover:bg-surface-container-high font-data-mono transition-colors">4</button>
+<button class="h-10 border border-outline/20 flex items-center justify-center hover:bg-surface-container-high font-data-mono transition-colors">5</button>
+</div>
+<div class="flex justify-between mt-1 text-[10px] font-label-caps text-on-surface-variant/60">
+<span class="text-brand-maroon font-bold">CRITICAL</span>
+<span class="text-secondary font-bold">FAVORABLE</span>
+</div>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-4 block uppercase">Probability of Supporting Party</label>
+<div class="relative w-full h-8 flex items-center">
+<input class="w-full h-1 bg-surface-container-highest appearance-none cursor-pointer accent-secondary" max="100" min="0" type="range" value="45"/>
+</div>
+<div class="flex justify-between mt-1 font-data-mono text-secondary text-sm">
+<span>0%</span>
+<span class="font-bold text-primary">45%</span>
+<span>100%</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Service Delivery Status -->
+<section class="space-y-4">
+<div class="flex items-center gap-2 mb-2 border-l-4 border-secondary pl-3">
+<span class="font-label-caps text-label-caps text-primary font-bold uppercase tracking-wider">Service Delivery Status</span>
+</div>
+<div class="space-y-3">
+<!-- Service Items -->
+<div class="bg-surface-container-lowest border border-outline/10 p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">water_drop</span>
+<span class="font-body-md font-medium text-primary">Water</span>
+</div>
+<select class="text-xs font-label-caps border-none bg-surface-container-high px-2 py-1 uppercase text-primary font-bold">
+<option>Stable</option>
+<option class="text-secondary">Intermittent</option>
+<option class="text-brand-maroon">Critical</option>
+</select>
+</div>
+<div class="bg-surface-container-lowest border border-outline/10 p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">bolt</span>
+<span class="font-body-md font-medium text-primary">Electricity</span>
+</div>
+<select class="text-xs font-label-caps border-none bg-error-container text-brand-maroon px-2 py-1 uppercase font-bold">
+<option>Stable</option>
+<option>Intermittent</option>
+<option selected="">Critical</option>
+</select>
+</div>
+<div class="bg-surface-container-lowest border border-outline/10 p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">delete_sweep</span>
+<span class="font-body-md font-medium text-primary">Sanitation</span>
+</div>
+<select class="text-xs font-label-caps border-none bg-surface-container-high px-2 py-1 uppercase text-primary font-bold">
+<option selected="">Stable</option>
+<option>Intermittent</option>
+<option>Critical</option>
+</select>
+</div>
+<div class="bg-surface-container-lowest border border-outline/10 p-4 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">edit_road</span>
+<span class="font-body-md font-medium text-primary">Roads</span>
+</div>
+<select class="text-xs font-label-caps border-none bg-secondary/10 text-secondary px-2 py-1 uppercase font-bold">
+<option>Stable</option>
+<option selected="">Intermittent</option>
+<option>Critical</option>
+</select>
+</div>
+</div>
+</section>
+<!-- Section 4: Complex Issue Escalation -->
+<section class="space-y-4">
+<div class="flex items-center gap-2 mb-2 border-l-4 border-brand-maroon pl-3">
+<span class="font-label-caps text-label-caps text-brand-maroon font-bold uppercase tracking-wider">Complex Issue Escalation</span>
+</div>
+<div class="bg-surface-container-lowest p-4 border border-brand-maroon/20 voter-card shadow-sm">
+<div class="flex items-center gap-2 mb-4 text-brand-maroon">
+<span class="material-symbols-outlined text-sm">priority_high</span>
+<span class="text-xs font-bold uppercase font-label-caps">LET Referral Triggered</span>
+</div>
+<textarea class="w-full bg-transparent border border-outline/20 p-3 rounded-none font-body-md resize-none focus:border-brand-maroon" placeholder="Detail the complex structural or legal issue requiring Local Election Team intervention..." rows="4"></textarea>
+</div>
+</section>
+<!-- Section 5: Submit Button -->
+<div class="pt-4">
+<button class="w-full bg-secondary text-on-secondary py-4 font-label-caps text-label-caps uppercase flex items-center justify-center gap-3 active:scale-[0.98] transition-all shadow-lg shadow-secondary/20 hover:brightness-110">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sync</span>
+            Sync Profile to Command
+        </button>
+<p class="text-center text-[10px] font-label-caps text-on-surface-variant/40 mt-4 uppercase tracking-widest">Powered by Innovation Consult</p>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface dark:bg-surface text-primary font-label-caps text-label-caps fixed bottom-0 w-full z-50 border-t border-outline-variant/20 flex justify-around items-center h-16 px-margin-mobile">
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:bg-surface-container-low transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">format_list_bulleted</span>
+<span>Walk List</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:bg-surface-container-low transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">map</span>
+<span>Map</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary border-t-2 border-secondary h-full hover:bg-surface-container-low transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_search</span>
+<span>Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:bg-surface-container-low transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<script>
+    // Interactive handling for sentiment numbers with brand colors
+    const sentimentButtons = document.querySelectorAll('button[class*="font-data-mono"]');
+    sentimentButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            sentimentButtons.forEach(b => {
+                b.classList.remove('bg-primary', 'text-on-primary', 'border-primary/20');
+                b.classList.add('hover:bg-surface-container-high', 'border-outline/20');
+            });
+            btn.classList.add('bg-primary', 'text-on-primary', 'border-primary/20');
+            btn.classList.remove('hover:bg-surface-container-high', 'border-outline/20');
+        });
+    });
+</script>
+</body></html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Allocation Confirmation | Campaign Resource Manager</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#2b1700",
+                        "secondary-fixed": "#ffdea1",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "tertiary": "#1a0c00",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#8289b4",
+                        "surface-dim": "#d9dadb",
+                        "on-background": "#191c1d",
+                        "on-primary-fixed-variant": "#3d456b",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-variant": "#e1e3e4",
+                        "surface-bright": "#f8f9fa",
+                        "tertiary-container": "#371f00",
+                        "tertiary-fixed-dim": "#eabf8f",
+                        "surface": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "on-tertiary-fixed-variant": "#5e411c",
+                        "surface-container-high": "#e7e8e9",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#46464e",
+                        "surface-variant": "#e1e3e4",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container": "#edeeef",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#545c84",
+                        "primary": "#040c30",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#785805",
+                        "inverse-primary": "#bdc4f1",
+                        "primary-container": "#1a2246",
+                        "secondary-container": "#fdd178",
+                        "outline-variant": "#c6c5cf",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed": "#10193c",
+                        "secondary": "#795907",
+                        "on-surface": "#191c1d",
+                        "secondary-fixed-dim": "#ebc169",
+                        "on-secondary-fixed": "#261900",
+                        "primary-fixed-dim": "#bdc4f1",
+                        "surface-container-highest": "#e1e3e4",
+                        "outline": "#76767f",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#ab855a",
+                        "background": "#f8f9fa",
+                        "tertiary-fixed": "#ffddb9",
+                        "primary-fixed": "#dde1ff",
+                        "amber-accent": "#B7913F"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "inline-gutter": "12px",
+                        "stack-gap": "16px",
+                        "section-padding": "24px",
+                        "container-margin": "20px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "display-lg": ["Archivo Narrow"],
+                        "headline-sm": ["Archivo Narrow"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Archivo Narrow"],
+                        "label-caps": ["Archivo Narrow"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .receipt-card {
+            box-shadow: 0 4px 20px -2px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        .receipt-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background-color: #B7913F;
+        }
+        .stamp-effect {
+            transform: rotate(-12deg);
+            opacity: 0.85;
+            mix-blend-mode: multiply;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-secondary-container">
+<!-- Top App Bar -->
+<header class="flex items-center justify-between px-container-margin w-full h-16 bg-surface border-b border-outline-variant z-50 sticky top-0">
+<div class="flex items-center gap-4">
+<button class="p-2 -ml-2 transition-colors duration-200 hover:bg-surface-container-low active:opacity-70">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-primary">Allocation Successful</h1>
+</div>
+<button class="p-2 transition-colors duration-200 hover:bg-surface-container-low active:opacity-70">
+<span class="material-symbols-outlined text-primary">more_vert</span>
+</button>
+</header>
+<main class="max-w-md mx-auto px-container-margin py-section-padding space-y-8 pb-32">
+<!-- Status Indicator -->
+<section class="flex flex-col items-center justify-center text-center space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+<div class="w-20 h-20 rounded-full flex items-center justify-center border-4 border-amber-accent/20 bg-white">
+<span class="material-symbols-outlined text-[48px] text-amber-accent" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="space-y-1">
+<h2 class="font-display-lg text-display-lg text-primary uppercase">Transaction Confirmed</h2>
+<p class="font-body-md text-on-surface-variant">The resource has been successfully provisioned to the recipient.</p>
+</div>
+</section>
+<!-- Receipt Card -->
+<section class="receipt-card bg-white border border-outline-variant p-6 space-y-6 relative overflow-hidden">
+<!-- Logo/Seal Header -->
+<div class="flex flex-col items-center border-b border-outline-variant pb-6 space-y-2">
+<div class="text-primary font-headline-md font-bold tracking-tighter uppercase">Innovation Consult</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-[0.2em]">Official Resource Document</div>
+</div>
+<!-- Receipt Metadata -->
+<div class="grid grid-cols-1 gap-y-4">
+<div class="flex justify-between items-end border-b border-surface-container pb-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Receipt ID</span>
+<span class="font-data-mono text-data-mono text-primary">REC-8821-04</span>
+</div>
+<div class="flex justify-between items-end border-b border-surface-container pb-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Resource Type</span>
+<span class="font-body-lg text-body-lg text-primary font-semibold">Airtime</span>
+</div>
+<div class="flex justify-between items-end border-b border-surface-container pb-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Amount</span>
+<span class="font-headline-md text-headline-md text-primary font-bold">R 2,500.00</span>
+</div>
+<div class="flex justify-between items-end border-b border-surface-container pb-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Recipient</span>
+<span class="font-body-lg text-body-lg text-primary">John S. - Ward 12 Lead</span>
+</div>
+<div class="flex justify-between items-end border-b border-surface-container pb-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Timestamp</span>
+<span class="font-body-md text-body-md text-primary">2024-08-12 14:45:00</span>
+</div>
+<div class="flex justify-between items-end border-b border-surface-container pb-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Authorized By</span>
+<span class="font-body-md text-body-md text-primary">Naledi Mokoena</span>
+</div>
+</div>
+<!-- Digital Signature / Stamp Area -->
+<div class="py-4 flex justify-between items-center relative">
+<div class="space-y-1">
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase">Digital Signature</div>
+<div class="font-[cursive] text-2xl text-primary opacity-80 pt-2 select-none">N. Mokoena</div>
+</div>
+<!-- Stamp -->
+<div class="stamp-effect absolute right-0 border-4 border-amber-accent text-amber-accent px-4 py-1 font-headline-sm font-black uppercase text-center leading-none">
+                    Verified<br/><span class="text-xs">IC-SYSTEMS</span>
+</div>
+</div>
+<!-- Verification Section -->
+<div class="flex flex-col items-center pt-6 space-y-4 border-t border-dashed border-outline">
+<div class="bg-white p-3 border border-outline-variant inline-block">
+<!-- Placeholder for QR Code -->
+<div class="w-32 h-32 bg-cover bg-center" data-alt="A clean, high-contrast black and white QR code centered on a white background, framed with thin black lines. The style is minimalist and professional, suitable for an official financial receipt verification." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD_Z5oufc3BIo-Ux7wAePn_0VdHFlDaqliNcVhEM2I36WBKDYGCOQTSCbp5AUvTP4LPKoWbrQhg8cAAI0e1QeiqyjAWz7VogQ8xgc4Vq4Cq_c8ARCNkdrBK4fmF7-ZCZd6abXWtqsxkgh-Fk4k8F2il1U4f-DmBOAxlkAoXS7itykQsNpdjxhzJcG3fZ8ueZTFfck8CedME54jxdkrmB1W9elziiXgO64kd8XKfw64MiN1RDe57WSPSwMrGflPLA4Wd7eb7I45o2w')"></div>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant text-center px-8 uppercase leading-relaxed">
+                    Scan to verify this transaction on the central blockchain ledger
+                </p>
+</div>
+</section>
+<!-- Actions -->
+<section class="space-y-3">
+<button class="w-full h-14 bg-primary-container text-white font-label-caps text-label-caps tracking-widest uppercase hover:bg-primary transition-all active:scale-95 flex items-center justify-center gap-2">
+                Back to Dashboard
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+<div class="grid grid-cols-2 gap-3">
+<button class="h-12 border-2 border-primary-container text-primary font-label-caps text-label-caps uppercase hover:bg-surface-container-low transition-all active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-base">share</span>
+                    Share
+                </button>
+<button class="h-12 border-2 border-primary-container text-primary font-label-caps text-label-caps uppercase hover:bg-surface-container-low transition-all active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-base">download</span>
+                    PDF
+                </button>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation (Hiding per 'Transactional' rule, but keeping structure for layout if needed) -->
+<!-- The prompt implies focus on the confirmation, so the shell is suppressed to prioritize content. -->
+<script>
+        // Simple success micro-interaction
+        document.addEventListener('DOMContentLoaded', () => {
+            const card = document.querySelector('.receipt-card');
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body></html>

@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Innovation Consult | War Room Tutorial</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f3f4f5",
+                        "on-error": "#ffffff",
+                        "on-background": "#191c1d",
+                        "tertiary-fixed-dim": "#ffb2b7",
+                        "primary": "#040c30",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#785805",
+                        "tertiary-fixed": "#ffdadb",
+                        "on-tertiary-fixed-variant": "#832331",
+                        "background": "#F7F4EE",
+                        "on-tertiary-container": "#dc6672",
+                        "on-primary-fixed": "#10193c",
+                        "secondary": "#795907",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "surface-container-high": "#e7e8e9",
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#dde1ff",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e1e3e4",
+                        "inverse-primary": "#bdc4f1",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-surface": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "secondary-fixed": "#ffdea1",
+                        "outline": "#76767f",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-fixed": "#261900",
+                        "on-primary-container": "#8289b4",
+                        "tertiary-container": "#510013",
+                        "error": "#ba1a1a",
+                        "muted-navy": "#484E6B",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-fixed": "#40000d",
+                        "surface-dim": "#d9dadb",
+                        "surface": "#f8f9fa",
+                        "error-container": "#ffdad6",
+                        "soft-amber": "#FDF6E9",
+                        "primary-fixed-dim": "#bdc4f1",
+                        "secondary-fixed-dim": "#ebc169",
+                        "on-primary-fixed-variant": "#3d456b",
+                        "outline-variant": "#c6c5cf",
+                        "secondary-container": "#fdd178",
+                        "primary-container": "#1a2246",
+                        "tertiary": "#290006",
+                        "maroon": "#800000",
+                        "accent-teal": "#2A7D7E",
+                        "soft-teal": "#E6F4F1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-desktop": "10vw",
+                        "margin-mobile": "1rem",
+                        "step-gap": "4rem",
+                        "gutter": "1.5rem",
+                        "content-inset": "2rem"
+                    },
+                    "fontFamily": {
+                        "step-number": ["Archivo Narrow"],
+                        "headline-lg": ["Archivo Narrow"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Archivo Narrow"],
+                        "headline-lg-mobile": ["Archivo Narrow"]
+                    },
+                    "fontSize": {
+                        "step-number": ["64px", { "lineHeight": "1", "fontWeight": "700" }],
+                        "headline-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "30px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "38px", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F7F4EE; color: #191c1d; }
+        .archivo { font-family: 'Archivo Narrow', sans-serif; }
+        .step-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .step-card:hover { transform: translateY(-4px); box-shadow: 0px 12px 24px rgba(26, 34, 70, 0.08); }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #795907; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background">
+<!-- Top Navigation Bar (JSON Shell Implementation) -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 bg-surface dark:bg-primary-container border-b border-outline-variant shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" style="font-variation-settings: 'FILL' 1;">strategy</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Innovation Consult</h1>
+</div>
+<div class="hidden md:flex gap-8 items-center">
+<nav class="flex gap-6">
+<a class="font-body-md text-body-md text-primary dark:text-primary-fixed border-b-2 border-primary" href="#">War Room Tutorial</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-primary-container hover:text-muted-navy transition-colors" href="#">Resources</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-on-primary-container hover:text-muted-navy transition-colors" href="#">Documentation</a>
+</nav>
+<button class="bg-primary text-on-primary px-6 py-2 font-label-caps text-label-caps rounded-lg uppercase tracking-wider hover:opacity-80 transition-opacity">Close Tutorial</button>
+</div>
+<div class="md:hidden">
+<span class="material-symbols-outlined text-primary">menu</span>
+</div>
+</header>
+<main class="pt-24 pb-step-gap px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
+<!-- Hero Section -->
+<div class="mb-12">
+<div class="flex flex-wrap items-center gap-4 mb-4">
+<span class="bg-soft-amber text-secondary px-3 py-1 rounded-full font-label-caps text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">timer</span> 12 MIN READ
+                </span>
+<span class="bg-soft-teal text-accent-teal px-3 py-1 rounded-full font-label-caps text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">school</span> STRATEGIC ONBOARDING
+                </span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2">Knowledge to Action: The LGE War Room Workflow</h2>
+<p class="font-body-lg text-body-lg text-muted-navy max-w-3xl">Transforming raw data into operational superiority. Follow this guided framework to master the Innovation Consult intelligence ecosystem.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Left Column: Instructional Flow (8 cols) -->
+<div class="md:col-span-8 space-y-step-gap">
+<!-- Section 1: The Command Tier -->
+<section class="relative" id="command-tier">
+<div class="flex gap-4 items-start mb-6">
+<div class="font-step-number text-step-number text-primary opacity-10 leading-none">01</div>
+<div class="pt-4">
+<h3 class="font-headline-md text-headline-md text-primary uppercase tracking-tight">The Command Tier</h3>
+<p class="font-body-md text-body-md text-muted-navy">Centralized Intelligence Management</p>
+</div>
+</div>
+<div class="step-card bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden flex flex-col md:flex-row">
+<div class="w-full md:w-5/12 bg-primary p-8 flex flex-col justify-center items-center relative min-h-[300px]">
+<div class="absolute inset-0 opacity-20">
+
+</div>
+<div class="z-10 bg-surface-container-lowest p-6 rounded-full border-4 border-secondary shadow-xl">
+<span class="material-symbols-outlined text-[80px] text-maroon" style="font-variation-settings: 'FILL' 1;">chess</span>
+</div>
+<div class="z-10 mt-6 text-center">
+<span class="text-secondary font-label-caps text-label-caps tracking-widest uppercase">Central Hub</span>
+<h4 class="text-white font-headline-md text-headline-md mt-1">War Room Dashboard</h4>
+</div>
+</div>
+<div class="w-full md:w-7/12 p-8 border-l-4 border-soft-teal">
+<h5 class="font-headline-md text-headline-md text-primary mb-4">Strategic Oversight</h5>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
+                                The Dashboard is your primary interface for total theater awareness. Like a Grandmaster's view of the chessboard, it synthesizes real-time reports from the field into actionable visualizations.
+                            </p>
+<ul class="space-y-3">
+<li class="flex items-center gap-3 font-body-md text-body-md text-primary">
+<span class="material-symbols-outlined text-secondary">check_circle</span> Real-time Deployment Tracking
+                                </li>
+<li class="flex items-center gap-3 font-body-md text-body-md text-primary">
+<span class="material-symbols-outlined text-secondary">check_circle</span> Target Demographic Hotspots
+                                </li>
+<li class="flex items-center gap-3 font-body-md text-body-md text-primary">
+<span class="material-symbols-outlined text-secondary">check_circle</span> Resource Allocation Heatmaps
+                                </li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Section 2: Field Operations -->
+<section id="field-ops">
+<div class="flex gap-4 items-start mb-6">
+<div class="font-step-number text-step-number text-primary opacity-10 leading-none">02</div>
+<div class="pt-4">
+<h3 class="font-headline-md text-headline-md text-primary uppercase tracking-tight">Field Operations</h3>
+<p class="font-body-md text-body-md text-muted-navy">Tactical Data Acquisition</p>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="step-card bg-surface-container-lowest border border-outline-variant rounded-xl p-8 border-l-4 border-secondary">
+<span class="material-symbols-outlined text-maroon mb-4 text-[40px]">cell_tower</span>
+<h4 class="font-headline-md text-headline-md text-primary mb-2">The Ground Game</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                                Field agents use the IC Mobile App for voter intake. Every interaction is geo-tagged and timestamped for precise reporting.
+                            </p>
+</div>
+<div class="step-card bg-surface-container-lowest border border-outline-variant rounded-xl p-8 border-l-4 border-secondary">
+<span class="material-symbols-outlined text-maroon mb-4 text-[40px]">home_work</span>
+<h4 class="font-headline-md text-headline-md text-primary mb-2">Household Logging</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">
+                                Deep-dive household profiling allows for nuanced sentiment mapping and granular issue identification.
+                            </p>
+</div>
+</div>
+<div class="mt-8 bg-soft-amber p-6 rounded-xl flex items-start gap-4">
+<span class="material-symbols-outlined text-secondary text-[32px]">lightbulb</span>
+<div>
+<span class="font-label-caps text-label-caps text-secondary uppercase font-bold">Pro-Tip</span>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Ensure agents enable high-accuracy GPS for automated 'Fence-Crossing' notifications during household logging.</p>
+</div>
+</div>
+</section>
+<!-- Section 3: Incident Lifecycle -->
+<section id="incident-lifecycle">
+<div class="flex gap-4 items-start mb-6">
+<div class="font-step-number text-step-number text-primary opacity-10 leading-none">03</div>
+<div class="pt-4">
+<h3 class="font-headline-md text-headline-md text-primary uppercase tracking-tight">Incident Lifecycle</h3>
+<p class="font-body-md text-body-md text-muted-navy">From Reporting to Resolution</p>
+</div>
+</div>
+<div class="relative py-8">
+<!-- Connecting Line -->
+<div class="absolute left-8 top-0 bottom-0 w-1 bg-outline-variant opacity-30 hidden md:block"></div>
+<div class="space-y-12">
+<!-- Lifecycle Step 1 -->
+<div class="flex flex-col md:flex-row gap-8 relative z-10">
+<div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center shrink-0 border-4 border-surface shadow-md">
+<span class="material-symbols-outlined text-white">report_problem</span>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant flex-1">
+<h5 class="font-headline-md text-headline-md text-primary">01. Mobile Logging</h5>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Volunteer identifies a field incident (e.g., ballot tampering, logistics failure) and submits via mobile with photo evidence.</p>
+</div>
+</div>
+<!-- Lifecycle Step 2 -->
+<div class="flex flex-col md:flex-row gap-8 relative z-10">
+<div class="w-16 h-16 bg-maroon rounded-full flex items-center justify-center shrink-0 border-4 border-surface shadow-md">
+<span class="material-symbols-outlined text-white">rule_folder</span>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant flex-1">
+<h5 class="font-headline-md text-headline-md text-primary">02. Central Triage</h5>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">War Room analysts verify the incident, assign a severity level, and route to the legal or logistics teams.</p>
+</div>
+</div>
+<!-- Lifecycle Step 3 -->
+<div class="flex flex-col md:flex-row gap-8 relative z-10">
+<div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center shrink-0 border-4 border-surface shadow-md">
+<span class="material-symbols-outlined text-white">picture_as_pdf</span>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant flex-1">
+<h5 class="font-headline-md text-headline-md text-primary">03. Formal Export</h5>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Generate court-ready PDF briefs or operational status reports directly from the consolidated incident data.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Strategic Intelligence -->
+<section id="strategic-intel">
+<div class="flex gap-4 items-start mb-6">
+<div class="font-step-number text-step-number text-primary opacity-10 leading-none">04</div>
+<div class="pt-4">
+<h3 class="font-headline-md text-headline-md text-primary uppercase tracking-tight">Strategic Intelligence</h3>
+<p class="font-body-md text-body-md text-muted-navy">Predictive Modeling &amp; Analytics</p>
+</div>
+</div>
+<div class="bg-primary-container p-8 rounded-2xl text-white overflow-hidden relative">
+<div class="absolute right-0 top-0 w-1/3 h-full opacity-10 pointer-events-none">
+
+</div>
+<div class="relative z-10">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+<div>
+<h4 class="font-headline-md text-headline-md text-secondary-fixed mb-4">Coalition Modeler</h4>
+<p class="font-body-md text-body-md text-primary-fixed leading-relaxed mb-6">
+                                        Simulate demographic shifts and coalition outcomes. Use the interactive modeler to test 'What-If' scenarios based on live field sentiment.
+                                    </p>
+<div class="h-2 w-full bg-primary rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-3/4"></div>
+</div>
+<span class="block mt-2 font-label-caps text-label-caps text-secondary-fixed-dim">Predictive Accuracy: 94.2%</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-secondary-fixed mb-4">Sentiment Analytics</h4>
+<p class="font-body-md text-body-md text-primary-fixed leading-relaxed mb-6">
+                                        Monitor the 'Vibe' of the electorate. Our NLP engines process field comments to detect shifts in public opinion before they hit the press.
+                                    </p>
+<div class="flex gap-2">
+<div class="flex-1 h-12 bg-primary rounded border border-on-primary-fixed-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-soft-teal">trending_up</span>
+</div>
+<div class="flex-1 h-12 bg-primary rounded border border-on-primary-fixed-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">monitoring</span>
+</div>
+<div class="flex-1 h-12 bg-primary rounded border border-on-primary-fixed-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-maroon">psychology</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Sidebar Checklist (4 cols) -->
+<aside class="md:col-span-4">
+<div class="sticky top-28 space-y-gutter">
+<!-- Checklist Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 shadow-sm">
+<h4 class="font-headline-md text-headline-md text-primary mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">fact_check</span> Getting Started
+                        </h4>
+<div class="space-y-6">
+<div class="flex items-start gap-4 group cursor-pointer">
+<div class="w-6 h-6 rounded border-2 border-outline-variant group-hover:border-secondary transition-colors mt-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-secondary hidden group-active:block">check</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-primary font-bold">Configure Command Tiers</p>
+<p class="font-label-caps text-[11px] text-on-surface-variant uppercase mt-1">3 Tasks Remaining</p>
+</div>
+</div>
+<div class="flex items-start gap-4 group cursor-pointer">
+<div class="w-6 h-6 rounded border-2 border-outline-variant group-hover:border-secondary transition-colors mt-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-secondary hidden group-active:block">check</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-primary font-bold">Assign Field Logistics</p>
+<p class="font-label-caps text-[11px] text-on-surface-variant uppercase mt-1">Pending Approval</p>
+</div>
+</div>
+<div class="flex items-start gap-4 group cursor-pointer">
+<div class="w-6 h-6 rounded border-2 border-outline-variant group-hover:border-secondary transition-colors mt-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px] text-secondary hidden group-active:block">check</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-primary font-bold">Initialize Triage Nodes</p>
+<p class="font-label-caps text-[11px] text-on-surface-variant uppercase mt-1">Awaiting Data</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-8 bg-primary text-white py-4 font-headline-md text-[18px] rounded-lg hover:bg-muted-navy transition-colors">Start Deployment</button>
+</div>
+<!-- Strategic Insight Box -->
+<div class="bg-soft-teal border-l-4 border-accent-teal p-8 rounded-r-xl">
+<span class="material-symbols-outlined text-accent-teal mb-2">insights</span>
+<h5 class="font-headline-md text-headline-md text-primary mb-2">Strategic Insight</h5>
+<p class="font-body-md text-body-md text-on-surface-variant italic">
+                            "The battle is won in the War Room, but the victory is validated at the doorstep." 
+                        </p>
+<p class="font-label-caps text-label-caps text-primary mt-4 font-bold">— CHIEF OPERATING OFFICER</p>
+</div>
+<!-- Resource Link -->
+<div class="bg-surface-container-high p-6 rounded-xl border border-outline-variant">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-4 tracking-widest">NEED MORE HELP?</p>
+<a class="flex justify-between items-center group" href="#">
+<span class="font-headline-md text-[18px] text-primary group-hover:underline">Technical PDF Guide</span>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+<hr class="my-4 border-outline-variant"/>
+<a class="flex justify-between items-center group" href="#">
+<span class="font-headline-md text-[18px] text-primary group-hover:underline">Video Tutorials</span>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">play_circle</span>
+</a>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Success Callout -->
+<section class="bg-surface-container-lowest border-y border-outline-variant py-16 px-margin-mobile md:px-margin-desktop text-center">
+<h3 class="font-headline-lg text-headline-lg text-primary mb-4">Ready to Master the Field?</h3>
+<p class="font-body-lg text-body-lg text-muted-navy mb-8 max-w-2xl mx-auto">Take the final assessment to unlock your Command Tier clearance and begin leading your first LGE team.</p>
+<div class="flex flex-wrap justify-center gap-4">
+<button class="bg-primary text-on-primary px-8 py-4 font-headline-md text-[20px] rounded-lg shadow-lg hover:shadow-xl transition-all">Take Assessment</button>
+<button class="border-2 border-secondary text-secondary px-8 py-4 font-headline-md text-[20px] rounded-lg hover:bg-soft-amber transition-colors">Review Dashboard Manual</button>
+</div>
+</section>
+<!-- Footer (JSON Shell Implementation) -->
+<footer class="w-full py-step-gap px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-gutter bg-surface-container-low dark:bg-surface-container-lowest">
+<div class="flex flex-col items-center md:items-start">
+<span class="font-label-caps text-label-caps text-primary mb-2">INNOVATION CONSULT STRATEGIC SOLUTIONS</span>
+<p class="font-body-md text-body-md text-muted-navy dark:text-on-surface-variant">© 2024 Innovation Consult Strategic Solutions</p>
+</div>
+<div class="flex gap-8">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-teal underline transition-all" href="#">Support Desk</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-teal underline transition-all" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-teal underline transition-all" href="#">User Agreement</a>
+</div>
+</footer>
+<!-- Micro-interaction script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const steps = document.querySelectorAll('.step-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        entry.target.classList.remove('opacity-0', 'translate-y-8');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            steps.forEach(step => {
+                step.classList.add('opacity-0', 'translate-y-8', 'transition-all', 'duration-700');
+                observer.observe(step);
+            });
+        });
+    </script>
+</body></html>

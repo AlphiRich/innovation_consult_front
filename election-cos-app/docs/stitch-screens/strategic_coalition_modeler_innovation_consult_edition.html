@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hung Council | Strategic Coalition Modeler</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Archivo+Narrow:wght@600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#3d456b",
+                        "surface-bright": "#faf8ff",
+                        "on-primary-fixed": "#10193c",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#510013",
+                        "primary-fixed": "#dde1ff",
+                        "background": "#faf8ff",
+                        "surface-variant": "#dce1ff",
+                        "surface-tint": "#545c84",
+                        "on-secondary-container": "#785805",
+                        "secondary-fixed": "#ffdea1",
+                        "inverse-primary": "#bdc4f1",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#dc6672",
+                        "on-tertiary-fixed-variant": "#832331",
+                        "on-secondary-fixed": "#261900",
+                        "inverse-on-surface": "#eff0ff",
+                        "on-surface": "#141a31",
+                        "secondary-fixed-dim": "#ebc169",
+                        "error-container": "#ffdad6",
+                        "surface-container": "#ebedff",
+                        "on-background": "#141a31",
+                        "inverse-surface": "#292f47",
+                        "primary-container": "#1a2246",
+                        "on-primary-container": "#8289b4",
+                        "tertiary": "#290006",
+                        "secondary-container": "#fdd178",
+                        "surface-container-highest": "#dce1ff",
+                        "tertiary-fixed": "#ffdadb",
+                        "surface-container-low": "#f3f2ff",
+                        "error": "#ba1a1a",
+                        "primary": "#040c30",
+                        "surface": "#faf8ff",
+                        "tertiary-fixed-dim": "#ffb2b7",
+                        "outline-variant": "#c6c5cf",
+                        "on-surface-variant": "#46464e",
+                        "on-error-container": "#93000a",
+                        "secondary": "#795907",
+                        "outline": "#76767f",
+                        "surface-container-high": "#e4e7ff",
+                        "primary-fixed-dim": "#bdc4f1",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "surface-dim": "#d3d9f7",
+                        "on-tertiary-fixed": "#40000d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px",
+                        "unit": "4px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-md": ["Archivo Narrow"],
+                        "display-lg": ["Archivo Narrow"],
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-sm": ["Archivo Narrow"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg": ["Archivo Narrow"],
+                        "headline-lg-mobile": ["Archivo Narrow"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #040c30;
+        }
+        .data-cell {
+            font-family: 'JetBrains Mono', monospace;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md">
+<!-- Shell Layout -->
+<div class="flex min-h-screen overflow-hidden">
+<!-- SideNavBar (Authority: JSON & Strategy) -->
+<aside class="fixed left-0 top-0 bottom-0 z-40 flex flex-col h-screen w-64 bg-surface dark:bg-background border-r border-outline-variant dark:border-outline">
+<div class="p-6 flex items-center gap-3">
+<img alt="Civic Authority Logo" class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOmSE3iPiKrBOV_v3Uk_AamhZ3B2inA1KBHKRBKt-W3IE-tGjevMFq7A78vb3tnEKx7qTt8LxSkBqXezHBWIY2j6iIY6ybjr14PaMzZb4bJKLj4lYn744M4rp9H8ImcyekmHAJ0xNXOaGXLNg0HcLoFNh46R1Kt1S6pkbRTywR-fBVvJzks8lwIKQuRZ0e5dFuj8uB1hUgGbD7Q5p5Ec9ikH-sY0zJ6UsXT5WwgqlFWjCSmllM7mPesCBF410hPhbg9qvm9tGlBA"/>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-primary">Civic Authority</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Strategic Planner</p>
+</div>
+</div>
+<nav class="flex-1 mt-4 px-4 space-y-1 overflow-y-auto custom-scrollbar">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary font-bold border-r-4 border-secondary bg-surface-container-high" href="#">
+<span class="material-symbols-outlined">calculate</span>
+<span class="font-body-md">Vote Calculator</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all duration-150" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-md">Threshold Analyzer</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all duration-150" href="#">
+<span class="material-symbols-outlined">settings_applications</span>
+<span class="font-body-md">Municipality Config</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all duration-150" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-body-md">Reports</span>
+</a>
+</nav>
+<div class="p-4 border-t border-outline-variant mt-auto">
+<a class="flex items-center gap-3 px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-sm">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-sm">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 flex-1 flex flex-col h-screen overflow-hidden bg-white">
+<!-- TopNavBar (Authority: JSON) -->
+<header class="h-16 flex justify-between items-center px-gutter w-full border-b border-outline-variant dark:border-outline bg-surface sticky top-0 z-30">
+<div class="flex items-center gap-4">
+<span class="font-headline-sm text-headline-sm font-archivo-narrow text-primary">Strategic Coalition Modeler</span>
+<span class="h-4 w-[1px] bg-outline-variant"></span>
+<span class="text-body-sm text-on-surface-variant">Session ID: <span class="font-label-md">HC-2024-ZA</span></span>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer p-2 hover:bg-surface-container-low rounded-full transition-colors">notifications</span>
+</div>
+<div class="flex items-center gap-2 cursor-pointer p-1 pr-3 hover:bg-surface-container-low rounded-full transition-colors">
+<img class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A professional headshot of a government analyst in a sharp navy blazer, looking confident and composed. The lighting is crisp, studio-quality, emphasizing clarity and trust. The background is a soft, out-of-focus modern office setting with a cool blue and white color palette, consistent with the corporate aesthetic of high-level administrative consultancy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBswlIVEeN7ojVKv_jZH51v8cKDkT-kR9Ks8yadZRjSyM8PH7dUMImUu7rdLHifAQthMJlcMywKLWTWGTWzYDv_uOFUvcQ5OrHykeC83a8sGF49q5731m1Utbh4lyvjc03HDfCC15otBfXy6kYdc76vE4HIgAL5PcedeqUKHLekNQWEJAVyKjvsPLtTE7NDyCnKRLEZalXMuFag9OlGKbxOfh3IF0_taEQGu6KdTuaD-5PIKcw1odwaqkY6l5sqcJ9W3MTkBX3LfQ"/>
+<span class="font-body-sm font-medium">Dr. M. Sefolo</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="flex-1 flex overflow-hidden">
+<!-- Left: Analysis & Visualization -->
+<div class="flex-1 p-8 overflow-y-auto custom-scrollbar bg-white">
+<!-- Mandate Status Hero -->
+<div class="mb-10 flex items-start justify-between">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2">Council Composition Analysis</h2>
+<p class="text-on-surface-variant max-w-2xl font-body-md">Model political realignments and evaluate coalition viability based on proportional representation thresholds. A total of <strong class="text-primary">270 seats</strong> are allocated.</p>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-6 flex flex-col items-end gap-2" id="status-card">
+<span class="text-body-sm font-bold uppercase tracking-tighter text-on-surface-variant">Coalition Mandate</span>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-primary" id="seat-counter">0</span>
+<span class="text-headline-sm text-on-surface-variant">/ 136</span>
+</div>
+<div class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1" id="mandate-badge">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+                                Insufficient Majority
+                            </div>
+</div>
+</div>
+<!-- Seat Distribution Table -->
+<section class="mb-10">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-headline-sm text-headline-sm text-primary">Seat Distribution by Party</h3>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-3 py-1.5 border border-outline-variant text-body-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">download</span> Export CSV
+                                </button>
+<button class="flex items-center gap-2 px-3 py-1.5 border border-outline-variant text-body-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">print</span> PDF Report
+                                </button>
+</div>
+</div>
+<div class="border border-outline-variant">
+<table class="w-full border-collapse">
+<thead class="bg-surface-container-low">
+<tr class="text-left">
+<th class="px-6 py-4 text-body-sm font-bold border-b border-outline-variant">Party Name</th>
+<th class="px-6 py-4 text-body-sm font-bold border-b border-outline-variant text-center">Vote %</th>
+<th class="px-6 py-4 text-body-sm font-bold border-b border-outline-variant text-center">Quota Ratio</th>
+<th class="px-6 py-4 text-body-sm font-bold border-b border-outline-variant text-center">PR Seats</th>
+<th class="px-6 py-4 text-body-sm font-bold border-b border-outline-variant text-center">Ward Seats</th>
+<th class="px-6 py-4 text-body-sm font-bold border-b border-outline-variant text-center bg-primary-container/5">Total Seats</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-2 h-8 bg-green-700"></div>
+<span class="font-medium text-primary">African National Congress</span>
+</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">35.4%</td>
+<td class="px-6 py-4 text-center data-cell text-body-sm">95.58</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">46</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">50</td>
+<td class="px-6 py-4 text-center data-cell text-body-md font-bold bg-primary-container/5">96</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-2 h-8 bg-blue-600"></div>
+<span class="font-medium text-primary">Democratic Alliance</span>
+</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">28.1%</td>
+<td class="px-6 py-4 text-center data-cell text-body-sm">75.87</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">40</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">36</td>
+<td class="px-6 py-4 text-center data-cell text-body-md font-bold bg-primary-container/5">76</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-2 h-8 bg-red-700"></div>
+<span class="font-medium text-primary">Economic Freedom Fighters</span>
+</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">14.8%</td>
+<td class="px-6 py-4 text-center data-cell text-body-sm">39.96</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">40</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">0</td>
+<td class="px-6 py-4 text-center data-cell text-body-md font-bold bg-primary-container/5">40</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-2 h-8 bg-green-500"></div>
+<span class="font-medium text-primary">ActionSA</span>
+</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">8.2%</td>
+<td class="px-6 py-4 text-center data-cell text-body-sm">22.14</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">22</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">0</td>
+<td class="px-6 py-4 text-center data-cell text-body-md font-bold bg-primary-container/5">22</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-2 h-8 bg-gray-500"></div>
+<span class="font-medium text-primary">Independents/Other</span>
+</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">13.5%</td>
+<td class="px-6 py-4 text-center data-cell text-body-sm">36.45</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">31</td>
+<td class="px-6 py-4 text-center data-cell text-body-md">5</td>
+<td class="px-6 py-4 text-center data-cell text-body-md font-bold bg-primary-container/5">36</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Formula breakdown bento -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="p-6 border border-outline-variant">
+<div class="flex items-center gap-2 mb-4 text-primary">
+<span class="material-symbols-outlined">calculate</span>
+<h4 class="font-headline-sm text-headline-sm">MMP Formula</h4>
+</div>
+<p class="text-body-sm text-on-surface-variant mb-4">The Mixed Member Proportional system ensures total council reflects the PR vote.</p>
+<div class="bg-surface-container-low p-4 rounded space-y-2">
+<div class="flex justify-between">
+<span class="text-xs uppercase font-bold text-on-surface-variant">Quota</span>
+<span class="font-label-md">Votes / (Seats - 1)</span>
+</div>
+<div class="flex justify-between">
+<span class="text-xs uppercase font-bold text-on-surface-variant">Entitlement</span>
+<span class="font-label-md">Votes / Quota</span>
+</div>
+</div>
+</div>
+<div class="p-6 border border-outline-variant relative overflow-hidden">
+<div class="flex items-center gap-2 mb-4 text-tertiary-fixed-dim">
+<span class="material-symbols-outlined">warning</span>
+<h4 class="font-headline-sm text-headline-sm text-on-tertiary-container">PR Risks</h4>
+</div>
+<p class="text-body-sm text-on-surface-variant mb-4">Detected variance in seat allocation vs. vote intent (Maroon Alert).</p>
+<div class="h-1 bg-tertiary-container w-full mb-2"></div>
+<div class="flex items-center gap-2 text-tertiary font-bold text-body-sm">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                                +2.4% Overhang Risk
+                            </div>
+</div>
+<div class="p-6 border border-outline-variant bg-white">
+<div class="flex items-center gap-2 mb-4 text-secondary">
+<span class="material-symbols-outlined">verified_user</span>
+<h4 class="font-headline-sm text-headline-sm">Governing Mandate</h4>
+</div>
+<p class="text-body-sm text-on-surface-variant mb-4">Required majority threshold for executive decision authority.</p>
+<div class="flex items-center gap-4">
+<div class="flex-1 h-3 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-0 transition-all duration-700 ease-out" id="progress-bar"></div>
+</div>
+<span class="font-label-md text-secondary">50% + 1</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Coalition Builder Sidebar -->
+<div class="w-80 border-l border-outline-variant bg-surface-container-low p-6 flex flex-col gap-6 overflow-y-auto">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-primary mb-1">Coalition Builder</h3>
+<p class="text-body-sm text-on-surface-variant">Toggle parties to form a majority.</p>
+</div>
+<div class="space-y-3" id="coalition-toggles">
+<!-- Party Toggles -->
+<div class="group cursor-pointer party-toggle" data-party="ANC" data-seats="96">
+<div class="flex items-center justify-between p-4 bg-white border border-outline-variant group-hover:border-primary transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-green-700"></div>
+<span class="font-medium text-body-md">ANC</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label-md text-primary">96</span>
+<div class="w-10 h-5 bg-outline-variant rounded-full p-1 relative transition-colors toggle-track">
+<div class="w-3 h-3 bg-white rounded-full transition-transform toggle-knob"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="group cursor-pointer party-toggle" data-party="DA" data-seats="76">
+<div class="flex items-center justify-between p-4 bg-white border border-outline-variant group-hover:border-primary transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-blue-600"></div>
+<span class="font-medium text-body-md">DA</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label-md text-primary">76</span>
+<div class="w-10 h-5 bg-outline-variant rounded-full p-1 relative transition-colors toggle-track">
+<div class="w-3 h-3 bg-white rounded-full transition-transform toggle-knob"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="group cursor-pointer party-toggle" data-party="EFF" data-seats="40">
+<div class="flex items-center justify-between p-4 bg-white border border-outline-variant group-hover:border-primary transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-red-700"></div>
+<span class="font-medium text-body-md">EFF</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label-md text-primary">40</span>
+<div class="w-10 h-5 bg-outline-variant rounded-full p-1 relative transition-colors toggle-track">
+<div class="w-3 h-3 bg-white rounded-full transition-transform toggle-knob"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="group cursor-pointer party-toggle" data-party="ActionSA" data-seats="22">
+<div class="flex items-center justify-between p-4 bg-white border border-outline-variant group-hover:border-primary transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<span class="font-medium text-body-md">ActionSA</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label-md text-primary">22</span>
+<div class="w-10 h-5 bg-outline-variant rounded-full p-1 relative transition-colors toggle-track">
+<div class="w-3 h-3 bg-white rounded-full transition-transform toggle-knob"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="group cursor-pointer party-toggle" data-party="Other" data-seats="36">
+<div class="flex items-center justify-between p-4 bg-white border border-outline-variant group-hover:border-primary transition-all">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-gray-500"></div>
+<span class="font-medium text-body-md">Other</span>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label-md text-primary">36</span>
+<div class="w-10 h-5 bg-outline-variant rounded-full p-1 relative transition-colors toggle-track">
+<div class="w-3 h-3 bg-white rounded-full transition-transform toggle-knob"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto p-4 bg-primary text-on-primary rounded">
+<h4 class="text-xs uppercase font-bold tracking-widest opacity-70 mb-2">Scenario Summary</h4>
+<p class="text-body-sm leading-relaxed" id="scenario-text">No parties selected. Start modeling by selecting potential coalition partners.</p>
+<button class="mt-4 w-full py-2 bg-secondary text-primary font-bold text-sm uppercase hover:opacity-90 transition-opacity">
+                            Finalize Model
+                        </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggles = document.querySelectorAll('.party-toggle');
+            const seatDisplay = document.getElementById('seat-counter');
+            const mandateBadge = document.getElementById('mandate-badge');
+            const progressBar = document.getElementById('progress-bar');
+            const scenarioText = document.getElementById('scenario-text');
+            const statusCard = document.getElementById('status-card');
+
+            let totalSeats = 0;
+            const selectedParties = [];
+
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const seats = parseInt(toggle.dataset.seats);
+                    const party = toggle.dataset.party;
+                    const track = toggle.querySelector('.toggle-track');
+                    const knob = toggle.querySelector('.toggle-knob');
+                    
+                    if (selectedParties.includes(party)) {
+                        // De-select
+                        selectedParties.splice(selectedParties.indexOf(party), 1);
+                        totalSeats -= seats;
+                        track.classList.replace('bg-primary', 'bg-outline-variant');
+                        knob.classList.remove('translate-x-5');
+                    } else {
+                        // Select
+                        selectedParties.push(party);
+                        totalSeats += seats;
+                        track.classList.replace('bg-outline-variant', 'bg-primary');
+                        knob.classList.add('translate-x-5');
+                    }
+
+                    updateUI();
+                });
+            });
+
+            function updateUI() {
+                // Counter Animation
+                seatDisplay.textContent = totalSeats;
+                
+                // Progress Bar (out of 270 total seats)
+                const percent = (totalSeats / 270) * 100;
+                progressBar.style.width = `${percent}%`;
+
+                // Logic check for 136 seats
+                if (totalSeats >= 136) {
+                    mandateBadge.innerHTML = `<span class="material-symbols-outlined text-[14px]">check_circle</span> Governing Mandate Achieved`;
+                    mandateBadge.classList.replace('bg-surface-container-high', 'bg-secondary-container');
+                    mandateBadge.classList.replace('text-on-surface-variant', 'text-secondary');
+                    statusCard.classList.add('border-secondary', 'bg-secondary-fixed/10');
+                } else {
+                    mandateBadge.innerHTML = `<span class="material-symbols-outlined text-[14px]">lock</span> Insufficient Majority`;
+                    mandateBadge.classList.replace('bg-secondary-container', 'bg-surface-container-high');
+                    mandateBadge.classList.replace('text-secondary', 'text-on-surface-variant');
+                    statusCard.classList.remove('border-secondary', 'bg-secondary-fixed/10');
+                }
+
+                // Scenario update
+                if (selectedParties.length === 0) {
+                    scenarioText.textContent = "No parties selected. Start modeling by selecting potential coalition partners.";
+                } else {
+                    scenarioText.textContent = `A coalition between ${selectedParties.join(', ')} controls ${totalSeats} seats. ${totalSeats >= 136 ? 'This configuration represents a stable governing mandate.' : 'This configuration lacks the 136-seat threshold.'}`;
+                }
+            }
+        });
+    </script>
+</body></html>

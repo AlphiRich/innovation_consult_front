@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Innovation Consult | Field Interface</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Public+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#1A2246", // Deep Navy
+                    "secondary": "#B7913F", // Gold
+                    "error": "#7E1F2E", // Maroon
+                    "surface": "#ffffff",
+                    "background": "#f8f9ff",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#1A2246",
+                    "on-surface-variant": "#46464e",
+                    "outline-variant": "#c6c5cf",
+                    "surface-container": "#f1f4f9",
+                    "surface-container-high": "#e5e9f0",
+                    "surface-container-highest": "#dce1e9",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "max-width": "1440px",
+                    "unit": "4px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "32px"
+            },
+            "fontFamily": {
+                    "display-lg-mobile": ["Archivo Narrow"],
+                    "label-caps": ["Archivo Narrow"],
+                    "headline-md": ["Archivo Narrow"],
+                    "display-lg": ["Archivo Narrow"],
+                    "body-md": ["Public Sans"],
+                    "data-mono": ["Public Sans"],
+                    "body-lg": ["Public Sans"]
+            },
+            "fontSize": {
+                    "display-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Public Sans', sans-serif; }
+        .font-headline-md { font-family: 'Archivo Narrow', sans-serif; }
+        .font-label-caps { font-family: 'Archivo Narrow', sans-serif; text-transform: uppercase; }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1A2246; border-radius: 10px; }
+
+        .form-input-focus:focus {
+            border-color: #B7913F;
+            box-shadow: inset 0 0 0 1px #B7913F;
+            outline: none;
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen pb-20">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 w-full z-50 flex justify-between items-center px-4 bg-primary h-16 border-b border-primary shadow-md">
+<div class="flex items-center gap-3">
+<img alt="Innovation Consult Logo" class="w-10 h-10 object-contain rounded bg-white p-0.5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5nH_Ss4-FYooT3CPzIYFvy7RbMO1kAS2ida8y8b81-sw1YWyLIRlpPMSZeegsPJaNHOAJ8kIXOlxV0hxaKnqcmIwFc_f9B6BRPYJyJn-7npmcXquTC-INQcxDN2-wb_-_mzr9T-KovzFlXd1XDY6ua7yH3sz79Rb6rvY61VcxnsEI7-f28_KPC0BiAlKTWRTyTGObbTXcP3sHJCIerUpFlfE6SSnaRz5770o4m6NIVx5eWUD7v4d_fmLRQo6rwMuoYFt8s5OWPA"/>
+<span class="font-display-lg-mobile text-display-lg-mobile text-on-primary">FieldOps</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-primary">notifications</button>
+<div class="w-8 h-8 rounded-full border border-secondary flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a professional coordinator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMzyqneNBkYTDTKZ_B5EOzN3Hq_SrBIQIOTXtn66QaiK7WrzrmDDYklLOduYSfhRyM75oZrQW_lcEaKmr73_Pj3hi_-snf2BycLXL6lm73Fp6OcH6h8WjXHeAKt0q8q_Yq4A2abzZm2DkVSYH2-TDuh2cLYybUyZ6x8AwEHSE5mnmI5psXKzDMWZMwSABC4n4fb9BaMcuMcyYQLwXYZN-tlgwe8Ds26nFxhSW_VHJQEtPQmi1IR0xsohcY4TzfszwlOYMNdH89IA"/>
+</div>
+</div>
+</header>
+<main class="px-4 py-6 max-w-lg mx-auto">
+<!-- Dashboard Header / Active VD Stats -->
+<section class="mb-8">
+<div class="flex flex-col gap-1">
+<span class="font-label-caps text-label-caps text-secondary font-bold">Active Deployment</span>
+<h1 class="font-headline-md text-headline-md text-primary">Voting District 042-A</h1>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-4">
+<div class="p-4 bg-surface border border-outline-variant rounded-lg">
+<span class="font-label-caps text-label-caps text-on-surface-variant block mb-1">Total Voters</span>
+<span class="text-2xl font-bold text-primary">2,481</span>
+</div>
+<div class="p-4 bg-primary text-on-primary border border-primary rounded-lg">
+<span class="font-label-caps text-label-caps text-secondary block mb-1">Coverage</span>
+<span class="text-2xl font-bold">64%</span>
+</div>
+</div>
+</section>
+<!-- Street-Specific Ward Map -->
+<section class="mb-8">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-headline-md text-headline-md text-primary">Live Sector Map</h2>
+<button class="text-sm font-bold text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-base">my_location</span> Recenter
+            </button>
+</div>
+<div class="relative w-full h-64 bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant">
+<div class="w-full h-full bg-cover bg-center opacity-80" data-alt="Urban neighborhood map" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAbWItiWiDAbYUbayJ-JSfg03gMb98lCRX-LFR184CpPhjgqnw79huYQCwRv1sCdDquzsmh1Tp_k4pZ1NXvL-5yACpGPXfrCVtAjpCk6mAA-Nx_Wr-mxfBEHHMAZaip0NqcX6OQHeBmYTYOv5ilkIquFjFhTsJKdC5UmjKTTIedVv0uTQ6h7iUNUJxemO2qdBeUh3I8M6iE0Q0C_Ju4flo-FEnrNxvS-ZRh_p0_7SCeNcLyn_Y5btEw1CKMNwJ7SofbE4xideYnLg')"></div>
+<!-- Custom Pins Overlay -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+<span class="material-symbols-outlined text-secondary text-4xl" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+<!-- Legend -->
+<div class="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm p-2 rounded border border-outline-variant shadow-sm">
+<div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> Covered
+                    <span class="w-2 h-2 rounded-full bg-primary ml-2"></span> Pending
+                </div>
+</div>
+</div>
+</section>
+<!-- Voter Detail Capture Form -->
+<section class="mb-8 p-6 bg-surface border border-outline-variant rounded-xl shadow-sm">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-secondary">edit_document</span>
+<h2 class="font-headline-md text-headline-md text-primary">Voter Intake Form</h2>
+</div>
+<form class="space-y-6">
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">Voter Identification No.</label>
+<input class="w-full h-12 px-4 border border-outline-variant rounded bg-white font-data-mono form-input-focus transition-all" placeholder="e.g. V-99283-X" type="text"/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">First Name</label>
+<input class="w-full h-12 px-4 border border-outline-variant rounded bg-white form-input-focus transition-all" type="text"/>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">Surname</label>
+<input class="w-full h-12 px-4 border border-outline-variant rounded bg-white form-input-focus transition-all" type="text"/>
+</div>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">Support Sentiment</label>
+<div class="flex gap-2">
+<button class="flex-1 py-3 border border-outline-variant rounded font-bold text-xs uppercase hover:bg-surface-container-high transition-colors" type="button">Positive</button>
+<button class="flex-1 py-3 border border-outline-variant rounded font-bold text-xs uppercase hover:bg-surface-container-high transition-colors" type="button">Neutral</button>
+<button class="flex-1 py-3 border border-error text-error rounded font-bold text-xs uppercase hover:bg-error/5 transition-colors" type="button">Hostile</button>
+</div>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">Key Issues (Tags)</label>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-surface-container-high text-[11px] font-bold rounded-full border border-outline-variant text-primary">Infrastructure</span>
+<span class="px-3 py-1 bg-surface-container-high text-[11px] font-bold rounded-full border border-outline-variant text-primary">Healthcare</span>
+<span class="px-3 py-1 bg-surface-container-high text-[11px] font-bold rounded-full border border-outline-variant text-primary">Economy</span>
+<button class="px-3 py-1 border border-dashed border-secondary text-secondary text-[11px] font-bold rounded-full" type="button">+ Add</button>
+</div>
+</div>
+<button class="w-full py-4 bg-secondary text-on-primary font-bold uppercase tracking-widest text-sm rounded shadow-lg active:scale-95 transition-transform">
+                Submit Record
+            </button>
+</form>
+</section>
+<!-- Field Diary -->
+<section class="mb-12">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-headline-md text-headline-md text-primary">Field Diary</h2>
+<button class="text-xs font-bold bg-surface-container-high text-primary px-4 py-2 rounded-full border border-outline-variant">+ New Entry</button>
+</div>
+<div class="space-y-4">
+<!-- Diary Entry 1 -->
+<div class="relative pl-6 border-l-2 border-secondary py-2">
+<div class="absolute -left-[5px] top-4 w-2 h-2 rounded-full bg-secondary"></div>
+<div class="flex justify-between items-start mb-1">
+<span class="font-data-mono text-data-mono text-on-surface-variant">14:22 PM</span>
+<span class="px-2 py-0.5 bg-primary text-on-primary text-[10px] font-bold uppercase rounded">Rally</span>
+</div>
+<h3 class="font-bold text-on-surface mb-1">Street Corner Meeting: Oak &amp; Main</h3>
+<p class="text-body-md text-on-surface-variant leading-relaxed">High turnout (approx 45 people). Primary concern raised: Street lighting on North side. Several registration forms distributed.</p>
+</div>
+<!-- Diary Entry 2 -->
+<div class="relative pl-6 border-l-2 border-error py-2">
+<div class="absolute -left-[5px] top-4 w-2 h-2 rounded-full bg-error"></div>
+<div class="flex justify-between items-start mb-1">
+<span class="font-data-mono text-data-mono text-on-surface-variant">11:05 AM</span>
+<span class="px-2 py-0.5 bg-error text-on-primary text-[10px] font-bold uppercase rounded">Alert</span>
+</div>
+<h3 class="font-bold text-on-surface mb-1">Opponent Postering Noted</h3>
+<p class="text-body-md text-on-surface-variant leading-relaxed">Cluster of 'Green Party' posters identified along Sector B border. Logged for branch review.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-primary border-t border-primary h-18 text-on-primary">
+<button class="flex flex-col items-center justify-center opacity-70 hover:opacity-100 transition-opacity group">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform">home</span>
+<span class="font-label-caps text-[10px] mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary text-on-primary rounded-full px-6 py-2 shadow-lg -translate-y-1">
+<span class="material-symbols-outlined">edit_document</span>
+<span class="font-label-caps text-[10px] mt-1">Field</span>
+</button>
+<button class="flex flex-col items-center justify-center opacity-70 hover:opacity-100 transition-opacity group">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform">explore</span>
+<span class="font-label-caps text-[10px] mt-1">Map</span>
+</button>
+<button class="flex flex-col items-center justify-center opacity-70 hover:opacity-100 transition-opacity group relative">
+<span class="material-symbols-outlined group-active:scale-90 transition-transform">notifications</span>
+<span class="absolute top-0 right-1 w-2 h-2 bg-secondary rounded-full"></span>
+<span class="font-label-caps text-[10px] mt-1">Alerts</span>
+</button>
+</nav>
+<!-- Floating Action Button -->
+<button class="fixed right-6 bottom-24 w-14 h-14 bg-secondary text-on-primary rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform z-40 border-4 border-surface">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+<script>
+    // Micro-interaction for form buttons
+    document.querySelectorAll('form button[type="button"]').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const parent = this.parentElement;
+            parent.querySelectorAll('button').forEach(b => {
+                b.classList.remove('bg-secondary', 'text-on-primary', 'border-secondary');
+                b.classList.add('bg-transparent', 'border-outline-variant');
+                if (b.innerText.includes('HOSTILE')) {
+                    b.classList.add('border-error', 'text-error');
+                    b.classList.remove('border-outline-variant');
+                }
+            });
+            this.classList.add('bg-secondary', 'text-on-primary', 'border-secondary');
+            this.classList.remove('bg-transparent', 'border-outline-variant', 'text-error');
+        });
+    });
+
+    const map = document.querySelector('[data-location]');
+    if(map) {
+        map.addEventListener('click', () => {
+            console.log('Innovation Consult Map Interface: Sector details synchronized.');
+        });
+    }
+</script>
+</body></html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Innovation Consult: Campaign OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Inter:wght@400;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "muted-navy": "#484E6B",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#ffdea1",
+                    "on-background": "#191c1d",
+                    "tertiary-fixed": "#ffdadb",
+                    "on-secondary-fixed": "#261900",
+                    "on-primary-fixed": "#10193c",
+                    "secondary-container": "#fdd178",
+                    "outline-variant": "#c6c5cf",
+                    "on-error-container": "#93000a",
+                    "surface-dim": "#d9dadb",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "on-tertiary-fixed-variant": "#832331",
+                    "on-surface-variant": "#46464e",
+                    "primary": "#040c30",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#8289b4",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#2e3132",
+                    "surface": "#f8f9fa",
+                    "secondary-fixed-dim": "#ebc169",
+                    "tertiary": "#290006",
+                    "secondary": "#795907",
+                    "surface-container-high": "#e7e8e9",
+                    "on-surface": "#191c1d",
+                    "surface-container-low": "#f3f4f5",
+                    "soft-teal": "#E6F4F1",
+                    "on-tertiary": "#ffffff",
+                    "soft-amber": "#FDF6E9",
+                    "surface-variant": "#e1e3e4",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "background": "#f8f9fa",
+                    "on-tertiary-container": "#dc6672",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "surface-container-highest": "#e1e3e4",
+                    "primary-container": "#1a2246",
+                    "surface-bright": "#f8f9fa",
+                    "error-container": "#ffdad6",
+                    "accent-teal": "#2A7D7E",
+                    "on-tertiary-fixed": "#40000d",
+                    "inverse-on-surface": "#f0f1f2",
+                    "outline": "#76767f",
+                    "inverse-primary": "#bdc4f1",
+                    "tertiary-fixed-dim": "#ffb2b7",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "primary-fixed": "#dde1ff",
+                    "tertiary-container": "#510013",
+                    "surface-tint": "#545c84",
+                    "surface-container": "#edeeef",
+                    "on-secondary-container": "#785805"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "1rem",
+                    "step-gap": "4rem",
+                    "margin-desktop": "10vw",
+                    "gutter": "1.5rem",
+                    "content-inset": "2rem"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "headline-md": ["Archivo Narrow"],
+                    "step-number": ["Archivo Narrow"],
+                    "headline-lg-mobile": ["Archivo Narrow"],
+                    "headline-lg": ["Archivo Narrow"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "30px", "fontWeight": "600"}],
+                    "step-number": ["64px", {"lineHeight": "1", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["32px", {"lineHeight": "38px", "fontWeight": "700"}],
+                    "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hero-pattern {
+            background-image: radial-gradient(circle at 2px 2px, #1a224610 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(26, 34, 70, 0.1);
+        }
+        .text-maroon { color: #7E1F2E; }
+        .bg-maroon { background-color: #7E1F2E; }
+        .text-gold { color: #B7913F; }
+        .border-gold { border-color: #B7913F; }
+    </style>
+</head>
+<body class="bg-[#F7F4EE] text-on-background font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 bg-surface dark:bg-primary-container border-b border-outline-variant">
+<div class="flex items-center gap-2">
+<img alt="Innovation Consult Logo" class="h-10 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBH9lFoSZNp98RErtGtGojZp105urbh8dg_Z0-4xxZpJRyXAsanXhqnFG7OSmDPenoTrdPDixr2yJfxk_am4RH8mxlsclsOJkRoS5bl2IAk_-kBuj9paxOaYxK-Vaze-uOYfHNf3dK8SQk7HCtuzLmzSAOnyLWogZWaJrup7QpYF488Nk_vHYkhpsS93rVB-302GSvsdqFkEHjjeuBQTXNNzzs3ogQaUL9EOAkuVKzyZj9RqO_zINwrx6z802wBTox0pnG9l8qXug"/>
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">Innovation Consult</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-primary dark:text-primary-fixed border-b-2 border-primary font-medium" href="#">Campaign OS</a>
+<a class="text-on-surface-variant dark:text-on-primary-container hover:text-muted-navy transition-colors" href="#">Strategic Services</a>
+<a class="text-on-surface-variant dark:text-on-primary-container hover:text-muted-navy transition-colors" href="#">Compliance</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined p-2 rounded-full hover:bg-surface-container transition-colors" data-icon="help_outline">help_outline</button>
+<button class="hidden md:block bg-primary text-white px-6 py-2 rounded-lg font-bold hover:opacity-90 transition-opacity">
+                Close Tutorial
+            </button>
+</div>
+</header>
+<!-- Hero Section -->
+<section class="relative min-h-screen pt-32 pb-20 px-margin-mobile md:px-margin-desktop hero-pattern flex flex-col items-center justify-center text-center">
+<div class="max-w-4xl mx-auto space-y-8 animate-fade-in">
+<div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-soft-amber border border-secondary-container text-secondary font-bold text-label-caps">
+<span class="material-symbols-outlined text-[16px]" data-icon="campaign">campaign</span>
+                INTRODUCING CAMPAIGN OS
+            </div>
+<h1 class="font-headline-lg text-headline-lg md:text-headline-lg text-primary tracking-tight">
+                Knowledge to Action: <br/>
+<span class="text-maroon">The Ultimate LGE War Room.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-muted-navy max-w-2xl mx-auto">
+                Empower your political campaign with real-time ground game intelligence, automated compliance, and strategic coalition modeling.
+            </p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+<button class="w-full sm:w-auto bg-primary text-white px-10 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform shadow-xl shadow-primary/20">
+                    Request a Demo
+                    <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="w-full sm:w-auto border-2 border-gold text-gold px-10 py-4 rounded-xl font-bold hover:bg-soft-amber transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="play_circle">play_circle</span>
+                    Watch the Film
+                </button>
+</div>
+</div>
+<!-- Floating UI Accents -->
+<div class="absolute top-1/3 -left-10 hidden xl:block animate-bounce" style="animation-duration: 4s;">
+<div class="glass-card p-4 rounded-2xl shadow-lg flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-soft-teal flex items-center justify-center text-accent-teal">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-muted-navy uppercase tracking-widest">Active Voters</p>
+<p class="text-xl font-bold text-primary">142,890</p>
+</div>
+</div>
+</div>
+<div class="absolute bottom-1/4 -right-10 hidden xl:block animate-bounce" style="animation-duration: 5s;">
+<div class="glass-card p-4 rounded-2xl shadow-lg flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-soft-amber flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-muted-navy uppercase tracking-widest">IEC Compliance</p>
+<p class="text-xl font-bold text-primary">100% SECURE</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Cinematic Video Section -->
+<section class="py-20 px-margin-mobile md:px-margin-desktop bg-primary-container relative overflow-hidden">
+<div class="absolute inset-0 opacity-10">
+</div>
+<div class="max-w-6xl mx-auto relative z-10">
+<div class="mb-12 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="space-y-2">
+<h2 class="font-headline-lg text-headline-lg text-white">Experience the Platform</h2>
+<p class="text-primary-fixed-dim font-body-md max-w-lg">A 2-minute feature walkthrough of the tools winning local government elections across the continent.</p>
+</div>
+<div class="flex gap-4">
+<div class="px-4 py-2 bg-primary/40 border border-white/10 rounded-lg backdrop-blur-sm text-white text-label-caps flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                        LIVE DEMO PREVIEW
+                    </div>
+</div>
+</div>
+<div class="relative group cursor-pointer aspect-video rounded-3xl overflow-hidden shadow-2xl border-4 border-white/5 bg-black/40">
+<div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors z-20">
+<div class="w-24 h-24 rounded-full bg-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">
+<span class="material-symbols-outlined text-primary text-5xl" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-black/80 to-transparent z-10">
+<p class="text-white font-bold text-xl">Operationalizing Innovation: Campaign OS v2.0</p>
+</div>
+<div class="w-full h-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A cinematic, high-contrast wide shot of a modern political war room featuring glowing blue dashboard screens with election maps, data charts, and professional staff in minimalist office wear. The lighting is low-key with cool blue and deep navy tones, creating a high-tech, authoritative atmosphere for the Innovation Consult brand. Minimalist furniture and sleek glass partitions reflect the screen displays." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC5iEZxgGKy2EGE5vVD6HLnPEG0NYxcCc2oGvcwjA5sL4RaGdbdWg-PH2UO5mJj3fkZPVBfA4hKEAjRfeO_nDawmV3Ry9acChCMGRz4ZjSkYmcwPZO2iKhdk2IEIMjiln3QVUVTvIV7j45bpjD8W-tOtzJBQRPQz5ejDVqMEuzfIDYSHDxb-CMH9oF9OpCFoNjj2MkuN5oOkDylpr-yKYZeU4610K4-mwcjMR0DVRdBGuY_S1CfOjFtkGuxjdcT5-ZQvpJ87Mx_rQ')">
+</div>
+</div>
+</div>
+</section><section class="py-20 px-margin-mobile md:px-margin-desktop bg-white">
+<div class="max-w-7xl mx-auto">
+<!-- Header -->
+<div class="mb-16 border-l-4 border-gold pl-6">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2 uppercase">Tactical Command Hierarchy</h2>
+<p class="font-body-lg text-body-lg text-muted-navy max-w-2xl">
+        Our institutional-grade infrastructure orchestrates the flow of data from individual voter sentiment to metropolitan-scale strategic intelligence.
+      </p>
+</div>
+<!-- Hierarchy Flow -->
+<div class="relative space-y-12 py-12">
+<!-- Vertical Connector Line -->
+<div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-gold via-primary to-accent-teal opacity-20 -translate-x-1/2 hidden md:block"></div>
+<!-- Tier 1: Strategic War Room -->
+<div class="relative z-10 flex flex-col md:flex-row items-center gap-8 md:justify-center">
+<div class="md:w-1/3 text-right hidden md:block">
+<span class="font-label-caps text-secondary font-bold bg-soft-amber px-3 py-1 rounded">EXECUTIVE LEVEL</span>
+</div>
+<div class="w-full md:w-1/2 bg-white border border-outline-variant p-8 rounded-2xl shadow-sm hover:border-primary transition-all">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-primary text-4xl">hub</span>
+<h3 class="font-headline-md text-headline-md text-primary uppercase">Strategic War Room</h3>
+</div>
+<p class="font-body-md text-on-surface-variant mb-4">The 'Brain' for metro-wide analytics and predictive coalition modeling. High-level dashboard for executive decision making.</p>
+<div class="border-t border-outline-variant pt-3">
+<span class="font-label-caps text-accent-teal">TACTICAL BENEFIT:</span>
+<p class="font-body-md text-primary font-medium italic">Coalition Risk Assessment &amp; Resource Optimization</p>
+</div>
+</div>
+<div class="md:w-1/3"></div>
+</div>
+<!-- Tier 2: Municipal Command -->
+<div class="relative z-10 flex flex-col md:flex-row items-center gap-8 md:justify-center">
+<div class="md:w-1/3"></div>
+<div class="w-full md:w-1/2 bg-white border border-outline-variant p-8 rounded-2xl shadow-sm hover:border-primary transition-all">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-primary text-4xl">corporate_fare</span>
+<h3 class="font-headline-md text-headline-md text-primary uppercase">Municipal Command</h3>
+</div>
+<p class="font-body-md text-on-surface-variant mb-4">Centralized management for hundreds of wards and regional field leads. Logistics, staffing, and regional performance tracking.</p>
+<div class="border-t border-outline-variant pt-3">
+<span class="font-label-caps text-accent-teal">TACTICAL BENEFIT:</span>
+<p class="font-body-md text-primary font-medium italic">Operational Scalability &amp; Performance Benchmarking</p>
+</div>
+</div>
+<div class="md:w-1/3 text-left hidden md:block">
+<span class="font-label-caps text-secondary font-bold bg-soft-amber px-3 py-1 rounded">OPERATIONAL LEVEL</span>
+</div>
+</div>
+<!-- Tier 3: Ward Field App -->
+<div class="relative z-10 flex flex-col md:flex-row items-center gap-8 md:justify-center">
+<div class="md:w-1/3 text-right hidden md:block">
+<span class="font-label-caps text-secondary font-bold bg-soft-amber px-3 py-1 rounded">FIELD LEVEL</span>
+</div>
+<div class="w-full md:w-1/2 bg-white border border-outline-variant p-8 rounded-2xl shadow-sm hover:border-primary transition-all">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-primary text-4xl">smartphone</span>
+<h3 class="font-headline-md text-headline-md text-primary uppercase">Ward Field App</h3>
+</div>
+<p class="font-body-md text-on-surface-variant mb-4">Real-time doorstep data entry tool for thousands of volunteers. Geofenced canvassing routes and automated intake forms.</p>
+<div class="border-t border-outline-variant pt-3">
+<span class="font-label-caps text-accent-teal">TACTICAL BENEFIT:</span>
+<p class="font-body-md text-primary font-medium italic">Zero-Latency Reporting &amp; Error Reduction</p>
+</div>
+</div>
+<div class="md:w-1/3"></div>
+</div>
+<!-- Tier 4: Voter Intelligence -->
+<div class="relative z-10 flex flex-col md:flex-row items-center gap-8 md:justify-center">
+<div class="md:w-1/3"></div>
+<div class="w-full md:w-1/2 bg-white border border-outline-variant p-8 rounded-2xl shadow-sm hover:border-primary transition-all">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-primary text-4xl">person_search</span>
+<h3 class="font-headline-md text-headline-md text-primary uppercase">Voter Intelligence</h3>
+</div>
+<p class="font-body-md text-on-surface-variant mb-4">The hyper-local layer where individual sentiment is captured. Deep profiles of community needs and historical engagement patterns.</p>
+<div class="border-t border-outline-variant pt-3">
+<span class="font-label-caps text-accent-teal">TACTICAL BENEFIT:</span>
+<p class="font-body-md text-primary font-medium italic">Real-time Sentiment Capture &amp; Personalized Outreach</p>
+</div>
+</div>
+<div class="md:w-1/3 text-left hidden md:block">
+<span class="font-label-caps text-secondary font-bold bg-soft-amber px-3 py-1 rounded">GRASSROOTS LEVEL</span>
+</div>
+</div>
+</div>
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
+<div class="bg-surface-container-low border border-outline-variant p-8 rounded-2xl">
+<h4 class="font-headline-md text-headline-md text-primary mb-4 uppercase">Bi-Directional Flow</h4>
+<p class="font-body-md text-on-surface-variant">Strategy flows down to ensure uniform messaging, while data flows up to provide high-fidelity situational awareness.</p>
+</div>
+<div class="bg-surface-container-low border border-outline-variant p-8 rounded-2xl">
+<h4 class="font-headline-md text-headline-md text-primary mb-4 uppercase">Data Integrity</h4>
+<p class="font-body-md text-on-surface-variant">Validated intake at the voter level prevents institutional hallucination at the war room level.</p>
+</div>
+<div class="bg-surface-container-low border border-outline-variant p-8 rounded-2xl">
+<h4 class="font-headline-md text-headline-md text-primary mb-4 uppercase">Institutional Trust</h4>
+<p class="font-body-md text-on-surface-variant">Architected for security and absolute precision in complex political and municipal landscapes.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Grid (Bento Style) -->
+<section class="py-step-gap px-margin-mobile md:px-margin-desktop max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Ground Game -->
+<div class="md:col-span-8 group bg-white border border-outline-variant rounded-3xl overflow-hidden hover:border-accent-teal transition-all flex flex-col md:flex-row">
+<div class="p-8 md:w-1/2 space-y-4">
+<div class="w-12 h-12 rounded-xl bg-soft-teal flex items-center justify-center text-accent-teal">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Ground Game</h3>
+<p class="text-on-surface-variant font-body-md">Mobilize street-level operations with precision. Track canvassing progress, manage volunteer routes, and log household-level voter sentiment in real-time.</p>
+</div>
+<div class="md:w-1/2 min-h-[200px] bg-cover bg-center" data-alt="A top-down stylized digital map visualization of a city district with glowing teal pinpoints and household paths. The aesthetic is clean and modern, following the Innovation Consult's minimalist infographic style with soft teal accents and sharp data lines against a white background." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB2r-rv_-Wf270__klRbizTQ1_LQ3dUEruW8m-cb_trm77nxJEhwnqnDVaDz0O_nTWZexCVB9zvacZv06WXgXkSwumMA07eLNNcr3X1fqQH8Udg0kBnmRdkzdLbp0hmZzTy99sKiNDYJL7e-T-RzELT3B_l4u1xUFp0V0swcStdOGFWTRXumdODO-fBldAB9qDFMU7rzEqSf-xCBMpxJJztzwxNUQj6F8YDHi_yBRQUCqZKDyM1pShg04SHDHysDiTi_iIJvQ6uOA')">
+</div>
+</div>
+<!-- Strategic Intel -->
+<div class="md:col-span-4 bg-primary text-white rounded-3xl p-8 flex flex-col justify-between hover:bg-primary-container transition-colors relative overflow-hidden group">
+<div class="absolute -right-10 -bottom-10 opacity-10 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[200px]" data-icon="query_stats">query_stats</span>
+</div>
+<div class="space-y-4 relative z-10">
+<div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary-container" data-icon="insights">insights</span>
+</div>
+<h3 class="font-headline-md text-headline-md">Strategic Intel</h3>
+<p class="text-primary-fixed-dim font-body-md">Navigate hung council scenarios with confidence. Utilize mixed-member proportionality (MMP) modeling, PR threshold analysis, and coalition impact simulations.</p>
+</div>
+<a class="mt-8 flex items-center gap-2 font-bold text-secondary-container group-hover:gap-4 transition-all" href="#">
+                    Explore Models
+                    <span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+</a>
+</div>
+<!-- Governance -->
+<div class="md:col-span-4 group bg-white border border-outline-variant rounded-3xl p-8 hover:border-maroon transition-all flex flex-col justify-between">
+<div class="space-y-4">
+<div class="w-12 h-12 rounded-xl bg-soft-amber flex items-center justify-center text-maroon">
+<span class="material-symbols-outlined" data-icon="gavel" style="font-variation-settings: 'FILL' 1;">gavel</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Governance</h3>
+<p class="text-on-surface-variant font-body-md">Enforce absolute compliance across all four major regimes: the Electoral Act, IEC funding disclosures, POPIA voter data protocols, and Public Gatherings Act permit workflows.</p>
+</div>
+<div class="mt-6 flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-surface-container rounded-full text-[10px] font-bold text-muted-navy uppercase">IEC READY</span>
+<span class="px-3 py-1 bg-surface-container rounded-full text-[10px] font-bold text-muted-navy uppercase">POPIA SECURE</span>
+</div>
+</div>
+<!-- Tactical Reports -->
+<div class="md:col-span-8 bg-soft-amber border border-secondary-container rounded-3xl overflow-hidden hover:shadow-xl transition-all flex flex-col md:flex-row-reverse">
+<div class="p-8 md:w-1/2 space-y-4">
+<div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-gold shadow-sm">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Tactical Reports</h3>
+<p class="text-on-surface-variant font-body-md">Convert raw field intelligence into court-ready documentation. Generate automated weekly briefings, authorized incident exports, and ward-level sentiment summaries.</p>
+</div>
+<div class="md:w-1/2 p-8 flex items-center justify-center bg-white/40">
+<div class="w-full space-y-3">
+<div class="h-4 bg-gold/20 rounded w-full"></div>
+<div class="h-4 bg-gold/20 rounded w-5/6"></div>
+<div class="h-20 bg-gold/5 rounded w-full flex items-center justify-center border-2 border-dashed border-gold/20">
+<span class="material-symbols-outlined text-gold/40" data-icon="download">download</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section><section class="py-20 px-margin-mobile md:px-margin-desktop bg-white" id="pricing">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-16">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-4">Pricing Plans</h2>
+<p class="text-muted-navy font-body-lg max-w-2xl mx-auto">Scalable solutions for every level of political engagement, from local wards to national metros.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Ward Edition -->
+<div class="bg-white border border-outline-variant rounded-3xl p-8 flex flex-col hover:shadow-xl transition-all">
+<div class="mb-8">
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Ward Edition</h3>
+<div class="flex items-baseline gap-1">
+<span class="text-3xl font-bold text-primary">R4,999</span>
+<span class="text-on-surface-variant">/mo</span>
+</div>
+<p class="mt-4 text-on-surface-variant font-body-md">For single-ward campaigns.</p>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-accent-teal text-[20px]">check_circle</span>
+            Basic Ground Game
+          </li>
+<li class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-accent-teal text-[20px]">check_circle</span>
+            Volunteer Tracking
+          </li>
+<li class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-accent-teal text-[20px]">check_circle</span>
+            Standard Reporting
+          </li>
+</ul>
+<button class="w-full py-4 rounded-xl border-2 border-primary text-primary font-bold hover:bg-primary hover:text-white transition-all">Get Started</button>
+</div>
+<!-- Municipal Edition -->
+<div class="bg-white border-4 border-gold rounded-3xl p-8 flex flex-col shadow-2xl relative scale-105 z-10">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gold text-white px-4 py-1 rounded-full text-label-caps font-bold">
+          MOST POPULAR
+        </div>
+<div class="mb-8">
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Municipal Edition</h3>
+<div class="flex items-baseline gap-1">
+<span class="text-3xl font-bold text-primary">R14,999</span>
+<span class="text-on-surface-variant">/mo</span>
+</div>
+<p class="mt-4 text-on-surface-variant font-body-md">For full municipal operations.</p>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-center gap-3 text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-gold text-[20px]">check_circle</span>
+            Everything in Ward
+          </li>
+<li class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-gold text-[20px]">check_circle</span>
+            Strategic Coalition Modeler
+          </li>
+<li class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-gold text-[20px]">check_circle</span>
+            PR Threshold Analysis
+          </li>
+<li class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-gold text-[20px]">check_circle</span>
+            IEC Compliance Suite
+          </li>
+</ul>
+<button class="w-full py-4 rounded-xl bg-primary text-white font-bold hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">Get Started</button>
+</div>
+<!-- Provincial/Metro Tier -->
+<div class="bg-white border border-outline-variant rounded-3xl p-8 flex flex-col hover:shadow-xl transition-all">
+<div class="mb-8">
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Provincial/Metro Tier</h3>
+<div class="flex items-baseline gap-1">
+<span class="text-3xl font-bold text-primary">Custom</span>
+</div>
+<p class="mt-4 text-on-surface-variant font-body-md">For large-scale regional campaigns.</p>
+</div>
+<ul class="space-y-4 mb-10 flex-grow">
+<li class="flex items-center gap-3 text-on-surface-variant font-medium">
+<span class="material-symbols-outlined text-maroon text-[20px]">check_circle</span>
+            Everything in Municipal
+          </li>
+<li class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-maroon text-[20px]">check_circle</span>
+            Multi-Team Management
+          </li>
+<li class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-maroon text-[20px]">check_circle</span>
+            API Access
+          </li>
+<li class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-maroon text-[20px]">check_circle</span>
+            Dedicated PLO Support
+          </li>
+</ul>
+<button class="w-full py-4 rounded-xl border-2 border-maroon text-maroon font-bold hover:bg-maroon hover:text-white transition-all">Contact Sales</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Callout / Strategic Insight -->
+<section class="py-20 px-margin-mobile md:px-margin-desktop">
+<div class="bg-soft-teal p-12 rounded-[2rem] border-l-[12px] border-accent-teal flex flex-col md:flex-row items-center gap-10 max-w-5xl mx-auto">
+<div class="text-accent-teal shrink-0">
+<span class="material-symbols-outlined text-7xl" data-icon="lightbulb" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+</div>
+<div class="space-y-4">
+<p class="text-[14px] font-bold tracking-widest text-accent-teal uppercase">Strategic Insight</p>
+<h4 class="font-headline-md text-headline-md text-primary">"The transition from Knowledge to Action is the only metric that matters in a three-week push before the polls."</h4>
+<p class="text-muted-navy font-body-md">Innovation Consult's OS isn't just a database—it's a directive system designed to eliminate hesitation at the local level.</p>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full py-step-gap px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-gutter bg-surface-container-low dark:bg-surface-container-lowest">
+<div class="flex flex-col items-center md:items-start gap-4">
+<div class="flex items-center gap-2">
+<img alt="LogoSmall" class="h-6 w-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBH9lFoSZNp98RErtGtGojZp105urbh8dg_Z0-4xxZpJRyXAsanXhqnFG7OSmDPenoTrdPDixr2yJfxk_am4RH8mxlsclsOJkRoS5bl2IAk_-kBuj9paxOaYxK-Vaze-uOYfHNf3dK8SQk7HCtuzLmzSAOnyLWogZWaJrup7QpYF488Nk_vHYkhpsS93rVB-302GSvsdqFkEHjjeuBQTXNNzzs3ogQaUL9EOAkuVKzyZj9RqO_zINwrx6z802wBTox0pnG9l8qXug"/>
+<span class="font-label-caps text-label-caps text-primary">INNOVATION CONSULT STRATEGIC SOLUTIONS</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">© 2024 Innovation Consult Strategic Solutions</p>
+</div>
+<div class="flex gap-8">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-teal underline transition-all" href="#">Support Desk</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-teal underline transition-all" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-accent-teal underline transition-all" href="#">User Agreement</a>
+</div>
+</footer>
+<script>
+        // Micro-interactions and scroll effects
+        document.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = {
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        entry.target.classList.remove('opacity-0', 'translate-y-10');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.add('transition-all', 'duration-1000', 'opacity-0', 'translate-y-10');
+                observer.observe(section);
+            });
+        });
+    </script>
+</body></html>

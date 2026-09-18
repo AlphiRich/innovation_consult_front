@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ward 12 Resource Audit Log | Admin Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Public+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-border {
+            border-left: 3px solid #795907;
+        }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#ebc169",
+                        "on-surface": "#0b1c30",
+                        "tertiary-container": "#252521",
+                        "on-primary-fixed-variant": "#3d456b",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#ffdea1",
+                        "secondary": "#795907",
+                        "surface-container-low": "#eff4ff",
+                        "tertiary-fixed": "#e5e2dc",
+                        "surface": "#f8f9ff",
+                        "inverse-surface": "#213145",
+                        "primary": "#040c30",
+                        "primary-container": "#1a2246",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#785805",
+                        "surface-tint": "#545c84",
+                        "surface-bright": "#f8f9ff",
+                        "outline": "#76767f",
+                        "on-secondary-fixed": "#261900",
+                        "primary-fixed": "#dde1ff",
+                        "on-tertiary-container": "#8d8c87",
+                        "error-container": "#ffdad6",
+                        "background": "#f8f9ff",
+                        "on-tertiary-fixed-variant": "#474743",
+                        "secondary-container": "#fdd178",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#dce9ff",
+                        "surface-container": "#e5eeff",
+                        "on-surface-variant": "#46464e",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-primary-container": "#8289b4",
+                        "primary-fixed-dim": "#bdc4f1",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#10100d",
+                        "on-primary-fixed": "#10193c",
+                        "surface-container-highest": "#d3e4fe",
+                        "outline-variant": "#c6c5cf",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "on-background": "#0b1c30",
+                        "surface-variant": "#d3e4fe",
+                        "surface-dim": "#cbdbf5",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#bdc4f1",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "tertiary-fixed-dim": "#c9c6c1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "max-width": "1440px",
+                        "margin-desktop": "32px",
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Public Sans"],
+                        "body-md": ["Public Sans"],
+                        "display-lg": ["Archivo Narrow"],
+                        "label-caps": ["Archivo Narrow"],
+                        "headline-md": ["Archivo Narrow"],
+                        "display-lg-mobile": ["Archivo Narrow"],
+                        "data-mono": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer">menu</span>
+<h1 class="text-headline-md font-headline-md font-bold tracking-tighter text-primary dark:text-primary-fixed-dim">RESOURCE ALLOCATION</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex items-center gap-8">
+<span class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary cursor-pointer transition-colors">INVENTORY</span>
+<span class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary cursor-pointer transition-colors">ALLOCATION</span>
+<span class="text-label-caps font-label-caps text-primary font-bold">STAFF</span>
+<span class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary cursor-pointer transition-colors">REPORTS</span>
+</div>
+<img class="w-10 h-10 rounded-full border border-outline-variant" data-alt="A professional headshot of a campaign administrator in a business suit, set against a blurred background of a modern office environment. The lighting is crisp and corporate, highlighting a sense of leadership and authority. The aesthetic is clean and high-contrast, following the Ink and Amber color scheme with subtle warm tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDS408SpgsG1Py6Zz35Mt8kDydlBLHiFbBOW3vxITGHiF2o9ivTmxZ2EiJphq50qs_CU15ty3KAGQ0Eypl1kF1fi9k9DHu9h7osZiicCdB9NgynHCRLndg-tuPxH34l911XFWW3OkSHLDqqNWMYpgpVf91P7WaQq0fdDYqLLxjVUgpeW9wDZuOIn2xf7ZU6F5N7w8U9OSgNTHWoBgBFDRSCF1nRkP82eR0awy0sAerQ5oDkVJlhqi-lriNstmsRJuCPTEcB_8_dgw"/>
+</div>
+</header>
+<div class="flex h-screen pt-16">
+<!-- Sidebar Navigation -->
+<aside class="hidden md:flex flex-col h-full w-80 bg-surface dark:bg-surface-dim border-r border-outline-variant dark:border-outline py-4 overflow-y-auto no-scrollbar">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-4 mb-4">
+<img class="w-12 h-12 rounded bg-primary-container p-2" data-alt="Official district headquarters emblem featuring geometric shapes and an eagle icon, styled in a minimalist ink-black and paper-white aesthetic with a single amber accent. The design is modern, professional, and suggests institutional reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnTaf4mDl14voJtBcgMQhQ2RmxwbhJbyPYfQTGiF3ecp_XA9BfpiHL-_-_LMSbFPdSwtmG2gty5np5ZBKuRCId6aRal_kR3Mi78G3P8lHUFNhJu8Ciuc4UfHAcLdbmRir-UeIi21aJ8LJtxzDffLpnxyXejKqo2L1L0ZYj2pATSYElabS_q73nYaD6NCPROdPmi3IOzf2tLwOUk262LE4FDCSWoQPeLcvBjWpakiG_ZCBlh1E6PQWOyrImYFm52icEl1z-NMr_cg"/>
+<div>
+<p class="text-headline-md font-headline-md text-primary">Admin Portal</p>
+<p class="text-label-caps font-label-caps text-on-surface-variant">District HQ</p>
+</div>
+</div>
+<div class="text-label-caps font-label-caps text-on-surface-variant opacity-50">V.2.4.0</div>
+</div>
+<nav class="flex flex-col gap-1 px-2">
+<div class="flex items-center gap-4 p-3 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-caps font-label-caps">Dashboard</span>
+</div>
+<div class="flex items-center gap-4 p-3 bg-secondary-container text-on-secondary-container font-bold rounded-lg translate-x-1 transition-transform">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="text-label-caps font-label-caps">Resource Logs</span>
+</div>
+<div class="flex items-center gap-4 p-3 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">
+<span class="material-symbols-outlined">map</span>
+<span class="text-label-caps font-label-caps">Ward Mapping</span>
+</div>
+<div class="flex items-center gap-4 p-3 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="text-label-caps font-label-caps">Security Vault</span>
+</div>
+<div class="flex items-center gap-4 p-3 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors cursor-pointer mt-4">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-label-caps font-label-caps">Settings</span>
+</div>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto no-scrollbar p-margin-mobile md:p-margin-desktop bg-surface-container-lowest">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+<div>
+<span class="text-label-caps font-label-caps text-secondary mb-1 block">AUDIT COMPLIANCE</span>
+<h2 class="text-display-lg-mobile md:text-display-lg font-display-lg text-primary uppercase">Ward 12 Resource Audit Log</h2>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded flex items-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span class="text-label-caps font-label-caps">EXPORT DATA</span>
+</button>
+</div>
+<!-- Summary Metrics Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-8">
+<div class="bg-surface border border-outline-variant p-6 flex flex-col gap-2">
+<span class="text-label-caps font-label-caps text-on-surface-variant">TOTAL ADJUSTMENTS</span>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-primary">34</span>
+<span class="text-label-caps font-label-caps text-secondary">+12% vs LY</span>
+</div>
+</div>
+<div class="bg-surface border border-outline-variant p-6 flex flex-col gap-2">
+<span class="text-label-caps font-label-caps text-on-surface-variant">SECURITY FLAGS</span>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-primary">0</span>
+<span class="text-label-caps font-label-caps text-green-600">ALL CLEAR</span>
+</div>
+</div>
+<div class="bg-surface border border-outline-variant p-6 flex flex-col gap-2 border-l-4 border-l-secondary">
+<span class="text-label-caps font-label-caps text-on-surface-variant">LAST VERIFIED SYNC</span>
+<div class="flex items-center gap-2 mt-2">
+<span class="material-symbols-outlined text-secondary">cloud_done</span>
+<span class="text-body-lg font-body-lg text-primary">Today, 14:02 PM</span>
+</div>
+<span class="text-label-caps font-label-caps text-on-surface-variant opacity-60">CENTRAL LEDGER MATCHED</span>
+</div>
+</div>
+<!-- Filter Bar -->
+<div class="bg-surface border border-outline-variant p-4 mb-4 flex flex-wrap items-center gap-4">
+<div class="flex-1 min-w-[200px]">
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 border-outline-variant focus:border-secondary focus:ring-0 text-label-caps font-label-caps bg-transparent" placeholder="SEARCH LOGS..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-label-caps font-label-caps text-on-surface-variant">RESOURCE:</span>
+<select class="border-outline-variant py-2 pr-8 text-label-caps font-label-caps bg-transparent focus:border-secondary focus:ring-0">
+<option>ALL RESOURCES</option>
+<option>AIRTIME</option>
+<option>PETROL</option>
+<option>STATIONERY</option>
+<option>VEHICLES</option>
+</select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-label-caps font-label-caps text-on-surface-variant">ADMIN:</span>
+<select class="border-outline-variant py-2 pr-8 text-label-caps font-label-caps bg-transparent focus:border-secondary focus:ring-0">
+<option>ALL STAFF</option>
+<option>M. SITHOLE</option>
+<option>J. KHUMALO</option>
+<option>L. DLAMINI</option>
+</select>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 border border-primary text-primary hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+<span class="text-label-caps font-label-caps">MORE FILTERS</span>
+</button>
+</div>
+<!-- Audit Data Table -->
+<div class="bg-surface border border-outline-variant overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container text-on-surface">
+<tr>
+<th class="p-4 text-label-caps font-label-caps border-b border-outline-variant">TIMESTAMP</th>
+<th class="p-4 text-label-caps font-label-caps border-b border-outline-variant">ADMINISTRATOR</th>
+<th class="p-4 text-label-caps font-label-caps border-b border-outline-variant">CATEGORY</th>
+<th class="p-4 text-label-caps font-label-caps border-b border-outline-variant">DETAILS</th>
+<th class="p-4 text-label-caps font-label-caps border-b border-outline-variant">STATUS</th>
+<th class="p-4 text-label-caps font-label-caps border-b border-outline-variant text-right">ACTION</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="p-4 text-data-mono font-data-mono whitespace-nowrap">2023-10-24 10:15</td>
+<td class="p-4 font-semibold text-primary">M. Sithole</td>
+<td class="p-4">
+<span class="px-2 py-1 bg-surface-container-high rounded text-[10px] font-bold text-on-surface-variant uppercase">Limit Adjustment</span>
+</td>
+<td class="p-4 text-on-surface-variant max-w-xs truncate">Increased Airtime Limit from R2,500 to R3,000</td>
+<td class="p-4">
+<div class="flex items-center gap-2 text-green-700">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-label-caps font-label-caps">VERIFIED</span>
+</div>
+</td>
+<td class="p-4 text-right">
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 cursor-pointer">open_in_new</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="p-4 text-data-mono font-data-mono whitespace-nowrap">2023-10-24 09:42</td>
+<td class="p-4 font-semibold text-primary">J. Khumalo</td>
+<td class="p-4">
+<span class="px-2 py-1 bg-surface-container-high rounded text-[10px] font-bold text-on-surface-variant uppercase">Override Toggle</span>
+</td>
+<td class="p-4 text-on-surface-variant max-w-xs truncate">Emergency Petrol Release: Unit 12-B</td>
+<td class="p-4">
+<div class="flex items-center gap-2 text-green-700">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-label-caps font-label-caps">VERIFIED</span>
+</div>
+</td>
+<td class="p-4 text-right">
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 cursor-pointer">open_in_new</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="p-4 text-data-mono font-data-mono whitespace-nowrap">2023-10-23 16:55</td>
+<td class="p-4 font-semibold text-primary">M. Sithole</td>
+<td class="p-4">
+<span class="px-2 py-1 bg-surface-container-high rounded text-[10px] font-bold text-on-surface-variant uppercase">Policy Update</span>
+</td>
+<td class="p-4 text-on-surface-variant max-w-xs truncate">Updated Weekend Fuel Allocation Policy v4.2</td>
+<td class="p-4">
+<div class="flex items-center gap-2 text-green-700">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-label-caps font-label-caps">VERIFIED</span>
+</div>
+</td>
+<td class="p-4 text-right">
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 cursor-pointer">open_in_new</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group bg-surface-container-lowest">
+<td class="p-4 text-data-mono font-data-mono whitespace-nowrap">2023-10-23 14:10</td>
+<td class="p-4 font-semibold text-primary">L. Dlamini</td>
+<td class="p-4">
+<span class="px-2 py-1 bg-surface-container-high rounded text-[10px] font-bold text-on-surface-variant uppercase">Resource Transfer</span>
+</td>
+<td class="p-4 text-on-surface-variant max-w-xs truncate">Transferred 500L Petrol from Main Hub to Ward 12</td>
+<td class="p-4">
+<div class="flex items-center gap-2 text-secondary">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+<span class="text-label-caps font-label-caps">SYNCING...</span>
+</div>
+</td>
+<td class="p-4 text-right">
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 cursor-pointer">open_in_new</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="p-4 text-data-mono font-data-mono whitespace-nowrap">2023-10-23 11:02</td>
+<td class="p-4 font-semibold text-primary">Admin System</td>
+<td class="p-4">
+<span class="px-2 py-1 bg-surface-container-high rounded text-[10px] font-bold text-on-surface-variant uppercase">System Reset</span>
+</td>
+<td class="p-4 text-on-surface-variant max-w-xs truncate">Daily automated ledger reconciliation performed.</td>
+<td class="p-4">
+<div class="flex items-center gap-2 text-green-700">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-label-caps font-label-caps">VERIFIED</span>
+</div>
+</td>
+<td class="p-4 text-right">
+<span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 cursor-pointer">open_in_new</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-4 bg-surface-container-low border-t border-outline-variant flex items-center justify-between">
+<span class="text-label-caps font-label-caps text-on-surface-variant">SHOWING 1-5 OF 34 ENTRIES</span>
+<div class="flex gap-2">
+<button class="px-3 py-1 border border-outline-variant bg-surface text-on-surface disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="px-3 py-1 border border-outline-variant bg-primary text-on-primary">
+<span class="text-label-caps font-label-caps">1</span>
+</button>
+<button class="px-3 py-1 border border-outline-variant bg-surface text-on-surface hover:bg-surface-container-high">
+<span class="text-label-caps font-label-caps">2</span>
+</button>
+<button class="px-3 py-1 border border-outline-variant bg-surface text-on-surface hover:bg-surface-container-high">
+<span class="text-label-caps font-label-caps">3</span>
+</button>
+<button class="px-3 py-1 border border-outline-variant bg-surface text-on-surface hover:bg-surface-container-high">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Live Audit Timeline (Diary Layout) -->
+<div class="mt-12 mb-20">
+<h3 class="text-headline-md font-headline-md text-primary mb-6 uppercase">Real-Time Audit Stream</h3>
+<div class="space-y-4">
+<div class="flex gap-4 group">
+<div class="flex flex-col items-center">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<div class="w-[1px] h-full bg-outline-variant"></div>
+</div>
+<div class="flex-1 bg-surface border border-outline-variant p-4 group-hover:border-secondary transition-colors border-l-4 border-l-secondary">
+<div class="flex justify-between items-start mb-2">
+<span class="text-data-mono font-data-mono text-secondary">JUST NOW</span>
+<span class="text-label-caps font-label-caps px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded">HIGH PRIORITY</span>
+</div>
+<p class="font-semibold text-primary">M. Sithole modified Petrol Quota for Mobile Unit 4</p>
+<p class="text-body-md text-on-surface-variant mt-1">Manual override triggered due to weather conditions. Ledger entry ID: #88902-X</p>
+</div>
+</div>
+<div class="flex gap-4 group">
+<div class="flex flex-col items-center">
+<div class="w-2 h-2 rounded-full bg-outline"></div>
+<div class="w-[1px] h-full bg-outline-variant"></div>
+</div>
+<div class="flex-1 bg-surface border border-outline-variant p-4 group-hover:border-primary transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-data-mono font-data-mono text-on-surface-variant">12 MINS AGO</span>
+<span class="text-label-caps font-label-caps px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded">ROUTINE</span>
+</div>
+<p class="font-semibold text-primary">J. Khumalo performed stationery audit for Sub-Ward 12-C</p>
+<p class="text-body-md text-on-surface-variant mt-1">All items accounted for. Physical stock matches digital ledger.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Bottom Navigation Bar (Mobile Only) -->
+<footer class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-16 bg-surface dark:bg-surface-dim border-t border-outline-variant dark:border-outline">
+<div class="flex flex-col items-center justify-center text-on-surface-variant pt-1">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="text-label-caps font-label-caps">Inventory</span>
+</div>
+<div class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim border-t-2 border-secondary pt-1">
+<span class="material-symbols-outlined">assignment_add</span>
+<span class="text-label-caps font-label-caps">Allocation</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant pt-1">
+<span class="material-symbols-outlined">groups</span>
+<span class="text-label-caps font-label-caps">Staff</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant pt-1">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-label-caps font-label-caps">Reports</span>
+</div>
+</footer>
+<script>
+        // Micro-interaction for hover states and subtle feedback
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.style.transform = 'translateX(2px)';
+                row.style.transition = 'transform 0.2s ease-out';
+            });
+            row.addEventListener('mouseleave', () => {
+                row.style.transform = 'translateX(0)';
+            });
+        });
+
+        // Search highlight logic (placeholder)
+        const searchInput = document.querySelector('input[placeholder="SEARCH LOGS..."]');
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const text = row.innerText.toLowerCase();
+                if (text.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body></html>

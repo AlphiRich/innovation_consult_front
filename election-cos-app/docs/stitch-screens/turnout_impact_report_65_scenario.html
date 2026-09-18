@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Hung Council: Turnout Impact Report</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:ital,wght@0,400;0,600;0,700;1,400&amp;family=Public+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#eff4ff",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#e5e2dc",
+                    "surface-container-highest": "#d3e4fe",
+                    "secondary-container": "#fdd178",
+                    "tertiary": "#10100d",
+                    "on-primary-container": "#8289b4",
+                    "primary-container": "#1a2246",
+                    "surface-container": "#e5eeff",
+                    "on-background": "#0b1c30",
+                    "inverse-surface": "#213145",
+                    "surface-dim": "#cbdbf5",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "surface-container-high": "#dce9ff",
+                    "secondary": "#795907",
+                    "outline": "#76767f",
+                    "on-surface-variant": "#46464e",
+                    "on-error-container": "#93000a",
+                    "outline-variant": "#c6c5cf",
+                    "tertiary-fixed-dim": "#c9c6c1",
+                    "surface": "#f8f9ff",
+                    "primary": "#040c30",
+                    "background": "#f8f9ff",
+                    "primary-fixed": "#dde1ff",
+                    "tertiary-container": "#252521",
+                    "on-error": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed": "#10193c",
+                    "surface-bright": "#f8f9ff",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#ebc169",
+                    "on-tertiary-fixed-variant": "#474743",
+                    "on-surface": "#0b1c30",
+                    "on-secondary-fixed": "#261900",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-tertiary-container": "#8d8c87",
+                    "on-secondary": "#ffffff",
+                    "inverse-primary": "#bdc4f1",
+                    "secondary-fixed": "#ffdea1",
+                    "on-secondary-container": "#785805",
+                    "surface-tint": "#545c84",
+                    "surface-variant": "#d3e4fe"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "max-width": "1440px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "32px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "display-lg-mobile": ["Archivo Narrow"],
+                    "display-lg": ["Archivo Narrow"],
+                    "headline-md": ["Archivo Narrow"],
+                    "body-md": ["Public Sans"],
+                    "label-caps": ["Archivo Narrow"],
+                    "data-mono": ["Public Sans"],
+                    "body-lg": ["Public Sans"]
+            },
+            "fontSize": {
+                    "display-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            .print-container { padding: 0 !important; margin: 0 !important; max-width: 100% !important; border: none !important; }
+        }
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            opacity: 0.03;
+            font-size: 120px;
+            font-weight: 900;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 0;
+            color: #040c30;
+        }
+        .border-amber-left {
+            border-left: 4px solid #795907;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-background font-body-md selection:bg-secondary-fixed">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-16 bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container border-b border-outline-variant no-print">
+<div class="flex items-center gap-4">
+<span class="text-headline-md font-headline-md font-bold text-on-primary">Civic Authority</span>
+<div class="h-6 w-px bg-on-primary/20 mx-2"></div>
+<nav class="flex gap-6">
+<a class="text-label-caps font-label-caps text-secondary-container font-bold hover:text-secondary-fixed transition-colors" href="#">Reports</a>
+<a class="text-label-caps font-label-caps text-on-primary/70 hover:text-secondary-fixed transition-colors" href="#">War Room</a>
+<a class="text-label-caps font-label-caps text-on-primary/70 hover:text-secondary-fixed transition-colors" href="#">Config</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined cursor-pointer active:opacity-80">notifications</span>
+<span class="material-symbols-outlined cursor-pointer active:opacity-80">account_circle</span>
+</div>
+</header>
+<!-- Side Navigation Bar (Desktop Only) -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-surface dark:bg-surface-container-lowest border-r border-outline-variant flex flex-col pt-4 no-print hidden md:flex">
+<div class="px-6 mb-8">
+<p class="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-widest">Active Analysis</p>
+<h2 class="text-headline-md font-headline-md font-bold text-primary">War Room</h2>
+<p class="text-body-md text-on-surface-variant">Strategic Planner</p>
+</div>
+<nav class="flex-grow">
+<ul class="space-y-1">
+<li><a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-200 gap-3" href="#"><span class="material-symbols-outlined">dashboard</span> <span class="text-label-caps font-label-caps">Dashboard</span></a></li>
+<li><a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-200 gap-3" href="#"><span class="material-symbols-outlined">calculate</span> <span class="text-label-caps font-label-caps">Vote Calculator</span></a></li>
+<li><a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-200 gap-3" href="#"><span class="material-symbols-outlined">query_stats</span> <span class="text-label-caps font-label-caps">Threshold Analyzer</span></a></li>
+<li><a class="flex items-center px-6 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-200 gap-3" href="#"><span class="material-symbols-outlined">settings_applications</span> <span class="text-label-caps font-label-caps">Municipality Config</span></a></li>
+<li><a class="flex items-center px-6 py-3 text-primary border-l-4 border-secondary-container bg-surface-container-low font-bold transition-all duration-200 gap-3" href="#"><span class="material-symbols-outlined">analytics</span> <span class="text-label-caps font-label-caps">Reports</span></a></li>
+</ul>
+</nav>
+<div class="p-6">
+<button class="w-full bg-primary text-on-primary py-3 rounded-none font-bold text-label-caps hover:bg-primary/90 transition-colors uppercase tracking-widest">New Calculation</button>
+</div>
+<div class="border-t border-outline-variant py-4">
+<ul class="space-y-1">
+<li><a class="flex items-center px-6 py-2 text-on-surface-variant hover:text-primary gap-3" href="#"><span class="material-symbols-outlined">help_outline</span> <span class="text-label-caps font-label-caps">Support</span></a></li>
+<li><a class="flex items-center px-6 py-2 text-on-surface-variant hover:text-primary gap-3" href="#"><span class="material-symbols-outlined">inventory_2</span> <span class="text-label-caps font-label-caps">Archive</span></a></li>
+</ul>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="md:ml-64 pt-16 pb-20 md:pb-0 relative min-h-screen">
+<div class="max-w-[1000px] mx-auto p-margin-mobile md:p-margin-desktop print-container relative">
+<div class="watermark no-print">CONFIDENTIAL</div>
+<!-- Report Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 border-b-2 border-primary pb-6 gap-4">
+<div>
+<div class="inline-block px-2 py-1 bg-primary text-on-primary text-label-caps font-label-caps mb-4">OFFICIAL DOCUMENT: STRATEGIC INTELLIGENCE</div>
+<h1 class="text-display-lg-mobile md:text-display-lg font-display-lg text-primary leading-tight">Hung Council:<br/>Turnout Impact Report</h1>
+<div class="flex flex-wrap gap-4 mt-4 text-label-caps font-label-caps text-on-surface-variant">
+<div class="flex items-center gap-1"><span class="font-bold text-primary">REPORT ID:</span> TI-2026-65</div>
+<div class="flex items-center gap-1"><span class="font-bold text-primary">TIMESTAMP:</span> 2026-10-14 | 14:45 GMT</div>
+<div class="flex items-center gap-1"><span class="font-bold text-primary">CLEARANCE:</span> Strategic Level 4</div>
+</div>
+</div>
+<div class="flex flex-col items-end text-right">
+<div class="bg-secondary-container text-on-secondary-container px-4 py-2 font-bold text-label-caps mb-2">CONFIDENTIAL</div>
+<p class="text-label-caps font-label-caps text-on-surface-variant">AUTHORIZED BY:</p>
+<p class="text-body-md font-bold text-primary uppercase">Municipal Strategic Planner</p>
+</div>
+</div>
+<!-- Content Grid: Executive Summary & Table -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-12">
+<!-- Executive Summary -->
+<div class="md:col-span-1 bg-surface-container-low p-6 border-amber-left">
+<h3 class="text-label-caps font-label-caps text-secondary mb-2 uppercase">Executive Summary</h3>
+<p class="text-body-md text-on-background mb-4 leading-relaxed">
+                        Modeling a voter turnout shift to <span class="font-bold">65.0%</span> reveals significant structural pressure on council seat allocation. The surge in participation dilutes the proportional value of existing ballots.
+                    </p>
+<div class="space-y-4">
+<div class="border-t border-outline-variant pt-4">
+<span class="text-label-caps font-label-caps text-on-surface-variant">Total Valid Votes</span>
+<div class="text-headline-md font-headline-md text-primary">1,260,450</div>
+</div>
+<div class="border-t border-outline-variant pt-4">
+<span class="text-label-caps font-label-caps text-on-surface-variant">Computed Quota (Droop)</span>
+<div class="text-headline-md font-headline-md text-secondary">4,668</div>
+</div>
+</div>
+</div>
+<!-- Quota Impact Table -->
+<div class="md:col-span-2">
+<h3 class="text-label-caps font-label-caps text-on-surface-variant mb-4 uppercase">Quota &amp; Threshold Impact Analysis</h3>
+<div class="overflow-x-auto border border-outline-variant">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-primary text-on-primary">
+<th class="p-4 text-label-caps font-label-caps">Metric</th>
+<th class="p-4 text-label-caps font-label-caps">Baseline (64.2%)</th>
+<th class="p-4 text-label-caps font-label-caps">Model (65.0%)</th>
+<th class="p-4 text-label-caps font-label-caps text-right">Impact</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="bg-surface">
+<td class="p-4 text-body-md font-bold">Voter Turnout</td>
+<td class="p-4 text-data-mono">821,402</td>
+<td class="p-4 text-data-mono">1,260,450</td>
+<td class="p-4 text-data-mono text-right text-error font-bold">+53.4%*</td>
+</tr>
+<tr class="bg-surface-container-lowest">
+<td class="p-4 text-body-md font-bold">Quota per Seat</td>
+<td class="p-4 text-data-mono">4,120</td>
+<td class="p-4 text-data-mono">4,668</td>
+<td class="p-4 text-data-mono text-right text-secondary font-bold">+13.3%</td>
+</tr>
+<tr class="bg-surface">
+<td class="p-4 text-body-md font-bold">Effective Cost</td>
+<td class="p-4 text-data-mono">R 124.50</td>
+<td class="p-4 text-data-mono">R 141.05</td>
+<td class="p-4 text-data-mono text-right">+R 16.55</td>
+</tr>
+<tr class="bg-surface-container-lowest">
+<td class="p-4 text-body-md font-bold">Min. Entry %</td>
+<td class="p-4 text-data-mono">0.31%</td>
+<td class="p-4 text-data-mono">0.37%</td>
+<td class="p-4 text-data-mono text-right text-error font-bold">Aggressive</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="text-xs text-on-surface-variant mt-2 italic font-body-md">*Delta accounts for localized registration surges in strategic wards.</p>
+</div>
+</div>
+<!-- Coalition & Risk Sections (Asymmetric Layout) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+<!-- Coalition Resilience -->
+<div class="bg-surface border border-outline-variant p-6">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-secondary">group_work</span>
+<h3 class="text-headline-md font-headline-md text-primary">Coalition Resilience</h3>
+</div>
+<div class="space-y-6">
+<!-- Block 1 -->
+<div class="relative">
+<div class="flex justify-between items-end mb-2">
+<span class="text-body-md font-bold">ANC + ActionSA + IND</span>
+<span class="text-label-caps font-label-caps text-secondary">Resilience: HIGH</span>
+</div>
+<div class="h-8 w-full bg-surface-container flex border border-outline-variant overflow-hidden">
+<div class="h-full bg-primary" style="width: 52%"></div>
+<div class="h-full bg-secondary-container" style="width: 12%"></div>
+<div class="h-full bg-outline-variant" style="width: 36%"></div>
+</div>
+<div class="flex justify-between mt-2 text-data-mono text-xs">
+<span>Projected Seats: 138 / 270</span>
+<span>Margin: +3 Seats</span>
+</div>
+</div>
+<p class="text-body-md text-on-surface-variant border-l-2 border-outline-variant pl-4 italic">
+                            Analysis indicates governing block gains stability as minor party fragmentation is purged by the heightened quota requirements.
+                        </p>
+</div>
+</div>
+<!-- Minor Party Risk -->
+<div class="bg-primary text-on-primary p-6">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-secondary-container">warning</span>
+<h3 class="text-headline-md font-headline-md text-on-primary">PR Representation Risk</h3>
+</div>
+<ul class="divide-y divide-on-primary/10">
+<li class="py-3 flex justify-between items-center">
+<div>
+<p class="text-label-caps font-label-caps text-secondary-fixed">HIGH RISK</p>
+<p class="text-body-md font-bold">Freedom Front Plus (FF+)</p>
+</div>
+<div class="text-right">
+<p class="text-data-mono">-2 Seats</p>
+</div>
+</li>
+<li class="py-3 flex justify-between items-center">
+<div>
+<p class="text-label-caps font-label-caps text-secondary-fixed">MODERATE RISK</p>
+<p class="text-body-md font-bold">Good Party</p>
+</div>
+<div class="text-right">
+<p class="text-data-mono">-1 Seat</p>
+</div>
+</li>
+<li class="py-3 flex justify-between items-center">
+<div>
+<p class="text-label-caps font-label-caps text-on-primary/50">THRESHOLD SECURE</p>
+<p class="text-body-md font-bold">Patriotic Alliance</p>
+</div>
+<div class="text-right">
+<p class="text-data-mono">+1 Seat</p>
+</div>
+</li>
+<li class="py-3 flex justify-between items-center">
+<div>
+<p class="text-label-caps font-label-caps text-secondary-fixed">HIGH RISK</p>
+<p class="text-body-md font-bold">Al Jama-ah</p>
+</div>
+<div class="text-right">
+<p class="text-data-mono">Loss of Seat</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<!-- Visual Component: Live Diary / Timeline for Report Generation -->
+<div class="border-t border-outline-variant pt-8">
+<h3 class="text-label-caps font-label-caps text-on-surface-variant mb-6 uppercase">Calculation Audit Trail</h3>
+<div class="space-y-4">
+<div class="flex gap-4 relative">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 bg-secondary rounded-full"></div>
+<div class="w-px flex-grow bg-outline-variant"></div>
+</div>
+<div class="pb-6">
+<span class="text-data-mono text-xs text-on-surface-variant">14:42:01</span>
+<p class="text-body-md font-bold">Dataset Finalized</p>
+<p class="text-xs text-on-surface-variant">Voter roll cross-referenced with municipal boundary adjustment v2.4.</p>
+</div>
+</div>
+<div class="flex gap-4 relative">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 bg-secondary rounded-full"></div>
+<div class="w-px flex-grow bg-outline-variant"></div>
+</div>
+<div class="pb-6">
+<span class="text-data-mono text-xs text-on-surface-variant">14:44:12</span>
+<p class="text-body-md font-bold">Quota Recalculation Complete</p>
+<p class="text-xs text-on-surface-variant">Applied Droop Quota algorithm across all 270 council seats.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 bg-secondary rounded-full"></div>
+</div>
+<div>
+<span class="text-data-mono text-xs text-on-surface-variant">14:45:00</span>
+<p class="text-body-md font-bold">Report Authored</p>
+<p class="text-xs text-on-surface-variant">Digital signature appended by Strategic Lead.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer for Document Integrity -->
+<div class="mt-20 pt-8 border-t border-outline text-center text-label-caps font-label-caps text-on-surface-variant">
+<p>INTERNAL USE ONLY — REPRODUCTION PROHIBITED WITHOUT EXPRESS AUTHORIZATION — CIVIC AUTHORITY STRATEGIC UNIT</p>
+<p class="mt-2">PAGE 1 OF 1 — ENCRYPTED HASH: 8F4E-29A1-X67L</p>
+</div>
+</div>
+<!-- Action Bar (Floating for Interactive Experience) -->
+<div class="fixed bottom-0 left-0 md:left-64 right-0 p-4 bg-surface/80 backdrop-blur-md border-t border-outline-variant no-print z-40">
+<div class="max-w-[1000px] mx-auto flex flex-wrap justify-between items-center gap-4">
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-6 py-2 flex items-center gap-2 hover:bg-primary/90 transition-colors uppercase tracking-widest text-label-caps font-bold" onclick="window.print()">
+<span class="material-symbols-outlined text-sm">print</span> Print Report
+                    </button>
+<button class="bg-white border border-primary text-primary px-6 py-2 flex items-center gap-2 hover:bg-surface-container-low transition-colors uppercase tracking-widest text-label-caps font-bold">
+<span class="material-symbols-outlined text-sm">download</span> Download PDF
+                    </button>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-primary hover:text-secondary-container transition-colors flex items-center gap-2 text-label-caps font-bold">
+<span class="material-symbols-outlined">share</span> Share with Strategic Leads
+                    </button>
+<button class="text-error hover:opacity-80 transition-opacity flex items-center gap-2 text-label-caps font-bold">
+<span class="material-symbols-outlined">lock</span> Revoke Access
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- Mobile Navigation Shell -->
+<footer class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-2 md:hidden bg-primary dark:bg-primary-container text-secondary-container border-t border-outline-variant shadow-lg no-print">
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 active:bg-primary-fixed-dim rounded-xl duration-75" href="#">
+<span class="material-symbols-outlined">calculate</span>
+<span class="text-label-caps font-label-caps">Calculations</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 active:bg-primary-fixed-dim rounded-xl duration-75" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+<span class="text-label-caps font-label-caps">Thresholds</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 active:bg-primary-fixed-dim rounded-xl duration-75" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-label-caps font-label-caps">Config</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl p-2 scale-95 duration-75" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-label-caps font-label-caps">Stats</span>
+</a>
+</footer>
+<script>
+        // Micro-interaction for hover effects or simple simulation
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.classList.add('scale-95');
+            });
+            button.addEventListener('mouseup', () => {
+                button.classList.remove('scale-95');
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Official Referral Notice - LET-0812</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Public+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Shared Component Logic & Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed": "#ffdea1",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "tertiary": "#10100d",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#8289b4",
+                    "surface-dim": "#cbdbf5",
+                    "on-background": "#0b1c30",
+                    "surface-variant": "#d3e4fe",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "surface-bright": "#f8f9ff",
+                    "tertiary-container": "#252521",
+                    "tertiary-fixed-dim": "#c9c6c1",
+                    "surface": "#f8f9ff",
+                    "inverse-surface": "#213145",
+                    "surface-container-high": "#dce9ff",
+                    "on-tertiary-fixed-variant": "#474743",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "on-surface-variant": "#46464e",
+                    "surface-container": "#e5eeff",
+                    "error-container": "#ffdad6",
+                    "primary": "#040c30",
+                    "surface-tint": "#545c84",
+                    "on-error-container": "#93000a",
+                    "error": "#ba1a1a",
+                    "on-secondary-container": "#785805",
+                    "inverse-primary": "#bdc4f1",
+                    "primary-container": "#1a2246",
+                    "secondary-container": "#fdd178",
+                    "outline-variant": "#c6c5cf",
+                    "on-primary-fixed": "#10193c",
+                    "on-error": "#ffffff",
+                    "secondary": "#795907",
+                    "on-surface": "#0b1c30",
+                    "secondary-fixed-dim": "#ebc169",
+                    "on-secondary-fixed": "#261900",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "surface-container-highest": "#d3e4fe",
+                    "outline": "#76767f",
+                    "on-tertiary-container": "#8d8c87",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#e5e2dc",
+                    "background": "#f8f9ff",
+                    "primary-fixed": "#dde1ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-desktop": "32px",
+                    "max-width": "1440px",
+                    "margin-mobile": "16px",
+                    "gutter": "16px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "label-caps": ["Archivo Narrow"],
+                    "headline-md": ["Archivo Narrow"],
+                    "display-lg": ["Archivo Narrow"],
+                    "data-mono": ["Public Sans"],
+                    "display-lg-mobile": ["Archivo Narrow"],
+                    "body-lg": ["Public Sans"],
+                    "body-md": ["Public Sans"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .document-paper {
+            box-shadow: 0 0 0 1px rgba(4, 12, 48, 0.1);
+            background-color: #ffffff;
+        }
+        .stamp-rotate {
+            transform: rotate(-12deg);
+        }
+        @media print {
+            .no-print { display: none; }
+            body { background: white; }
+            .document-paper { box-shadow: none; border: none; }
+        }
+    </style>
+</head>
+<body class="bg-surface-container-low font-body-md text-on-surface min-h-screen">
+<!-- TopNavBar from JSON -->
+<nav class="sticky top-0 w-full z-50 flex justify-between items-center px-margin-desktop bg-surface dark:bg-primary h-16 border-b border-outline-variant dark:border-on-primary-fixed-variant no-print">
+<div class="flex items-center gap-4">
+<span class="font-display-lg text-headline-md font-bold text-primary dark:text-primary-fixed">ElectoralOS</span>
+<div class="hidden md:flex gap-6 ml-8">
+<a class="text-on-surface-variant dark:text-on-primary-container font-label-caps text-label-caps hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors px-2 py-1" href="#">Command Center</a>
+<a class="text-primary dark:text-primary-fixed font-bold border-b-2 border-primary dark:border-primary-fixed font-label-caps text-label-caps px-2 py-1" href="#">Resources</a>
+<a class="text-on-surface-variant dark:text-on-primary-container font-label-caps text-label-caps hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors px-2 py-1" href="#">Settings</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary p-2 rounded-full hover:bg-surface-container-high">notifications</button>
+<div class="h-8 w-8 bg-primary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-sm">person</span>
+</div>
+</div>
+</nav>
+<div class="flex">
+<!-- SideNavBar from JSON (Hidden on Print/Mobile) -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 hidden lg:flex flex-col py-4 bg-surface-container-lowest border-r border-outline-variant no-print">
+<div class="px-6 mb-8">
+<h2 class="font-display-lg text-primary text-xl font-bold">Strategy HQ</h2>
+<p class="text-on-surface-variant text-xs uppercase tracking-widest">District 042 Admin</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 py-3 px-4 mx-2 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">dashboard</span> Command Center
+                </a>
+<a class="flex items-center gap-3 py-3 px-4 mx-2 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">groups</span> Voter Roll
+                </a>
+<a class="flex items-center gap-3 py-3 px-4 mx-2 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">map</span> Ward Mapping
+                </a>
+<a class="flex items-center gap-3 py-3 px-4 mx-2 bg-secondary-fixed text-on-secondary-fixed font-bold rounded-lg font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">event_note</span> Field Diary
+                </a>
+<a class="flex items-center gap-3 py-3 px-4 mx-2 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg font-label-caps text-label-caps" href="#">
+<span class="material-symbols-outlined">description</span> Resources
+                </a>
+</nav>
+<div class="mt-auto px-2 space-y-1 border-t border-outline-variant pt-4">
+<button class="w-full flex items-center gap-3 py-2 px-4 text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high">
+<span class="material-symbols-outlined">verified_user</span> System Status
+                </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-64 p-4 md:p-8 lg:p-12 flex justify-center">
+<!-- Document Container -->
+<div class="document-paper w-full max-w-[800px] min-h-[1000px] p-8 md:p-16 relative overflow-hidden flex flex-col border border-outline-variant">
+<!-- Background Atmospheric Texture (Subtle pattern) -->
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#040c30 1px, transparent 1px); background-size: 20px 20px;"></div>
+<!-- Header Section -->
+<header class="relative z-10 flex justify-between items-start mb-12 border-b-2 border-primary pb-8">
+<div class="flex flex-col">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+<div class="flex flex-col">
+<span class="font-display-lg text-xl font-bold text-primary leading-tight">CIVIC AUTHORITY</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">MUNICIPAL COMMAND CENTER</span>
+</div>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary mt-4">OFFICIAL REFERRAL NOTICE</h1>
+<p class="font-data-mono text-data-mono text-on-surface-variant">REFERENCE ID: <span class="font-bold text-primary">LET-0812</span></p>
+</div>
+<div class="text-right">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1">DATE OF ISSUE</p>
+<p class="font-headline-md text-lg text-primary">July 19, 2024</p>
+<div class="mt-6 border-2 border-error p-2 stamp-rotate inline-block">
+<p class="font-label-caps text-error text-lg leading-none font-extrabold">PRIORITY: CRITICAL</p>
+</div>
+</div>
+</header>
+<!-- Document Body -->
+<div class="relative z-10 flex-1">
+<!-- Recipient Block -->
+<section class="mb-8">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">TO:</p>
+<div class="font-body-lg text-primary font-semibold">
+                            Department of Public Works / ESKOM<br/>
+                            Attn: Regional Operations Director<br/>
+                            Gauteng Provincial Headquarters
+                        </div>
+</section>
+<!-- Subject Line -->
+<section class="mb-10 bg-surface-container p-4 border-l-4 border-secondary">
+<p class="font-label-caps text-label-caps text-secondary mb-1">SUBJECT</p>
+<h2 class="font-body-lg text-primary font-bold">Urgent Infrastructure Intervention: Power Failure &amp; Backup Generator Malfunction at Polling Station 40224</h2>
+</section>
+<!-- Salutation and Content -->
+<section class="space-y-6 text-on-surface">
+<p class="font-body-md">To the Regional Operations Director,</p>
+<p class="font-body-md leading-relaxed">
+                            This communication serves as a formal referral of a critical infrastructure failure logged in <span class="font-bold">Ward 24, Johannesburg</span> (Primary Reporter: <span class="font-data-mono font-bold">Agent-004</span>). 
+                        </p>
+<p class="font-body-md leading-relaxed">
+                            As of <span class="font-bold">05:00 AM SAST</span>, the primary polling facility located at <span class="font-bold">Alexandra High School</span> has experienced a total and sustained power failure. Preliminary assessment indicates a localized substation fault. Crucially, the on-site backup generator unit failed to initiate during the primary outage and remains inoperable despite manual restart attempts by presiding officers.
+                        </p>
+<p class="font-body-md leading-relaxed">
+                            Be advised that local Eskom technicians have been identified as <span class="text-error font-semibold italic">unresponsive</span> to standard LGE field calls and emergency dispatch requests for the past 120 minutes.
+                        </p>
+<div class="bg-surface-container-low border border-outline-variant p-6 my-8">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<p class="font-body-md font-bold text-primary mb-1">STRATEGIC IMPACT ASSESSMENT</p>
+<p class="font-body-md text-on-surface-variant leading-relaxed">
+                                        Data projections indicate a high voter density surge beginning at the <span class="font-bold">08:00 AM peak</span>. Failure to restore power infrastructure immediately will compromise the integrity of the electronic voter roll verification systems and result in the disenfranchisement of citizens at this location.
+                                    </p>
+</div>
+</div>
+</div>
+<p class="font-body-md font-semibold text-primary">
+                            Immediate escalation and field intervention are required to ensure constitutional voting rights are maintained.
+                        </p>
+</section>
+</div>
+<!-- Footer / Authorization -->
+<footer class="relative z-10 mt-16 pt-8 border-t border-outline-variant">
+<p class="font-body-md italic text-on-surface-variant mb-12">Issued on behalf of the Municipal Command Center.</p>
+<div class="flex justify-between items-end">
+<div class="w-64">
+<div class="mb-2">
+<!-- Digital Signature Placeholder -->
+<p class="font-label-caps text-xs text-on-surface-variant opacity-50 mb-1 italic">Electronically Signed</p>
+<p class="font-display-lg text-2xl text-primary font-bold italic tracking-tighter" style="font-family: 'serif';">M. Thorne</p>
+</div>
+<div class="h-px bg-primary w-full mb-2"></div>
+<p class="font-body-md font-bold text-primary">Dir. Marcus Thorne</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant uppercase">Chief of Intelligence</p>
+</div>
+<div class="text-right">
+<div class="inline-block bg-primary p-3 mb-2">
+<span class="material-symbols-outlined text-surface text-3xl">qr_code_2</span>
+</div>
+<p class="font-data-mono text-[10px] text-on-surface-variant">BLOCKCHAIN VERIFIED REGISTRY</p>
+<p class="font-data-mono text-[10px] font-bold text-primary">TS: 20240719-0544-ZA-MCC-ESC</p>
+</div>
+</div>
+</footer>
+</div>
+</main>
+</div>
+<!-- BottomNavBar for Mobile from JSON -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface-container-highest dark:bg-primary-container border-t border-outline-variant dark:border-on-primary-fixed-variant lg:hidden no-print">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-primary-container">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-caps text-[10px]">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1">
+<span class="material-symbols-outlined">edit_document</span>
+<span class="font-label-caps text-[10px]">Field</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-primary-container">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-caps text-[10px]">Map</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-primary-container">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-caps text-[10px]">Alerts</span>
+</button>
+</nav>
+<!-- Floating Action Button Contextual Logic -->
+<button class="fixed bottom-24 right-8 h-14 w-14 rounded-full bg-secondary shadow-lg flex items-center justify-center text-on-secondary hover:scale-105 transition-transform lg:bottom-8 lg:right-8 no-print">
+<span class="material-symbols-outlined">print</span>
+</button>
+<script>
+        // Micro-interaction for print button
+        document.querySelector('.fixed.bottom-24.right-8')?.addEventListener('click', () => {
+            window.print();
+        });
+
+        // Simulating active state navigation
+        // The page is a "Resource" or "Referral Notice" which falls under Resources/Field Diary logic
+    </script>
+</body></html>
