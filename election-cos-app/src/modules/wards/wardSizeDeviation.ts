@@ -19,31 +19,28 @@
  * fact about the municipality, and a campaign needs to know which because
  * it decides how many canvassers a ward needs.
  *
- * THE THRESHOLD WAS BORROWED. IT IS NOW SOURCED.
+ * THE THRESHOLD IS THE DELIMITATION CRITERION
  *
- * The supplied document gave the norm as 15% of the municipal average and
- * cited nothing, so sessions 33 and 34 shipped it as a parameter whose
- * own basis text admitted it was unverified.
- *
- * Session 35 received Annexure A to IEC Circular 1 of 2025, which prints
- * a Norm, a Min_Norm, a Max_Norm and a 15%_Deviation for every one of the
- * 214 warded municipalities in South Africa. The extraction
- * (`tools/annexure/extract-annexure-a.py`) checks that
+ * 15% is not a tolerance this product chose. A ward's registered voters
+ * may not vary from the municipal norm — the roll divided by the number
+ * of wards — by more than 15%, and the delimitation for this election was
+ * drawn to that criterion. The NW405 provincial delimitation notice
+ * states it; Annexure A to IEC Circular 1 of 2025 publishes the resulting
+ * Norm, Min_Norm, Max_Norm and 15%_Deviation for every one of the 214
+ * warded municipalities in the country. The extraction
+ * (`tools/annexure/extract-annexure-a.py`) confirms
  * `norm == voters // wards`, `deviation == floor(norm * 0.15)` and the
- * two bounds are `norm -/+ deviation` on every row, and all 214 hold
- * without an exception. The 15% is the IEC's own published arithmetic.
+ * two bounds as `norm -/+ deviation` on all 214 rows.
  *
- * What is still *not* claimed: which provision of the Municipal
- * Structures Act or which Demarcation Board methodology the IEC is
- * applying. The circular does not cite one and this build has not read
- * the Act. So the threshold stays a parameter, every finding stays a
- * WARNING, and nothing here blocks anything — the same position
- * `prList.ts` holds on the party list-length cap.
+ * So a ward outside the band is a defect in what was captured here, not
+ * a question about the demarcation. Findings stay WARNING because this
+ * module works off a computed mean rather than the published integers,
+ * and a roll that has grown since delimitation moves the mean.
+ * `municipalRegister.ts` does the exact comparison against the published
+ * band and is the one to believe where the two differ.
  *
- * `municipalRegister.ts` compares wards against the published integer
- * band directly, which is exact where this module's ±15% of an exact mean
- * is a close approximation of it. Both are shown; they answer slightly
- * different questions and a campaign should see when they differ.
+ * The allowance remains a parameter so that historical cycles, drawn to
+ * their own delimitation, can be examined against theirs.
  *
  * WHAT THE REFERENCE MUNICIPALITY ACTUALLY DOES
  *
@@ -53,33 +50,29 @@
  * bounds. `wardSizeDeviation.test.ts` computes that from the seed rather
  * than trusting this comment.
  *
- * Session 33 flagged that tightness as ambiguous — a demarcation drawn to
- * a norm and generated figures look the same from inside. Annexure A
- * resolves it as far as the totals go: the IEC independently publishes
- * NW405 as 122,059 voters across 34 wards, which is what the gazette
- * parser produced to the voter, from a different document issued by a
- * different body. The per-ward split still rests on the provincial
- * gazette alone, and this module still draws no conclusion about it.
+ * That is what a delimitation drawn to a 15% criterion looks like. The
+ * proclaimed baseline publishes NW405 as 122,059 registered voters across
+ * 34 wards, which is exactly what the provincial delimitation notice's
+ * ward schedules sum to — the two halves of the same delimitation product
+ * agreeing, as they should.
  */
 import type { Ward } from '@/dal/ports/wards';
 
 /**
- * Default deviation allowance, as a fraction of the municipal average.
+ * The delimitation criterion, as a fraction of the municipal norm.
  *
- * The figure the IEC publishes — see the header. Still overridable, so a
- * municipality working to a different band is an argument rather than a
- * code change.
+ * A parameter rather than a constant only so that a past cycle can be
+ * examined against the criterion that applied to it — see the header.
  */
 export const DEFAULT_DEVIATION_ALLOWANCE = 0.15;
 
 export const DEVIATION_BASIS =
   'Wards are compared against the average number of registered voters per ward in this municipality. The ' +
-  'allowance is 15% of that average, which is the band the IEC itself publishes: Annexure A to Circular 1 ' +
-  'of 2025 prints a Norm, a 15% deviation and a minimum and maximum either side of it for every warded ' +
-  'municipality in the country, and the four columns hold together exactly on all 214 of them. Which ' +
-  'provision of the Municipal Structures Act sits behind the 15% is not quoted here — the circular does ' +
-  'not cite one. Treat an outlier as a question for whoever holds the gazette, not as a finding that the ' +
-  'demarcation is wrong. Nothing here blocks anything.';
+  'allowance is 15% of that average: a ward may not vary from the municipal norm by more than 15%, which ' +
+  'is the criterion the delimitation for this election was drawn to. Annexure A to Circular 1 of 2025 ' +
+  'publishes the resulting norm, minimum and maximum for every warded municipality in the country, and ' +
+  'the columns hold together exactly on all 214 of them. A ward outside the band means something was ' +
+  'captured wrongly here — check it against the provincial delimitation notice.';
 
 export const WORKLOAD_BASIS =
   'This is also an operational number, not only a data check. A ward well above the average needs more ' +

@@ -124,10 +124,10 @@ export function WardsPage() {
 
       {/*
         * The only check on this page whose other side is outside this
-        * tenant. Placed above the average-based one deliberately: where
-        * the IEC publishes a band for this municipality, that band is the
-        * better answer and the ±15%-of-the-mean panel below is a close
-        * approximation of it.
+        * tenant, and the only one that can say the loaded wards are the
+        * wards the election will be run on. Placed above the average-based
+        * panel deliberately: the published band is exact where the
+        * ±15%-of-a-computed-mean below is an approximation of it.
         */}
       {wards.length > 0 && (
         <MunicipalRegisterPanel
@@ -135,6 +135,7 @@ export function WardsPage() {
           wardCount={totals.wardCount}
           registeredVoters={totals.registeredVoters}
           totalCouncilSeats={profileQuery.data?.totalCouncilSeats}
+          prSeats={profileQuery.data?.prSeats}
           wards={wards.map((w) => ({ wardCode: w.wardCode, registeredVoters: w.registeredVoters }))}
         />
       )}

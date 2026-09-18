@@ -16,23 +16,32 @@
  * different documents from different bodies and they agree to the voter.
  * That is asserted from both files rather than described in a comment.
  *
- * The third is the usual one: the module has to keep saying what its
- * figures are and are not — 2024, not 2026; a question, not a
- * contradiction.
+ * The third: the module has to keep treating the delimitation as
+ * authoritative — a tenant that disagrees with it is blocked, a district
+ * council never reaches the Schedule 1 calculator, and PR seats are never
+ * a second hand-kept copy of councillors minus wards.
  */
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import {
   BAND_BASIS,
+  BASELINE_AUTHORITY,
+  DELIMITATION_VERSION,
   REGISTER_ENTRIES,
   REGISTER_SOURCE,
-  VINTAGE_BASIS,
+  ROLL_BASIS,
+  SCHEDULE_2_BASIS,
+  assertSchedule1Applies,
   checkAgainstRegister,
   compareToPublishedBand,
+  delimitationFor,
   lookupMunicipality,
   publishedBand,
+  quotaScheduleFor,
+  wardCountMatchesBaseline,
 } from './municipalRegister';
+import { allocateSeats } from '@/modules/analytics/seatCalculator';
 import { DEVIATION_BASIS } from '@/modules/wards/wardSizeDeviation';
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
@@ -64,8 +73,7 @@ describe('the document’s own arithmetic, recomputed from the shipped dataset',
       if (m.maxNorm !== norm + deviation) broken.push(`${m.code} max`);
       if (wards !== Math.ceil(m.councillors / 2)) broken.push(`${m.code} wards/councillors`);
     }
-    // This is the assertion the 15% citation rests on. If it ever fails,
-    // DEVIATION_BASIS is overclaiming and has to go back to "borrowed".
+    // Every claim the build makes about the band rests on this.
     expect(broken).toEqual([]);
   });
 
@@ -104,12 +112,13 @@ describe('NW405, checked against the gazette the seed was parsed from', () => {
   const wards = seed.map((entry) => entry.ward);
   const total = wards.reduce((sum, w) => sum + w.registeredVoters, 0);
 
-  it('agrees with the IEC to the voter, from a different document', () => {
+  it('agrees with the proclaimed baseline to the voter', () => {
     const entry = lookupMunicipality('NW405');
     expect(entry?.name).toBe('JB Marks');
     expect(entry?.province).toBe('North West');
-    // The gazette parser produced these. The IEC published these. Neither
-    // was derived from the other.
+    // The provincial delimitation notice's ward schedules sum to these.
+    // The Commission's annexure publishes these. Two halves of one
+    // delimitation product, agreeing.
     expect(entry?.wards).toBe(wards.length);
     expect(entry?.registeredVoters).toBe(total);
     // 67 councillors for 34 wards — an odd council, so ward seats are not
@@ -118,14 +127,14 @@ describe('NW405, checked against the gazette the seed was parsed from', () => {
     expect(Math.ceil(67 / 2)).toBe(34);
   });
 
-  it('puts every gazetted ward inside the IEC’s published band', () => {
+  it('puts every delimited ward inside the published band', () => {
     const band = publishedBand('NW405');
     expect(band).toEqual({ norm: 3589, minNorm: 3051, maxNorm: 4127, deviation: 538 });
     const comparisons = compareToPublishedBand(wards, band!);
     expect(comparisons.filter((c) => c.position !== 'INSIDE')).toEqual([]);
     // The largest ward sits exactly on the published maximum and the
-    // smallest one voter above the published minimum. Reported as
-    // arithmetic; no conclusion drawn about how the lines were drawn.
+    // smallest one voter above the minimum — a delimitation drawn to the
+    // 15% criterion, working to its ceiling.
     expect(comparisons[comparisons.length - 1].registeredVoters).toBe(4127);
     expect(comparisons[comparisons.length - 1].onBound).toBe(true);
     expect(comparisons[0].registeredVoters).toBe(3052);
@@ -138,8 +147,8 @@ describe('the band comparison', () => {
   const w = (wardCode: string, registeredVoters: number) => ({ wardCode, registeredVoters });
 
   it('treats the published bounds as inclusive', () => {
-    // The IEC prints integers. A ward carrying exactly Max_Norm is the
-    // demarcation the IEC published, not a breach of it.
+    // The annexure prints integers. A ward carrying exactly Max_Norm is
+    // the delimitation itself, not a breach of it.
     const result = compareToPublishedBand([w('A', 850), w('B', 1150)], band);
     expect(result.map((c) => c.position)).toEqual(['INSIDE', 'INSIDE']);
     expect(result.every((c) => c.onBound)).toBe(true);
@@ -155,29 +164,133 @@ describe('the band comparison', () => {
   });
 });
 
-describe('checking a tenant against the register', () => {
-  const wards = [
-    { wardCode: 'W1', registeredVoters: 3500 },
-    { wardCode: 'W2', registeredVoters: 3600 },
-  ];
+describe('the delimitation baseline', () => {
+  it('derives PR seats rather than carrying a second copy of them', () => {
+    const nw405 = delimitationFor('NW405');
+    expect(nw405?.councillors).toBe(67);
+    expect(nw405?.wardSeats).toBe(34);
+    // 67 - 34. Never stored, never entered, so it cannot drift from the
+    // two numbers it is made of.
+    expect(nw405?.prSeats).toBe(33);
+    expect((nw405?.wardSeats ?? 0) + (nw405?.prSeats ?? 0)).toBe(nw405?.councillors);
+  });
 
-  it('says so plainly when the IEC publishes the same figures', () => {
+  it('holds councillors == wards + PR for every warded municipality', () => {
+    const broken = warded
+      .map((m) => delimitationFor(m.code))
+      .filter((b) => b !== null && (b.wardSeats ?? 0) + (b.prSeats ?? 0) !== b.councillors);
+    expect(broken).toEqual([]);
+  });
+
+  it('pins itself to a delimitation version and an electoral event', () => {
+    expect(DELIMITATION_VERSION.electoralEvent).toBe('LGE-2026-11-04');
+    expect(DELIMITATION_VERSION.electionDate).toBe('2026-11-04');
+    expect(DELIMITATION_VERSION.id).toBe('IEC-CIRCULAR-1-2025-ANNEXURE-A');
+  });
+
+  it('routes categories to the right Schedule of the Act', () => {
+    expect(quotaScheduleFor('A')).toBe('SCHEDULE_1');
+    expect(quotaScheduleFor('B')).toBe('SCHEDULE_1');
+    expect(quotaScheduleFor('C')).toBe('SCHEDULE_2');
+    expect(delimitationFor('NW405')?.quotaSchedule).toBe('SCHEDULE_1');
+    expect(delimitationFor('BUF')?.quotaSchedule).toBe('SCHEDULE_1');
+    expect(delimitationFor('DC40')?.quotaSchedule).toBe('SCHEDULE_2');
+    // Every district in the country, not just the worked one.
+    for (const entry of REGISTER_ENTRIES.filter((m) => m.category === 'C')) {
+      expect(delimitationFor(entry.code)?.quotaSchedule).toBe('SCHEDULE_2');
+      expect(delimitationFor(entry.code)?.wardSeats).toBeUndefined();
+      expect(delimitationFor(entry.code)?.prSeats).toBeUndefined();
+    }
+  });
+
+  it('answers whether a loaded ward count is the delimited one', () => {
+    expect(wardCountMatchesBaseline('NW405', 34)).toBe(true);
+    expect(wardCountMatchesBaseline('NW405', 33)).toBe(false);
+    expect(wardCountMatchesBaseline('DC40', 12)).toBeNull();
+    expect(wardCountMatchesBaseline('NW999', 34)).toBeNull();
+  });
+});
+
+describe('the Schedule 2 refusal', () => {
+  it('lets metros and locals through', () => {
+    expect(() => assertSchedule1Applies('NW405')).not.toThrow();
+    expect(() => assertSchedule1Applies('BUF')).not.toThrow();
+    // An unnamed municipality is a legitimate what-if.
+    expect(() => assertSchedule1Applies('NW999')).not.toThrow();
+  });
+
+  it('stops a district council reaching the Schedule 1 calculator', () => {
+    // A returned flag would let a caller walk away with a number. This
+    // throws, so there is no number to walk away with.
+    expect(() => assertSchedule1Applies('DC40')).toThrow(/district council/i);
+    expect(() =>
+      allocateSeats({
+        municipalityCode: 'DC40',
+        totalValidVotes: 100_000,
+        totalSeats: 40,
+        parties: [{ id: 'A', name: 'A', votes: 100_000, wardSeatsWon: 0 }],
+      }),
+    ).toThrow(/Schedule 2/);
+  });
+
+  it('still allocates for the municipality the calculator is built for', () => {
+    const result = allocateSeats({
+      municipalityCode: 'NW405',
+      totalValidVotes: 101_439,
+      totalSeats: 67,
+      parties: [{ id: 'ANC', name: 'ANC', votes: 101_439, wardSeatsWon: 0 }],
+    });
+    expect(result.quota).toBe(1515);
+  });
+
+  it('labels every allocation with the delimitation it belongs to', () => {
+    const current = allocateSeats({
+      totalValidVotes: 1000,
+      totalSeats: 10,
+      parties: [{ id: 'A', name: 'A', votes: 1000, wardSeatsWon: 0 }],
+    });
+    expect(current.delimitationId).toBe(DELIMITATION_VERSION.id);
+    // A historical result must not be labelled with today's boundaries.
+    const historical = allocateSeats({
+      delimitationId: 'LGE-2021-SUPERSEDED',
+      totalValidVotes: 1000,
+      totalSeats: 10,
+      parties: [{ id: 'A', name: 'A', votes: 1000, wardSeatsWon: 0 }],
+    });
+    expect(historical.delimitationId).toBe('LGE-2021-SUPERSEDED');
+  });
+});
+
+describe('checking a tenant against the proclaimed delimitation', () => {
+  it('confirms a tenant that matches, and blocks nothing', () => {
     const check = checkAgainstRegister({
       municipalityCode: 'NW405',
       wardCount: 34,
       registeredVoters: 122059,
       totalCouncilSeats: 67,
+      prSeats: 33,
     });
+    expect(check.alignedToBaseline).toBe(true);
+    expect(check.blocking).toEqual([]);
     expect(check.findings.every((f) => f.outcome === 'CONFIRMS')).toBe(true);
-    expect(check.findings.map((f) => f.code).sort()).toEqual([
-      'COUNCIL_SEATS',
-      'REGISTERED_VOTERS',
-      'WARD_COUNT',
-    ]);
     expect(check.rollDrift).toBe(0);
   });
 
-  it('names the consequence when the council size disagrees', () => {
+  it('blocks a ward count that is not the delimited one', () => {
+    const check = checkAgainstRegister({
+      municipalityCode: 'NW405',
+      wardCount: 33,
+      registeredVoters: 122059,
+    });
+    const wardCount = check.findings.find((f) => f.code === 'WARD_COUNT');
+    expect(wardCount?.outcome).toBe('CONTRADICTS');
+    expect(wardCount?.severity).toBe('BLOCKING');
+    expect(check.alignedToBaseline).toBe(false);
+    // Says what is wrong downstream, not merely that two numbers differ.
+    expect(wardCount?.message).toMatch(/coverage, canvassing targets/i);
+  });
+
+  it('blocks a council size that is not the MEC’s determination', () => {
     const check = checkAgainstRegister({
       municipalityCode: 'NW405',
       wardCount: 34,
@@ -185,12 +298,26 @@ describe('checking a tenant against the register', () => {
       totalCouncilSeats: 68,
     });
     const seats = check.findings.find((f) => f.code === 'COUNCIL_SEATS');
-    expect(seats?.outcome).toBe('DISAGREES');
-    // Not "these differ" — what breaks because they differ.
-    expect(seats?.message).toMatch(/seat calculator divides by this number/i);
+    expect(seats?.outcome).toBe('CONTRADICTS');
+    expect(seats?.severity).toBe('BLOCKING');
+    expect(seats?.message).toMatch(/seat quota divides by this number/i);
   });
 
-  it('quantifies how far a roll has moved rather than only flagging it', () => {
+  it('blocks a PR seat count that is not councillors minus wards', () => {
+    const check = checkAgainstRegister({
+      municipalityCode: 'NW405',
+      wardCount: 34,
+      registeredVoters: 122059,
+      totalCouncilSeats: 67,
+      prSeats: 34,
+    });
+    const pr = check.findings.find((f) => f.code === 'PR_SEATS');
+    expect(pr?.severity).toBe('BLOCKING');
+    // The consequence, which is what makes this worth blocking on.
+    expect(pr?.message).toMatch(/rejected at nomination/i);
+  });
+
+  it('treats a grown roll as ordinary, never as a discrepancy', () => {
     const check = checkAgainstRegister({
       municipalityCode: 'NW405',
       wardCount: 34,
@@ -198,17 +325,21 @@ describe('checking a tenant against the register', () => {
     });
     expect(check.rollDrift).toBeCloseTo(0.05, 4);
     const roll = check.findings.find((f) => f.code === 'REGISTERED_VOTERS');
-    expect(roll?.outcome).toBe('DISAGREES');
-    expect(roll?.message).toContain('5.0%');
-    expect(roll?.message).toMatch(/a roll moves between registration weekends/i);
+    expect(roll?.outcome).toBe('DRIFT');
+    expect(roll?.severity).toBe('INFO');
+    expect(roll?.message).toContain('+5.0%');
+    expect(check.blocking).toEqual([]);
+    // The delimitation does not move with the roll, and the text says so.
+    expect(ROLL_BASIS).toMatch(/do not move with it/i);
   });
 
-  it('reports a code the table does not carry without pretending to check it', () => {
+  it('blocks a municipality code the delimitation does not carry', () => {
     const check = checkAgainstRegister({ municipalityCode: 'NW999', wardCount: 34, registeredVoters: 1 });
-    expect(check.entry).toBeNull();
+    expect(check.baseline).toBeNull();
     expect(check.band).toBeNull();
     expect(check.findings).toHaveLength(1);
-    expect(check.findings[0].outcome).toBe('UNKNOWN');
+    expect(check.findings[0].severity).toBe('BLOCKING');
+    expect(check.alignedToBaseline).toBe(false);
     expect(check.findings[0].message).toContain('258');
   });
 
@@ -217,21 +348,21 @@ describe('checking a tenant against the register', () => {
       municipalityCode: 'DC40',
       wardCount: 12,
       registeredVoters: 352259,
-      wards,
+      wards: [{ wardCode: 'W1', registeredVoters: 3500 }],
     });
     expect(check.band).toBeNull();
     expect(check.outsideBand).toEqual([]);
-    const finding = check.findings.find((f) => f.code === 'NO_WARDS_IN_REGISTER');
-    expect(finding?.outcome).toBe('UNKNOWN');
+    const finding = check.findings.find((f) => f.code === 'DISTRICT_COUNCIL');
+    expect(finding?.message).toMatch(/Schedule 2/);
     // And it must not have invented a ward-count comparison against a
-    // municipality that has no wards to compare with.
+    // municipality that has no wards.
     expect(check.findings.some((f) => f.code === 'WARD_COUNT')).toBe(false);
   });
 
-  it('lists wards outside the published band, furthest out first', () => {
+  it('lists wards outside the delimitation band, furthest out first', () => {
     const check = checkAgainstRegister({
       municipalityCode: 'NW405',
-      wardCount: 3,
+      wardCount: 34,
       registeredVoters: 122059,
       wards: [
         { wardCode: 'W1', registeredVoters: 2000 }, // 1,051 below
@@ -242,30 +373,42 @@ describe('checking a tenant against the register', () => {
     expect(check.outsideBand.map((c) => c.wardCode)).toEqual(['W1', 'W3']);
     expect(check.outsideBand[0].marginToBound).toBe(1051);
     const sizes = check.findings.find((f) => f.code === 'WARD_SIZES');
-    expect(sizes?.outcome).toBe('DISAGREES');
-    expect(sizes?.message).toContain('2 of 3 wards');
+    expect(sizes?.outcome).toBe('CONTRADICTS');
+    // A WARNING, not BLOCKING: this module works off published integers
+    // but a roll that has grown since delimitation moves real wards.
+    expect(sizes?.severity).toBe('WARNING');
   });
 
   it('accepts a code however it is capitalised or padded', () => {
     expect(lookupMunicipality(' nw405 ')?.code).toBe('NW405');
+    expect(delimitationFor(' nw405 ')?.code).toBe('NW405');
   });
 });
 
-describe('what the register says about itself', () => {
-  it('is 2024, and never presented as 2026', () => {
-    expect(VINTAGE_BASIS).toMatch(/not the 2026 register/i);
-    expect(VINTAGE_BASIS).toMatch(/Nothing here blocks anything/i);
-    expect(VINTAGE_BASIS).toMatch(/question about which is current/i);
+describe('what the baseline says about itself', () => {
+  it('states the delimitation is authoritative and final for this cycle', () => {
+    expect(BASELINE_AUTHORITY).toMatch(/4 November 2026/);
+    expect(BASELINE_AUTHORITY).toMatch(/Municipal Demarcation Board/);
+    expect(BASELINE_AUTHORITY).toMatch(/MECs for local government/);
+    expect(BASELINE_AUTHORITY).toMatch(/final for this cycle/i);
+    expect(BASELINE_AUTHORITY).toMatch(/your figures are wrong/i);
   });
 
-  it('claims the IEC’s arithmetic and not the statute behind it', () => {
-    expect(BAND_BASIS).toMatch(/214 warded municipalities/);
-    expect(BAND_BASIS).toMatch(/statutory provision behind the 15% is not quoted here/i);
-    expect(BAND_BASIS).not.toMatch(/\b(required by law|the Act requires|in terms of section)\b/i);
+  it('never invites an operator to second-guess the delimitation', () => {
+    const text = [BASELINE_AUTHORITY, ROLL_BASIS, BAND_BASIS, SCHEDULE_2_BASIS].join(' ');
+    // The wording this build used before the baseline was proclaimed
+    // treated the figures as a question of vintage. It must not come back.
+    expect(text).not.toMatch(/may be superseded|not the 2026|question about which is current/i);
+    expect(text).not.toMatch(/\b(unverified|unconfirmed|may be wrong|possibly outdated)\b/i);
+  });
+
+  it('puts the band on the delimitation rather than on this product', () => {
+    expect(BAND_BASIS).toMatch(/may not vary from the municipal norm/i);
+    expect(BAND_BASIS).toMatch(/error in what was captured here/i);
   });
 
   it('does not describe any of this as a forecast or a projection', () => {
-    const text = [VINTAGE_BASIS, BAND_BASIS].join(' ');
+    const text = [BASELINE_AUTHORITY, ROLL_BASIS, BAND_BASIS].join(' ');
     expect(text).not.toMatch(/\b(forecast|predict|projection)\b/i);
   });
 });

@@ -117,11 +117,28 @@ The pattern to copy for the next table:
    all 258 rows of Annexure A gives a 44.3-million "national roll". The
    real figure is 27.7 million; districts repeat their locals.
 
-Consuming it: `src/modules/reference/municipalRegister.ts`.
-`checkAgainstRegister()` reports agreement as well as disagreement — it is
-the only check in the build whose other side is outside the tenant. Its
-findings are never blocking: the table is 2024 and a tenant's roll is
-today's.
+Consuming it: `src/modules/reference/municipalRegister.ts`. This one is
+not a reference table to compare against — it is the **proclaimed
+delimitation for 4 November 2026** and the build treats it as the source
+of truth. `checkAgainstRegister()` reports agreement as well as
+disagreement, and separates two things that look alike:
+
+- **Ward counts and council sizes are fixed** by the delimitation and the
+  MEC's determination. A tenant that disagrees is **BLOCKING** — every
+  ward-level figure and every seat projection is computed off them.
+- **The roll keeps growing.** A municipality carrying more voters than the
+  annexure records is ordinary, never a discrepancy.
+
+Two structural rules that came out of this and apply to any future table:
+
+- **Derive, never store twice.** PR seats are `councillors - wards`,
+  computed on read. Municipality Config used to offer three free number
+  fields; that is three chances to disagree with the delimitation and with
+  each other, and a PR list of the wrong length is rejected at nomination.
+- **Category routes the formula family.** A category C district council
+  allocates under Schedule 2, not the Schedule 1 Item 12 quota this build
+  implements. `allocateSeats()` throws rather than returning a flag — a
+  caller that ignores a flag still walks away with a number.
 
 ## Stage 2 — ingest
 
@@ -187,12 +204,12 @@ failure modes this project has already met:
   `1..N`, that column is a per-party position, not a ward
   (`docs/nw-candidate-list-2026-review.md` §1).
 - **A figure bounded suspiciously tightly.** Run `analyseWardSizes()` and
-  `compareToPublishedBand()`; report the arithmetic and draw no conclusion
-  about why. NW405's wards sit inside the IEC's published band with the
-  largest exactly on its ceiling, which looked like generated data in
-  session 33 and turned out to be a demarcation drawn to the norm — the
-  restraint was right and so was waiting for a second document
-  (entries 33.2, 35.1).
+  `compareToPublishedBand()`. NW405's wards sit inside the delimitation
+  band with the largest exactly on its ceiling, which read as possible
+  generated data in session 33 and is a delimitation drawn to the 15%
+  criterion. The lesson is the restraint, not the suspicion: report the
+  arithmetic, and wait for the second document rather than concluding from
+  one (entries 33.2, 35.6).
 - **An over-wide ID mask.** Anything showing more than the last four
   digits, and especially anything leading with a date of birth, is refused
   — `src/lib/saIdNumber.ts`.

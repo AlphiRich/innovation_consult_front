@@ -15,7 +15,19 @@ export interface ExampleParty {
   wardSeatsWon: number;
 }
 
+/**
+ * The delimitation this result belongs to.
+ *
+ * Deliberately not the baseline proclaimed for 4 November 2026. These are
+ * 2021 figures drawn against the 2021 ward boundaries, and labelling them
+ * with the current delimitation would be the "compute against the current
+ * ward table" mistake — a historical result read as though today's
+ * boundaries produced it.
+ */
+export const NW405_2021_DELIMITATION = 'LGE-2021-SUPERSEDED';
+
 export const NW405_2021_EXAMPLE = {
+  delimitationId: NW405_2021_DELIMITATION,
   totalSeats: 67,
   totalValidVotes: 101_439,
   independentWardSeats: 0,

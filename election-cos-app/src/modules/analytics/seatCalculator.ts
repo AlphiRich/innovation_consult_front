@@ -38,6 +38,8 @@
  * councilSizeFinal` always holds — see seatCalculator.test.ts.
  */
 
+import { DELIMITATION_VERSION, assertSchedule1Applies } from '@/modules/reference/municipalRegister';
+
 export interface PartyInput {
   id: string;
   name: string;
@@ -53,6 +55,23 @@ export interface SeatAllocationInput {
   independentWardSeats?: number;
   /** Ward seats won by parties that didn't submit a PR list — deducted from the denominator (Schedule 1's "D"). Default 0. */
   noPRListWardSeats?: number;
+  /**
+   * The municipality this is being computed for.
+   *
+   * Supplying it is what makes the calculator refuse to run Schedule 1 on
+   * a category C district council, whose seats are allocated under
+   * Schedule 2 — a different formula family this build does not
+   * implement. Omitted, the calculator is a what-if tool and allocates
+   * whatever it is given.
+   */
+  municipalityCode?: string;
+  /**
+   * Which delimitation these figures belong to. Ward boundaries and
+   * council sizes change between cycles, so a seat figure that does not
+   * name the delimitation it was computed against is not reproducible.
+   * Defaults to the delimitation proclaimed for 4 November 2026.
+   */
+  delimitationId?: string;
 }
 
 export interface PartyResult {
@@ -80,12 +99,20 @@ export interface SeatAllocationResult {
   pendingSeats: number; // seats withheld pending manual tie resolution — never auto-assigned
   parties: PartyResult[];
   tieFlags: TieFlag[];
+  /** The delimitation this allocation belongs to. Never blank. */
+  delimitationId: string;
 }
 
 export function allocateSeats(input: SeatAllocationInput): SeatAllocationResult {
   const { totalValidVotes, totalSeats, parties, independentWardSeats = 0, noPRListWardSeats = 0 } = input;
   if (totalSeats < 1) throw new Error('totalSeats must be at least 1');
   if (totalValidVotes < 0) throw new Error('totalValidVotes cannot be negative');
+  // Refuses rather than returning a flag: a caller that ignores a flag
+  // still walks away with a number, and a Schedule 1 projection for a
+  // district council is exactly the confident wrong answer this product
+  // exists not to produce.
+  if (input.municipalityCode) assertSchedule1Applies(input.municipalityCode);
+  const delimitationId = input.delimitationId ?? DELIMITATION_VERSION.id;
 
   // Schedule 1's "B - C - D": total seats less independents and no-PR-list
   // ward winners, since neither participates in PR allocation.
@@ -158,6 +185,7 @@ export function allocateSeats(input: SeatAllocationInput): SeatAllocationResult 
 
   return {
     quota,
+    delimitationId,
     councilSizeFinal,
     totalSeatsAllocated: allocatedSoFar,
     pendingSeats,

@@ -940,40 +940,28 @@ python3 tools/source-acquisition/acquire.py --fetch
 
 ---
 
-## Session 35 — IEC Circular 1 of 2025, Annexure A
+## Session 35 — The proclaimed delimitation for 4 November 2026
 
-Supplied: `Annexure-A-Number_of_Voters-Councillors-Wards_Circular_1_2025.pdf`,
-with the note "Per the IEC Official Announcement yesterday."
+Supplied: `Annexure-A-Number_of_Voters-Councillors-Wards_Circular_1_2025.pdf`.
 
-### Entry 35.1 — The first primary IEC source the build holds
+This is the culmination of the delimitation cycle for the 4 November 2026
+local government election: wards delimited by the Municipal Demarcation
+Board, councillor numbers determined by the provincial MECs for local
+government, consolidated by the Electoral Commission into the structure
+against which ward and PR candidates are nominated and against which
+seats will be allocated. It is final for this cycle.
 
-**Accepted, extracted, verified, and wired in.**
+### Entry 35.1 — Extraction, and what it verified
 
-Seven pages, 273,729 bytes, SHA-256 `fe3361c7…5a78`, produced from Excel
-on 27 February 2025 and last modified 10 March 2025. It lists **258
-municipalities** — every metro, local and district in the country — with
-registered voters as at 2024, the councillors the MEC determined, and for
-the **214 that have wards**, a Norm, a Min_Norm, a Max_Norm and a
-15%_Deviation.
+Seven pages, 273,729 bytes, SHA-256 `fe3361c7…5a78`. **258
+municipalities** — 8 metros, 206 locals, 44 districts — with registered
+voters, MEC-determined councillors, and for the **214 that have wards**,
+the ward count and the delimitation band.
 
-It is the first primary IEC source in this build covering more than one
-municipality, and it did not have to be fetched. Sessions 33 and 34
-established that this environment denies `elections.org.za` at CONNECT and
-shipped a four-row acquisition registry with every entry `UNCONFIRMED`.
-This document bypassed that entirely by being handed over.
-
-**What is recorded about it, and what is not.** Its hash, size, page
-count, document dates and the date it arrived are in `sources.json` under
-a new `suppliedDocuments` key. **No URL is recorded.** The location it was
-published at is not known here, and a guessed URL in an acquisition
-registry is indistinguishable from a confirmed one six months later —
-which is the failure the whole registry exists to correct (entry 33.1).
-
-`tools/annexure/extract-annexure-a.py` does the extraction. It verifies
-the SHA-256 before reading, so a re-run against a different document fails
-rather than silently producing a different dataset, and it refuses to
-write anything unless the document holds together against **five**
-relations on every row:
+`tools/annexure/extract-annexure-a.py` verifies the SHA-256 before
+reading, so a re-run against a different document fails rather than
+silently producing a different dataset, and refuses to write unless five
+relations hold on every row:
 
 ```
 norm       == registeredVoters // wards
@@ -983,116 +971,135 @@ maxNorm    == norm + deviation
 wards      == ceil(councillors / 2)
 ```
 
-All 214 warded rows satisfy all five, without one exception. The
-`--self-test` breaks each relation in turn and asserts the corresponding
-check fires.
+All 214 warded rows satisfy all five. A sixth check works across the whole
+table: every local sits inside exactly one district and no metro does, so
+the two columns describe the same voters — 16,546,428 each, with DC40's
+352,259 exactly NW403 + NW404 + NW405. That identity is what would catch
+a dropped or duplicated page, and it also caught a number this build would
+otherwise have published: summing all 258 rows gives 44,270,103, which
+counts every voter outside a metro twice. The dataset records 27,723,675
+and 16,546,428 separately with a sentence saying they are never added.
 
-**A sixth check, at the level of the whole table.** Every local sits
-inside exactly one district and no metro does, so the district column and
-the local column describe the same voters. They total the same to the
-voter (16,546,428 each; DC40's 352,259 is exactly NW403 + NW404 + NW405).
-That identity is what would catch a dropped or duplicated page, and it is
-asserted both in the extractor and in the test suite.
+Recorded in `sources.json` under a new `suppliedDocuments` key with hash,
+size and arrival date. **No URL** — the location it was published at is
+not known here, and a guessed URL in an acquisition registry is
+indistinguishable from a confirmed one six months later (entry 33.1).
 
-It also catches a number this build would otherwise have published.
-Summing all 258 rows gives **44,270,103** registered voters — a plausible
-sounding "national roll" that counts every voter outside a metro twice.
-The dataset records 27,723,675 (metros and locals) and 16,546,428
-(districts) as separate figures with a basis sentence saying they are
-never added.
+### Entry 35.2 — Hardwired as the source of truth, not as a cross-check
 
-### Entry 35.2 — The 15% band: promoted from borrowed to cited
+**The correction that matters this session.** The first pass treated the
+annexure as a reference table to compare against, with every finding
+non-blocking on the reasoning that the figures were a 2024 snapshot that
+might be superseded. That conflated two different things:
 
-**Corrected.** `src/modules/wards/wardSizeDeviation.ts`.
+- **The roll** (`RegVoters_2024`) genuinely moves. Every registration
+  weekend adds to it.
+- **The ward delimitation and the councillor determination** do not. They
+  are the proclaimed structure for this election, fixed by statutory
+  process across the MDB, the MECs and the Commission.
 
-Session 33 built the ward-size check around ±15% of the municipal average
-on the authority of a supplied planning note that cited nothing, and
-`DEVIATION_BASIS` said so in as many words: *"taken from a supplied
-source-acquisition note and not confirmed against the Municipal Structures
-Act or the Demarcation Board's published methodology in this build."*
+Treating the second as provisional was wrong, and the build now does not.
+`src/modules/reference/municipalRegister.ts` carries
+`DELIMITATION_VERSION` (`IEC-CIRCULAR-1-2025-ANNEXURE-A`, electoral event
+`LGE-2026-11-04`) and `delimitationFor(code)`, and:
 
-Annexure A publishes that band as columns, and the arithmetic holds on all
-214 warded municipalities. The basis now cites the circular.
+- A tenant ward count that is not the delimited count is **BLOCKING**.
+  Every ward-level figure in the application is computed over the wards
+  that are loaded, so all of them are wrong until it matches.
+- A council size that is not the MEC's determination is **BLOCKING**. The
+  quota divides by it.
+- A roll difference is **INFO**, never blocking, and the text says the
+  delimitation does not move with the roll.
+- A guard fails if the old vintage wording — "may be superseded", "not the
+  2026 register", "question about which is current" — reappears anywhere
+  in the module's basis text.
 
-**What is still refused.** Which provision of the Municipal Structures Act
-or which Demarcation Board methodology the IEC is applying. The circular
-does not cite one and this build has not read the Act. `DEVIATION_BASIS`
-says the statutory provision is not quoted here, and a guard fails on
-`required by law`, `the Act requires` or `in terms of section` appearing
-in it. The promotion is one step, not two.
+### Entry 35.3 — PR seats are derived, never stored
 
-Everything else stays: the allowance is still a parameter, every finding
-is still a WARNING, nothing blocks.
+**Defect class closed.** Municipality Config had three free number fields:
+council seats, ward seats, PR seats. Three chances to disagree with the
+delimitation and with each other, and a PR list drawn to the wrong length
+is rejected at nomination.
 
-### Entry 35.3 — Entry 33.2's open question, answered
+The fields are gone. Entering a municipality code fills all three from the
+baseline and shows them read-only; `prSeats` is always
+`councillors - wardSeats`, computed, never stored as an independent
+figure. A profile saved before this change that still disagrees is
+flagged on the page with the proclaimed figures beside it.
 
-**Resolved for the totals. Still open for the split.**
+A guard asserts `wardSeats + prSeats == councillors` for all 214 warded
+municipalities, not just the worked one.
 
-Entry 33.2 recorded that NW405's seed looked equally like a demarcation
-drawn to a norm and like generated figures, and deliberately drew no
-conclusion. The seed was parsed from the North West provincial gazette
-(Provincial Notice 1300 of 2025): 34 wards, 122,059 registered voters,
-range 3,052 to 4,127.
+### Entry 35.4 — Category routes the formula family
 
-Annexure A, produced by a different body from a different source, gives
-NW405 **122,059 registered voters, 34 wards and 67 councillors**. Neither
-figure was derived from the other. Two documents agreeing to the voter is
-the corroboration that entry was waiting for, and
-`municipalRegister.test.ts` asserts it by reading both files rather than
-describing it in a comment.
+**Structural refusal added.** A category C district council has no wards
+and allocates seats under **Schedule 2** of the Municipal Structures Act,
+not the Schedule 1 Item 12 quota `seatCalculator.ts` implements. Running
+the Schedule 1 calculator on a district would produce a confident, wrong
+answer — the same shape as the Item 16 overhang gap this project has
+already met once.
 
-The published band for NW405 is 3,051 to 4,127. Every gazetted ward falls
-inside it; the largest sits **exactly on** the published maximum and the
-smallest one voter above the published minimum. That tightness now reads
-as a demarcation drawn to the IEC's ceiling rather than as a warning sign.
+`allocateSeats()` now takes an optional `municipalityCode` and calls
+`assertSchedule1Applies()`, which **throws**. A returned flag would let a
+caller ignore it and still walk away with a number. Omitting the code
+leaves the calculator a what-if tool, which is a legitimate use.
 
-**What is not resolved.** The per-ward split still rests on the provincial
-gazette alone — Annexure A gives municipal totals, not ward-level figures.
-The modules still draw no conclusion about it.
+Every allocation also carries `delimitationId`, defaulting to the
+proclaimed baseline. The NW405 2021 worked example passes
+`LGE-2021-SUPERSEDED` explicitly, so a historical result is never labelled
+with today's boundaries.
 
-### Entry 35.4 — The first check whose other side is outside the tenant
+### Entry 35.5 — The 15% band is the delimitation criterion
 
-**Built.** `src/modules/reference/municipalRegister.ts` and
-`MunicipalRegisterPanel.tsx`, on the Wards page.
+**Corrected twice.** Session 33 shipped it as a borrowed figure whose own
+basis text admitted it was unsourced. The first pass this session promoted
+it to "the IEC's published arithmetic" while still disclaiming the statute.
+Both undersold it.
 
-`reconcileSeed()` compares a tenant against itself and says so in
-`RECONCILIATION_BASIS`: agreement means the two are consistent, not that
-either is correct. Nothing in the build could say more than that, because
-nothing in the build held an outside figure to compare against.
+A ward's registered voters may not vary from the municipal norm by more
+than 15%; the delimitation was drawn to that criterion; the NW405
+provincial delimitation notice states it and Annexure A publishes the
+resulting norm and bounds for all 214 warded municipalities. So a ward
+outside the band indicates an error in what was captured, not a question
+about the demarcation, and `DEVIATION_BASIS` says exactly that. A guard
+fails on "not confirmed against", "unverified", "borrowed" or "may be
+wrong" returning to that text.
 
-`checkAgainstRegister()` can. It compares ward count, council seats,
-registered voters and per-ward sizes against the IEC's published figures,
-and **reports agreement as prominently as disagreement** — a campaign that
-can see the IEC publishing the same 34 wards and 122,059 voters it seeded
-has something no amount of internal consistency gives it.
+Findings from `analyseWardSizes()` stay WARNING for a narrow technical
+reason stated in the module: it works off a computed mean rather than the
+published integers, and a roll that has grown since delimitation moves the
+mean. `municipalRegister.ts` does the exact comparison and is the one to
+believe where the two differ.
 
-Design decisions worth recording:
+### Entry 35.6 — NW405: the two halves of one delimitation product
 
-- **Nothing is blocking.** The table is 2024 and a roll moves every week;
-  an MEC may re-determine before 2026. A disagreement is a question about
-  which figure is current. `VINTAGE_BASIS` says this and a guard holds it.
-- **The published bounds are inclusive.** A ward carrying exactly
-  Max_Norm is the demarcation the IEC published. Treating the IEC's own
-  ceiling as a breach would flag NW405's largest ward.
-- **A disagreement names its consequence.** The council-seats finding does
-  not say "these differ" — it says the seat calculator divides by this
-  number, so the difference changes every projection it produces.
-- **A district council is refused rather than approximated.** Districts
-  have no wards; the check says so and does not invent a comparison.
-- **No new route.** §3.2 fixes navigation at nine items; the panel sits
-  beside the wards it is checking.
+The seed was parsed from the North West provincial delimitation notice:
+34 wards, 122,059 registered voters, range 3,052 to 4,127. The proclaimed
+baseline gives NW405 **122,059 registered voters, 34 wards, 67
+councillors** — and a band of 3,051 to 4,127, with every delimited ward
+inside it and the largest sitting exactly on the maximum.
 
-**Guards proven by injection:** a one-voter hand-patch to `maxNorm` on a
-single row (the derived-columns check and the NW405 band check both fail);
-and a dropped municipality row (the coverage count, the roll identity, the
-`all 214` claim in `DEVIATION_BASIS`, and the 258-code message all fail).
-Reverted clean; 863 tests pass.
+The annexure fixes how many wards a municipality has; the provincial
+notice says where they are. `wardCountMatchesBaseline()` is the join, and
+`municipalRegister.test.ts` asserts the agreement by reading both files.
 
-### Entry 35.5 — What the document is not
+This closes entry 33.2's open question. What was read in session 33 as
+possibly-generated tightness is a delimitation drawn to the 15% criterion,
+working to its ceiling.
 
-Stated because the covering message called it yesterday's announcement.
-The annexure is dated February–March 2025, its voter column is headed
-`RegVoters_2024`, and its councillor column is the MEC's 2024
-determination. Whatever was announced this week, **this file is not a 2026
-register and not a 2026 determination**, and the build does not present it
-as one.
+### Entry 35.7 — What the annexure does not contain
+
+Stated so the boundary is clear rather than discovered later. The document
+is municipality-level: category, councillors, wards, roll, band. **Ward-by-
+ward voter splits and voting-district schedules are not columns in it** —
+those come from each province's MDB delimitation notice, which is where
+this build's NW405 ward and VD records already come from. The VD data
+model (split stations, `${wardCode}::${vdCode}`, entry 32.2) is unchanged
+and remains keyed to that notice.
+
+**Guards proven by injection:** a one-voter patch to a single `maxNorm`;
+a dropped municipality row; removing the Schedule 2 refusal from
+`allocateSeats`; an off-by-one in derived PR seats (fails four tests
+including the all-214 invariant); and downgrading the ward-count
+contradiction from BLOCKING to WARNING. All fail; reverted clean; 875
+tests pass.

@@ -104,26 +104,27 @@ This was found by using real data, not by writing a test first — the
 synthetic single-ward examples used in every prior session never had a
 reason to produce a colliding vdCode.
 
-## Independent corroboration (session 35)
+## The proclaimed delimitation (session 35)
 
-Annexure A to IEC Circular 1 of 2025 — supplied directly, since the IEC's
-site is unreachable from this build — lists every municipality in the
-country with its 2024 registered voters, the councillors the MEC
-determined, and its ward count. For **NW405 it gives 122,059 registered
-voters, 34 wards and 67 councillors.**
+Annexure A to IEC Circular 1 of 2025 — the consolidation of the
+delimitation cycle for the 4 November 2026 election — gives **NW405
+122,059 registered voters, 34 wards and 67 councillors**, with a ward band
+of 3,051 to 4,127.
 
-Those are the figures the gazette parser produced, to the voter, from a
-different document issued by a different body. Neither was derived from
-the other.
+Those are the figures the gazette parser produced from the provincial
+delimitation notice, to the voter. The two documents are the two halves of
+one delimitation product: the annexure fixes how many wards a municipality
+has and how many councillors its council carries, the provincial notice
+says where the ward boundaries run and which voting districts fall in
+each. Every delimited ward falls inside the published band, the largest
+sitting exactly on the maximum — a delimitation drawn to the 15%
+criterion, working to its ceiling.
 
-The annexure also publishes a band around the municipal average — for
-NW405, 3,051 to 4,127 registered voters per ward. Every gazetted ward
-falls inside it, the largest sitting exactly on the published maximum.
-Session 33 had flagged that tightness as ambiguous between a demarcation
-drawn to a norm and generated figures; with the band published and the
-totals independently confirmed, it reads as the former.
+Council composition for this cycle, derived and never stored twice:
+**67 council seats = 34 ward + 33 PR.**
 
-**Still resting on the provincial gazette alone:** the ward-by-ward split
-of those 122,059 voters, and the voting-district schedules. The annexure
-gives municipal totals only. See `src/modules/reference/municipalRegister.ts`
-and the change register, entries 35.1–35.3.
+The annexure is municipality-level and carries no ward-by-ward voter
+column and no voting-district schedules; those remain sourced from the
+provincial notice, which is what this seed was built from. See
+`src/modules/reference/municipalRegister.ts` and the change register,
+entries 35.2–35.7.

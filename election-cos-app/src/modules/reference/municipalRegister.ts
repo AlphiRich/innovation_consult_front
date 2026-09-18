@@ -1,5 +1,5 @@
 /**
- * Election Campaign OS — the IEC's own figures for every municipality
+ * Election Campaign OS — the proclaimed delimitation baseline
  * IC-ECOS-BUILD-2026-V2 §6.1, §8.2.
  *
  * WHAT THIS IS
@@ -7,51 +7,46 @@
  * Annexure A to IEC Circular 1 of 2025 — "Number of Voters, Councillors,
  * Wards" — extracted by `tools/annexure/extract-annexure-a.py` into
  * `src/data/iec/circular-1-2025-annexure-a.json`. Two hundred and
- * fifty-eight rows: every metro, local and district municipality in
- * South Africa, with its registered voters as at 2024, the councillors
- * the MEC determined, and (for the 214 that have wards) the ward count
- * and the band the IEC publishes around the municipal average.
+ * fifty-eight municipalities: every metro, local and district in South
+ * Africa, with the number of councillors the MEC determined and, for the
+ * 214 that have wards, the ward count and the delimitation band.
  *
- * WHY IT MATTERS MORE THAN ITS SIZE SUGGESTS
+ * THIS IS THE SOURCE OF TRUTH, NOT A CROSS-CHECK
  *
- * Until this arrived, every external number in this build was either
- * hand-transcribed from one municipality's gazette or unsourced. The
- * acquisition registry ships four rows all marked UNCONFIRMED because
- * the build environment denies elections.org.za at CONNECT and nothing
- * could be fetched. This document did not have to be fetched — it was
- * handed over — and it is the first primary IEC source the build holds
- * that covers more than one municipality.
+ * It is the culmination of the delimitation cycle for the 4 November 2026
+ * local government election: the Municipal Demarcation Board delimited the
+ * wards, the provincial MECs for local government determined the number
+ * of councillors, and this annexure is the Electoral Commission's
+ * consolidation of that product — the structure against which ward and PR
+ * candidates are nominated and against which seats will be allocated.
  *
- * It settles two things that were open:
+ * It is final for this cycle. Nothing in this build treats a
+ * municipality's ward count or council size as an open question, offers
+ * an operator a way to override it, or carries a second copy of it that
+ * could drift. Where a tenant's own figures disagree with the baseline,
+ * the tenant's figures are wrong and the application says so.
  *
- *  1. The 15% band. `wardSizeDeviation.ts` had been comparing wards
- *     against ±15% of the municipal average on the authority of a
- *     planning note nobody could source, and said so in its own basis
- *     text. Annexure A publishes Norm, Min_Norm, Max_Norm and
- *     15%_Deviation as columns, and the extraction verifies that
- *     `norm == voters // wards`, `deviation == floor(norm * 0.15)` and
- *     `min`/`max == norm -/+ deviation` for all 214 warded rows without
- *     one exception. The band is the IEC's arithmetic, not a borrowed
- *     guess.
+ * WHAT THE DOCUMENT CONTAINS, AND THEREFORE WHAT THIS MODULE SERVES
  *
- *  2. NW405's municipal totals. The seed was parsed from the North West
- *     provincial gazette (Provincial Notice 1300 of 2025) and sums to
- *     122,059 registered voters across 34 wards. Annexure A, produced by
- *     a different body from a different source, gives NW405 exactly
- *     122,059 voters, 34 wards and 67 councillors. Two documents
- *     agreeing to the voter is the corroboration the register's entry
- *     33.2 asked for.
+ * Municipality-level structure: category, councillors, wards, the
+ * registered-voter total the delimitation was drawn against, and the
+ * band. Ward-by-ward voter splits and voting-district schedules are not
+ * columns in it — those are in each province's MDB delimitation notice,
+ * which is where this build's NW405 ward and VD records already come
+ * from (`docs/nw405-seed-data.md`). The two fit together: the annexure
+ * fixes how many wards a municipality has, the provincial notice says
+ * where they are. `wardCountMatchesBaseline()` is the join between them.
  *
- * WHAT IT IS NOT
+ * CATEGORY IS NOT DECORATION
  *
- * It is not the 2026 register and it is not the 2026 determination. The
- * voter column is headed RegVoters_2024; the councillor column is the
- * MEC's 2024 determination; the document was produced in February 2025.
- * A municipality's roll moves every week and an MEC may re-determine
- * before the election. So a disagreement between this table and a
- * tenant's own figures is a question, never a contradiction — and
- * nothing in this module blocks anything. `VINTAGE_BASIS` says so, and
- * `municipalRegister.test.ts` fails if that sentence goes missing.
+ * A category C district council is not a small category B. It has no
+ * wards, and its seats are allocated under Schedule 2 of the Municipal
+ * Structures Act, not the Schedule 1 Item 12 formula this build's seat
+ * calculator implements. Running the Schedule 1 calculator on a district
+ * would produce a confident, wrong answer, so `quotaScheduleFor()` names
+ * the family and `assertSchedule1Applies()` refuses. That refusal is
+ * structural rather than documentary on purpose — the same class of
+ * defect as the Item 16 overhang gap this project has already met once.
  */
 import register from '@/data/iec/circular-1-2025-annexure-a.json';
 
@@ -95,24 +90,148 @@ const FILE = register as unknown as RegisterFile;
 export const REGISTER_SOURCE: MunicipalRegisterSource = FILE.source;
 export const REGISTER_ENTRIES: MunicipalRegisterEntry[] = FILE.municipalities;
 
-export const VINTAGE_BASIS =
-  'These are the IEC’s figures as at 2024, published in Annexure A to Circular 1 of 2025. They are not ' +
-  'the 2026 register and not the 2026 determination: a roll moves every week, and an MEC may determine a ' +
-  'different number of councillors before the election. Treat a disagreement with your own figures as a ' +
-  'question about which is current, not as a finding that either is wrong. Nothing here blocks anything.';
+/**
+ * The delimitation version every seat calculation in this build is pinned
+ * to.
+ *
+ * Ward boundaries and council sizes are not static across cycles, so a
+ * seat figure that does not name the delimitation it was computed against
+ * is not reproducible. A 2021 result belongs to the 2021 delimitation; a
+ * 2026 projection belongs to this one.
+ */
+export const DELIMITATION_VERSION = {
+  id: 'IEC-CIRCULAR-1-2025-ANNEXURE-A',
+  description: 'Annexure A to IEC Circular 1 of 2025 — Number of Voters, Councillors, Wards',
+  electoralEvent: 'LGE-2026-11-04',
+  /** See docs/iec-election-timetable-2026.md. */
+  electionDate: '2026-11-04',
+  receivedOn: '2026-09-18',
+} as const;
+
+export const BASELINE_AUTHORITY =
+  'The ward counts and council sizes here are the proclaimed delimitation for the local government ' +
+  'election of 4 November 2026: wards delimited by the Municipal Demarcation Board, councillor numbers ' +
+  'determined by the provincial MECs for local government, and consolidated by the Electoral Commission ' +
+  'in Annexure A to Circular 1 of 2025. Ward and PR candidates are nominated against this structure and ' +
+  'seats will be allocated against it. It is final for this cycle and this application treats it as ' +
+  'authoritative: where your own figures disagree with it, your figures are wrong.';
+
+export const ROLL_BASIS =
+  'The registered-voter figure is the roll the delimitation was drawn against. The roll itself keeps ' +
+  'growing — every registration weekend adds to it — so a municipality carrying more voters today than ' +
+  'the annexure records is the ordinary case and not a discrepancy. The number of wards and the number of ' +
+  'councillors do not move with it.';
 
 export const BAND_BASIS =
-  'The band is the IEC’s own, not this product’s. Annexure A prints a Norm (registered voters ' +
-  'divided by wards, rounded down), a 15% deviation, and a minimum and maximum either side of it. Those ' +
-  'four columns hold together exactly for all 214 warded municipalities in the table, which is why this ' +
-  'build now quotes the band instead of asserting one. The statutory provision behind the 15% is not ' +
-  'quoted here — the circular does not cite one, and this build has not read the Act.';
+  'A ward’s registered voters may not vary from the municipal norm — the roll divided by the number of ' +
+  'wards — by more than 15%. The delimitation was drawn to that criterion and Annexure A publishes the ' +
+  'resulting norm, minimum and maximum for every warded municipality. A seeded ward outside the band ' +
+  'therefore indicates an error in what was captured here, not in the delimitation.';
 
 const BY_CODE = new Map<string, MunicipalRegisterEntry>(FILE.municipalities.map((m) => [m.code, m]));
 
 /** The register row for a municipality code, or null if it carries none. */
 export function lookupMunicipality(code: string): MunicipalRegisterEntry | null {
   return BY_CODE.get(code.trim().toUpperCase()) ?? null;
+}
+
+export type MunicipalCategory = 'A' | 'B' | 'C';
+
+/**
+ * Which Schedule of the Municipal Structures Act allocates this
+ * municipality's seats.
+ *
+ * Metros and locals: Schedule 1, Item 12 — the quota formula
+ * `seatCalculator.ts` implements. Districts: Schedule 2, a different
+ * family with no independent-councillor term, which this build does not
+ * implement.
+ */
+export type QuotaSchedule = 'SCHEDULE_1' | 'SCHEDULE_2';
+
+export function quotaScheduleFor(category: string): QuotaSchedule {
+  return category === 'C' ? 'SCHEDULE_2' : 'SCHEDULE_1';
+}
+
+export const SCHEDULE_2_BASIS =
+  'District (category C) councils allocate seats under Schedule 2 of the Municipal Structures Act, which ' +
+  'is a different formula family from the Schedule 1 Item 12 quota this calculator implements. Running ' +
+  'this calculator on a district council would produce a confident and wrong answer, so it refuses ' +
+  'instead. Schedule 2 is not implemented in this build.';
+
+export interface DelimitationBaseline {
+  version: typeof DELIMITATION_VERSION;
+  code: string;
+  name: string;
+  province: string;
+  category: MunicipalCategory;
+  quotaSchedule: QuotaSchedule;
+  /** Total council seats, as determined by the MEC. */
+  councillors: number;
+  /** Ward seats. Undefined for a district council, which has no wards. */
+  wardSeats?: number;
+  /**
+   * PR seats — always derived as councillors minus ward seats, never
+   * stored and never entered. Two hand-kept copies of this number is how
+   * a PR list is drawn to the wrong length.
+   *
+   * Undefined for a district council: its composition is part-elected and
+   * part-delegated under Schedule 2, and this build does not model it.
+   */
+  prSeats?: number;
+  /** The roll the delimitation was drawn against. */
+  registeredVoters: number;
+  /** Registered voters per ward, as published. Undefined for a district. */
+  norm?: number;
+  minNorm?: number;
+  maxNorm?: number;
+  deviation?: number;
+}
+
+/**
+ * The proclaimed baseline for a municipality, or null where the annexure
+ * carries no such code.
+ */
+export function delimitationFor(code: string): DelimitationBaseline | null {
+  const entry = lookupMunicipality(code);
+  if (!entry) return null;
+  const category = entry.category as MunicipalCategory;
+  const wardSeats = entry.wards;
+  return {
+    version: DELIMITATION_VERSION,
+    code: entry.code,
+    name: entry.name,
+    province: entry.province,
+    category,
+    quotaSchedule: quotaScheduleFor(category),
+    councillors: entry.councillors,
+    wardSeats,
+    prSeats: wardSeats === undefined ? undefined : entry.councillors - wardSeats,
+    registeredVoters: entry.registeredVoters,
+    norm: entry.norm,
+    minNorm: entry.minNorm,
+    maxNorm: entry.maxNorm,
+    deviation: entry.deviation,
+  };
+}
+
+/**
+ * Throw unless the Schedule 1 seat calculator may be run against this
+ * municipality.
+ *
+ * Deliberately a throw rather than a returned flag: a caller that ignores
+ * a flag still gets a number, and a wrong seat projection for a district
+ * council is exactly the kind of confident output this product exists not
+ * to produce. An unknown code is allowed through — a what-if scenario for
+ * a municipality nobody has named is a legitimate use of the calculator.
+ */
+export function assertSchedule1Applies(code: string): void {
+  const baseline = delimitationFor(code);
+  if (baseline && baseline.quotaSchedule !== 'SCHEDULE_1') {
+    throw new Error(
+      `${baseline.code} (${baseline.name}) is a category ${baseline.category} district council. ` +
+        SCHEDULE_2_BASIS,
+    );
+  }
 }
 
 export interface PublishedBand {
@@ -150,11 +269,11 @@ export interface BandComparison {
 }
 
 /**
- * Compare each ward against the IEC's published band.
+ * Compare each ward against the published band.
  *
  * The bounds are inclusive: a ward carrying exactly Max_Norm voters is
- * inside the band, not outside it. The IEC prints integers, and treating
- * its own ceiling as a breach would flag the demarcation it published.
+ * inside the band. The annexure prints integers, and treating the
+ * published ceiling as a breach would flag the delimitation itself.
  */
 export function compareToPublishedBand(
   wards: { wardCode: string; registeredVoters: number }[],
@@ -182,22 +301,37 @@ export function compareToPublishedBand(
     .sort((a, b) => a.registeredVoters - b.registeredVoters);
 }
 
+/** Does a tenant's loaded ward count match the proclaimed delimitation? */
+export function wardCountMatchesBaseline(code: string, wardCount: number): boolean | null {
+  const baseline = delimitationFor(code);
+  if (!baseline || baseline.wardSeats === undefined) return null;
+  return baseline.wardSeats === wardCount;
+}
+
 export type RegisterFindingCode =
   | 'NOT_IN_REGISTER'
-  | 'NO_WARDS_IN_REGISTER'
+  | 'DISTRICT_COUNCIL'
   | 'WARD_COUNT'
   | 'COUNCIL_SEATS'
+  | 'PR_SEATS'
   | 'REGISTERED_VOTERS'
   | 'WARD_SIZES';
 
 export interface RegisterFinding {
   code: RegisterFindingCode;
   /**
-   * CONFIRMS means the tenant's figure and the IEC's agree. DISAGREES
-   * means they do not, which is a question about vintage before it is
-   * anything else. UNKNOWN means the table cannot speak to it.
+   * CONFIRMS — the tenant's figure matches the proclaimed baseline.
+   * CONTRADICTS — it does not, and the baseline is the one that is right.
+   * DRIFT — a figure that is expected to move, reported for information.
+   * UNKNOWN — the baseline cannot speak to it.
    */
-  outcome: 'CONFIRMS' | 'DISAGREES' | 'UNKNOWN';
+  outcome: 'CONFIRMS' | 'CONTRADICTS' | 'DRIFT' | 'UNKNOWN';
+  /**
+   * BLOCKING means campaign output computed from this would be wrong.
+   * Reserved for figures the delimitation fixes: ward count and council
+   * size. A roll difference is never blocking.
+   */
+  severity: 'BLOCKING' | 'WARNING' | 'INFO';
   message: string;
 }
 
@@ -208,18 +342,25 @@ export interface RegisterCheckInput {
   registeredVoters: number;
   /** From Municipality Config, where one has been entered. */
   totalCouncilSeats?: number;
+  /** From Municipality Config. Should always be councillors minus wards. */
+  prSeats?: number;
   wards?: { wardCode: string; registeredVoters: number }[];
 }
 
 export interface RegisterCheck {
+  baseline: DelimitationBaseline | null;
   entry: MunicipalRegisterEntry | null;
   band: PublishedBand | null;
   findings: RegisterFinding[];
+  /** Findings that make campaign output wrong. Empty is the goal state. */
+  blocking: RegisterFinding[];
+  /** True when nothing contradicts the proclaimed baseline. */
+  alignedToBaseline: boolean;
   /** Wards outside the published band, furthest out first. Empty without a band. */
   outsideBand: BandComparison[];
   /**
-   * How far the tenant's roll has moved from the 2024 figure, as a signed
-   * fraction. Null where the table has no figure to compare against.
+   * How far the tenant's roll has grown past the delimitation roll, as a
+   * signed fraction. Null where there is no figure to compare against.
    */
   rollDrift: number | null;
 }
@@ -227,110 +368,145 @@ export interface RegisterCheck {
 const fmt = (n: number) => n.toLocaleString('en-ZA');
 
 /**
- * Check a tenant's municipality against the IEC's published figures.
+ * Check a tenant's municipality against the proclaimed delimitation.
  *
- * Deliberately produces findings for agreement as well as disagreement.
- * `reconcileSeed()` compares a tenant against itself and can only ever
- * report consistency; this is the first check in the build that can say
- * "an outside body publishes the same number", and that is worth showing
- * rather than only reporting when something is wrong.
+ * Reports agreement as well as disagreement. `reconcileSeed()` compares a
+ * tenant against itself and can only ever report internal consistency;
+ * this says whether what has been captured matches the structure the
+ * election will actually be run on.
  */
 export function checkAgainstRegister(input: RegisterCheckInput): RegisterCheck {
   const entry = lookupMunicipality(input.municipalityCode);
+  const baseline = entry ? delimitationFor(entry.code) : null;
   const findings: RegisterFinding[] = [];
 
-  if (!entry) {
+  const done = (): RegisterCheck => {
+    const blocking = findings.filter((f) => f.severity === 'BLOCKING');
     return {
-      entry: null,
-      band: null,
-      outsideBand: [],
-      rollDrift: null,
-      findings: [
-        {
-          code: 'NOT_IN_REGISTER',
-          outcome: 'UNKNOWN',
-          message:
-            `${input.municipalityCode} is not one of the ${FILE.municipalities.length} codes in Annexure A. ` +
-            'Either the code is entered differently here than the IEC writes it, or this is a municipality ' +
-            'the table does not cover. Nothing below could be checked against it.',
-        },
-      ],
+      baseline,
+      entry,
+      band: entry ? publishedBand(entry.code) : null,
+      findings,
+      blocking,
+      alignedToBaseline: blocking.length === 0,
+      outsideBand,
+      rollDrift,
     };
+  };
+
+  let outsideBand: BandComparison[] = [];
+  let rollDrift: number | null = null;
+
+  if (!entry || !baseline) {
+    findings.push({
+      code: 'NOT_IN_REGISTER',
+      outcome: 'UNKNOWN',
+      severity: 'BLOCKING',
+      message:
+        `${input.municipalityCode} is not one of the ${FILE.municipalities.length} municipality codes in the ` +
+        'proclaimed delimitation. Every municipality contesting on 4 November is in that list, so this is a ' +
+        'code entered differently here than the Commission writes it. Correct it in Municipality Config ' +
+        'before anything is computed from it.',
+    });
+    return done();
   }
 
-  if (entry.wards === undefined) {
+  if (baseline.wardSeats === undefined) {
     findings.push({
-      code: 'NO_WARDS_IN_REGISTER',
+      code: 'DISTRICT_COUNCIL',
       outcome: 'UNKNOWN',
+      severity: 'WARNING',
       message:
-        `${entry.code} (${entry.name}) is a district council in Annexure A, and district councils have no ` +
-        'wards. Ward figures here cannot be checked against it.',
+        `${baseline.code} (${baseline.name}) is a category C district council. It has no wards, and its ` +
+        'seats are allocated under Schedule 2. ' +
+        SCHEDULE_2_BASIS,
     });
-  } else if (entry.wards === input.wardCount) {
+  } else if (baseline.wardSeats === input.wardCount) {
     findings.push({
       code: 'WARD_COUNT',
       outcome: 'CONFIRMS',
-      message: `${fmt(input.wardCount)} wards loaded, and the IEC publishes ${fmt(entry.wards)} for ${entry.code}.`,
+      severity: 'INFO',
+      message:
+        `${fmt(input.wardCount)} wards loaded, matching the ${fmt(baseline.wardSeats)} wards delimited for ` +
+        `${baseline.code} for this election.`,
     });
   } else {
     findings.push({
       code: 'WARD_COUNT',
-      outcome: 'DISAGREES',
+      outcome: 'CONTRADICTS',
+      severity: 'BLOCKING',
       message:
-        `${fmt(input.wardCount)} wards are loaded here; Annexure A gives ${entry.code} ` +
-        `${fmt(entry.wards)}. Check the demarcation notice you seeded from is the current one.`,
+        `${fmt(input.wardCount)} wards are loaded here. ${baseline.code} has ${fmt(baseline.wardSeats)} ` +
+        'wards for this election. Every ward-level figure in this application — coverage, canvassing ' +
+        'targets, the ward seats fed to the seat calculator — is computed over the wards that are loaded, ' +
+        'so all of them are wrong until this matches.',
     });
   }
 
   if (input.totalCouncilSeats !== undefined) {
-    if (input.totalCouncilSeats === entry.councillors) {
+    if (input.totalCouncilSeats === baseline.councillors) {
       findings.push({
         code: 'COUNCIL_SEATS',
         outcome: 'CONFIRMS',
+        severity: 'INFO',
         message:
-          `${fmt(entry.councillors)} council seats in Municipality Config, and the same number in the MEC’s ` +
-          'determination as published by the IEC.',
+          `${fmt(baseline.councillors)} council seats, matching the MEC’s determination for ` +
+          `${baseline.code}.`,
       });
     } else {
       findings.push({
         code: 'COUNCIL_SEATS',
-        outcome: 'DISAGREES',
+        outcome: 'CONTRADICTS',
+        severity: 'BLOCKING',
         message:
-          `Municipality Config carries ${fmt(input.totalCouncilSeats)} council seats; the MEC’s ` +
-          `determination in Annexure A gives ${entry.code} ${fmt(entry.councillors)}. The seat calculator ` +
-          'divides by this number, so the difference changes every projection it produces.',
+          `Municipality Config carries ${fmt(input.totalCouncilSeats)} council seats. The MEC determined ` +
+          `${fmt(baseline.councillors)} for ${baseline.code}. The seat quota divides by this number, so ` +
+          'every projection this application produces is wrong until it matches.',
       });
     }
   }
 
-  const rollDrift =
-    entry.registeredVoters > 0
-      ? (input.registeredVoters - entry.registeredVoters) / entry.registeredVoters
+  if (input.prSeats !== undefined && baseline.prSeats !== undefined && input.prSeats !== baseline.prSeats) {
+    findings.push({
+      code: 'PR_SEATS',
+      outcome: 'CONTRADICTS',
+      severity: 'BLOCKING',
+      message:
+        `${fmt(input.prSeats)} PR seats are recorded against ${fmt(baseline.councillors)} council seats and ` +
+        `${fmt(baseline.wardSeats as number)} wards, which leaves ${fmt(baseline.prSeats)}. A PR list drawn ` +
+        'to the wrong length is rejected at nomination.',
+    });
+  }
+
+  rollDrift =
+    baseline.registeredVoters > 0
+      ? (input.registeredVoters - baseline.registeredVoters) / baseline.registeredVoters
       : null;
 
-  if (input.registeredVoters === entry.registeredVoters) {
+  if (input.registeredVoters === baseline.registeredVoters) {
     findings.push({
       code: 'REGISTERED_VOTERS',
       outcome: 'CONFIRMS',
+      severity: 'INFO',
       message:
-        `${fmt(input.registeredVoters)} registered voters loaded, matching Annexure A’s 2024 figure for ` +
-        `${entry.code} exactly.`,
+        `${fmt(input.registeredVoters)} registered voters loaded, matching the roll the delimitation was ` +
+        `drawn against for ${baseline.code} exactly.`,
     });
   } else {
     findings.push({
       code: 'REGISTERED_VOTERS',
-      outcome: 'DISAGREES',
+      outcome: 'DRIFT',
+      severity: 'INFO',
       message:
-        `${fmt(input.registeredVoters)} registered voters are loaded here against Annexure A’s 2024 ` +
-        `figure of ${fmt(entry.registeredVoters)}` +
-        (rollDrift === null ? '' : ` — a difference of ${(rollDrift * 100).toFixed(1)}%`) +
-        '. A roll moves between registration weekends, so a small difference is expected and a large one ' +
-        'is worth tracing.',
+        `${fmt(input.registeredVoters)} registered voters are loaded here; the delimitation was drawn ` +
+        `against ${fmt(baseline.registeredVoters)}` +
+        (rollDrift === null ? '' : ` (${rollDrift >= 0 ? '+' : ''}${(rollDrift * 100).toFixed(1)}%)`) +
+        '. ' +
+        ROLL_BASIS,
     });
   }
 
-  const band = publishedBand(entry.code);
-  let outsideBand: BandComparison[] = [];
+  const band = publishedBand(baseline.code);
   if (band && input.wards && input.wards.length > 0) {
     const comparisons = compareToPublishedBand(input.wards, band);
     outsideBand = comparisons
@@ -341,8 +517,9 @@ export function checkAgainstRegister(input: RegisterCheckInput): RegisterCheck {
       findings.push({
         code: 'WARD_SIZES',
         outcome: 'CONFIRMS',
+        severity: 'INFO',
         message:
-          `All ${comparisons.length} wards fall inside the IEC’s published band of ${fmt(band.minNorm)} to ` +
+          `All ${comparisons.length} wards fall inside the delimitation band of ${fmt(band.minNorm)} to ` +
           `${fmt(band.maxNorm)} voters` +
           (onBound.length > 0 ? `, with ${onBound.join(', ')} sitting exactly on a bound` : '') +
           '.',
@@ -350,14 +527,15 @@ export function checkAgainstRegister(input: RegisterCheckInput): RegisterCheck {
     } else {
       findings.push({
         code: 'WARD_SIZES',
-        outcome: 'DISAGREES',
+        outcome: 'CONTRADICTS',
+        severity: 'WARNING',
         message:
-          `${outsideBand.length} of ${comparisons.length} wards fall outside the IEC’s published band of ` +
-          `${fmt(band.minNorm)} to ${fmt(band.maxNorm)} voters. Check those wards against the demarcation ` +
-          'notice before planning canvassing rounds around them.',
+          `${outsideBand.length} of ${comparisons.length} wards fall outside the delimitation band of ` +
+          `${fmt(band.minNorm)} to ${fmt(band.maxNorm)} voters. Check what was captured for those wards ` +
+          'against the provincial delimitation notice.',
       });
     }
   }
 
-  return { entry, band, findings, outsideBand, rollDrift };
+  return done();
 }

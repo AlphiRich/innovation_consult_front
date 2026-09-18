@@ -124,21 +124,19 @@ describe('the arithmetic', () => {
 });
 
 describe('what the threshold says about itself', () => {
-  it('names the document it now comes from', () => {
+  it('states the delimitation criterion rather than a product tolerance', () => {
     expect(DEFAULT_DEVIATION_ALLOWANCE).toBe(0.15);
-    // Session 35: promoted from "taken from a supplied note" to a
-    // citation, because Annexure A publishes the band as columns and
-    // every warded row in it satisfies the arithmetic.
+    expect(DEVIATION_BASIS).toMatch(/may not vary from the municipal norm by more than 15%/i);
+    expect(DEVIATION_BASIS).toMatch(/the criterion the delimitation for this election was drawn to/i);
     expect(DEVIATION_BASIS).toMatch(/Annexure A to Circular 1 of 2025/);
-    expect(DEVIATION_BASIS).toMatch(/Nothing here blocks anything/i);
   });
 
-  it('still refuses to claim the statute it has not read', () => {
-    // The circular cites no provision, so neither does this. A basis that
-    // said "as required by the Municipal Structures Act" would be the
-    // overclaim the promotion above is one step away from.
-    expect(DEVIATION_BASIS).toMatch(/not quoted here/i);
-    expect(DEVIATION_BASIS).not.toMatch(/\b(required by law|the Act requires|in terms of section)\b/i);
+  it('puts an outlier on the capture, not on the demarcation', () => {
+    // The delimitation is proclaimed and final for this cycle. A ward
+    // outside the band is a data-entry problem here; wording that made it
+    // a question about the demarcation must not come back.
+    expect(DEVIATION_BASIS).toMatch(/captured wrongly here/i);
+    expect(DEVIATION_BASIS).not.toMatch(/not confirmed against|unverified|borrowed|may be wrong/i);
   });
 
   it('explains why the number matters operationally, not only as a check', () => {
