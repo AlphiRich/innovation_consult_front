@@ -707,3 +707,88 @@ Fails.
 **No behaviour changed.** The rule fixed in 32.2 is unaffected — the
 narrowing was always on both codes, and only the sentence describing how
 common the problem is was wrong. It was understated, not overstated.
+
+---
+
+### Entry 33.4 — The pipeline corrected, and download enabled
+
+**Asked for.** Correct the ETL pipeline from entry 33.1 and enable
+download.
+
+**Built.** `tools/source-acquisition/` — `acquire.py`, `sources.json`,
+`README.md`, plus `src/lib/acquisitionTool.test.ts` holding the two
+properties that stop it decaying back into what it replaced.
+
+An operator utility, not part of the application build: nothing in `src/`
+imports it, `npm run build` does not touch it, and it stays Python
+because it runs on somebody's laptop beside their file sync.
+
+**The correction is about reporting more than code.** The original's two
+scrape functions ended in `pass` with every network call commented out —
+but the reason that mattered is that it *announced success*: thirty
+`> Fetching …` lines and `ETL Pipeline complete. The local folder is ready
+for Drive synchronization.` A run that prints per-item progress and then
+declares completion is one somebody runs, sees green, walks away from, and
+believes.
+
+So:
+
+| Original | Corrected |
+|---|---|
+| Prints a fetch line per item, downloads nothing | Nothing reported as fetched unless bytes were written **and verified** |
+| Always prints "ETL Pipeline complete" | No completion message exists on a failed run; exit `0` only if every selected source succeeded, `1` on any failure, `2` if nothing was attempted |
+| No record of what arrived | Every run writes a manifest to `_runs/` — source, outcome, bytes, SHA-256 |
+| Would write whatever came back | Streams to `.part`, verifies, renames only on pass; a rejected payload never takes the real filename |
+| `C:\Users\<name>\Desktop\…` hardcoded | Defaults to the working directory, `--out` to override |
+| "plug in your IEC credentials here" | `auth_env` names an environment variable; no token in the repo, none printed |
+| `requests`, `pandas`, `beautifulsoup4` (pandas unused) | Standard library only |
+
+**Verification is deliberately blunt**: minimum size, content type, leading
+bytes (`%PDF-`, `PK\x03\x04`), and rejection of an HTML document where a
+dataset was expected. That last one is the common silent failure — a
+portal answering an unknown path with an error page, HTTP 200, plausible
+filename, wrong thing entirely.
+
+**What could and could not be proven here.** The build environment's
+network policy denies `elections.org.za`, `demarcation.org.za` and the MDB
+ArcGIS portal at CONNECT (403). So no URL in the registry has been fetched
+from inside this project, and none is marked `CONFIRMED`.
+
+What *was* proven is the machinery. `--self-test` starts a local HTTP
+server, serves six payloads — a good PDF, an HTML error page wearing a
+`.pdf` name, an empty response, a truncated one, a right-sized file with
+wrong bytes, and a 500 — and asserts exactly one is accepted and **none of
+the rejects land on disk**. It passes, with no network and no credentials,
+so it gives the same answer on any machine.
+
+The failure path was also demonstrated end to end: running `--fetch`
+against the real registry from here produced four `FAILED_NETWORK` rows, a
+manifest recording each, `This run did not complete.`, and exit code 1 —
+where the original would have printed thirty progress lines and declared
+success.
+
+**The registry's two deliberate choices.**
+
+- **`status` per source.** `CONFIRMED` means somebody fetched it and
+  checked what came back; `UNCONFIRMED` means it came from a planning note
+  and has never been tested. Both download; both are labelled in the
+  output and the manifest; the summary always says how many unconfirmed
+  sources were involved. Everything ships `UNCONFIRMED`, including the
+  North West gazette whose *contents* this build does use — the filename
+  is confirmed, the path it sits at is not.
+- **Four rows, not thirty.** The supplied plan asked for six provinces ×
+  five cycles. A registry of thirty rows nobody has fetched is a list of
+  guesses wearing the shape of a plan. One row is kept for the MDB ward
+  boundary shapefiles, pointing at the portal's human-facing page because
+  nobody has found the download link — that row is the build's largest
+  outstanding data gap (entry 32.1) and it gets a row so it stays visible.
+
+`api.elections.org.za/results/{year}/LGE/{prov}` is **not** in the
+registry. It was commented out in the script it came from and has never
+been called; repeating it as a known URL would be the error this exercise
+corrects. A guard asserts it stays out.
+
+**Guards proven by injection:** the completion line hoisted above the
+failure return; a source promoted to `CONFIRMED` that nobody fetched; and
+the rename moved ahead of verification so an unverified payload takes the
+real filename. All three fail.

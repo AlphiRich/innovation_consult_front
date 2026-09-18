@@ -1,0 +1,89 @@
+{
+  "$comment": [
+    "Source registry for tools/source-acquisition/acquire.py.",
+    "",
+    "URLs live here rather than in the script so that correcting one is a",
+    "data edit, not a code change, and so that the diff on a correction",
+    "shows exactly what moved.",
+    "",
+    "status: CONFIRMED means a person has fetched this URL and checked that",
+    "what came back is what the entry says. UNCONFIRMED means it came from a",
+    "planning note and has never been tested. Both download; both are",
+    "labelled in the console output and in every run manifest. Nothing in",
+    "this build has been able to reach these hosts — the session that wrote",
+    "this file was on a network that denies them at CONNECT — so every entry",
+    "starts UNCONFIRMED and it is the operator who promotes one.",
+    "",
+    "To promote an entry: run --probe, then --fetch, open the file, satisfy",
+    "yourself it is the right document, and set status to CONFIRMED with a",
+    "note saying when and by whom.",
+    "",
+    "expect: what a good payload looks like. min_bytes and magic are what",
+    "catch a portal answering an unknown path with a login page or an error",
+    "page — HTTP 200, plausible filename, wrong thing entirely.",
+    "",
+    "auth_env: the environment variable holding a bearer token, where a",
+    "source needs one. Never put the token in this file."
+  ],
+
+  "targetFolderName": "07_Geospatial_and_Electoral_Data",
+
+  "sources": [
+    {
+      "id": "mdb-nw405-gazette-8929",
+      "province": "NW",
+      "category": "MDB_Gazettes",
+      "filename": "8929_18112025_NWestDemarcation.pdf",
+      "url": "https://www.demarcation.org.za/wp-content/uploads/2025/11/8929_18112025_NWestDemarcation.pdf",
+      "status": "UNCONFIRMED",
+      "note": "North West Provincial Gazette Extraordinary Vol 268 No. 8929, 18 November 2025 (Provincial Notice 1300 of 2025). This is the notice docs/nw405-seed-data.md was parsed from, and the only source in this registry whose contents this build has actually used. The URL is a reconstruction of where it is published and has not been fetched from here — the filename is the confirmed part, the path is not.",
+      "expect": {
+        "content_type": "application/pdf",
+        "min_bytes": 51200,
+        "magic": "pdf"
+      }
+    },
+    {
+      "id": "mdb-ward-boundaries-2026",
+      "province": "ZA",
+      "category": "MDB_Spatial",
+      "filename": "mdb-wards-2026.zip",
+      "url": "https://dataportal-mdb-sa.opendata.arcgis.com/datasets/wards-2026/explore",
+      "status": "UNCONFIRMED",
+      "note": "Ward boundary shapefiles. This is the thing the build actually needs and does not have — see the register, entry 32.1: the ward GeoJSON supplied in session 32 carried generated lattice coordinates, not centroids, so this product still holds no ward geometry. The URL here is the portal's human-facing page, not a download link; whoever runs this first must find the dataset's actual download endpoint and replace it. Left in deliberately so the gap has a row rather than being absent.",
+      "expect": {
+        "content_type": "application/zip",
+        "min_bytes": 102400,
+        "magic": "zip"
+      }
+    },
+    {
+      "id": "iec-lge-2021-nw-ward-results",
+      "province": "NW",
+      "category": "IEC_Results",
+      "filename": "LGE_2021_NW_ward_results.csv",
+      "url": "https://www.elections.org.za/dashboards/lge/downloads/LGE2021_NW_Ward.csv",
+      "status": "UNCONFIRMED",
+      "note": "Ward-level results for the 2021 local government election. URL shape inferred from the supplied acquisition note and never tested. The note's api.elections.org.za/results/{year}/LGE/{prov} form is NOT used here: it was commented out in the script it came from, never called by anyone, and repeating it as though it were known would be the error this whole exercise is correcting. Expect to replace this URL.",
+      "expect": {
+        "content_type": "text/csv",
+        "min_bytes": 2048,
+        "reject_html": true
+      }
+    },
+    {
+      "id": "iec-lge-2016-nw-ward-results",
+      "province": "NW",
+      "category": "IEC_Results",
+      "filename": "LGE_2016_NW_ward_results.csv",
+      "url": "https://www.elections.org.za/dashboards/lge/downloads/LGE2016_NW_Ward.csv",
+      "status": "UNCONFIRMED",
+      "note": "As above, for the 2016 cycle. The supplied plan asked for 2000, 2006, 2011, 2016 and 2021 across six provinces — thirty combinations. Two are listed here rather than thirty: a registry of twenty-eight rows nobody has ever fetched is a list of guesses wearing the shape of a plan. Add rows as URLs are confirmed.",
+      "expect": {
+        "content_type": "text/csv",
+        "min_bytes": 2048,
+        "reject_html": true
+      }
+    }
+  ]
+}
