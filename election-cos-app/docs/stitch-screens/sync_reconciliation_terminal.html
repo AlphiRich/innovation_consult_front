@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sync Reconciliation | Strategic Voter Systems</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Archivo+Narrow:wght@600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#faf8ff",
+                    "primary-container": "#1a2246",
+                    "on-primary-fixed": "#10193c",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "on-surface": "#141a31",
+                    "inverse-primary": "#bdc4f1",
+                    "surface-container": "#ebedff",
+                    "surface-bright": "#faf8ff",
+                    "secondary": "#795907",
+                    "tertiary-fixed": "#ffdadb",
+                    "surface-dim": "#d3d9f7",
+                    "outline-variant": "#c6c5cf",
+                    "on-secondary-fixed": "#261900",
+                    "on-secondary-container": "#785805",
+                    "primary-fixed": "#dde1ff",
+                    "on-tertiary-fixed-variant": "#832331",
+                    "secondary-container": "#fdd178",
+                    "on-error-container": "#93000a",
+                    "on-background": "#141a31",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "surface-tint": "#545c84",
+                    "inverse-on-surface": "#eff0ff",
+                    "tertiary-container": "#510013",
+                    "on-primary-container": "#8289b4",
+                    "on-secondary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "tertiary": "#290006",
+                    "primary": "#040c30",
+                    "surface-variant": "#dce1ff",
+                    "surface-container-highest": "#dce1ff",
+                    "secondary-fixed-dim": "#ebc169",
+                    "secondary-fixed": "#ffdea1",
+                    "on-surface-variant": "#46464e",
+                    "surface-container-low": "#f3f2ff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed": "#40000d",
+                    "background": "#faf8ff",
+                    "surface-container-high": "#e4e7ff",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#292f47",
+                    "tertiary-fixed-dim": "#ffb2b7",
+                    "outline": "#76767f",
+                    "on-tertiary-container": "#dc6672",
+                    "on-tertiary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "margin-mobile": "16px",
+                    "container-max": "1280px",
+                    "unit": "4px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Archivo Narrow"],
+                    "headline-lg": ["Archivo Narrow"],
+                    "body-sm": ["Inter"],
+                    "label-md": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "headline-md": ["Archivo Narrow"],
+                    "headline-sm": ["Archivo Narrow"],
+                    "display-lg": ["Archivo Narrow"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        .sync-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        .data-stream {
+            background: linear-gradient(90deg, transparent 0%, #1a2246 50%, transparent 100%);
+            background-size: 200% 100%;
+            animation: flow 3s linear infinite;
+        }
+        @keyframes flow {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- Top AppBar -->
+<header class="w-full top-0 sticky z-50 bg-surface border-b border-outline-variant/20 flex items-center justify-between px-margin-mobile h-14">
+<div class="flex items-center gap-4">
+<button class="active:opacity-80 transition-opacity p-2 hover:bg-surface-container-low transition-colors rounded-full">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile text-primary">Sync Reconciliation</h1>
+</div>
+<button class="active:opacity-80 transition-opacity p-2 hover:bg-surface-container-low transition-colors rounded-full">
+<span class="material-symbols-outlined text-primary">more_vert</span>
+</button>
+</header>
+<main class="pb-32">
+<!-- 1. Sync Status Header -->
+<section class="px-margin-mobile py-6 bg-surface-container-low">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="material-symbols-outlined text-secondary text-4xl" style="font-variation-settings: 'FILL' 1;">cloud_sync</span>
+<div class="absolute -top-1 -right-1 w-3 h-3 bg-secondary rounded-full sync-pulse"></div>
+</div>
+<div>
+<p class="font-label-md text-label-md text-secondary uppercase tracking-wider">System Connectivity</p>
+<h2 class="font-headline-sm text-headline-sm text-primary">Local Cache Active</h2>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 p-4 bg-surface-container-lowest border border-outline-variant/30 rounded-lg">
+<div class="flex justify-between items-center">
+<span class="font-body-sm text-on-surface-variant">Last Handshake</span>
+<span class="font-label-md text-label-md text-primary">12:44:02.891 UTC</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+<div class="data-stream h-full w-full opacity-30"></div>
+</div>
+</div>
+</section>
+<!-- 2. Conflict Resolution Visualizer -->
+<section class="px-margin-mobile py-8 border-b border-outline-variant/10">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">gavel</span>
+<h3 class="font-headline-sm text-headline-sm text-primary">Conflict Resolution</h3>
+</div>
+<div class="p-6 bg-primary-container text-on-primary-container rounded-xl relative overflow-hidden">
+<!-- Abstract visual of LWW -->
+<div class="flex items-center justify-between mb-6 relative z-10">
+<div class="flex flex-col items-center gap-2 opacity-60">
+<div class="w-12 h-12 rounded-lg bg-surface/10 flex items-center justify-center border border-surface/20">
+<span class="material-symbols-outlined text-surface">edit_document</span>
+</div>
+<span class="font-label-md text-[10px] uppercase">Node A</span>
+</div>
+<div class="flex-1 flex flex-col items-center px-4">
+<span class="material-symbols-outlined text-secondary-fixed-dim mb-1">history</span>
+<div class="h-px w-full bg-gradient-to-r from-transparent via-secondary-fixed-dim to-transparent"></div>
+<span class="font-label-md text-[10px] mt-2 text-center uppercase tracking-tighter">LWW Protocol</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-12 h-12 rounded-lg bg-secondary-fixed-dim/20 flex items-center justify-center border border-secondary-fixed-dim/40 shadow-lg shadow-secondary-container/10">
+<span class="material-symbols-outlined text-secondary-fixed-dim">verified</span>
+</div>
+<span class="font-label-md text-[10px] uppercase text-secondary-fixed-dim">Priority</span>
+</div>
+</div>
+<p class="font-body-sm text-on-primary-container relative z-10 leading-relaxed">
+                    In the event of concurrent edits to a voter profile, the system prioritizes the record with the <span class="text-secondary-fixed-dim font-semibold italic">most recent millisecond-accurate timestamp</span>.
+                </p>
+<!-- Background decoration -->
+<div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-[120px]">architecture</span>
+</div>
+</div>
+</section>
+<!-- 3. Sync Queue List -->
+<section class="px-margin-mobile py-8">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">data_thresholding</span>
+<h3 class="font-headline-sm text-headline-sm text-primary">Sync Queue</h3>
+</div>
+<span class="bg-surface-container-high px-2 py-1 rounded font-label-md text-primary">3 Pending</span>
+</div>
+<div class="space-y-4">
+<!-- Item 1 -->
+<div class="flex items-start gap-4 p-4 bg-white border border-outline-variant/30 rounded-xl">
+<div class="mt-1 w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">person_add</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<h4 class="font-body-md font-semibold text-primary">Voter Log: V-8892</h4>
+<span class="font-label-md text-secondary uppercase">Reconciling</span>
+</div>
+<p class="font-label-md text-on-surface-variant mt-1">TS: 2023-10-27T14:22:01.002Z</p>
+<div class="mt-2 w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 65%;"></div>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-start gap-4 p-4 bg-white border border-outline-variant/30 rounded-xl">
+<div class="mt-1 w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">report_problem</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<h4 class="font-body-md font-semibold text-primary">Incident: I-042</h4>
+<span class="font-label-md text-on-surface-variant uppercase">Queued</span>
+</div>
+<p class="font-label-md text-on-surface-variant mt-1">TS: 2023-10-27T14:23:45.118Z</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant">schedule</span>
+</div>
+<!-- Item 3 -->
+<div class="flex items-start gap-4 p-4 bg-surface-container-low border border-outline-variant/10 rounded-xl opacity-60">
+<div class="mt-1 w-10 h-10 rounded-full bg-white flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<h4 class="font-body-md font-semibold text-primary">Voter Log: V-8891</h4>
+<span class="font-label-md text-on-surface-variant uppercase">Synced</span>
+</div>
+<p class="font-label-md text-on-surface-variant mt-1">TS: 2023-10-27T14:15:00.000Z</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. Technical Guardrails -->
+<section class="px-margin-mobile py-8 bg-surface-container-lowest">
+<div class="border-t border-outline-variant/20 pt-6">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">shield</span>
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Technical Guardrails</h3>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 border border-outline-variant/20 rounded-lg">
+<span class="material-symbols-outlined text-primary mb-2">lock</span>
+<h5 class="font-body-sm font-bold text-primary">AES-256</h5>
+<p class="text-[10px] text-on-surface-variant leading-tight mt-1">End-to-end client-side encryption active.</p>
+</div>
+<div class="p-4 border border-outline-variant/20 rounded-lg">
+<span class="material-symbols-outlined text-primary mb-2">database</span>
+<h5 class="font-body-sm font-bold text-primary">Dexie.js</h5>
+<p class="text-[10px] text-on-surface-variant leading-tight mt-1">Persistent IndexedDB offline storage.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Shell & Primary Action -->
+<div class="fixed bottom-0 w-full z-50">
+<!-- Floating Primary Action -->
+<div class="px-margin-mobile pb-6">
+<button class="w-full bg-primary text-on-primary py-4 rounded-lg flex items-center justify-center gap-3 active:scale-95 transition-transform shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">sync</span>
+<span class="font-headline-sm tracking-wide">Manual Force Sync</span>
+</button>
+</div>
+<!-- Shared Bottom Nav (Suppressed for focused task, but keeping for layout context as requested) -->
+<nav class="bg-surface border-t border-outline-variant/20 flex justify-around items-center h-16 px-margin-mobile w-full">
+<div class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined">format_list_bulleted</span>
+<span class="font-label-md text-[10px] mt-1">Walk List</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-md text-[10px] mt-1">Map</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined">person_search</span>
+<span class="font-label-md text-[10px] mt-1">Search</span>
+</div>
+<!-- Active State: Settings/Sync is often under settings or a technical hub -->
+<div class="flex flex-col items-center justify-center text-primary border-t-2 border-secondary h-full pt-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-md text-[10px] mt-1">Settings</span>
+</div>
+</nav>
+</div>
+<script>
+        // Micro-interaction for the sync button
+        const syncBtn = document.querySelector('button.bg-primary');
+        syncBtn.addEventListener('click', () => {
+            const icon = syncBtn.querySelector('.material-symbols-outlined');
+            icon.classList.add('animate-spin');
+            syncBtn.style.opacity = '0.8';
+            
+            setTimeout(() => {
+                icon.classList.remove('animate-spin');
+                syncBtn.style.opacity = '1';
+                // Trigger a toast or feedback (not requested but good UX)
+            }, 2000);
+        });
+    </script>
+</body></html>

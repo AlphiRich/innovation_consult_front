@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ward Sentiment Comparison | INNOVATION CONSULT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#c9c6c1",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "primary-fixed": "#dde1ff",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#ffffff",
+                    "on-secondary-container": "#785805",
+                    "surface-tint": "#1A2246",
+                    "primary-container": "#1a2246",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "error-container": "#ffdad6",
+                    "surface-container": "#f3f2ff",
+                    "outline": "#76767f",
+                    "tertiary-container": "#252521",
+                    "on-primary-container": "#ffffff",
+                    "on-error": "#ffffff",
+                    "on-surface-variant": "#46464e",
+                    "secondary-fixed": "#B7913F",
+                    "secondary": "#B7913F",
+                    "secondary-fixed-dim": "#B7913F",
+                    "error": "#7E1F2E",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "on-tertiary-fixed-variant": "#474743",
+                    "surface-container-highest": "#dce1ff",
+                    "background": "#ffffff",
+                    "on-secondary-fixed": "#261900",
+                    "surface-dim": "#d3d9f7",
+                    "on-background": "#141a31",
+                    "surface-container-low": "#f3f2ff",
+                    "inverse-on-surface": "#eff0ff",
+                    "outline-variant": "#c6c5cf",
+                    "on-surface": "#141a31",
+                    "on-primary": "#ffffff",
+                    "secondary-container": "#B7913F",
+                    "on-primary-fixed": "#10193c",
+                    "primary": "#1A2246",
+                    "tertiary": "#7E1F2E",
+                    "inverse-primary": "#bdc4f1",
+                    "inverse-surface": "#292f47",
+                    "on-tertiary-container": "#8d8c87",
+                    "surface-variant": "#dce1ff",
+                    "surface-container-high": "#e4e7ff",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#faf8ff",
+                    "tertiary-fixed": "#e5e2dc",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "brand-green": "#2F7E4A",
+                    "brand-gold": "#B7913F",
+                    "brand-maroon": "#7E1F2E",
+                    "brand-navy": "#1A2246"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "max-width": "1440px",
+                    "gutter": "16px",
+                    "margin-desktop": "32px",
+                    "unit": "4px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Archivo Narrow"],
+                    "headline-md": ["Archivo Narrow"],
+                    "display-lg-mobile": ["Archivo Narrow"],
+                    "data-mono": ["Archivo Narrow"],
+                    "body-md": ["Archivo Narrow"],
+                    "label-caps": ["Archivo Narrow"],
+                    "body-lg": ["Archivo Narrow"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .sentiment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 2px;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c6c5cf;
+        }
+        body { font-family: 'Archivo Narrow', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-brand-navy text-on-primary font-body-md docked full-width top-0 border-b border-outline-variant/20 flex justify-between items-center w-full px-margin-desktop h-20 z-50 sticky">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<img alt="Innovation Consult Logo" class="h-12 w-auto object-contain brightness-0 invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeMjbk1LZhQRCcC5PX2Hp-JJ7vTFIx-9dlOdKijNuvUfXFuog-FUkgwreRMzhAS0l_lSjw-xSQpOYVuWJVGX9BukVDf1FUl7tzDYCzxRqvyHNL0f_5344Am04FlUqxx9SDmwK5NiIcWkJZnfXx8Wf8DJdWTeHYKLdpS-6Ps-DcAFMZgGp7lT2xqYv6kcn-O71ZNBit94wUPClIeDMlitdT3RbIAEU3FCh4dV3opC5-Lep6hzABPsxh_gjHGFxmYwTvC13pTHSI-w"/>
+<div class="hidden sm:block border-l border-on-primary/20 pl-4">
+<h1 class="font-headline-md text-xl font-bold tracking-tighter leading-none">INNOVATION CONSULT</h1>
+<p class="font-label-caps text-[10px] tracking-widest text-secondary-fixed">KNOWLEDGE TO ACTION</p>
+</div>
+</div>
+<nav class="hidden md:flex items-center gap-6 ml-4">
+<a class="text-secondary-fixed border-b-2 border-secondary-fixed pb-1 font-bold" href="#">Analytics</a>
+<a class="text-on-primary/70 hover:text-on-primary transition-colors" href="#">Voter Map</a>
+<a class="text-on-primary/70 hover:text-on-primary transition-colors" href="#">Campaigns</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-primary/50">search</span>
+<input class="bg-primary-container border border-outline-variant/30 text-on-primary-container font-body-md pl-10 pr-4 py-1.5 rounded-sm focus:ring-1 focus:ring-secondary-fixed w-64" placeholder="Search Wards..." type="text"/>
+</div>
+<button class="material-symbols-outlined hover:bg-primary-container/50 p-2 transition-colors">notifications</button>
+<button class="material-symbols-outlined hover:bg-primary-container/50 p-2 transition-colors">help_outline</button>
+<div class="w-8 h-8 rounded-full bg-secondary-fixed overflow-hidden border border-on-primary/20">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDze1JR7rwzXHSu1GJ8s44AkSPjVjkRy9NyCVxl2VXUudOi1eCIwNO9-41yE9sTfYm7TdQE4rz5kUlzachUwIig5FNRRNShnOsJgfKkQ3_i2bp9AZCYkaTDhpHJB9TOWauvrlset2YS_mBjiDwmWejqYd8qj117N_BNj_CXO_7f9dicyOcz32RCqt7yoPwHJvt99IvaDYGpwVBnnz1GQ27T0NkjtXjcgTfj30TexnbEOxBdbxIWw0xV-2YhSuFU5gimlKx_9sfNzA"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1">
+<!-- SideNavBar -->
+<aside class="bg-surface-container-lowest border-r border-outline-variant/30 flex flex-col h-screen sticky top-0 left-0 pt-6 pb-8 w-64 hidden md:flex shrink-0">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-brand-navy text-3xl">analytics</span>
+<div>
+<h2 class="font-headline-md text-brand-navy text-lg leading-tight uppercase tracking-wider">STRATEGIC INTEL</h2>
+<p class="font-label-caps text-[10px] text-on-surface-variant/70">MUNICIPAL COMMAND</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1 px-3">
+<a class="flex items-center gap-3 px-4 py-3 font-label-caps text-on-surface-variant hover:bg-surface-container hover:text-brand-navy transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span> War Room
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 font-label-caps text-on-surface-variant hover:bg-surface-container hover:text-brand-navy transition-colors" href="#">
+<span class="material-symbols-outlined">report_problem</span> Incidents
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 font-label-caps text-on-surface-variant hover:bg-surface-container hover:text-brand-navy transition-colors" href="#">
+<span class="material-symbols-outlined">groups</span> Voters
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 font-label-caps text-on-surface-variant hover:bg-surface-container hover:text-brand-navy transition-colors" href="#">
+<span class="material-symbols-outlined">local_shipping</span> Logistics
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 font-label-caps text-brand-navy border-l-4 border-brand-gold bg-surface-container-high font-bold" href="#">
+<span class="material-symbols-outlined">analytics</span> Analytics
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 font-label-caps text-on-surface-variant hover:bg-surface-container hover:text-brand-navy transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+            </a>
+</nav>
+<div class="px-3 mt-auto space-y-4">
+<button class="w-full bg-brand-gold text-on-primary font-label-caps py-3 tracking-widest hover:brightness-110 active:scale-95 transition-all">
+                LAUNCH CAMPAIGN
+            </button>
+<div class="pt-4 border-t border-outline-variant/30 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 font-label-caps text-on-surface-variant text-[10px] hover:text-brand-navy" href="#">
+<span class="material-symbols-outlined text-sm">contact_support</span> Support
+                </a>
+<a class="flex items-center gap-3 px-4 py-2 font-label-caps text-on-surface-variant text-[10px] hover:text-brand-navy" href="#">
+<span class="material-symbols-outlined text-sm">inventory_2</span> Archive
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto bg-surface p-margin-mobile md:p-margin-desktop">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+<div>
+<h2 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-brand-navy uppercase tracking-tight">Ward Sentiment Comparison</h2>
+<p class="text-on-surface-variant max-w-2xl font-body-lg">Cross-ward volatility analysis and constituent temperature monitoring for Strategic Decision Making.</p>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<div class="flex items-center gap-2 bg-surface-container-lowest border border-outline-variant/30 px-3 py-2">
+<span class="font-label-caps text-on-surface-variant">RANGE:</span>
+<select class="bg-transparent border-none font-label-caps text-brand-navy p-0 focus:ring-0"><option>LAST 24H</option><option>7 DAYS</option><option selected="">30 DAYS</option></select>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-lowest border border-outline-variant/30 px-3 py-2">
+<span class="font-label-caps text-on-surface-variant">WARD:</span>
+<select class="bg-transparent border-none font-label-caps text-brand-navy p-0 focus:ring-0">
+<option>ALL WARDS (01-42)</option>
+<option>PRECINCT ALPHA</option>
+<option>PRECINCT BRAVO</option>
+</select>
+</div>
+<button class="bg-white border border-outline-variant/30 text-brand-navy px-4 py-2 flex items-center gap-2 font-label-caps tracking-widest hover:bg-surface-container-low transition-colors" onclick="const toast = document.getElementById('download-toast'); toast.classList.remove('hidden'); setTimeout(() =&gt; toast.classList.add('hidden'), 3000);">
+<span class="material-symbols-outlined text-sm">description</span>
+                    DOWNLOAD SUMMARY
+                </button>
+<button class="bg-brand-navy text-on-primary px-4 py-2 flex items-center gap-2 font-label-caps tracking-widest hover:bg-brand-navy/90">
+<span class="material-symbols-outlined text-sm">file_download</span> EXPORT DATA
+                </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- 1. Sentiment Leaderboard (Left Side) -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-lowest border border-outline-variant/20 flex flex-col h-[600px] rounded-sm">
+<div class="p-4 border-b border-outline-variant/10 flex justify-between items-center bg-brand-navy text-on-primary">
+<h3 class="font-label-caps tracking-wider">SENTIMENT LEADERBOARD</h3>
+<span class="material-symbols-outlined">sort</span>
+</div>
+<div class="overflow-y-auto flex-1 custom-scrollbar">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container sticky top-0 z-10">
+<tr>
+<th class="px-4 py-2 font-label-caps text-[10px] text-on-surface-variant">WARD</th>
+<th class="px-4 py-2 font-label-caps text-[10px] text-on-surface-variant">INDEX</th>
+<th class="px-4 py-2 font-label-caps text-[10px] text-on-surface-variant text-right">STATUS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-4 py-3 font-data-mono font-bold text-brand-navy">WARD 04</td>
+<td class="px-4 py-3 font-data-mono text-brand-green font-bold">+88</td>
+<td class="px-4 py-3 text-right">
+<span class="bg-brand-green/10 text-brand-green text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Positive</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-4 py-3 font-data-mono font-bold text-brand-navy">WARD 12</td>
+<td class="px-4 py-3 font-data-mono text-brand-green font-bold">+72</td>
+<td class="px-4 py-3 text-right">
+<span class="bg-brand-green/10 text-brand-green text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Positive</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-4 py-3 font-data-mono font-bold text-brand-navy">WARD 09</td>
+<td class="px-4 py-3 font-data-mono text-brand-gold font-bold">+12</td>
+<td class="px-4 py-3 text-right">
+<span class="bg-brand-gold/10 text-brand-gold text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Neutral</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors border-l-4 border-brand-gold">
+<td class="px-4 py-3 font-data-mono font-bold text-brand-navy">WARD 18</td>
+<td class="px-4 py-3 font-data-mono text-brand-gold font-bold">-14</td>
+<td class="px-4 py-3 text-right">
+<span class="bg-brand-gold text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Contested</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-4 py-3 font-data-mono font-bold text-brand-navy">WARD 31</td>
+<td class="px-4 py-3 font-data-mono text-brand-maroon font-bold">-42</td>
+<td class="px-4 py-3 text-right">
+<span class="bg-brand-maroon/10 text-brand-maroon text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Volatile</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-4 py-3 font-data-mono font-bold text-brand-navy">WARD 07</td>
+<td class="px-4 py-3 font-data-mono text-brand-maroon font-bold">-68</td>
+<td class="px-4 py-3 text-right">
+<span class="bg-brand-maroon/10 text-brand-maroon text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Negative</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-4 py-3 font-data-mono font-bold text-brand-navy">WARD 22</td>
+<td class="px-4 py-3 font-data-mono text-brand-maroon font-bold">-91</td>
+<td class="px-4 py-3 text-right">
+<span class="bg-brand-maroon text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Critical</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- 2. Large Heat Map Visualization (Center/Top) -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant/20 p-6 flex flex-col h-[400px] rounded-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-label-caps text-brand-navy tracking-wider font-bold">SENTIMENT INDEX MAP (30-DAY AGGREGATE)</h3>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1">
+<div class="w-3 h-3 bg-brand-green"></div>
+<span class="text-[10px] font-label-caps">STABLE</span>
+</div>
+<div class="flex items-center gap-1">
+<div class="w-3 h-3 bg-brand-gold"></div>
+<span class="text-[10px] font-label-caps">CONTESTED</span>
+</div>
+<div class="flex items-center gap-1">
+<div class="w-3 h-3 bg-brand-maroon"></div>
+<span class="text-[10px] font-label-caps">VOLATILE</span>
+</div>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-between">
+<div class="sentiment-grid h-48 content-start">
+<!-- Mapping to Innovation Consult brand scale -->
+<div class="h-10 bg-brand-green" title="Ward 01: +92"></div>
+<div class="h-10 bg-brand-green/80"></div>
+<div class="h-10 bg-brand-green/60"></div>
+<div class="h-10 bg-brand-green/40"></div>
+<div class="h-10 bg-brand-green/20"></div>
+<div class="h-10 bg-surface-container"></div>
+<div class="h-10 bg-surface-container-high"></div>
+<div class="h-10 bg-brand-gold/20"></div>
+<div class="h-10 bg-brand-gold/40"></div>
+<div class="h-10 bg-brand-gold/60"></div>
+<div class="h-10 bg-brand-gold/80"></div>
+<div class="h-10 bg-brand-gold"></div>
+<div class="h-10 bg-brand-maroon/20"></div>
+<div class="h-10 bg-brand-maroon/40"></div>
+<div class="h-10 bg-brand-maroon/60"></div>
+<div class="h-10 bg-brand-maroon/80"></div>
+<div class="h-10 bg-brand-maroon"></div>
+<div class="h-10 bg-brand-green"></div>
+<div class="h-10 bg-brand-gold/50"></div>
+<div class="h-10 bg-surface-container"></div>
+<div class="h-10 bg-brand-maroon/70"></div>
+<div class="h-10 bg-brand-maroon"></div>
+<div class="h-10 bg-brand-green/90"></div>
+<div class="h-10 bg-brand-green/70"></div>
+<div class="h-10 bg-brand-green/30"></div>
+<div class="h-10 bg-surface-container"></div>
+<div class="h-10 bg-brand-gold/30"></div>
+<div class="h-10 bg-brand-maroon/90"></div>
+<div class="h-10 bg-brand-maroon"></div>
+<div class="h-10 bg-brand-green/50"></div>
+<div class="h-10 bg-surface-container"></div>
+<div class="h-10 bg-brand-gold"></div>
+<div class="h-10 bg-brand-gold/60"></div>
+<div class="h-10 bg-brand-green/40"></div>
+<div class="h-10 bg-brand-green/80"></div>
+<div class="h-10 bg-surface-container"></div>
+<div class="h-10 bg-brand-maroon/40"></div>
+<div class="h-10 bg-brand-maroon/70"></div>
+<div class="h-10 bg-brand-gold/90"></div>
+<div class="h-10 bg-brand-green"></div>
+<div class="h-10 bg-brand-green/60"></div>
+<div class="h-10 bg-brand-green/30"></div>
+</div>
+<div class="mt-4 pt-4 border-t border-outline-variant/10 flex justify-between text-[10px] font-data-mono text-on-surface-variant font-bold">
+<span>WARD 01</span>
+<span>WARD 21</span>
+<span>WARD 42</span>
+</div>
+</div>
+</div>
+<!-- 3. Top Issues by Ward Grid -->
+<div class="col-span-12 lg:col-span-5 bg-surface-container-lowest border border-outline-variant/20 p-6 flex flex-col rounded-sm">
+<h3 class="font-label-caps text-brand-navy tracking-wider mb-6 font-bold">CRITICAL ISSUES: PRIORITY WARDS</h3>
+<div class="space-y-3">
+<div class="flex items-center gap-4 p-3 border-l-4 border-brand-maroon bg-brand-maroon/5">
+<div class="w-12 h-12 flex items-center justify-center bg-brand-maroon text-on-primary font-data-mono font-bold text-lg">31</div>
+<div class="flex-1">
+<h4 class="font-label-caps text-brand-navy text-[10px]">WARD 31 (UPPER PLAINS)</h4>
+<p class="text-brand-maroon font-bold text-lg tracking-tight">WATER SECURITY</p>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-[10px] text-brand-maroon font-bold">92% INTENSITY</span>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 border-l-4 border-brand-maroon bg-brand-maroon/5">
+<div class="w-12 h-12 flex items-center justify-center bg-brand-maroon text-on-primary font-data-mono font-bold text-lg">22</div>
+<div class="flex-1">
+<h4 class="font-label-caps text-brand-navy text-[10px]">WARD 22 (RIVERFRONT)</h4>
+<p class="text-brand-maroon font-bold text-lg tracking-tight">JOB CREATION</p>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-[10px] text-brand-maroon font-bold">78% INTENSITY</span>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 border-l-4 border-brand-gold bg-brand-gold/5">
+<div class="w-12 h-12 flex items-center justify-center bg-brand-gold text-on-primary font-data-mono font-bold text-lg">18</div>
+<div class="flex-1">
+<h4 class="font-label-caps text-brand-navy text-[10px]">WARD 18 (UPPER)</h4>
+<p class="text-brand-gold font-bold text-lg tracking-tight">PUBLIC SAFETY</p>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-[10px] text-brand-gold font-bold">64% INTENSITY</span>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 border-l-4 border-brand-gold bg-brand-gold/5">
+<div class="w-12 h-12 flex items-center justify-center bg-brand-gold text-on-primary font-data-mono font-bold text-lg">07</div>
+<div class="flex-1">
+<h4 class="font-label-caps text-brand-navy text-[10px]">WARD 07 (CENTRAL)</h4>
+<p class="text-brand-gold font-bold text-lg tracking-tight">LAND TENURE</p>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-[10px] text-brand-gold font-bold">59% INTENSITY</span>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 border-l-4 border-brand-gold bg-brand-gold/5">
+<div class="w-12 h-12 flex items-center justify-center bg-brand-gold text-on-primary font-data-mono font-bold text-lg">09</div>
+<div class="flex-1">
+<h4 class="font-label-caps text-brand-navy text-[10px]">WARD 09 (SOUTH)</h4>
+<p class="text-brand-gold font-bold text-lg tracking-tight">WASTE MGMT</p>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-[10px] text-brand-gold font-bold">55% INTENSITY</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 4. Strategic Insights & Timeline -->
+<div class="col-span-12 lg:col-span-3 flex flex-col gap-6">
+<!-- Strategic Insight Card -->
+<div class="bg-brand-navy text-on-primary p-6 border-l-[6px] border-brand-gold relative overflow-hidden rounded-sm shadow-lg">
+<div class="relative z-10">
+<h3 class="font-label-caps tracking-widest mb-3 text-brand-gold font-bold">STRATEGIC ALERT</h3>
+<p class="text-xl font-bold leading-tight tracking-tight">Shift identified in Ward 18 from <span class="text-brand-gold">Neutral</span> to <span class="text-brand-maroon">Critical</span> over 48h.</p>
+<div class="mt-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-brand-gold">trending_down</span>
+<span class="text-[11px] font-data-mono uppercase font-bold tracking-wider">Field presence mandated.</span>
+</div>
+</div>
+<div class="absolute right-[-20px] bottom-[-20px] opacity-10 scale-150">
+<span class="material-symbols-outlined text-9xl">priority_high</span>
+</div>
+</div>
+<!-- Municipal Pulse Diary -->
+<div class="bg-surface-container-lowest border border-outline-variant/20 p-6 flex-1 rounded-sm shadow-sm">
+<h3 class="font-label-caps text-brand-navy tracking-wider mb-6 font-bold">INTELLIGENCE FEED</h3>
+<div class="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[1px] before:bg-outline-variant/40">
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-[22px] h-[22px] bg-white border-2 border-brand-green rounded-full flex items-center justify-center z-10">
+<span class="w-2 h-2 bg-brand-green rounded-full"></span>
+</div>
+<p class="font-data-mono text-[10px] text-on-surface-variant font-bold">08:42 AM</p>
+<p class="text-xs font-bold text-brand-navy uppercase">Ward 04 Stabilization</p>
+<p class="text-[11px] text-on-surface-variant leading-tight mt-1">Canvassing reports 85% positive reception on utility proposal.</p>
+</div>
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-[22px] h-[22px] bg-white border-2 border-brand-gold rounded-full flex items-center justify-center z-10">
+<span class="w-2 h-2 bg-brand-gold rounded-full"></span>
+</div>
+<p class="font-data-mono text-[10px] text-on-surface-variant font-bold">07:15 AM</p>
+<p class="text-xs font-bold text-brand-navy uppercase">Ward 18 Volatility</p>
+<p class="text-[11px] text-on-surface-variant leading-tight mt-1">Social activity rise regarding infrastructure delays.</p>
+</div>
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-[22px] h-[22px] bg-white border-2 border-brand-maroon rounded-full flex items-center justify-center z-10">
+<span class="w-2 h-2 bg-brand-maroon rounded-full animate-pulse"></span>
+</div>
+<p class="font-data-mono text-[10px] text-on-surface-variant font-bold">06:02 AM</p>
+<p class="text-xs font-bold text-brand-navy uppercase">Incident: Ward 31</p>
+<p class="text-[11px] text-on-surface-variant leading-tight mt-1">Minor picket at local water hub. Logistics alert active.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Stats (Global) -->
+<div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="bg-brand-navy p-5 border border-brand-navy/20 rounded-sm">
+<p class="font-label-caps text-[10px] text-on-primary/60 font-bold">AGGREGATE SENTIMENT</p>
+<p class="text-3xl font-bold text-on-primary">+12.4</p>
+<div class="w-full bg-white/10 h-1.5 mt-3">
+<div class="bg-brand-gold h-full w-[62%]"></div>
+</div>
+</div>
+<div class="bg-surface-container-low p-5 border border-outline-variant/30 rounded-sm">
+<p class="font-label-caps text-[10px] text-on-surface-variant font-bold">TOP PERFORMING WARD</p>
+<p class="text-3xl font-bold text-brand-green">WARD 04</p>
+<p class="text-[11px] font-data-mono text-on-surface-variant font-bold mt-1">+88 INDEX</p>
+</div>
+<div class="bg-surface-container-low p-5 border border-outline-variant/30 rounded-sm">
+<p class="font-label-caps text-[10px] text-on-surface-variant font-bold">MOST VOLATILE WARD</p>
+<p class="text-3xl font-bold text-brand-maroon">WARD 22</p>
+<p class="text-[11px] font-data-mono text-on-surface-variant font-bold mt-1">-91 INDEX</p>
+</div>
+<div class="bg-surface-container-low p-5 border border-outline-variant/30 rounded-sm">
+<p class="font-label-caps text-[10px] text-on-surface-variant font-bold">CONTESTED WARDS</p>
+<p class="text-3xl font-bold text-brand-gold">08 / 42</p>
+<p class="text-[11px] font-data-mono text-on-surface-variant font-bold mt-1">19% OF TOTAL</p>
+</div>
+</div>
+</main>
+</div>
+<!-- Bottom Navigation (Mobile Only) -->
+<footer class="md:hidden bg-brand-navy text-on-primary fixed bottom-0 left-0 w-full flex justify-around items-center h-16 z-50 px-4 border-t border-on-primary/10">
+<a class="flex flex-col items-center gap-1 opacity-50" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-label-caps">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-secondary-fixed" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-label-caps">Analytics</span>
+</a>
+<a class="flex flex-col items-center gap-1 opacity-50" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="text-[10px] font-label-caps">Voters</span>
+</a>
+<a class="flex flex-col items-center gap-1 opacity-50" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-label-caps">Settings</span>
+</a>
+</footer>
+<div class="hidden fixed bottom-20 right-8 z-50 bg-brand-navy text-on-primary px-6 py-4 rounded-sm shadow-2xl border-l-4 border-brand-gold flex items-center gap-3 animate-pulse" id="download-toast">
+<span class="material-symbols-outlined text-brand-gold">download_done</span>
+<div class="flex flex-col">
+<p class="font-label-caps text-[10px] text-brand-gold font-bold">SYSTEM NOTIFICATION</p>
+<p class="text-sm font-bold tracking-tight">Report Exported: Ward_Analysis_2024.pdf</p>
+</div>
+</div>
+<script>
+    // Micro-interactions for Heatmap
+    document.querySelectorAll('.sentiment-grid div').forEach(ward => {
+        ward.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.15)';
+            this.style.zIndex = '20';
+            this.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.2)';
+            this.style.borderRadius = '2px';
+        });
+        ward.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.zIndex = '1';
+            this.style.boxShadow = 'none';
+            this.style.borderRadius = '0px';
+        });
+    });
+</script>
+</body></html>

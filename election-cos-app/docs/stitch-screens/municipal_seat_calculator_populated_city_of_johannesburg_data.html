@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Civic Authority | War Room Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Archivo+Narrow:wght@600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "secondary-fixed-dim": "#ebc169",
+                "primary-fixed": "#dde1ff",
+                "primary": "#040c30",
+                "on-secondary-container": "#785805",
+                "inverse-on-surface": "#f0f1f2",
+                "surface-tint": "#545c84",
+                "error-container": "#ffdad6",
+                "on-secondary": "#ffffff",
+                "surface-container-lowest": "#ffffff",
+                "tertiary-fixed-dim": "#ffb2b7",
+                "tertiary-container": "#510013",
+                "on-error-container": "#93000a",
+                "surface-container-high": "#e7e8e9",
+                "on-primary": "#ffffff",
+                "surface": "#f8f9fa",
+                "primary-container": "#1a2246",
+                "outline": "#76767f",
+                "on-background": "#191c1d",
+                "on-surface-variant": "#46464e",
+                "secondary-container": "#fdd178",
+                "surface-variant": "#e1e3e4",
+                "on-error": "#ffffff",
+                "background": "#f8f9fa",
+                "secondary": "#795907",
+                "on-primary-container": "#8289b4",
+                "tertiary": "#290006",
+                "muted-navy": "#484E6B",
+                "surface-container": "#edeeef",
+                "inverse-surface": "#2e3132",
+                "accent-teal": "#2A7D7E",
+                "on-secondary-fixed": "#261900",
+                "inverse-primary": "#bdc4f1",
+                "on-primary-fixed-variant": "#3d456b",
+                "soft-teal": "#E6F4F1",
+                "on-tertiary-fixed-variant": "#832331",
+                "on-tertiary": "#ffffff",
+                "on-tertiary-container": "#dc6672",
+                "on-tertiary-fixed": "#40000d",
+                "soft-amber": "#FDF6E9",
+                "primary-fixed-dim": "#bdc4f1",
+                "error": "#ba1a1a",
+                "surface-container-highest": "#e1e3e4",
+                "secondary-fixed": "#ffdea1",
+                "on-secondary-fixed-variant": "#5c4300",
+                "surface-container-low": "#f3f4f5",
+                "surface-bright": "#f8f9fa",
+                "outline-variant": "#c6c5cf",
+                "tertiary-fixed": "#ffdadb",
+                "surface-dim": "#d9dadb",
+                "on-primary-fixed": "#10193c",
+                "on-surface": "#191c1d"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "margin-mobile": "1rem",
+                "margin-desktop": "10vw",
+                "step-gap": "4rem",
+                "gutter": "1.5rem",
+                "content-inset": "2rem"
+            },
+            "fontFamily": {
+                "label-caps": ["Inter"],
+                "headline-lg-mobile": ["Archivo Narrow"],
+                "body-lg": ["Inter"],
+                "step-number": ["Archivo Narrow"],
+                "headline-lg": ["Archivo Narrow"],
+                "body-md": ["Inter"],
+                "headline-md": ["Archivo Narrow"]
+            },
+            "fontSize": {
+                "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                "headline-lg-mobile": ["32px", {"lineHeight": "38px", "fontWeight": "700"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "step-number": ["64px", {"lineHeight": "1", "fontWeight": "700"}],
+                "headline-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "headline-md": ["24px", {"lineHeight": "30px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .step-card-active {
+            border-left: 6px solid #E6F4F1;
+            box-shadow: 0px 12px 24px rgba(26, 34, 70, 0.08);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c6c5cf; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-16 bg-primary border-b border-outline-variant">
+<div class="flex items-center gap-8">
+<span class="text-headline-md font-headline-md font-bold text-on-primary">Civic Authority</span>
+<div class="hidden md:flex gap-6">
+<a class="text-secondary-container font-bold font-label-caps text-label-caps transition-colors" href="#">Dashboard</a>
+<a class="text-on-primary/70 hover:text-secondary-fixed transition-colors font-label-caps text-label-caps" href="#">Calculations</a>
+<a class="text-on-primary/70 hover:text-secondary-fixed transition-colors font-label-caps text-label-caps" href="#">Thresholds</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-primary cursor-pointer active:opacity-80">notifications</span>
+<span class="material-symbols-outlined text-on-primary cursor-pointer active:opacity-80">account_circle</span>
+</div>
+</header>
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden md:flex fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-surface border-r border-outline-variant flex-col pt-4">
+<div class="px-6 mb-8">
+<p class="text-label-caps font-label-caps text-on-surface-variant uppercase tracking-widest opacity-50">War Room</p>
+<p class="text-body-md font-body-md font-bold text-primary">Strategic Planner</p>
+</div>
+<div class="flex flex-col flex-1">
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-caps font-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-primary border-l-4 border-secondary-container bg-surface-container-low font-bold transition-all" href="#">
+<span class="material-symbols-outlined">calculate</span>
+<span class="text-label-caps font-label-caps">Vote Calculator</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="text-label-caps font-label-caps">Threshold Analyzer</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">settings_applications</span>
+<span class="text-label-caps font-label-caps">Municipality Config</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-label-caps font-label-caps">Reports</span>
+</a>
+</div>
+<div class="p-6 border-t border-outline-variant flex flex-col gap-2">
+<button class="bg-primary text-on-primary py-2 px-4 rounded-lg font-label-caps text-label-caps flex items-center justify-center gap-2 hover:bg-primary-container transition-all">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Calculation
+            </button>
+<div class="mt-4 flex flex-col gap-2">
+<a class="flex items-center gap-2 text-on-surface-variant text-label-caps font-label-caps hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">help_outline</span> Support
+                </a>
+<a class="flex items-center gap-2 text-on-surface-variant text-label-caps font-label-caps hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">inventory_2</span> Archive
+                </a>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-20 md:pb-8 px-margin-mobile md:pl-[calc(16rem+2rem)] md:pr-8 max-w-full">
+<!-- Header & Top Stepper -->
+<div class="mb-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="bg-soft-amber text-on-secondary-container px-3 py-1 rounded-full text-label-caps font-label-caps border border-secondary-container">MUNICIPAL CASE STUDY</span>
+<span class="text-on-surface-variant font-label-caps text-label-caps opacity-60">REF: JHB-2024-ZA</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">City of Johannesburg (JHB)</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-2xl mt-2">Allocating proportional representation seats based on total valid votes and ward victories across the metropolitan area.</p>
+</div>
+<div class="flex gap-3">
+<button class="border border-secondary text-secondary py-3 px-6 rounded-lg font-label-caps text-label-caps flex items-center gap-2 hover:bg-soft-amber transition-all">
+<span class="material-symbols-outlined">description</span> View Gazette
+                    </button>
+<button class="bg-primary text-on-primary py-3 px-8 rounded-lg font-headline-md text-[14px] flex items-center gap-2 hover:bg-primary-container transition-all shadow-md">
+<span class="material-symbols-outlined">picture_as_pdf</span> Export Results
+                    </button>
+</div>
+</div>
+<!-- Progress Bar -->
+<div class="flex items-center gap-1 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+<div class="flex-1 min-w-[120px] h-1.5 bg-secondary-fixed rounded-full"></div>
+<div class="flex-1 min-w-[120px] h-1.5 bg-primary rounded-full"></div>
+<div class="flex-1 min-w-[120px] h-1.5 bg-surface-container-highest rounded-full"></div>
+<div class="flex-1 min-w-[120px] h-1.5 bg-surface-container-highest rounded-full"></div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Calculation & Table (8 Cols) -->
+<div class="lg:col-span-8 flex flex-col gap-8">
+<!-- Input/Quota Summary Card -->
+<section class="bg-white p-content-inset rounded-xl border border-outline-variant step-card-active">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-lg bg-soft-teal flex items-center justify-center text-primary font-bold text-xl">1</div>
+<h2 class="font-headline-md text-headline-md text-primary">Calculation Foundation (Quota)</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant/30">
+<p class="text-label-caps font-label-caps text-on-surface-variant mb-1">Total Valid Votes (V)</p>
+<p class="text-headline-md font-headline-md text-primary">1,245,680</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-lg border border-outline-variant/30">
+<p class="text-label-caps font-label-caps text-on-surface-variant mb-1">Council Seats (S)</p>
+<p class="text-headline-md font-headline-md text-primary">270</p>
+</div>
+<div class="p-4 bg-soft-amber rounded-lg border border-secondary-container">
+<p class="text-label-caps font-label-caps text-secondary font-bold mb-1">Droop Quota (Q)</p>
+<p class="text-headline-md font-headline-md text-primary">4,615</p>
+<p class="text-[10px] text-on-surface-variant mt-1">Formula: [(V / S) + 1]</p>
+</div>
+</div>
+</section>
+<!-- Seat Allocation Bento Table -->
+<section class="bg-white overflow-hidden rounded-xl border border-outline-variant">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h3 class="font-headline-md text-[20px] text-primary">Seat Allocation Protocol</h3>
+<div class="flex gap-2">
+<div class="flex items-center gap-1 text-label-caps font-label-caps text-on-surface-variant bg-white px-3 py-1 rounded border border-outline-variant">
+<span class="material-symbols-outlined text-sm">filter_list</span> Filter
+                             </div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface text-label-caps font-label-caps text-on-surface-variant border-b border-outline-variant">
+<th class="p-4 font-bold">Political Party</th>
+<th class="p-4 font-bold text-center">PR Votes</th>
+<th class="p-4 font-bold text-center">Entitlement</th>
+<th class="p-4 font-bold text-center">Ward Wins</th>
+<th class="p-4 font-bold text-right bg-soft-teal/50">Allocated PR</th>
+</tr>
+</thead>
+<tbody class="text-body-md font-body-md">
+<tr class="border-b border-outline-variant hover:bg-surface-container transition-colors">
+<td class="p-4 font-bold text-primary">Party A</td>
+<td class="p-4 text-center">500,000</td>
+<td class="p-4 text-center">108</td>
+<td class="p-4 text-center text-accent-teal font-bold">60</td>
+<td class="p-4 text-right font-bold text-primary bg-soft-teal/20">48</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container transition-colors">
+<td class="p-4 font-bold text-primary">Party B</td>
+<td class="p-4 text-center">300,000</td>
+<td class="p-4 text-center">65</td>
+<td class="p-4 text-center text-accent-teal font-bold">30</td>
+<td class="p-4 text-right font-bold text-primary bg-soft-teal/20">35</td>
+</tr>
+<tr class="border-b border-outline-variant hover:bg-surface-container transition-colors">
+<td class="p-4 font-bold text-primary">Party C</td>
+<td class="p-4 text-center">150,000</td>
+<td class="p-4 text-center">32</td>
+<td class="p-4 text-center text-accent-teal font-bold">10</td>
+<td class="p-4 text-right font-bold text-primary bg-soft-teal/20">22</td>
+</tr>
+<tr class="bg-surface-container-lowest opacity-50">
+<td class="p-4 text-on-surface-variant">Other Independent</td>
+<td class="p-4 text-center">295,680</td>
+<td class="p-4 text-center">65</td>
+<td class="p-4 text-center">170</td>
+<td class="p-4 text-right">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Right Column: Threshold Intelligence (4 Cols) -->
+<aside class="lg:col-span-4 flex flex-col gap-6">
+<!-- Strategic Insight Callout -->
+<div class="bg-soft-amber p-6 rounded-xl border border-secondary-container">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<h4 class="font-headline-md text-headline-md text-on-secondary-container">Threshold Intelligence</h4>
+</div>
+<div class="space-y-4">
+<div>
+<p class="text-label-caps font-label-caps text-secondary uppercase mb-1">The Droop Quota</p>
+<p class="text-body-md font-body-md text-on-surface-variant">
+                                A critical mathematical limit. In the JHB scenario, a party must secure a minimum of 4,615 votes to be considered for its first seat allocation.
+                            </p>
+</div>
+<div class="pt-4 border-t border-secondary-container/50">
+<p class="text-label-caps font-label-caps text-secondary uppercase mb-1">Largest Remainder Method</p>
+<p class="text-body-md font-body-md text-on-surface-variant">
+                                After primary allocation, unassigned seats are distributed to parties with the highest decimal remainders. This ensures full 270 seat occupancy.
+                            </p>
+</div>
+</div>
+</div>
+<!-- Strategic Illustration Placeholder -->
+<div class="relative bg-primary-container rounded-xl aspect-[4/3] overflow-hidden flex items-center justify-center p-8 group">
+<div class="absolute inset-0 opacity-40 bg-cover bg-center group-hover:scale-105 transition-transform duration-700" data-alt="A clean, minimalist infographic showing a stylized city map of Johannesburg with data points and seat distribution overlays. The style is professional architectural blueprint meets digital data visualization, using deep navy, gold, and soft teal colors with high-key studio lighting." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBEjk54C-WjbVmLmeOG0I9UtI8u-AjM7offCnucJ-yUu6s32PoyBujwFu2CNagLyKFIqr-1S_qo1zf92D8ceey_wfg2t2bUIWK4-GTPVvG7OGr1w5wfltaAf3iBWJ_IM-5NXSTNsgXqDk1CxcE3YTiztp_j7SR_pxu_PLlDtEAuspSQ-2mxpwGBM8tDI5_xDk4GsiF0-rn5SFr5kaT1NgPY67CXk3ebqve5zZAUb7UWv2xfT67A83IcQcKHI2cPPF5j_N870m6FNA')"></div>
+<div class="relative z-10 text-center">
+<p class="text-on-primary-container font-headline-md text-headline-md mb-2">Visual Mapping</p>
+<p class="text-on-primary/60 text-body-md">Ward distribution vs PR weight analysis</p>
+</div>
+</div>
+<!-- Help/Doc Card -->
+<div class="bg-white p-6 rounded-xl border border-outline-variant">
+<h5 class="font-headline-md text-[18px] text-primary mb-4">Documentation</h5>
+<ul class="space-y-3">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-accent-teal">verified</span>
+<span class="text-body-md text-on-surface-variant">Municipal Structures Act, 1998</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-accent-teal">verified</span>
+<span class="text-body-md text-on-surface-variant">IEC Election Handbook 2024</span>
+</li>
+</ul>
+</div>
+</aside>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-2 md:hidden bg-primary shadow-lg border-t border-outline-variant">
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 active:bg-primary-fixed-dim rounded-xl transition-all scale-95 duration-75" href="#">
+<span class="material-symbols-outlined">calculate</span>
+<span class="text-label-caps font-label-caps">Calculations</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl p-2 transition-all scale-95 duration-75" href="#">
+<span class="material-symbols-outlined">trending_up</span>
+<span class="text-label-caps font-label-caps">Thresholds</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 active:bg-primary-fixed-dim rounded-xl transition-all scale-95 duration-75" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-label-caps font-label-caps">Config</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary/60 p-2 active:bg-primary-fixed-dim rounded-xl transition-all scale-95 duration-75" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-label-caps font-label-caps">Stats</span>
+</a>
+</nav>
+<!-- FAB (Floating Action Button) - Contextual for Calculations -->
+<button class="fixed bottom-24 right-8 md:bottom-8 md:right-8 w-14 h-14 bg-secondary-container text-on-secondary-container rounded-full shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40 group">
+<span class="material-symbols-outlined text-3xl">add</span>
+<span class="absolute right-full mr-4 bg-primary text-on-primary text-label-caps px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Run New Calculation</span>
+</button>
+<script>
+        // Simple Micro-interactions
+        document.querySelectorAll('button, a').forEach(el => {
+            el.addEventListener('click', (e) => {
+                const ripple = document.createElement('div');
+                ripple.classList.add('ripple');
+                // Effect logic here if needed
+            });
+        });
+    </script>
+</body></html>

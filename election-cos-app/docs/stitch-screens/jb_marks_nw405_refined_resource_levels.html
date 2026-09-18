@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ward 12 Logistics Summary</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;600;700&amp;family=Public+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#dce9ff",
+                    "surface-tint": "#545c84",
+                    "outline-variant": "#c6c5cf",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "on-primary-container": "#8289b4",
+                    "tertiary-container": "#252521",
+                    "secondary-container": "#fdd178",
+                    "on-tertiary-container": "#8d8c87",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "on-background": "#0b1c30",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "secondary-fixed-dim": "#ebc169",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#ffdea1",
+                    "primary-container": "#1a2246",
+                    "on-primary": "#ffffff",
+                    "primary-fixed": "#dde1ff",
+                    "inverse-primary": "#bdc4f1",
+                    "surface": "#f8f9ff",
+                    "tertiary-fixed": "#e5e2dc",
+                    "tertiary": "#10100d",
+                    "error-container": "#ffdad6",
+                    "primary": "#040c30",
+                    "on-secondary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary": "#795907",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#213145",
+                    "outline": "#76767f",
+                    "tertiary-fixed-dim": "#c9c6c1",
+                    "on-secondary-container": "#785805",
+                    "error": "#ba1a1a",
+                    "surface-variant": "#d3e4fe",
+                    "surface-container": "#e5eeff",
+                    "on-secondary-fixed": "#261900",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "on-tertiary-fixed-variant": "#474743",
+                    "on-surface-variant": "#46464e",
+                    "on-surface": "#0b1c30",
+                    "surface-bright": "#f8f9ff",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "on-primary-fixed": "#10193c",
+                    "inverse-on-surface": "#eaf1ff",
+                    "surface-dim": "#cbdbf5",
+                    "background": "#f8f9ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "margin-desktop": "32px",
+                    "gutter": "16px",
+                    "max-width": "1440px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "data-mono": ["Public Sans"],
+                    "display-lg": ["Archivo Narrow"],
+                    "body-lg": ["Public Sans"],
+                    "label-caps": ["Archivo Narrow"],
+                    "display-lg-mobile": ["Archivo Narrow"],
+                    "body-md": ["Public Sans"],
+                    "headline-md": ["Archivo Narrow"]
+            },
+            "fontSize": {
+                    "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #f8f9ff;
+            color: #0b1c30;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+        .paper-border {
+            border: 1px solid rgba(11, 28, 48, 0.1);
+        }
+        .critical-alert {
+            border-left: 4px solid #ba1a1a;
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0% { border-left-color: #ba1a1a; }
+            50% { border-left-color: transparent; }
+            100% { border-left-color: #ba1a1a; }
+        }
+        .sticky-col {
+            position: sticky;
+            left: 0;
+            background-color: inherit;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Top Navigation -->
+<header class="fixed top-0 w-full bg-surface border-b border-outline-variant z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary p-2 hover:bg-surface-container-low transition-colors rounded-lg">menu</button>
+<h1 class="text-headline-md font-headline-md font-bold tracking-tighter text-primary">RESOURCE ALLOCATION</h1>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex gap-8">
+<a class="text-label-caps font-label-caps text-primary font-bold" href="#">LOGISTICS</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors" href="#">FLEET</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors" href="#">PERSONNEL</a>
+</nav>
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center border border-outline-variant overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a campaign administrator in a well-lit modern office setting. The individual is wearing a crisp white shirt, exuding an air of strategic authority and calm leadership. The photography style is high-end editorial with shallow depth of field, using natural light to create soft highlights and deep, authoritative shadows against a clean, architectural background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6E1TC7PQ9lhRAYMd8d-rwt98jKBEd-YqVc2UA59Tvm2loXgvMaN6-6kCrqRUSoI8zvOqFoSso4V71ITAHqEZa_SZJZNBno6pT87AL6AG7hmZRIfe6TF0jkQ81oZmbrOKniuR6CiJ_S9CPJufwEJYfnA_ccHcTDwli-Xal-N_EtrbJBR3ZS52BnziuqahtKA-pGrwYEH3BvNfDGa-E4uX7reP6aqjWtxrmp52OEItUsJJGjuoT72b0GKgEMdq--_dHssRFNIrWAg"/>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-20 px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto">
+<!-- Header Section -->
+<section class="mb-8">
+<h2 class="text-display-lg-mobile md:text-display-lg font-display-lg text-primary leading-tight">JB Marks (NW405) Logistics Summary</h2>
+<p class="text-body-lg text-on-surface-variant mt-2 max-w-2xl">Central command view for resource deployment, fleet status, and inventory health within the Ward 12 district.</p>
+</section>
+<!-- KPI Bento Grid -->
+<div class="bento-grid mb-8">
+<!-- Health KPIs -->
+<div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Airtime -->
+<div class="bg-surface-container-lowest paper-border p-6 rounded-lg flex flex-col justify-between"><div><span class="text-label-caps font-label-caps text-on-surface-variant mb-4 block">AIRTIME VOUCHERS</span><div class="flex items-end gap-2"><span class="text-display-lg-mobile font-display-lg text-primary">88%</span><span class="text-secondary font-bold text-sm mb-2">STABLE</span></div></div><div class="w-full bg-surface-container-high h-1 mt-4"><div class="bg-primary h-full" style="width: 88%"></div></div></div>
+<!-- Petrol -->
+<div class="bg-surface-container-lowest paper-border p-6 rounded-lg flex flex-col justify-between"><div><span class="text-label-caps font-label-caps text-on-surface-variant mb-4 block">PETROL RESERVES</span><div class="flex items-end gap-2"><span class="text-secondary font-display-lg text-display-lg-mobile">45%</span><span class="text-secondary font-bold text-sm mb-2">LOW</span></div></div><div class="w-full bg-surface-container-high h-1 mt-4"><div class="bg-secondary h-full" style="width: 45%"></div></div></div>
+<!-- Field Kits -->
+<div class="bg-surface-container-lowest paper-border p-6 rounded-lg flex flex-col justify-between"><div><span class="text-label-caps font-label-caps text-on-surface-variant mb-4 block">FIELD KITS</span><div class="flex items-end gap-2"><span class="text-display-lg-mobile font-display-lg text-primary">92%</span><span class="text-secondary font-bold text-sm mb-2">EXCELLENT</span></div></div><div class="w-full bg-surface-container-high h-1 mt-4"><div class="bg-primary h-full" style="width: 92%"></div></div></div>
+<!-- Staff -->
+<div class="bg-surface-container-lowest paper-border p-6 rounded-lg flex flex-col justify-between">
+<div>
+<span class="text-label-caps font-label-caps text-on-surface-variant mb-4 block">STAFF ON DUTY</span>
+<div class="flex items-end gap-2">
+<span class="text-display-lg-mobile font-display-lg text-primary">12</span>
+<span class="text-on-surface-variant font-bold text-sm mb-2">LEADS</span>
+</div>
+</div>
+<div class="flex gap-1 mt-4">
+<div class="w-2 h-2 bg-secondary rounded-full"></div>
+<div class="w-2 h-2 bg-secondary rounded-full"></div>
+<div class="w-2 h-2 bg-secondary rounded-full"></div>
+<div class="w-2 h-2 bg-secondary rounded-full"></div>
+<div class="w-2 h-2 bg-outline-variant rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Tactical Actions -->
+<div class="col-span-12 lg:col-span-4 bg-primary text-on-primary p-6 rounded-lg flex flex-col justify-between border border-primary">
+<span class="text-label-caps font-label-caps text-primary-fixed mb-6 block">TACTICAL ACTIONS</span>
+<div class="space-y-3">
+<button class="w-full py-3 px-4 bg-secondary-container text-on-secondary-container font-label-caps text-label-caps flex items-center justify-between hover:bg-secondary-fixed transition-all group active:scale-95">
+                        REQUEST RE-SUPPLY
+                        <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform" data-icon="local_shipping">local_shipping</span>
+</button>
+<button class="w-full py-3 px-4 border border-outline-variant text-on-primary font-label-caps text-label-caps flex items-center justify-between hover:bg-white/10 transition-all active:scale-95">
+                        REASSIGN LEAD
+                        <span class="material-symbols-outlined text-sm" data-icon="person_add">person_add</span>
+</button>
+<button class="w-full py-3 px-4 border border-outline-variant text-on-primary font-label-caps text-label-caps flex items-center justify-between hover:bg-white/10 transition-all active:scale-95">
+                        CONFIGURE LIMITS
+                        <span class="material-symbols-outlined text-sm" data-icon="settings_input_component">settings_input_component</span>
+</button>
+</div>
+</div>
+<!-- Map Visualization -->
+<div class="col-span-12 lg:col-span-7 h-[400px] bg-surface-container-low paper-border rounded-lg relative overflow-hidden group">
+<div class="absolute top-6 left-6 z-10 bg-surface/90 backdrop-blur-sm p-4 border border-outline-variant">
+<span class="text-label-caps font-label-caps text-primary block mb-1">DEPLOYMENT MAP</span>
+<span class="text-body-md text-on-surface-variant">JB Marks Tactical Deployment - NW405</span>
+</div>
+<div class="w-full h-full bg-cover bg-center transition-transform duration-1000 group-hover:scale-105" data-alt="A clean, grayscale architectural map of an urban district. The map uses minimal lines and professional cartography styling. Vibrant amber pins mark specific locations across the grid, with subtle glowing pulses around them. The lighting is neutral, corporate, and precise, mirroring a data-driven command center interface." data-location="JB Marks Local Municipality" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBJmhArWBWYQ3joFrJygKbC_G_PJP1dxcqLhooxoUbI4RdAQAQUOa4EjiXYgGnSmWmbvdYyFEg9riB-N21wUCJziXN61FhKIuZS6UmZWpBUgh2HuuKFZc2CWU2_UO5BAXdrEYf9Z633OzPzJhtpH1RCTlMBrrdCG8Aupv7uLS_K9fnogv1x0KHND_-Ov0D2-9X0Fj3GhTVo1YHWK-9H5R1C7tNthhTYA6hd_JBGosKlQJ7hfq_BWhXLs_rzy7HRlmxOtsCqV-NCyw')"></div>
+<!-- Map Overlay Elements -->
+<div class="absolute inset-0 pointer-events-none">
+<div class="absolute top-1/4 left-1/3 w-4 h-4 bg-secondary border-4 border-white rounded-full shadow-lg"></div>
+<div class="absolute top-1/2 left-2/3 w-4 h-4 bg-secondary border-4 border-white rounded-full shadow-lg"></div>
+<div class="absolute bottom-1/3 left-1/2 w-4 h-4 bg-secondary border-4 border-white rounded-full shadow-lg"></div>
+</div>
+</div>
+<!-- Saturation List -->
+<div class="col-span-12 lg:col-span-5 bg-surface-container-lowest paper-border p-6 rounded-lg">
+<span class="text-label-caps font-label-caps text-on-surface-variant block mb-6">SATURATION BY VD</span>
+<div class="space-y-6">
+<div class="flex items-center justify-between group"><div class="flex flex-col"><span class="text-body-md font-bold text-primary">Voting District 1</span><span class="text-label-caps text-on-surface-variant">12 Active Volunteers</span></div><div class="text-right"><span class="text-label-caps font-bold text-primary block">95%</span><div class="w-24 h-2 bg-surface-container-high rounded-full mt-1"><div class="bg-secondary h-full rounded-full" style="width: 95%"></div></div></div></div>
+<div class="flex items-center justify-between group"><div class="flex flex-col"><span class="text-body-md font-bold text-primary">Voting District 2</span><span class="text-label-caps text-on-surface-variant">8 Active Volunteers</span></div><div class="text-right"><span class="text-label-caps font-bold text-primary block">78%</span><div class="w-24 h-2 bg-surface-container-high rounded-full mt-1"><div class="bg-secondary h-full rounded-full" style="width: 78%"></div></div></div></div>
+<div class="flex items-center justify-between group"><div class="flex flex-col"><span class="text-body-md font-bold text-primary">Voting District 3</span><span class="text-label-caps text-on-surface-variant">4 Active Volunteers</span></div><div class="text-right"><span class="text-label-caps font-bold text-secondary block">54%</span><div class="w-24 h-2 bg-surface-container-high rounded-full mt-1"><div class="bg-secondary h-full rounded-full" style="width: 54%"></div></div></div></div>
+<div class="flex items-center justify-between group">
+<div class="flex flex-col">
+<span class="text-body-md font-bold text-primary">Voting District 4</span>
+<span class="text-label-caps text-on-surface-variant">15 Active Volunteers</span>
+</div>
+<div class="text-right">
+<span class="text-label-caps font-bold text-primary block">100%</span>
+<div class="w-24 h-2 bg-surface-container-high rounded-full mt-1">
+<div class="bg-primary h-full rounded-full" style="width: 100%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Inventory Table -->
+<div class="col-span-12 bg-surface-container-lowest paper-border rounded-lg overflow-hidden">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-low/30">
+<span class="text-label-caps font-label-caps text-primary">WARD 12 ASSET INVENTORY</span>
+<div class="flex gap-2">
+<span class="text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-1 rounded">FILTER: ALL</span>
+<span class="text-label-caps text-on-surface-variant bg-surface-container-high px-2 py-1 rounded">SORT: STATUS</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="p-4 text-label-caps font-label-caps text-on-surface-variant">ASSET TYPE</th>
+<th class="p-4 text-label-caps font-label-caps text-on-surface-variant">ID CODE</th>
+<th class="p-4 text-label-caps font-label-caps text-on-surface-variant">LOCATION / VD</th>
+<th class="p-4 text-label-caps font-label-caps text-on-surface-variant">LAST INSPECTION</th>
+<th class="p-4 text-label-caps font-label-caps text-on-surface-variant">STATUS</th>
+<th class="p-4 text-label-caps font-label-caps text-on-surface-variant text-right">ACTION</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-fixed-dim bg-primary p-1 text-sm rounded">mic_detect_auto</span>
+<span class="font-bold text-body-md">Gazebo (3x3m)</span>
+</div>
+</td>
+<td class="p-4 text-data-mono font-data-mono">W12-GZ-009</td>
+<td class="p-4 text-body-md">VD 01 - North Entry</td>
+<td class="p-4 text-data-mono">Oct 24, 08:30</td>
+<td class="p-4">
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container text-label-caps font-bold rounded">IN FIELD</span>
+</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:underline font-label-caps text-xs">DETAILS</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-fixed-dim bg-primary p-1 text-sm rounded">volume_up</span>
+<span class="font-bold text-body-md">PA Sound System</span>
+</div>
+</td>
+<td class="p-4 text-data-mono font-data-mono">W12-SS-042</td>
+<td class="p-4 text-body-md text-error">Central Maintenance</td>
+<td class="p-4 text-data-mono">Oct 22, 14:15</td>
+<td class="p-4">
+<span class="px-2 py-1 border border-outline text-on-surface-variant text-label-caps font-bold rounded">MAINTENANCE</span>
+</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:underline font-label-caps text-xs">DETAILS</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-fixed-dim bg-primary p-1 text-sm rounded">directions_car</span>
+<span class="font-bold text-body-md">Fleet Vehicle (LDV)</span>
+</div>
+</td>
+<td class="p-4 text-data-mono font-data-mono">CA-881-229</td>
+<td class="p-4 text-body-md">VD 04 - Dispatch</td>
+<td class="p-4 text-data-mono">Oct 24, 06:00</td>
+<td class="p-4">
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container text-label-caps font-bold rounded">IN FIELD</span>
+</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:underline font-label-caps text-xs">DETAILS</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-fixed-dim bg-primary p-1 text-sm rounded">campaign</span>
+<span class="font-bold text-body-md">Branding Banners (Set 4)</span>
+</div>
+</td>
+<td class="p-4 text-data-mono font-data-mono">W12-BR-201</td>
+<td class="p-4 text-body-md">Ward Storage C</td>
+<td class="p-4 text-data-mono">Oct 20, 11:45</td>
+<td class="p-4">
+<span class="px-2 py-1 bg-surface-container-high text-on-surface-variant text-label-caps font-bold rounded">STORAGE</span>
+</td>
+<td class="p-4 text-right">
+<button class="text-primary hover:underline font-label-caps text-xs">DETAILS</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 bg-surface-container-lowest border-t border-outline-variant flex justify-center">
+<button class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2">
+                        VIEW FULL INVENTORY LOG
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Mobile -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-16 bg-surface border-t border-outline-variant">
+<button class="flex flex-col items-center justify-center text-on-surface-variant pt-1 opacity-60">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="text-label-caps font-label-caps">Inventory</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary border-t-2 border-secondary pt-1">
+<span class="material-symbols-outlined" data-icon="assignment_add">assignment_add</span>
+<span class="text-label-caps font-label-caps">Allocation</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant pt-1 opacity-60">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="text-label-caps font-label-caps">Staff</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant pt-1 opacity-60">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-label-caps font-label-caps">Reports</span>
+</button>
+</nav>
+<script>
+        // Simple micro-interaction for active states
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.style.transform = 'scale(0.97)';
+            });
+            btn.addEventListener('mouseup', () => {
+                btn.style.transform = 'scale(1)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

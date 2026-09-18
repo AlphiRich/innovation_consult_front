@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Household Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&amp;family=Public+Sans:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#1a2246",
+                      "primary": "#040c30",
+                      "surface": "#f8f9ff",
+                      "inverse-surface": "#213145",
+                      "tertiary-fixed": "#e5e2dc",
+                      "surface-container-low": "#eff4ff",
+                      "secondary-fixed": "#ffdea1",
+                      "secondary": "#795907",
+                      "on-primary-fixed-variant": "#3d456b",
+                      "on-error": "#ffffff",
+                      "tertiary-container": "#252521",
+                      "secondary-fixed-dim": "#ebc169",
+                      "on-surface": "#0b1c30",
+                      "secondary-container": "#fdd178",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#474743",
+                      "background": "#f8f9ff",
+                      "on-tertiary-container": "#8d8c87",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#dde1ff",
+                      "on-secondary-fixed": "#261900",
+                      "surface-bright": "#f8f9ff",
+                      "outline": "#76767f",
+                      "surface-tint": "#545c84",
+                      "on-secondary-container": "#785805",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-highest": "#d3e4fe",
+                      "tertiary": "#10100d",
+                      "on-primary-fixed": "#10193c",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed-dim": "#bdc4f1",
+                      "on-primary-container": "#8289b4",
+                      "inverse-on-surface": "#eaf1ff",
+                      "surface-container-high": "#dce9ff",
+                      "surface-container": "#e5eeff",
+                      "on-surface-variant": "#46464e",
+                      "tertiary-fixed-dim": "#c9c6c1",
+                      "on-secondary-fixed-variant": "#5c4300",
+                      "on-secondary": "#ffffff",
+                      "inverse-primary": "#bdc4f1",
+                      "error": "#ba1a1a",
+                      "surface-variant": "#d3e4fe",
+                      "surface-dim": "#cbdbf5",
+                      "on-tertiary-fixed": "#1c1c18",
+                      "on-background": "#0b1c30",
+                      "outline-variant": "#c6c5cf",
+                      "on-error-container": "#93000a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-desktop": "32px",
+                      "max-width": "1440px",
+                      "unit": "4px",
+                      "margin-mobile": "16px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Archivo Narrow"
+                      ],
+                      "label-caps": [
+                              "Archivo Narrow"
+                      ],
+                      "headline-md": [
+                              "Archivo Narrow"
+                      ],
+                      "display-lg-mobile": [
+                              "Archivo Narrow"
+                      ],
+                      "data-mono": [
+                              "Public Sans"
+                      ],
+                      "body-lg": [
+                              "Public Sans"
+                      ],
+                      "body-md": [
+                              "Public Sans"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "38px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "data-mono": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col items-center">
+<!-- Mobile Container Wrapper -->
+<div class="w-full max-w-md bg-surface min-h-screen relative flex flex-col border-x border-outline-variant/10 shadow-sm">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky bg-surface dark:bg-surface border-b border-outline-variant/20 flat no shadows z-40">
+<div class="flex items-center justify-between px-margin-mobile h-14 w-full text-primary dark:text-primary-fixed-dim">
+<button class="hover:bg-surface-container-low transition-colors active:opacity-80 transition-opacity p-2 -ml-2 rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md-mobile text-primary dark:text-primary-fixed-dim text-center truncate px-4 font-bold tracking-tight">Household Detail</h1>
+<button class="hover:bg-surface-container-low transition-colors active:opacity-80 transition-opacity p-2 -mr-2 rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">more_vert</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto pb-24 px-margin-mobile pt-6 space-y-8">
+<!-- Address Header Section -->
+<section class="space-y-4">
+<div class="flex items-start justify-between gap-4">
+<div>
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-primary font-bold">148 Oakwood Dr</h2>
+<p class="font-data-mono text-data-mono text-on-surface-variant mt-1">Precinct 4B • Ward 12</p>
+</div>
+<div class="w-12 h-12 bg-surface-container flex items-center justify-center rounded border border-outline-variant/20 flex-shrink-0">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">home</span>
+</div>
+</div>
+<!-- Household Level Notes (Critical Information) -->
+<div class="bg-surface-container-lowest border border-outline-variant/20 rounded p-4 border-l-4 border-l-secondary-fixed-dim">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-secondary-fixed-dim text-sm" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h3 class="font-label-caps text-label-caps text-on-surface uppercase tracking-widest">Canvasser Notes</h3>
+</div>
+<ul class="font-body-md text-body-md text-on-surface-variant space-y-2">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-outline text-base mt-0.5">pets</span>
+<span>Large dog on property, usually fenced in backyard.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-outline text-base mt-0.5">gate</span>
+<span>Gate code required for main driveway access: #4129</span>
+</li>
+</ul><div class="mt-6 pt-6 border-t border-outline-variant/20 space-y-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-secondary-fixed-dim text-sm" style="font-variation-settings: 'FILL' 1;">report</span>
+<h3 class="font-label-caps text-label-caps text-on-surface uppercase tracking-widest">Report Local Incident</h3>
+</div>
+<!-- Category Picker -->
+<div class="space-y-2">
+<label class="block font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest">Category</label>
+<div class="grid grid-cols-4 gap-2">
+<button class="flex flex-col items-center justify-center p-2 rounded border border-primary bg-surface-container-high text-primary">
+<span class="material-symbols-outlined text-base">water_drop</span>
+<span class="text-[10px] font-bold mt-1">Water</span>
+</button>
+<button class="flex flex-col items-center justify-center p-2 rounded border border-outline-variant/30 hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-base">bolt</span>
+<span class="text-[10px] font-bold mt-1">Power</span>
+</button>
+<button class="flex flex-col items-center justify-center p-2 rounded border border-outline-variant/30 hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-base">security</span>
+<span class="text-[10px] font-bold mt-1">Safety</span>
+</button>
+<button class="flex flex-col items-center justify-center p-2 rounded border border-outline-variant/30 hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-base">traffic</span>
+<span class="text-[10px] font-bold mt-1">Roads</span>
+</button>
+</div>
+</div>
+<!-- Priority Level Toggle -->
+<div class="space-y-2">
+<label class="block font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest">Priority Level</label>
+<div class="flex rounded-lg border border-outline-variant/30 overflow-hidden">
+<button class="flex-1 py-2 text-[10px] font-bold uppercase bg-surface-container-low text-on-surface-variant border-r border-outline-variant/30">Low</button>
+<button class="flex-1 py-2 text-[10px] font-bold uppercase bg-surface-container-low text-on-surface-variant border-r border-outline-variant/30">Med</button>
+<button class="flex-1 py-2 text-[10px] font-bold uppercase bg-surface-container-low text-on-surface-variant border-r border-outline-variant/30">High</button>
+<button class="flex-1 py-2 text-[10px] font-bold uppercase bg-error text-on-error">Urgent</button>
+</div>
+</div>
+<!-- Description & Photo -->
+<div class="space-y-3">
+<div class="relative">
+<textarea class="w-full p-3 bg-surface-container-lowest border border-outline-variant/30 rounded-lg font-body-md text-body-md text-on-surface-variant focus:outline-none focus:border-primary transition-colors" placeholder="Describe the issue..." rows="2"></textarea>
+<button class="absolute right-2 bottom-2 p-2 text-primary hover:bg-surface-container rounded-full">
+<span class="material-symbols-outlined">photo_camera</span>
+</button>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full h-12 bg-secondary-container text-on-secondary-container font-body-md font-semibold rounded flex items-center justify-center gap-2 active:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">send</span>
+    Submit Incident
+  </button>
+</div>
+</div>
+</section>
+<!-- Registered Voters Section -->
+<section class="space-y-4">
+<div class="flex items-center justify-between border-b border-outline-variant/20 pb-2">
+<h3 class="font-label-caps text-label-caps text-on-surface uppercase tracking-widest">Registered Voters (2)</h3>
+</div>
+<!-- Voter Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant/10 rounded-lg p-4 shadow-sm relative group overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-headline-md text-headline-md-mobile text-primary font-semibold">Johan de Beer</h4>
+<div class="flex items-center gap-2 mt-1">
+<span class="px-2 py-0.5 bg-surface-container rounded text-on-surface font-data-mono text-[12px]">45 Yrs</span>
+<span class="px-2 py-0.5 bg-surface-container rounded text-on-surface font-data-mono text-[12px]">Dem</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-1">Sentiment</span>
+<div class="flex items-center gap-1 bg-secondary-container text-on-secondary-container px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">thumb_up</span>
+<span class="font-data-mono text-[12px] font-bold">Strong</span>
+</div>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 bg-primary text-on-primary font-body-md text-body-md py-3 rounded flex items-center justify-center gap-2 active:bg-primary/90 transition-colors h-12">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">edit_document</span>
+                            Log Response
+                        </button>
+<button class="w-12 h-12 border border-outline-variant/30 text-primary rounded flex items-center justify-center active:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Voter Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant/10 rounded-lg p-4 shadow-sm relative group overflow-hidden">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h4 class="font-headline-md text-headline-md-mobile text-primary font-semibold">Sarah de Beer</h4>
+<div class="flex items-center gap-2 mt-1">
+<span class="px-2 py-0.5 bg-surface-container rounded text-on-surface font-data-mono text-[12px]">42 Yrs</span>
+<span class="px-2 py-0.5 bg-surface-container rounded text-on-surface font-data-mono text-[12px]">Ind</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-1">Sentiment</span>
+<div class="flex items-center gap-1 bg-surface-container-high text-on-surface px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 0;">help</span>
+<span class="font-data-mono text-[12px] font-bold">Undecided</span>
+</div>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex-1 bg-primary text-on-primary font-body-md text-body-md py-3 rounded flex items-center justify-center gap-2 active:bg-primary/90 transition-colors h-12">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">edit_document</span>
+                            Log Response
+                        </button>
+<button class="w-12 h-12 border border-outline-variant/30 text-primary rounded flex items-center justify-center active:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

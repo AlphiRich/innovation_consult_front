@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Election Campaign OS - Tablet Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-background": "#141a31",
+                    "primary": "#040c30",
+                    "secondary": "#795907",
+                    "outline-variant": "#c6c5cf",
+                    "on-error": "#ffffff",
+                    "on-tertiary-container": "#dc6672",
+                    "on-primary-fixed": "#10193c",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "surface-dim": "#d3d9f7",
+                    "on-secondary": "#ffffff",
+                    "outline": "#76767f",
+                    "inverse-on-surface": "#eff0ff",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed": "#261900",
+                    "surface-container": "#ebedff",
+                    "surface-tint": "#545c84",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#dce1ff",
+                    "inverse-surface": "#292f47",
+                    "on-surface-variant": "#46464e",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "inverse-primary": "#bdc4f1",
+                    "tertiary-fixed-dim": "#ffb2b7",
+                    "surface": "#faf8ff",
+                    "on-tertiary-fixed": "#40000d",
+                    "tertiary-fixed": "#ffdadb",
+                    "on-surface": "#141a31",
+                    "on-tertiary-fixed-variant": "#832331",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "tertiary-container": "#510013",
+                    "secondary-fixed": "#ffdea1",
+                    "secondary-container": "#fdd178",
+                    "on-secondary-container": "#785805",
+                    "error": "#ba1a1a",
+                    "primary-container": "#1a2246",
+                    "surface-bright": "#faf8ff",
+                    "error-container": "#ffdad6",
+                    "tertiary": "#290006",
+                    "surface-container-high": "#e4e7ff",
+                    "on-primary-container": "#8289b4",
+                    "surface-container-low": "#f3f2ff",
+                    "surface-container-highest": "#dce1ff",
+                    "primary-fixed": "#dde1ff",
+                    "on-tertiary": "#ffffff",
+                    "background": "#faf8ff",
+                    "secondary-fixed-dim": "#ebc169",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-desktop": "64px",
+                    "gutter": "24px",
+                    "unit": "4px",
+                    "container-max": "1280px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Archivo Narrow"],
+                    "headline-sm": ["Archivo Narrow"],
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-md": ["JetBrains Mono"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            user-select: none;
+        }
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        body {
+            background-color: #faf8ff;
+            color: #141a31;
+        }
+        .card-border {
+            border: 1px solid #E2E4E9;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c6c5cf;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-hidden h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="w-full h-16 bg-surface dark:bg-background flex justify-between items-center px-6 border-b border-outline-variant z-50">
+<div class="flex items-center gap-4">
+<span class="text-headline-md font-headline-md text-primary">Civic Authority</span>
+<div class="hidden md:flex bg-surface-container-low rounded-lg p-1 ml-8">
+<button class="px-4 py-1.5 rounded text-on-surface-variant hover:bg-white transition-all text-sm font-medium">Desktop</button>
+<button class="px-4 py-1.5 rounded bg-primary text-white shadow-sm transition-all text-sm font-medium">Tablet</button>
+<button class="px-4 py-1.5 rounded text-on-surface-variant hover:bg-white transition-all text-sm font-medium">Mobile</button>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center bg-surface-container rounded-full px-4 py-2 border border-outline-variant mr-4">
+<span class="material-symbols-outlined text-primary mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48" placeholder="Global Search..." type="text"/>
+</div>
+<button class="touch-target flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<button class="touch-target flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors ml-1">
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar (Slim for Tablet) -->
+<nav class="h-full w-20 flex flex-col items-center py-6 bg-surface border-r border-outline-variant transition-all duration-300">
+<div class="flex flex-col gap-8 w-full items-center">
+<button class="flex flex-col items-center gap-1 w-full py-3 text-primary border-r-4 border-secondary font-bold">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-[10px] uppercase tracking-wider">Dash</span>
+</button>
+<button class="flex flex-col items-center gap-1 w-full py-3 text-on-surface-variant hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">calculate</span>
+<span class="text-[10px] uppercase tracking-wider">Vote</span>
+</button>
+<button class="flex flex-col items-center gap-1 w-full py-3 text-on-surface-variant hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] uppercase tracking-wider">Stats</span>
+</button>
+<button class="flex flex-col items-center gap-1 w-full py-3 text-on-surface-variant hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">settings_applications</span>
+<span class="text-[10px] uppercase tracking-wider">Config</span>
+</button>
+<button class="flex flex-col items-center gap-1 w-full py-3 text-on-surface-variant hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">description</span>
+<span class="text-[10px] uppercase tracking-wider">Reports</span>
+</button>
+</div>
+<div class="mt-auto flex flex-col gap-6 w-full items-center pb-6">
+<button class="touch-target flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="touch-target flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</nav>
+<!-- Main Dashboard Content -->
+<main class="flex-1 overflow-y-auto p-6 bg-background space-y-6">
+<!-- Hero Banner & Countdown -->
+<section class="relative w-full rounded-xl overflow-hidden h-48 bg-primary-container flex items-center p-8">
+<div class="z-10 w-full flex justify-between items-center">
+<div class="text-white max-w-md">
+<h1 class="font-headline-lg text-headline-lg mb-2">Campaign OS</h1>
+<p class="text-on-primary-container text-body-md">Strategic administrative control for municipal leadership. Live monitoring active.</p>
+</div>
+<div class="flex gap-4">
+<div class="bg-white/10 backdrop-blur-md rounded-lg p-4 text-center min-w-[80px] border border-white/20">
+<span class="block font-headline-md text-headline-md text-white">42</span>
+<span class="text-[10px] uppercase tracking-widest text-on-primary-container">Days</span>
+</div>
+<div class="bg-white/10 backdrop-blur-md rounded-lg p-4 text-center min-w-[80px] border border-white/20">
+<span class="block font-headline-md text-headline-md text-white">12</span>
+<span class="text-[10px] uppercase tracking-widest text-on-primary-container">Hours</span>
+</div>
+<div class="bg-white/10 backdrop-blur-md rounded-lg p-4 text-center min-w-[80px] border border-white/20">
+<span class="block font-headline-md text-headline-md text-white">18</span>
+<span class="text-[10px] uppercase tracking-widest text-on-primary-container">Mins</span>
+</div>
+</div>
+</div>
+<!-- Subtle decorative background image -->
+<div class="absolute inset-0 opacity-20 bg-cover bg-center" data-alt="A sophisticated architectural visualization of a modern city hall at twilight, rendered in deep navy and amber tones. The building features clean geometric lines and large glass facades, reflecting a sense of transparent governance and authority. The lighting is soft and cinematic, emphasizing structure and stability in a high-contrast corporate style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDrldr4Mx7ITvnC1FOwvaRZc3bpV8qnF4HzHTscVp53N4BQbfMTzMsohXQV0tD-rIhFzIki0DWu0VYy7vjS93SpeYm5HRZW4KmK3G5OTIidXKI_mHc44Jh_90lQxg6oflPi8S27vA44Q_7pep-3J0jQXyTDbr5AhuqDNPpRHfbdnA5mvyW6lnFnTLj6o4I9VYYp_hC72fvz1c0AqL2qJHB808F5egqKZi_N6b-l4PTnM0iJQoUje4Q')"></div>
+</section>
+<!-- KPI Grid -->
+<section class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- KPI 1 -->
+<div class="bg-white card-border rounded-xl p-6 flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<span class="text-sm font-medium text-on-surface-variant uppercase tracking-wider">Voter Contact</span>
+<span class="material-symbols-outlined text-primary">groups</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-md text-headline-md">18,402</span>
+<span class="text-xs font-label-md text-secondary">+4.2%</span>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-white card-border rounded-xl p-6 flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<span class="text-sm font-medium text-on-surface-variant uppercase tracking-wider">Support Sentiment</span>
+<span class="material-symbols-outlined text-primary">favorite</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-md text-headline-md">64.8%</span>
+<span class="text-xs font-label-md text-secondary">Strong</span>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-white card-border rounded-xl p-6 flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<span class="text-sm font-medium text-on-surface-variant uppercase tracking-wider">Funds Raised</span>
+<span class="material-symbols-outlined text-secondary">payments</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-md text-headline-md">$2.4M</span>
+<span class="text-xs font-label-md text-secondary">Goal 80%</span>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="bg-white card-border rounded-xl p-6 flex flex-col justify-between h-32 hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<span class="text-sm font-medium text-on-surface-variant uppercase tracking-wider">Active Incidents</span>
+<span class="material-symbols-outlined text-error">priority_high</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="font-headline-md text-headline-md">07</span>
+<span class="text-xs font-label-md text-on-surface-variant">3 Critical</span>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Live Sector Map (Tablet Optimized) -->
+<section class="lg:col-span-2 bg-white card-border rounded-xl overflow-hidden flex flex-col min-h-[400px]">
+<div class="p-4 flex justify-between items-center border-b border-outline-variant">
+<h2 class="font-headline-sm text-headline-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">map</span>
+                            Live Sector Map
+                        </h2>
+<div class="flex gap-2">
+<button class="touch-target px-4 py-2 bg-surface-container rounded-lg text-sm font-medium hover:bg-surface-container-high border border-outline-variant">Heatmap</button>
+<button class="touch-target px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium">Sectors</button>
+</div>
+</div>
+<div class="flex-1 relative bg-surface-container-lowest">
+<div class="absolute inset-0 z-0 bg-cover bg-center grayscale opacity-60" data-location="Washington DC" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA7pDkXbwfVKrBVQRs_vg6GNchqm4psxWQL4q8YIuyDuyuEGEpanZvrb2YNb5ExQvouljAhRMHNKSMISIvTPWjaoGA-kIYCoWjbFY63ZJhdapfaOuuMA-BGpiRIdYE_XvljM4yb6jqyzakrztmOViQithoNVLrAhlzUKFh2n0tTPMpgjmzFxkZC6VsWy57Eo7kWgjlLuck4oCqZZz3UN1pMrI-rXNn8Hg7pgDgiZgQnGBF5foYIV1g')"></div>
+<!-- Map Overlay Controls (Touch Targets) -->
+<div class="absolute right-4 top-4 flex flex-col gap-3 z-10">
+<button class="w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-surface active:scale-95 transition-all">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-surface active:scale-95 transition-all">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<button class="w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-surface active:scale-95 transition-all">
+<span class="material-symbols-outlined">my_location</span>
+</button>
+</div>
+<!-- Mock Data Point Icons -->
+<div class="absolute top-1/4 left-1/3 z-10 w-10 h-10 bg-secondary rounded-full flex items-center justify-center shadow-lg border-2 border-white animate-pulse">
+<span class="material-symbols-outlined text-white text-sm">campaign</span>
+</div>
+<div class="absolute bottom-1/3 right-1/4 z-10 w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+<span class="material-symbols-outlined text-white text-sm">flag</span>
+</div>
+</div>
+</section>
+<!-- Recent Activity Feed -->
+<section class="bg-white card-border rounded-xl flex flex-col h-full max-h-[400px]">
+<div class="p-4 border-b border-outline-variant flex justify-between items-center">
+<h2 class="font-headline-sm text-headline-sm">Recent Activity</h2>
+<span class="text-xs font-label-md text-on-surface-variant bg-surface-container px-2 py-1 rounded">LIVE</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<div class="flex gap-4 p-3 hover:bg-surface-container-lowest rounded-lg transition-colors border-l-2 border-secondary">
+<div class="w-10 h-10 rounded-full bg-secondary/10 flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-sm">volunteer_activism</span>
+</div>
+<div>
+<p class="text-sm font-semibold">New Volunteer Onboarding</p>
+<p class="text-xs text-on-surface-variant">District 4: 12 new members joined the ground team.</p>
+<p class="text-[10px] text-outline mt-1 uppercase font-label-md">2 minutes ago</p>
+</div>
+</div>
+<div class="flex gap-4 p-3 hover:bg-surface-container-lowest rounded-lg transition-colors border-l-2 border-primary">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">article</span>
+</div>
+<div>
+<p class="text-sm font-semibold">Media Mention</p>
+<p class="text-xs text-on-surface-variant">Local Gazette released poll favoring central policies.</p>
+<p class="text-[10px] text-outline mt-1 uppercase font-label-md">1 hour ago</p>
+</div>
+</div>
+<div class="flex gap-4 p-3 hover:bg-surface-container-lowest rounded-lg transition-colors border-l-2 border-error">
+<div class="w-10 h-10 rounded-full bg-error/10 flex-shrink-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-error text-sm">warning</span>
+</div>
+<div>
+<p class="text-sm font-semibold">Logistics Alert</p>
+<p class="text-xs text-on-surface-variant">Pamphlet delivery delayed in West Ward area.</p>
+<p class="text-[10px] text-outline mt-1 uppercase font-label-md">4 hours ago</p>
+</div>
+</div>
+</div>
+<button class="w-full py-3 text-sm font-medium text-primary hover:bg-surface-container-low transition-colors border-t border-outline-variant">View All Activities</button>
+</section>
+</div>
+<!-- Incident Management Table -->
+<section class="bg-white card-border rounded-xl overflow-hidden mb-8">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center">
+<div>
+<h2 class="font-headline-sm text-headline-sm">Incident Management</h2>
+<p class="text-sm text-on-surface-variant">Tracking active field reports and tactical resolutions.</p>
+</div>
+<button class="touch-target bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+                        Report Incident
+                    </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-lowest border-b border-outline-variant">
+<tr>
+<th class="px-6 py-4 text-xs font-label-md text-on-surface-variant uppercase tracking-wider">Reference ID</th>
+<th class="px-6 py-4 text-xs font-label-md text-on-surface-variant uppercase tracking-wider">Subject</th>
+<th class="px-6 py-4 text-xs font-label-md text-on-surface-variant uppercase tracking-wider">Sector</th>
+<th class="px-6 py-4 text-xs font-label-md text-on-surface-variant uppercase tracking-wider">Priority</th>
+<th class="px-6 py-4 text-xs font-label-md text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 text-xs font-label-md text-on-surface-variant uppercase tracking-wider">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-4 font-label-md text-sm">#INC-4029</td>
+<td class="px-6 py-4 text-sm font-medium">Digital Misinformation Wave</td>
+<td class="px-6 py-4 text-sm">Central Hub</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-error/10 text-error text-[10px] font-bold rounded uppercase">High</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+<span class="text-sm">Triaging</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:underline text-sm font-medium">Details</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-4 font-label-md text-sm">#INC-4031</td>
+<td class="px-6 py-4 text-sm font-medium">Event Logistics - Venue Lockout</td>
+<td class="px-6 py-4 text-sm">East Coast</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-secondary/10 text-secondary text-[10px] font-bold rounded uppercase">Med</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-outline"></div>
+<span class="text-sm">Assigned</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:underline text-sm font-medium">Details</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-4 font-label-md text-sm">#INC-4032</td>
+<td class="px-6 py-4 text-sm font-medium">Volunteer No-Show (Subway Station)</td>
+<td class="px-6 py-4 text-sm">Downtown</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[10px] font-bold rounded uppercase">Low</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-outline"></div>
+<span class="text-sm">Queue</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<button class="text-primary hover:underline text-sm font-medium">Details</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+</div>
+<!-- Contextual FAB (Only visible for core dashboard) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-secondary text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-105 transition-transform z-50 active:scale-95">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+<script>
+        // Simple interactivity for demonstration
+        document.querySelectorAll('.touch-target, button').forEach(button => {
+            button.addEventListener('click', () => {
+                // Tactical vibration or visual feedback simulation
+                button.classList.add('opacity-50');
+                setTimeout(() => button.classList.remove('opacity-50'), 100);
+            });
+        });
+
+        // Dynamic countdown simulation
+        function updateTimer() {
+            // Static values for UI demo but logic placeholder
+            const labels = ['Days', 'Hours', 'Mins'];
+            // Logic would go here to update values
+        }
+        setInterval(updateTimer, 60000);
+    </script>
+</body></html>

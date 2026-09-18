@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Strategic Lead Assignment | CIVIC ARCHITECT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700&amp;family=Archivo+Narrow:wght@400;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&amp;family=Public+Sans:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f8f9ff",
+                        "tertiary-container": "#252521",
+                        "tertiary-fixed-dim": "#c9c6c1",
+                        "surface": "#f8f9ff",
+                        "inverse-surface": "#213145",
+                        "surface-container-high": "#dce9ff",
+                        "on-tertiary-fixed-variant": "#474743",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "on-surface-variant": "#46464e",
+                        "surface-container": "#e5eeff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#ffdea1",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "tertiary": "#10100d",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#8289b4",
+                        "surface-dim": "#cbdbf5",
+                        "on-background": "#0b1c30",
+                        "surface-variant": "#d3e4fe",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-primary-fixed-variant": "#3d456b",
+                        "secondary-fixed-dim": "#ebc169",
+                        "on-secondary-fixed": "#261900",
+                        "primary-fixed-dim": "#bdc4f1",
+                        "surface-container-highest": "#d3e4fe",
+                        "outline": "#76767f",
+                        "on-tertiary-container": "#8d8c87",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#e5e2dc",
+                        "background": "#f8f9ff",
+                        "primary-fixed": "#dde1ff",
+                        "primary": "#040c30",
+                        "surface-tint": "#545c84",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#785805",
+                        "inverse-primary": "#bdc4f1",
+                        "primary-container": "#1a2246",
+                        "secondary-container": "#fdd178",
+                        "outline-variant": "#c6c5cf",
+                        "on-primary-fixed": "#10193c",
+                        "on-error": "#ffffff",
+                        "secondary": "#795907",
+                        "on-surface": "#0b1c30"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px",
+                        "max-width": "1440px",
+                        "margin-desktop": "32px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Public Sans"],
+                        "label-caps": ["Archivo Narrow"],
+                        "headline-md": ["Archivo Narrow"],
+                        "display-lg": ["Archivo Narrow"],
+                        "data-mono": ["Public Sans"],
+                        "display-lg-mobile": ["Archivo Narrow"],
+                        "body-lg": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-stepper-line {
+            background: linear-gradient(90deg, #ffdea1 50%, #c6c5cf 50%);
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-surface-bright text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-primary text-on-primary font-body-md docked full-width top-0 border-b border-outline-variant/20 flex justify-between items-center w-full px-margin-desktop h-16 z-50">
+<div class="flex items-center gap-8">
+<h1 class="font-headline-md text-headline-md font-bold text-secondary-fixed">CIVIC ARCHITECT</h1>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors px-2 py-1" href="#">War Room</a>
+<a class="text-secondary-fixed border-b-2 border-secondary-fixed pb-1" href="#">Teams</a>
+<a class="text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors px-2 py-1" href="#">Voters</a>
+<a class="text-on-primary/70 hover:text-on-primary hover:bg-primary-container/50 transition-colors px-2 py-1" href="#">Logistics</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-primary/50 text-sm">search</span>
+<input class="bg-primary-container border-none text-on-primary placeholder:text-on-primary/40 text-sm pl-10 pr-4 py-2 w-64 rounded-none focus:ring-1 focus:ring-secondary-fixed" placeholder="Search parameters..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-on-primary/70 hover:text-on-primary">notifications</button>
+<button class="material-symbols-outlined text-on-primary/70 hover:text-on-primary">help_outline</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-secondary-fixed/30 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a municipal administrator in a crisp white shirt against a neutral architectural background. The lighting is bright and corporate, echoing the paper-and-ink design philosophy of the Civic Architect brand, using deep navy and gold accents in the environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCG5kS9tmaAw_HCSXvSeQ4ibwFMXd2f2o9tOsn3KXOBZUYkEchNx2FAUJaBFIcdpg8nuvTkLQR3izDNSRDb1LUW6F3YZSDwXm1f4_3GwEJi9asW7W_oUs0ZsKcmkDmKUBEBRLxYbaonifP8yLCxjbRpmu1r5lO35NO01DtBFSpEBmNAmKgt4FvVTTfKPjIuCQM5M37DJvGQhcF5XBjs4lk2dAQY07APU7v2oStSnb8Y0VfA__4Ymb7sI_075UJA-7eTcWVHXd-uRg"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar -->
+<aside class="bg-surface-bright flex flex-col h-screen sticky top-0 left-0 pt-4 pb-8 border-r border-outline-variant/30 w-64 shrink-0 hidden md:flex">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-primary text-3xl">account_balance</span>
+<h2 class="font-headline-md text-headline-md text-primary leading-tight">SA Elections 2024</h2>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant/70">MUNICIPAL COMMAND</p>
+</div>
+<nav class="flex-1 px-2 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">War Room</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-150" href="#">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="font-label-caps text-label-caps">Incidents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-primary bg-surface-container-high border-l-4 border-secondary-fixed font-bold scale-95 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="font-label-caps text-label-caps">Voters</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-150" href="#">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="font-label-caps text-label-caps">Logistics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-150" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-150" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+<div class="mt-auto px-6 py-4 space-y-4">
+<button class="w-full bg-secondary text-on-secondary font-label-caps text-label-caps py-3 hover:opacity-90 transition-opacity uppercase tracking-widest">
+                    Launch Campaign
+                </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant/80 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">contact_support</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant/80 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-sm">inventory_2</span>
+<span class="font-label-caps text-label-caps">Archive</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-surface p-8 scrollbar-hide">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-2 mb-8 font-label-caps text-label-caps text-on-surface-variant/60">
+<a class="hover:text-primary" href="#">ADMINISTRATIVE</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<a class="hover:text-primary" href="#">TEAMS</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<a class="hover:text-primary" href="#">NEW CONFIGURATION</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-primary font-bold">STRATEGIC LEAD DEPLOYMENT</span>
+</nav>
+<!-- Header & Stepper -->
+<div class="mb-10">
+<h1 class="font-headline-md text-4xl text-primary font-bold mb-6">Deploy Strategic Lead</h1>
+<div class="flex items-center gap-4 max-w-2xl">
+<div class="flex-1 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm">1</div>
+<span class="font-label-caps text-label-caps text-primary">Regional Context</span>
+</div>
+<div class="h-[2px] w-12 bg-secondary"></div>
+<div class="flex-1 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold text-sm shadow-[0_0_10px_rgba(183,145,63,0.5)]">2</div>
+<span class="font-label-caps text-label-caps text-primary font-bold">Leadership Deployment</span>
+</div>
+</div>
+</div>
+<!-- Dashboard Grid Layout -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Search and List Section -->
+<section class="col-span-12 lg:col-span-8 space-y-6">
+<!-- Search Controls -->
+<div class="bg-white border-2 border-primary p-6 flex flex-col md:flex-row gap-4 shadow-sm">
+<div class="flex-1 relative">
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-1 block">REGISTRY SEARCH</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40">search</span>
+<input class="w-full border-outline-variant/30 focus:border-primary focus:ring-0 pl-10 py-3 text-body-md" placeholder="Filter by name, expertise, or seniority level..." type="text"/>
+</div>
+</div>
+<div class="w-full md:w-48">
+<label class="font-label-caps text-label-caps text-on-surface-variant mb-1 block">STATUS</label>
+<select class="w-full border-outline-variant/30 focus:border-primary focus:ring-0 py-3 text-body-md">
+<option>All Strategists</option>
+<option>Available</option>
+<option>Restricted</option>
+</select>
+</div>
+</div>
+<!-- Strategist List (High Density) -->
+<div class="space-y-3">
+<!-- Strategist Row 1 -->
+<div class="bg-white border border-outline-variant/30 hover:border-secondary transition-colors cursor-pointer group p-4 flex items-center gap-6" onclick="selectLead('lead1')">
+<div class="w-14 h-14 bg-surface-container shrink-0 border border-outline-variant/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A focused female strategist in professional attire, looking directly at the camera with a confident expression. The environment is a clean, modern command center with soft architectural lighting and professional navy and gold decorative elements in the background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF8htchYUeUy7EP_JUm462MP6feOklyiWp-gqNQYS_0Leitnct6omxIWJxU8lwmOawE3MWh4qDAYSKeRJuB2ZfZI8lAVxcYZoCsoBLYB-TxdvfjnHUdNilI1teielHardv0v7TGGeeLG3XtUgWwa_TE9xYZyb7CdEnALgwF3H3XQhcJO3whVYVeYLHVwr1EETomurZBeBY-4AJOHx5B2P8wWZOC_39ftIkdlx4cBdxeJcXm9A1mi65oxRrs-_FgcqinHOUrR1XQA"/>
+</div>
+<div class="flex-1 grid grid-cols-4 items-center gap-4">
+<div class="col-span-1">
+<h3 class="font-headline-md text-lg text-primary group-hover:text-secondary transition-colors">Dr. Elena Vance</h3>
+<p class="font-label-caps text-[10px] text-on-surface-variant/70 uppercase">Regional Director</p>
+</div>
+<div class="col-span-1">
+<span class="font-label-caps text-[10px] block text-on-surface-variant/60 mb-1">CORE EXPERTISE</span>
+<span class="bg-surface-container px-2 py-1 text-xs font-bold text-primary">Ground Game Specialist</span>
+</div>
+<div class="col-span-1">
+<span class="font-label-caps text-[10px] block text-on-surface-variant/60 mb-1">SENIORITY</span>
+<span class="text-body-md font-medium text-primary">12+ Years</span>
+</div>
+<div class="col-span-1">
+<span class="font-label-caps text-[10px] block text-on-surface-variant/60 mb-1">CURRENT ASSIGNMENTS</span>
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-12 bg-outline-variant/30 overflow-hidden">
+<div class="h-full bg-secondary w-1/3"></div>
+</div>
+<span class="text-xs font-bold">1/3</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-secondary">chevron_right</span>
+</div>
+<!-- Strategist Row 2 -->
+<div class="bg-white border border-outline-variant/30 hover:border-secondary transition-colors cursor-pointer group p-4 flex items-center gap-6" onclick="selectLead('lead2')">
+<div class="w-14 h-14 bg-surface-container shrink-0 border border-outline-variant/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A mature male campaign director with salt-and-pepper hair, dressed in a sharp navy suit. He is standing in a brightly lit, high-end office with large windows. The style is authoritative and reliable, emphasizing the 'Silent Architect' brand persona with clean lines and sharp focus." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuXbZ0yd__92piUIi3qhCXxJzaG5Vt2TvGIXkdIFsGB8BWRgbpp9ypIvIecj0xT6vi3UV3SVhBjn8Ny9nfP848y0OP8E3TXptVvKpkjM5Ko-1cIMZ0hfF3xzANW463PEMk6-DTYVr52aAuVaLugBPrD2CxGrTR5XdIcPC-si5f5btJMIjD40RSFnX0ZmK9tjS4UD6M6zgzABLHYDcNMarP5lMSLnbDEuxMCd9nv5SrKne172LWYOceolc_7FM2nBMW4qCFj9j7lg"/>
+</div>
+<div class="flex-1 grid grid-cols-4 items-center gap-4">
+<div class="col-span-1">
+<h3 class="font-headline-md text-lg text-primary group-hover:text-secondary transition-colors">Marcus Thorne</h3>
+<p class="font-label-caps text-[10px] text-on-surface-variant/70 uppercase">Field Strategist</p>
+</div>
+<div class="col-span-1">
+<span class="font-label-caps text-[10px] block text-on-surface-variant/60 mb-1">CORE EXPERTISE</span>
+<span class="bg-surface-container px-2 py-1 text-xs font-bold text-primary">Voter Data Analyst</span>
+</div>
+<div class="col-span-1">
+<span class="font-label-caps text-[10px] block text-on-surface-variant/60 mb-1">SENIORITY</span>
+<span class="text-body-md font-medium text-primary">8 Years</span>
+</div>
+<div class="col-span-1">
+<span class="font-label-caps text-[10px] block text-on-surface-variant/60 mb-1">CURRENT ASSIGNMENTS</span>
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-12 bg-outline-variant/30 overflow-hidden">
+<div class="h-full bg-secondary w-2/3"></div>
+</div>
+<span class="text-xs font-bold">2/3</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-secondary">chevron_right</span>
+</div>
+<!-- Strategist Row 3 -->
+<div class="bg-white border-2 border-secondary p-4 flex items-center gap-6 relative shadow-md" onclick="selectLead('lead3')">
+<div class="absolute top-0 right-0 bg-secondary text-on-secondary px-4 py-1 font-label-caps text-[10px] tracking-widest">SELECTED</div>
+<div class="w-14 h-14 bg-surface-container shrink-0 border border-outline-variant/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A young, sharp-looking professional woman with a focused gaze, wearing dark glasses and a professional blazer. She is in a data-rich environment with subtle digital displays blurred in the background. The aesthetic is modern corporate with editorial precision, featuring the brand's navy and paper-white color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAYVU0R1YKLFvtnl24p0SO6vu7KZjZw2MunvdGU-CUT76LPle7bJXbc9bMbGQewzuU2a81BEHJMRa0rsTeGLPLuEUgMWUYVylL7HJcY7wvIELeP2IPYxP3B2pA7TAWWluD6LVLy19l-cIPzbHrgWCfAcSIBsZ11Tra22xP7eecIOgzcOLFB-mdqxI1XmNK-9q3iPZgGWES9Ggbw46IFdD--YxfNZ7hqLQXEMsIXoFkbSsRgftwUN_h0Z98R_CpV43irhj2JX6-xA"/>
+</div>
+<div class="flex-1 grid grid-cols-4 items-center gap-4">
+<div class="col-span-1">
+<h3 class="font-headline-md text-lg text-primary">Sasha Ković</h3>
+<p class="font-label-caps text-[10px] text-on-surface-variant/70 uppercase">Logistics Coordinator</p>
+</div>
+<div class="col-span-1">
+<span class="font-label-caps text-[10px] block text-on-surface-variant/60 mb-1">CORE EXPERTISE</span>
+<span class="bg-secondary text-on-secondary px-2 py-1 text-xs font-bold">Operations Lead</span>
+</div>
+<div class="col-span-1">
+<span class="font-label-caps text-[10px] block text-on-surface-variant/60 mb-1">SENIORITY</span>
+<span class="text-body-md font-medium text-primary">5 Years</span>
+</div>
+<div class="col-span-1">
+<span class="font-label-caps text-[10px] block text-on-surface-variant/60 mb-1">CURRENT ASSIGNMENTS</span>
+<div class="flex items-center gap-2">
+<div class="h-1.5 w-12 bg-outline-variant/30 overflow-hidden">
+<div class="h-full bg-primary w-0"></div>
+</div>
+<span class="text-xs font-bold">0/3</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="pt-6 flex justify-between border-t border-outline-variant/20">
+<button class="px-8 py-3 border border-primary text-primary font-label-caps text-label-caps hover:bg-primary hover:text-on-primary transition-all">
+                            BACK: REGIONAL CONTEXT
+                        </button>
+<button class="px-12 py-3 bg-secondary text-on-secondary font-label-caps text-label-caps hover:opacity-90 transition-opacity tracking-widest shadow-lg ring-2 ring-secondary ring-offset-2 ring-offset-surface">CONFIRM DEPLOYMENT</button>
+</div>
+</section>
+<!-- Detail Panel -->
+<aside class="col-span-12 lg:col-span-4 sticky top-8 h-fit">
+<div class="bg-primary text-on-primary p-8 shadow-xl">
+<div class="mb-8">
+<h2 class="font-label-caps text-label-caps text-secondary-fixed mb-4">STRATEGIC LEAD PROFILE</h2>
+<div class="flex items-center gap-4 mb-6">
+<div class="w-20 h-20 bg-primary-container border-2 border-secondary-fixed shrink-0 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close up of a logistics professional's workspace with a high-end map and digital tablet displaying campaign data. Beside the map sits an official-looking document with a municipal seal. The tone is authoritative, disciplined, and data-driven, highlighting tactical clarity and strategic intent." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPCkKyLGiUOOf5Ncgq7Nxbb1ptxrXiS2Mu3EvIdlXv18kMuLi9d92VsTFrKKeufanZlUmjix2-avso2AU0hXiw5LVcyA90IFeRj56gXFa-_zNG28a7ONY8uVZBOMflNsFsHtZAtNzX-fkIEG6V2-UwXNS5MDwtrT_5z5ThE4U33SuSzjepjunz421AMPdfy2Nbwo4rL4-dijQAhAzl_2d144WxRAofKA074wLdMkleNHjTW4kcnTD44E0i6r8IFhZEEMy2iJ353w"/>
+</div>
+<div>
+<h3 class="font-headline-md text-2xl text-on-primary">Sasha Ković</h3>
+<p class="font-label-caps text-secondary-fixed/80">LOGISTICS &amp; OPS SPECIALIST</p>
+</div>
+</div>
+<div class="space-y-6">
+<div>
+<h4 class="font-label-caps text-[10px] text-on-primary/50 mb-2">PROFESSIONAL BIO</h4>
+<p class="text-sm leading-relaxed text-on-primary/80">
+                                        Ković specializes in rapid-deployment field logistics and voter mobilization in urban centers. Known for her data-first approach to volunteer scaling and asset management during critical 72-hour windows.
+                                    </p>
+</div>
+<div>
+<h4 class="font-label-caps text-[10px] text-on-primary/50 mb-3">SUCCESSFUL CAMPAIGNS</h4>
+<div class="space-y-3">
+<div class="border-l-2 border-secondary-fixed pl-4">
+<span class="font-data-mono text-xs text-secondary-fixed">2023 • METRO SOUTH</span>
+<p class="text-sm font-bold">Logistics Optimization Project</p>
+<p class="text-xs text-on-primary/60">Increased volunteer reach by 22% within 14 days.</p>
+</div>
+<div class="border-l-2 border-outline-variant/30 pl-4">
+<span class="font-data-mono text-xs text-on-primary/40">2021 • COASTAL DISTRICT</span>
+<p class="text-sm font-bold">Voter Data Reconciliation</p>
+<p class="text-xs text-on-primary/60">Lead Architect for cross-district data sync.</p>
+</div>
+</div>
+</div>
+<div class="pt-6 border-t border-on-primary/10">
+<div class="grid grid-cols-2 gap-4"><div class="bg-primary-container p-3 border-l-2 border-secondary-fixed"><span class="block font-label-caps text-[10px] text-on-primary/50">SUCCESS RATE</span><span class="text-xl font-bold text-secondary-fixed">94%</span></div><div class="bg-primary-container p-3 border-l-2 border-secondary-fixed"><span class="block font-label-caps text-[10px] text-on-primary/50">WARDS MANAGED</span><span class="text-xl font-bold text-secondary-fixed">4/12</span></div><div class="bg-primary-container p-3 border-l-2 border-secondary-fixed col-span-2"><span class="block font-label-caps text-[10px] text-on-primary/50">CAPACITY STATUS</span><span class="text-xl font-bold text-secondary-fixed">AVAILABLE</span></div></div>
+</div>
+</div>
+</div>
+<button class="w-full border border-secondary-fixed text-secondary-fixed font-label-caps text-label-caps py-4 hover:bg-secondary-fixed hover:text-primary transition-colors">
+                            VIEW FULL DOSSIER
+                        </button>
+</div>
+<!-- Informational Context Card -->
+<div class="mt-6 bg-surface-container-high p-6 border-l-4 border-primary">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary">info</span>
+<div>
+<h4 class="font-label-caps text-primary mb-1">DEPLOYMENT IMPACT</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+                                    Selecting a lead with "Operations" expertise will grant a +15% efficiency bonus to field asset deployment in urban zones during this campaign cycle.
+                                </p>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+<!-- Micro-interaction script -->
+<script>
+        function selectLead(id) {
+            // Logic for visual feedback on selection could be added here
+            console.log("Strategist selected:", id);
+        }
+    </script>
+</body></html>

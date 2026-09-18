@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Civic Authority | Volunteer Performance Metrics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&family=Inter:wght@100..900&family=JetBrains+Mono:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#e4e7ff",
+                        "on-primary-container": "#8289b4",
+                        "on-secondary-container": "#785805",
+                        "inverse-primary": "#bdc4f1",
+                        "primary-fixed-dim": "#bdc4f1",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#545c84",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f3f2ff",
+                        "on-surface-variant": "#46464e",
+                        "surface-container": "#ebedff",
+                        "secondary-fixed": "#ffdea1",
+                        "on-primary-fixed": "#10193c",
+                        "tertiary-fixed": "#ffdadb",
+                        "on-primary-fixed-variant": "#3d456b",
+                        "surface-variant": "#dce1ff",
+                        "inverse-on-surface": "#eff0ff",
+                        "surface": "#faf8ff",
+                        "on-tertiary-fixed-variant": "#832331",
+                        "on-surface": "#141a31",
+                        "outline-variant": "#c6c5cf",
+                        "secondary-container": "#fdd178",
+                        "on-secondary-container": "#785805",
+                        "background": "#faf8ff",
+                        "on-error": "#ffffff",
+                        "on-background": "#141a31",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed": "#261900",
+                        "surface-dim": "#d3d9f7",
+                        "primary-fixed": "#dde1ff",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#040c30",
+                        "on-tertiary-fixed": "#40000d",
+                        "surface-container-highest": "#dce1ff",
+                        "primary-container": "#1a2246",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#ebc169",
+                        "tertiary-container": "#510013",
+                        "tertiary": "#290006",
+                        "tertiary-fixed-dim": "#ffb2b7",
+                        "outline": "#76767f",
+                        "inverse-surface": "#292f47",
+                        "surface-bright": "#faf8ff",
+                        "secondary": "#795907",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "unit": "4px",
+                        "container-max": "1280px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Archivo Narrow"],
+                        "headline-lg": ["Archivo Narrow"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Archivo Narrow"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "display-lg": ["Archivo Narrow"],
+                        "headline-md": ["Archivo Narrow"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        .administrative-shadow {
+            box-shadow: 0px 4px 12px rgba(26, 34, 70, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-16 bg-primary dark:bg-primary-container border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<img alt="Innovation Consult Logo" class="h-10 w-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcsI9SMsQJ2ebvqxssa_6JX8gEBHpFmdeW4Pbr965SrQUTJ31-XbLk3ULY1g40Vkh-ClPfpeIFg8nUmCqR97WGG7W3Ex0ODQSfvfKuhTg_ltJ5FOEWdF4mioMqkYDRGWuzGCpSVqsphNOZT5HNwVfQeO1OXI5HHN_SE_7w5nnwK8ZKkG9n6gsiuSE3XNrpw49uf1hTSZT97D0-xqWZiqJN_HSYziDRfvX8shdeXZgUpbSmXT_16Be_oJeJ6Z9bvA-RrhR7VRiSDQ"/>
+<span class="text-headline-md font-headline-md font-bold text-on-primary">Civic Authority</span>
+</div>
+<div class="hidden md:flex items-center space-x-8">
+<span class="text-secondary-container font-bold cursor-pointer transition-colors hover:text-secondary-fixed">War Room</span>
+<span class="text-on-primary/70 cursor-pointer transition-colors hover:text-secondary-fixed">Strategy</span>
+<span class="text-on-primary/70 cursor-pointer transition-colors hover:text-secondary-fixed">Logistics</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative flex items-center bg-white/10 rounded-full px-4 py-1.5 border border-white/20">
+<span class="material-symbols-outlined text-on-primary/70 text-[20px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm text-on-primary placeholder:text-on-primary/50 w-48" placeholder="Search Metrics..." type="text"/>
+</div>
+<div class="flex items-center gap-4 text-on-primary">
+<span class="material-symbols-outlined cursor-pointer hover:text-secondary-fixed transition-colors">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-secondary-fixed transition-colors">account_circle</span>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-surface dark:bg-surface-container-lowest border-r border-outline-variant flex flex-col pt-4 z-40 hidden md:flex">
+<div class="px-6 mb-6">
+<h2 class="text-label-md font-label-md text-outline uppercase tracking-widest">Navigation</h2>
+</div>
+<nav class="flex-1">
+<div class="px-3 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-md font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-primary border-l-4 border-secondary-container bg-surface-container-low font-bold transition-all duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-label-md font-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined">calculate</span>
+<span class="text-label-md font-label-md">Vote Calculator</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="text-label-md font-label-md">Threshold Analyzer</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings_applications</span>
+<span class="text-label-md font-label-md">Municipality Config</span>
+</a>
+</div>
+</nav>
+<div class="p-6 border-t border-outline-variant">
+<button class="w-full bg-primary text-on-primary py-3 px-4 font-headline-sm text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Calculation
+            </button>
+<div class="mt-6 flex flex-col gap-2">
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-primary text-xs" href="#">
+<span class="material-symbols-outlined text-sm">help_outline</span> Support
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-primary text-xs" href="#">
+<span class="material-symbols-outlined text-sm">inventory_2</span> Archive
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="md:ml-64 pt-16 min-h-screen">
+<div class="max-w-container-max mx-auto p-gutter">
+<!-- Page Header -->
+<div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary">Volunteer Performance Metrics</h1>
+<p class="font-body-md text-body-md text-outline">Real-time analysis of ground operations and mobilization efficacy.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="bg-surface-container border border-outline-variant px-4 py-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">calendar_today</span>
+<span class="text-label-md font-label-md">Last 30 Days</span>
+</div>
+<button class="border border-secondary text-secondary px-6 py-2 font-headline-sm text-sm hover:bg-secondary hover:text-white transition-all">
+                        Export Report
+                    </button>
+</div>
+</div>
+<!-- Ground Force Snapshot -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-10">
+<div class="bg-white border border-outline-variant p-6 administrative-shadow">
+<p class="text-label-md font-label-md text-outline mb-1 uppercase tracking-wider">Total Volunteers</p>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-primary">2,481</span>
+<span class="text-label-md font-label-md text-green-600 flex items-center gap-0.5"><span class="material-symbols-outlined text-sm">arrow_upward</span>12%</span>
+</div>
+<p class="text-body-sm text-outline mt-2 italic">Cumulative force strength</p>
+</div>
+<div class="bg-white border border-outline-variant p-6 administrative-shadow">
+<p class="text-label-md font-label-md text-outline mb-1 uppercase tracking-wider">Active Today</p>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-primary">412</span>
+<span class="text-label-md font-label-md text-secondary">High Traffic</span>
+</div>
+<p class="text-body-sm text-outline mt-2 italic">Currently deployed in field</p>
+</div>
+<div class="bg-white border border-outline-variant p-6 administrative-shadow">
+<p class="text-label-md font-label-md text-outline mb-1 uppercase tracking-wider">Hours Logged</p>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-primary">18.2k</span>
+<span class="text-label-md font-label-md text-outline">h</span>
+</div>
+<p class="text-body-sm text-outline mt-2 italic">Strategic effort units</p>
+</div>
+<div class="bg-white border border-outline-variant p-6 administrative-shadow">
+<p class="text-label-md font-label-md text-outline mb-1 uppercase tracking-wider">Voters Contacted</p>
+<div class="flex items-baseline gap-2">
+<span class="text-display-lg font-display-lg text-primary">54.3k</span>
+<span class="text-label-md font-label-md text-green-600">+4.1k</span>
+</div>
+<p class="text-body-sm text-outline mt-2 italic">Direct engagement reach</p>
+</div>
+</section>
+<!-- Main Data Grid -->
+<div class="bento-grid">
+<!-- Performance Trends Chart -->
+<div class="col-span-12 lg:col-span-8 bg-white border border-outline-variant p-6 administrative-shadow">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-sm text-headline-sm text-primary">Performance Trends</h3>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-primary"></span>
+<span class="text-label-md font-label-md">Voter Contacts</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-secondary-container"></span>
+<span class="text-label-md font-label-md">Hours Logged</span>
+</div>
+</div>
+</div>
+<div class="h-64 flex items-end justify-between gap-1 border-b border-l border-outline-variant/30 pb-2 pl-2">
+<!-- Simulated Bar/Line Chart -->
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 transition-colors h-[20%] relative group">
+<div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] px-1 hidden group-hover:block">1.2k</div>
+</div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[35%] relative group"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[25%] relative group"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[50%] relative group"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[45%] relative group"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[65%] relative group"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[80%] relative group"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[75%] relative group"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[90%] relative group"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[85%] relative group"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[95%] relative group"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[70%] relative group"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[100%] relative group"></div>
+<div class="flex-1 bg-primary/20 hover:bg-primary/40 h-[80%] relative group"></div>
+</div>
+<div class="flex justify-between mt-4 text-label-md font-label-md text-outline">
+<span>Day 01</span>
+<span>Day 15</span>
+<span>Day 30</span>
+</div>
+</div>
+<!-- Top Performers Leaderboard -->
+<div class="col-span-12 lg:col-span-4 bg-white border border-outline-variant p-6 administrative-shadow">
+<h3 class="font-headline-sm text-headline-sm text-primary mb-6">Top Performers</h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between border-b border-outline-variant pb-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-[10px] font-bold">EM</div>
+<div>
+<p class="text-body-sm font-semibold">Elena Martinez</p>
+<p class="text-label-md font-label-md text-outline">Ward 4 Captain</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-body-sm font-bold text-primary">842 Contacts</p>
+<p class="text-label-md font-label-md text-on-tertiary-container">14.2% Conv.</p>
+</div>
+</div>
+<div class="flex items-center justify-between border-b border-outline-variant pb-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-secondary-container rounded-full flex items-center justify-center text-primary text-[10px] font-bold">JW</div>
+<div>
+<p class="text-body-sm font-semibold">James Whitlock</p>
+<p class="text-label-md font-label-md text-outline">Canvassing Lead</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-body-sm font-bold text-primary">791 Contacts</p>
+<p class="text-label-md font-label-md text-on-tertiary-container">12.8% Conv.</p>
+</div>
+</div>
+<div class="flex items-center justify-between border-b border-outline-variant pb-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-surface-container-high rounded-full flex items-center justify-center text-primary text-[10px] font-bold">SC</div>
+<div>
+<p class="text-body-sm font-semibold">Sarah Chen</p>
+<p class="text-label-md font-label-md text-outline">Phone Bank Oper.</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-body-sm font-bold text-primary">654 Contacts</p>
+<p class="text-label-md font-label-md text-on-tertiary-container">11.5% Conv.</p>
+</div>
+</div>
+<div class="flex items-center justify-between border-b border-outline-variant pb-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-surface-container rounded-full flex items-center justify-center text-primary text-[10px] font-bold">RB</div>
+<div>
+<p class="text-body-sm font-semibold">Robert Black</p>
+<p class="text-label-md font-label-md text-outline">Ward 12 Volunteer</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-body-sm font-bold text-primary">522 Contacts</p>
+<p class="text-label-md font-label-md text-on-tertiary-container">15.1% Conv.</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 text-label-md font-label-md text-primary font-bold hover:underline">View Full Leaderboard</button>
+</div>
+<!-- Ward Deployment Map Section -->
+<div class="col-span-12 lg:col-span-7 bg-white border border-outline-variant p-6 administrative-shadow">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-sm text-headline-sm text-primary">Ward Deployment Strategy</h3>
+<span class="text-label-md font-label-md text-on-tertiary-container flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">warning</span> Under-covered Areas
+                        </span>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="p-4 border border-outline-variant bg-surface">
+<p class="text-label-md font-label-md text-outline">Ward 01</p>
+<p class="text-body-md font-bold text-primary">84% Coverage</p>
+<div class="w-full bg-outline-variant h-1 mt-2">
+<div class="bg-primary h-full" style="width: 84%;"></div>
+</div>
+</div>
+<div class="p-4 border border-outline-variant bg-surface">
+<p class="text-label-md font-label-md text-outline">Ward 04</p>
+<p class="text-body-md font-bold text-primary">96% Coverage</p>
+<div class="w-full bg-outline-variant h-1 mt-2">
+<div class="bg-primary h-full" style="width: 96%;"></div>
+</div>
+</div>
+<div class="p-4 border border-error-container bg-error-container/10">
+<p class="text-label-md font-label-md text-on-error-container">Ward 07</p>
+<p class="text-body-md font-bold text-error">32% Coverage</p>
+<div class="w-full bg-outline-variant h-1 mt-2">
+<div class="bg-error h-full" style="width: 32%;"></div>
+</div>
+</div>
+<div class="p-4 border border-outline-variant bg-surface">
+<p class="text-label-md font-label-md text-outline">Ward 12</p>
+<p class="text-body-md font-bold text-primary">71% Coverage</p>
+<div class="w-full bg-outline-variant h-1 mt-2">
+<div class="bg-primary h-full" style="width: 71%;"></div>
+</div>
+</div>
+</div>
+<div class="mt-6 aspect-video bg-surface-container flex items-center justify-center relative overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A sophisticated digital heat map showing municipal boundaries with varying intensities of deep navy and bright gold representing volunteer activity levels. The visual style is clean, cartographic, and high-density, reminiscent of a strategic military intelligence dashboard. Soft ambient lighting emphasizes the textures of the terrain while keeping the administrative data prominent and clear." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCLRjFWC-2McMGW6ZTWaIrVDNZZBpzAtBjmh0Skkk-2nRhegiyhEMOX1tbaQWlfphMXsIsu4LqGXgVaoKMRJjeQ5WishF0cd9qQo7hDYZl2NDLkBn5JnXohhWunoCiN56u5Xxoa5E4rqnXXTbbYXNoj1FgOV9hkg9g6JgKW4HYYgEgl2ufA-CA78yrJTU3dfrhLKCXLEGHLcLA4QGumLxCHdDecTS07DuXhlz_p-TC6fs4JxtGY5k1GhfN88VvVsw3s72KfGRzroQ')"></div>
+<div class="relative z-10 bg-white/90 p-4 border border-outline-variant text-center">
+<p class="text-label-md font-label-md font-bold text-primary">Interactive Map Layer Deployed</p>
+<p class="text-body-sm text-outline">Hover over wards for granular metrics</p>
+</div>
+</div>
+</div>
+<!-- Strategic Insights / Conversion Stats -->
+<div class="col-span-12 lg:col-span-5 bg-primary p-8 flex flex-col justify-between text-on-primary">
+<div>
+<h3 class="font-headline-sm text-headline-sm mb-4">Strategic Pulse</h3>
+<p class="text-body-md text-on-primary/80 mb-8 leading-relaxed">
+                            Current mobilization efficiency is <span class="text-secondary-container font-bold">14.2% higher</span> than the trailing 7-day average. Focus remains on Ward 07 and Ward 09 for the upcoming weekend canvassing drive.
+                        </p>
+<div class="space-y-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 flex-shrink-0 bg-secondary-container/20 border border-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary-container">groups</span>
+</div>
+<div>
+<p class="text-label-md font-label-md uppercase tracking-widest text-on-primary/60">Canvassing Efficiency</p>
+<p class="text-headline-sm font-headline-sm">4.2 Doors / Hour</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 flex-shrink-0 bg-secondary-container/20 border border-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary-container">call</span>
+</div>
+<div>
+<p class="text-label-md font-label-md uppercase tracking-widest text-on-primary/60">Phone Bank Reach</p>
+<p class="text-headline-sm font-headline-sm">28 Contacts / Hour</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 flex-shrink-0 bg-secondary-container/20 border border-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary-container">thumbs_up_down</span>
+</div>
+<div>
+<p class="text-label-md font-label-md uppercase tracking-widest text-on-primary/60">Average Conversion Rate</p>
+<p class="text-headline-sm font-headline-sm">12.4% Strategy Target</p>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-8 border-t border-white/10">
+<p class="text-label-md font-label-md text-secondary-container font-bold cursor-pointer hover:underline flex items-center gap-2">
+                            Download Actionable Summary <span class="material-symbols-outlined text-sm">download</span>
+</p>
+</div>
+</div>
+<!-- Volunteer Activity Ledger -->
+<div class="col-span-12 bg-white border border-outline-variant administrative-shadow">
+<div class="p-6 border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-4">
+<h3 class="font-headline-sm text-headline-sm text-primary">Volunteer Activity Ledger</h3>
+<div class="flex flex-wrap items-center gap-3">
+<select class="bg-surface border border-outline-variant text-label-md font-label-md py-2 px-4 focus:ring-primary focus:border-primary">
+<option>All Wards</option>
+<option>Ward 01</option>
+<option>Ward 04</option>
+<option>Ward 07</option>
+</select>
+<select class="bg-surface border border-outline-variant text-label-md font-label-md py-2 px-4 focus:ring-primary focus:border-primary">
+<option>All Roles</option>
+<option>Canvassing</option>
+<option>Phone Bank</option>
+<option>Admin</option>
+</select>
+<select class="bg-surface border border-outline-variant text-label-md font-label-md py-2 px-4 focus:ring-primary focus:border-primary">
+<option>Status: All</option>
+<option>Status: High Perf.</option>
+<option>Status: Average</option>
+<option>Status: At Risk</option>
+</select>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface border-b border-outline-variant">
+<th class="px-6 py-4 text-label-md font-label-md text-outline uppercase">Volunteer Name</th>
+<th class="px-6 py-4 text-label-md font-label-md text-outline uppercase">Ward</th>
+<th class="px-6 py-4 text-label-md font-label-md text-outline uppercase">Role</th>
+<th class="px-6 py-4 text-label-md font-label-md text-outline uppercase text-center">Contacts</th>
+<th class="px-6 py-4 text-label-md font-label-md text-outline uppercase text-center">Conv. %</th>
+<th class="px-6 py-4 text-label-md font-label-md text-outline uppercase">Status</th>
+<th class="px-6 py-4 text-label-md font-label-md text-outline uppercase">Last Activity</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<p class="text-body-sm font-semibold text-primary">Arthur Morgan</p>
+<p class="text-label-md text-outline">a.morgan@campaign.org</p>
+</td>
+<td class="px-6 py-4 text-body-sm">Ward 01</td>
+<td class="px-6 py-4 text-body-sm">Canvassing</td>
+<td class="px-6 py-4 text-center font-label-md text-primary">124</td>
+<td class="px-6 py-4 text-center font-label-md text-primary">9.5%</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-green-100 text-green-800 text-[10px] font-bold uppercase rounded-full">Optimal</span>
+</td>
+<td class="px-6 py-4 text-body-sm text-outline">2h ago</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<p class="text-body-sm font-semibold text-primary">Linda Zhao</p>
+<p class="text-label-md text-outline">l.zhao@campaign.org</p>
+</td>
+<td class="px-6 py-4 text-body-sm">Ward 04</td>
+<td class="px-6 py-4 text-body-sm">Phone Bank</td>
+<td class="px-6 py-4 text-center font-label-md text-primary">342</td>
+<td class="px-6 py-4 text-center font-label-md text-primary">14.1%</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-secondary-container/30 text-secondary text-[10px] font-bold uppercase rounded-full">Elite</span>
+</td>
+<td class="px-6 py-4 text-body-sm text-outline">45m ago</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<p class="text-body-sm font-semibold text-primary">David Smith</p>
+<p class="text-label-md text-outline">d.smith@campaign.org</p>
+</td>
+<td class="px-6 py-4 text-body-sm">Ward 07</td>
+<td class="px-6 py-4 text-body-sm">Canvassing</td>
+<td class="px-6 py-4 text-center font-label-md text-primary">45</td>
+<td class="px-6 py-4 text-center font-label-md text-primary">3.2%</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-error-container/30 text-error text-[10px] font-bold uppercase rounded-full">At Risk</span>
+</td>
+<td class="px-6 py-4 text-body-sm text-outline">1d ago</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<p class="text-body-sm font-semibold text-primary">Rachel Green</p>
+<p class="text-label-md text-outline">r.green@campaign.org</p>
+</td>
+<td class="px-6 py-4 text-body-sm">Ward 12</td>
+<td class="px-6 py-4 text-body-sm">Events</td>
+<td class="px-6 py-4 text-center font-label-md text-primary">210</td>
+<td class="px-6 py-4 text-center font-label-md text-primary">8.4%</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant text-[10px] font-bold uppercase rounded-full">Stable</span>
+</td>
+<td class="px-6 py-4 text-body-sm text-outline">5h ago</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-6 border-t border-outline-variant flex justify-between items-center">
+<span class="text-body-sm text-outline">Showing 4 of 2,481 volunteers</span>
+<div class="flex gap-2">
+<button class="px-4 py-2 border border-outline-variant text-label-md disabled:opacity-50" disabled="">Previous</button>
+<button class="px-4 py-2 border border-outline-variant text-label-md hover:bg-surface-container transition-colors">Next</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-2 md:hidden bg-primary dark:bg-primary-container border-t border-outline-variant shadow-lg">
+<div class="flex flex-col items-center justify-center text-on-primary/60 p-2 active:bg-primary-fixed-dim scale-95 duration-75">
+<span class="material-symbols-outlined">calculate</span>
+<span class="text-label-caps font-label-caps text-[10px]">Calculations</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl p-2 scale-95 duration-75">
+<span class="material-symbols-outlined">trending_up</span>
+<span class="text-label-caps font-label-caps text-[10px]">Thresholds</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-primary/60 p-2 active:bg-primary-fixed-dim scale-95 duration-75">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-label-caps font-label-caps text-[10px]">Config</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-primary/60 p-2 active:bg-primary-fixed-dim scale-95 duration-75">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-label-caps font-label-caps text-[10px]">Stats</span>
+</div>
+</nav>
+<script>
+        // Simple micro-interaction for table rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', () => {
+                row.classList.toggle('bg-surface-container');
+            });
+        });
+
+        // Search bar focus effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-secondary-container');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-secondary-container');
+        });
+    </script>
+</body></html>

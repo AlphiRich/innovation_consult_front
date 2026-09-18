@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Automated Reporting Configuration | CIVIC ARCHITECT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=Archivo+Narrow:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom scrollbar for high-density tables */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8f9ff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c6c5cf;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #76767f;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#e5e2dc",
+                        "on-secondary-fixed": "#261900",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#dde1ff",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary-container": "#8289b4",
+                        "tertiary-fixed-dim": "#c9c6c1",
+                        "tertiary-container": "#252521",
+                        "secondary-fixed-dim": "#ebc169",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#785805",
+                        "secondary": "#795907",
+                        "on-surface": "#0b1c30",
+                        "inverse-primary": "#bdc4f1",
+                        "surface-container-low": "#eff4ff",
+                        "tertiary": "#10100d",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "surface-container-high": "#dce9ff",
+                        "background": "#f8f9ff",
+                        "surface-container": "#e5eeff",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "inverse-surface": "#213145",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-highest": "#d3e4fe",
+                        "outline": "#76767f",
+                        "on-tertiary-fixed-variant": "#474743",
+                        "secondary-container": "#fdd178",
+                        "on-background": "#0b1c30",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#bdc4f1",
+                        "secondary-fixed": "#ffdea1",
+                        "primary-container": "#1a2246",
+                        "on-primary-fixed-variant": "#3d456b",
+                        "surface-tint": "#545c84",
+                        "on-primary-fixed": "#10193c",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "on-surface-variant": "#46464e",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#cbdbf5",
+                        "surface-variant": "#d3e4fe",
+                        "on-tertiary-container": "#8d8c87",
+                        "primary": "#040c30",
+                        "outline-variant": "#c6c5cf"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "max-width": "1440px",
+                        "margin-desktop": "32px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "data-mono": ["Public Sans"],
+                        "body-md": ["Public Sans"],
+                        "label-caps": ["Archivo Narrow"],
+                        "display-lg": ["Archivo Narrow"],
+                        "body-lg": ["Public Sans"],
+                        "headline-md": ["Archivo Narrow"]
+                    },
+                    "fontSize": {
+                        "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="flex flex-col h-screen sticky top-0 left-0 pt-4 pb-8 bg-surface-bright border-r border-outline-variant/30 w-64 z-50 shrink-0">
+<div class="px-6 mb-10">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-on-primary text-2xl" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary leading-tight">SA Elections 2024</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant/60 uppercase">Municipal Command</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 font-label-caps text-label-caps uppercase text-on-surface-variant/80 hover:bg-surface-container hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-lg">dashboard</span>
+<span>War Room</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 font-label-caps text-label-caps uppercase text-on-surface-variant/80 hover:bg-surface-container hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-lg">report_problem</span>
+<span>Incidents</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 font-label-caps text-label-caps uppercase text-on-surface-variant/80 hover:bg-surface-container hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-lg">groups</span>
+<span>Voters</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 font-label-caps text-label-caps uppercase text-on-surface-variant/80 hover:bg-surface-container hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-lg">local_shipping</span>
+<span>Logistics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 font-label-caps text-label-caps uppercase text-on-surface-variant/80 hover:bg-surface-container hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-lg">analytics</span>
+<span>Analytics</span>
+</a>
+<!-- Active Item -->
+<a class="flex items-center gap-3 px-4 py-3 font-label-caps text-label-caps uppercase text-primary border-l-4 border-secondary-fixed bg-surface-container-high font-bold transform transition-transform duration-150 active:scale-95" href="#">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="px-4 mt-auto pt-4 space-y-1 border-t border-outline-variant/20">
+<a class="flex items-center gap-3 px-4 py-2 font-label-caps text-label-caps uppercase text-on-surface-variant/80 hover:bg-surface-container hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">contact_support</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 font-label-caps text-label-caps uppercase text-on-surface-variant/80 hover:bg-surface-container hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-lg">inventory_2</span>
+<span>Archive</span>
+</a>
+<div class="px-4 py-4">
+<button class="w-full py-3 px-4 bg-secondary-fixed text-on-secondary-fixed font-label-caps text-label-caps uppercase font-bold border border-secondary transition-all hover:bg-secondary-container shadow-sm active:scale-95">
+                        Launch Campaign
+                    </button>
+</div>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center w-full px-margin-desktop h-16 z-50 bg-primary sticky top-0 border-b border-outline-variant/20">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md font-bold text-secondary-fixed">CIVIC ARCHITECT</span>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="font-body-md text-body-md text-on-primary/70 hover:text-on-primary transition-colors" href="#">Configuration</a>
+<a class="font-body-md text-body-md text-secondary-fixed border-b-2 border-secondary-fixed pb-1" href="#">Automated Reporting</a>
+<a class="font-body-md text-body-md text-on-primary/70 hover:text-on-primary transition-colors" href="#">Security Logs</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-primary hover:bg-primary-container/50 p-2 rounded-full transition-colors">notifications</button>
+<button class="material-symbols-outlined text-on-primary hover:bg-primary-container/50 p-2 rounded-full transition-colors">help_outline</button>
+<div class="h-8 w-px bg-on-primary/20 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-label-caps text-on-primary/60 uppercase leading-none mb-1">Admin Session</p>
+<p class="text-sm font-bold text-on-primary leading-none">Command Center</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-secondary-fixed object-cover" data-alt="A professional headshot of a municipal administrator in a clean office environment, high-contrast professional lighting, sharp corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiLSdg5x0JdQwWxMZmao2bt4KFkKxXNz1PUcqbnw-RJ39U1BBVPqI8MSYiqRXRhcKdyy9bnKIe_afK8CjvkoA32z6gbHBzSEIkgoVJHAn4Ynj3MLnf3Jl-G88TQItITQukBBxi_bIJXYDC8tRjB1hxrCe7dBSF4Vw4cuGlCTa1IqD3p9IYjB7aGAL8UuKZ2GCjlEyYm60wryfM1fmUIiogoG4BDlu_a9a-GmE09b7szAPKr8BnS7T9ckE5BX6hIqAdUGk3rRmVzw"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-margin-desktop space-y-8 max-w-6xl mx-auto w-full">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-outline-variant pb-6">
+<div>
+<div class="flex items-center gap-2 text-primary mb-2">
+<span class="material-symbols-outlined text-xl">file_save</span>
+<span class="font-label-caps text-label-caps uppercase">System Engine / Notifications</span>
+</div>
+<h2 class="font-display-lg text-display-lg text-primary tracking-tight">Automated Reporting</h2>
+<p class="text-on-surface-variant max-w-2xl mt-2 font-body-lg text-body-lg">Configure the autonomous intelligence engine to distribute municipal strategy updates and field performance metrics to stakeholders.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-6 py-2 border border-primary text-primary font-label-caps text-label-caps uppercase font-bold hover:bg-primary hover:text-on-primary transition-all active:scale-95">
+                            Send Test Report
+                        </button>
+<button class="px-6 py-2 bg-primary text-on-primary font-label-caps text-label-caps uppercase font-bold hover:bg-inverse-surface transition-all active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">save</span>
+                            Save Configuration
+                        </button>
+</div>
+</div>
+<!-- Three Phase Config Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Phase 1: Frequency (Col 4) -->
+<section class="lg:col-span-4 space-y-4">
+<div class="bg-white border border-outline-variant p-6 h-full relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<h3 class="font-label-caps text-label-caps uppercase text-on-surface-variant mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">schedule</span>
+                                01. Reporting Frequency
+                            </h3>
+<div class="space-y-3">
+<!-- Daily -->
+<label class="group flex items-center justify-between p-4 border border-outline-variant/30 hover:border-primary/50 cursor-pointer transition-all">
+<div class="flex flex-col">
+<span class="font-bold text-primary">Daily Briefing</span>
+<span class="text-xs text-on-surface-variant">Every morning at 06:00 AM</span>
+</div>
+<input class="text-primary focus:ring-secondary w-5 h-5" name="frequency" type="radio"/>
+</label>
+<!-- Weekly (Default) -->
+<label class="group flex items-center justify-between p-4 border-2 border-primary bg-surface-container-low cursor-pointer transition-all">
+<div class="flex flex-col">
+<span class="font-bold text-primary">Weekly Summary</span>
+<span class="text-xs text-on-surface-variant">Every Monday at 08:00 AM</span>
+</div>
+<input checked="" class="text-primary focus:ring-secondary w-5 h-5" name="frequency" type="radio"/>
+</label>
+<!-- Monthly -->
+<label class="group flex items-center justify-between p-4 border border-outline-variant/30 hover:border-primary/50 cursor-pointer transition-all">
+<div class="flex flex-col">
+<span class="font-bold text-primary">Monthly Review</span>
+<span class="text-xs text-on-surface-variant">Last day of month at 10:00 PM</span>
+</div>
+<input class="text-primary focus:ring-secondary w-5 h-5" name="frequency" type="radio"/>
+</label>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/20">
+<p class="text-xs font-label-caps text-on-surface-variant uppercase mb-2">Timezone Anchor</p>
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined text-sm">public</span>
+                                    (UTC+02:00) Johannesburg
+                                </div>
+</div>
+</div>
+</section>
+<!-- Phase 2: Scoping (Col 8) -->
+<section class="lg:col-span-8">
+<div class="bg-white border border-outline-variant p-6">
+<h3 class="font-label-caps text-label-caps uppercase text-on-surface-variant mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">analytics</span>
+                                02. Data Scoping Modules
+                            </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Module 1 -->
+<div class="p-4 border border-outline-variant/40 flex items-start justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="mt-1 w-10 h-10 bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">groups_2</span>
+</div>
+<div>
+<p class="font-bold text-primary">Voter Contact Metrics</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Canvassing rates, demographic reach, and volunteer efficiency logs.</p>
+</div>
+</div>
+<button class="mt-1 w-12 h-6 bg-outline-variant rounded-full p-1 flex transition-all duration-200" onclick="this.classList.toggle('bg-primary'); this.classList.toggle('justify-end');">
+<div class="w-4 h-4 bg-white shadow-sm"></div>
+</button>
+</div>
+<!-- Module 2 (Active) -->
+<div class="p-4 border-2 border-primary bg-surface-container-low flex items-start justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="mt-1 w-10 h-10 bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary">report_problem</span>
+</div>
+<div>
+<p class="font-bold text-primary">Incident Logs</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Security alerts, municipal service disruptions, and field escalations.</p>
+</div>
+</div>
+<button class="mt-1 w-12 h-6 bg-primary rounded-full p-1 flex justify-end transition-all duration-200">
+<div class="w-4 h-4 bg-white shadow-sm"></div>
+</button>
+</div>
+<!-- Module 3 -->
+<div class="p-4 border border-outline-variant/40 flex items-start justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="mt-1 w-10 h-10 bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">local_shipping</span>
+</div>
+<div>
+<p class="font-bold text-primary">Resource Logistics</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Inventory status, transport efficiency, and procurement summaries.</p>
+</div>
+</div>
+<button class="mt-1 w-12 h-6 bg-outline-variant rounded-full p-1 flex transition-all duration-200" onclick="this.classList.toggle('bg-primary'); this.classList.toggle('justify-end');">
+<div class="w-4 h-4 bg-white shadow-sm"></div>
+</button>
+</div>
+<!-- Module 4 (Active) -->
+<div class="p-4 border-2 border-primary bg-surface-container-low flex items-start justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="mt-1 w-10 h-10 bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary">ads_click</span>
+</div>
+<div>
+<p class="font-bold text-primary">Digital Impact Analytics</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Social sentiment tracking, ad performance, and web traffic source data.</p>
+</div>
+</div>
+<button class="mt-1 w-12 h-6 bg-primary rounded-full p-1 flex justify-end transition-all duration-200">
+<div class="w-4 h-4 bg-white shadow-sm"></div>
+</button>
+</div>
+</div>
+<div class="mt-6 flex gap-4 p-4 bg-tertiary-fixed text-on-tertiary-fixed border-l-4 border-primary">
+<span class="material-symbols-outlined">info</span>
+<p class="text-sm">Reports are generated as encrypted PDFs. <strong>Incident Logs</strong> are prioritized for immediate review at the top of the summary.</p>
+</div>
+</div>
+</section>
+<!-- Phase 3: Recipient Management (Col 12 Full) -->
+<section class="lg:col-span-12">
+<div class="bg-white border border-outline-variant p-6">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+<h3 class="font-label-caps text-label-caps uppercase text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">group_add</span>
+                                    03. Recipient Management — Johannesburg Team
+                                </h3>
+<div class="flex items-center gap-2 max-w-sm w-full">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">alternate_email</span>
+<input class="w-full pl-10 pr-4 py-2 border border-outline-variant focus:border-primary focus:ring-0 text-sm font-body-md" placeholder="Enter recipient email..." type="email"/>
+</div>
+<button class="px-4 py-2 bg-secondary text-on-secondary-fixed font-bold text-sm hover:bg-secondary-container transition-colors uppercase font-label-caps">
+                                        Add
+                                    </button>
+</div>
+</div>
+<!-- High Density Table -->
+<div class="overflow-x-auto">
+<table class="w-full border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-y border-outline-variant/30">
+<th class="px-4 py-3 text-left font-label-caps text-label-caps uppercase text-on-surface-variant">Name &amp; Role</th>
+<th class="px-4 py-3 text-left font-label-caps text-label-caps uppercase text-on-surface-variant">Contact Method</th>
+<th class="px-4 py-3 text-left font-label-caps text-label-caps uppercase text-on-surface-variant">Level</th>
+<th class="px-4 py-3 text-left font-label-caps text-label-caps uppercase text-on-surface-variant">Status</th>
+<th class="px-4 py-3 text-right font-label-caps text-label-caps uppercase text-on-surface-variant">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20">
+<tr class="hover:bg-surface-container/30 transition-colors group">
+<td class="px-4 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs">DN</div>
+<div>
+<p class="font-bold text-primary">David Nkosi</p>
+<p class="text-xs text-on-surface-variant italic">Infrastructure Specialist</p>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 text-sm font-data-mono">d.nkosi@civic-arch.gov.za</td>
+<td class="px-4 py-4">
+<span class="px-2 py-0.5 bg-tertiary text-on-tertiary text-[10px] font-bold uppercase tracking-wider">Strategic</span>
+</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-green-600"></div>
+<span class="text-xs font-bold text-green-800">Active</span>
+</div>
+</td>
+<td class="px-4 py-4 text-right">
+<button class="material-symbols-outlined text-outline hover:text-error transition-colors">delete</button>
+</td>
+</tr>
+<!-- Mock Entry 2 -->
+<tr class="hover:bg-surface-container/30 transition-colors group">
+<td class="px-4 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs">LM</div>
+<div>
+<p class="font-bold text-primary">Lindiwe Mabaso</p>
+<p class="text-xs text-on-surface-variant italic">Lead Data Architect</p>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 text-sm font-data-mono">l.mabaso@civic-arch.gov.za</td>
+<td class="px-4 py-4">
+<span class="px-2 py-0.5 bg-outline text-white text-[10px] font-bold uppercase tracking-wider">Operations</span>
+</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-green-600"></div>
+<span class="text-xs font-bold text-green-800">Active</span>
+</div>
+</td>
+<td class="px-4 py-4 text-right">
+<button class="material-symbols-outlined text-outline hover:text-error transition-colors">delete</button>
+</td>
+</tr>
+<!-- Mock Entry 3 -->
+<tr class="hover:bg-surface-container/30 transition-colors group">
+<td class="px-4 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-primary flex items-center justify-center font-bold text-xs">TC</div>
+<div>
+<p class="font-bold text-primary">Thabo Cele</p>
+<p class="text-xs text-on-surface-variant italic">Security Liaison</p>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 text-sm font-data-mono">t.cele@command.gov.za</td>
+<td class="px-4 py-4">
+<span class="px-2 py-0.5 bg-error text-on-error text-[10px] font-bold uppercase tracking-wider">Critical</span>
+</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-1.5">
+<div class="w-2 h-2 rounded-full bg-orange-400"></div>
+<span class="text-xs font-bold text-orange-800">Pending</span>
+</div>
+</td>
+<td class="px-4 py-4 text-right">
+<button class="material-symbols-outlined text-outline hover:text-error transition-colors">delete</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Audit Trail / Footer Actions (Col 12) -->
+<section class="lg:col-span-12">
+<div class="bg-primary p-6 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary-fixed text-3xl">history_edu</span>
+<div>
+<p class="text-on-primary font-bold">Last Configuration Change</p>
+<p class="text-on-primary/60 text-xs">Modified by <span class="text-secondary-fixed">Admin_Unit_04</span> on 12 May 2024, 14:32</p>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="px-8 py-3 border border-on-primary/30 text-on-primary font-label-caps text-label-caps uppercase hover:bg-on-primary hover:text-primary transition-all">
+                                    Discard Changes
+                                </button>
+<button class="px-8 py-3 bg-secondary-fixed text-on-secondary-fixed font-bold font-label-caps text-label-caps uppercase shadow-lg shadow-black/20 hover:bg-white transition-all active:scale-95">
+                                    Commit &amp; Distribute
+                                </button>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- Mobile Navigation (Bottom Bar) -->
+<footer class="md:hidden sticky bottom-0 left-0 w-full bg-primary h-16 flex items-center justify-around px-4 z-50">
+<button class="flex flex-col items-center gap-1 text-on-primary/70">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-label-caps uppercase">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-primary/70">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-label-caps uppercase">Reports</span>
+</button>
+<div class="relative -top-4">
+<button class="w-14 h-14 bg-secondary-fixed rounded-full shadow-lg flex items-center justify-center border-4 border-primary">
+<span class="material-symbols-outlined text-on-secondary-fixed text-3xl">add</span>
+</button>
+</div>
+<button class="flex flex-col items-center gap-1 text-on-primary/70">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-label-caps uppercase">Field</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-secondary-fixed">
+<span class="material-symbols-outlined active-fill">settings</span>
+<span class="text-[10px] font-label-caps uppercase">Settings</span>
+</button>
+</footer>
+</main>
+</div>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Tab highlight logic
+        const navLinks = document.querySelectorAll('aside nav a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                navLinks.forEach(l => {
+                    l.classList.remove('bg-surface-container-high', 'border-l-4', 'border-secondary-fixed', 'text-primary', 'font-bold');
+                    l.classList.add('text-on-surface-variant/80');
+                });
+                link.classList.add('bg-surface-container-high', 'border-l-4', 'border-secondary-fixed', 'text-primary', 'font-bold');
+                link.classList.remove('text-on-surface-variant/80');
+            });
+        });
+
+        // Toggle simulation for scopes
+        function setupToggles() {
+            const toggles = document.querySelectorAll('.module-toggle');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    this.classList.toggle('bg-primary');
+                    const knob = this.querySelector('div');
+                    knob.classList.toggle('translate-x-6');
+                });
+            });
+        }
+    </script>
+</body></html>

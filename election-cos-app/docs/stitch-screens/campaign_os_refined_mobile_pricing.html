@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Campaign OS | Innovation Consult</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Public+Sans:wght@400;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@100..900&amp;family=Public+Sans:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#edeeef",
+                    "error": "#ba1a1a",
+                    "on-primary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-tint": "#545c84",
+                    "on-tertiary-container": "#7a89c9",
+                    "outline-variant": "#c6c5cf",
+                    "on-surface": "#191c1d",
+                    "surface-variant": "#e1e3e4",
+                    "surface-container-low": "#f3f4f5",
+                    "on-secondary-container": "#785805",
+                    "on-tertiary-fixed-variant": "#34437f",
+                    "on-error": "#ffffff",
+                    "on-background": "#191c1d",
+                    "primary-fixed": "#dde1ff",
+                    "on-primary-fixed": "#10193c",
+                    "on-primary-container": "#8289b4",
+                    "inverse-surface": "#2e3132",
+                    "secondary-fixed": "#ffdea1",
+                    "primary-container": "#1a2246",
+                    "inverse-on-surface": "#f0f1f2",
+                    "primary": "#040c30",
+                    "secondary-container": "#fdd178",
+                    "secondary-fixed-dim": "#ebc169",
+                    "background": "#f8f9fa",
+                    "on-secondary-fixed": "#261900",
+                    "surface-container-highest": "#e1e3e4",
+                    "tertiary-fixed": "#dde1ff",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "on-secondary": "#ffffff",
+                    "inverse-primary": "#bdc4f1",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#e7e8e9",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "surface-bright": "#f8f9fa",
+                    "tertiary": "#000a37",
+                    "on-tertiary-fixed": "#011452",
+                    "surface-dim": "#d9dadb",
+                    "surface": "#f8f9fa",
+                    "secondary": "#795907",
+                    "error-container": "#ffdad6",
+                    "outline": "#76767f",
+                    "tertiary-container": "#0d1f5b",
+                    "on-surface-variant": "#46464e",
+                    "tertiary-fixed-dim": "#b8c4ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "sm": "16px",
+                    "margin-mobile": "16px",
+                    "gutter": "16px",
+                    "margin-desktop": "32px",
+                    "xl": "64px",
+                    "lg": "40px",
+                    "xs": "8px",
+                    "base": "4px",
+                    "md": "24px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Public Sans"],
+                    "body-lg": ["Public Sans"],
+                    "headline-lg-mobile": ["Archivo Narrow"],
+                    "headline-lg": ["Archivo Narrow"],
+                    "headline-md": ["Archivo Narrow"],
+                    "label-md": ["Public Sans"],
+                    "display-lg-mobile": ["Archivo Narrow"],
+                    "display-lg": ["Archivo Narrow"],
+                    "body-md": ["Public Sans"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "1.1", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .ink-gradient {
+        background: radial-gradient(circle at top right, #1a2246 0%, #040c30 100%);
+      }
+      .vertical-flow-line {
+        background: repeating-linear-gradient(to bottom, #76767f 0, #76767f 4px, transparent 4px, transparent 8px);
+        width: 2px;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile h-12 w-full bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary" data-icon="security">security</span>
+<span class="font-headline-md text-headline-md text-primary tracking-tight font-bold">CAMPAIGN OS</span>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-sm py-xs hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-150 rounded-lg">
+            Contact Sales
+        </button>
+</header>
+<main class="pt-12">
+<!-- Hero Section -->
+<section class="ink-gradient relative min-h-[751px] flex flex-col justify-center items-center px-margin-mobile text-center overflow-hidden">
+<div class="absolute inset-0 opacity-20">
+</div>
+<div class="relative z-10 max-w-md">
+<span class="bg-secondary-container text-on-secondary-container font-label-md text-label-md px-sm py-1 rounded-full uppercase mb-md inline-block">
+                    Operational Intelligence
+                </span>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-primary mb-sm leading-tight">
+                    Knowledge to Action: The Ultimate LGE War Room
+                </h1>
+<p class="font-body-md text-body-md text-on-primary/80 mb-lg">
+                    Institutional-grade strategy infrastructure for modern political campaigns. Deploy intelligence at scale.
+                </p>
+<div class="flex flex-col gap-sm w-full">
+<button class="bg-secondary-container text-on-secondary-container font-label-md text-label-md h-12 flex items-center justify-center uppercase tracking-widest hover:opacity-90 active:scale-[0.98] transition-all rounded-lg">
+                        Request a Demo
+                    </button>
+<button class="border border-on-primary/30 text-on-primary font-label-md text-label-md h-12 flex items-center justify-center uppercase tracking-widest hover:bg-white/10 active:scale-[0.98] transition-all rounded-lg">
+                        Watch the Film
+                    </button>
+</div>
+</div>
+<div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce opacity-50">
+<span class="material-symbols-outlined text-on-primary" data-icon="keyboard_arrow_down">keyboard_arrow_down</span>
+</div>
+</section>
+<!-- Video Section -->
+<section class="py-xl px-margin-mobile bg-surface">
+<div class="text-center mb-lg">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-xs">Operationalizing Innovation</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Version 2.0 Deployment Architecture</p>
+</div>
+<div class="relative group aspect-video bg-primary-container rounded-xl overflow-hidden shadow-xl border border-outline-variant">
+<div class="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-all z-10">
+<button class="w-16 h-16 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center shadow-2xl active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[32px]" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<div class="absolute bottom-0 left-0 w-full p-sm bg-gradient-to-t from-black/80 to-transparent z-10">
+<span class="font-label-md text-label-md text-on-primary opacity-80">Campaign OS v2.0 Reveal</span>
+</div>
+<img class="w-full h-full object-cover" data-alt="A cinematic, high-contrast aerial shot of a modern city at night with glowing blue and teal data visualization overlays representing digital connectivity. The scene is professional, institutional, and high-tech, using an ink navy and gold color palette to suggest authority and specialized intelligence in a corporate consulting context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlbfj9GLBxoHTXgW0OJw4D7KKHEuiWy8OK5N_Cn8js4nkYhrX7VNvkJBnAnHIgxcHodcdqvo5moJ42Tc3hrU_Y5yh7RhPqfpzET8ZeioJ6LfsGhftXjPs24N1HW_2hPrBrgBWEa9OPoKddBvJ58NqhlxPTtwaCPLtxR3XUp01UkWLyFIerttQ9gzitGKvPG0mvgSZ_pWjBlg-wtEFjhqGJQU97IhEMfvYeH-iMXHhwEgji1-Ytc-FpQnhSiyi5_M613NdhaKj6Lw"/>
+</div>
+</section>
+<!-- Tactical Command Hierarchy -->
+<section class="py-xl px-margin-mobile bg-surface-container-low overflow-hidden">
+<div class="mb-lg">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-xs">Command Hierarchy</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">End-to-end data flow from HQ to the field.</p>
+</div>
+<div class="relative flex flex-col gap-lg">
+<!-- Vertical Line Connector -->
+<div class="absolute left-6 top-8 bottom-8 vertical-flow-line z-0"></div>
+<!-- Level 1 -->
+<div class="relative z-10 flex gap-md items-start">
+<div class="w-12 h-12 flex-shrink-0 bg-primary text-on-primary rounded-lg flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined" data-icon="hub">hub</span>
+</div>
+<div class="bg-white p-sm rounded-xl border border-outline-variant shadow-sm flex-1">
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Strategic War Room</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Central intelligence hub for high-level resource allocation and real-time polling analytics.</p>
+</div>
+</div>
+<!-- Level 2 -->
+<div class="relative z-10 flex gap-md items-start">
+<div class="w-12 h-12 flex-shrink-0 bg-tertiary-container text-tertiary-fixed-dim rounded-lg flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+</div>
+<div class="bg-white p-sm rounded-xl border border-outline-variant shadow-sm flex-1">
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Municipal Command</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Localized operational management for specific regions and voter demographic targets.</p>
+</div>
+</div>
+<!-- Level 3 -->
+<div class="relative z-10 flex gap-md items-start">
+<div class="w-12 h-12 flex-shrink-0 bg-secondary-container text-on-secondary-container rounded-lg flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined" data-icon="mobile_friendly">mobile_friendly</span>
+</div>
+<div class="bg-white p-sm rounded-xl border border-outline-variant shadow-sm flex-1">
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Ward Field App</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Real-time door-to-door canvas optimization for field workers and regional coordinators.</p>
+</div>
+</div>
+<!-- Level 4 -->
+<div class="relative z-10 flex gap-md items-start">
+<div class="w-12 h-12 flex-shrink-0 bg-on-tertiary-container text-tertiary-container rounded-lg flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+</div>
+<div class="bg-white p-sm rounded-xl border border-outline-variant shadow-sm flex-1">
+<h3 class="font-headline-md text-headline-md text-primary mb-1">Voter Intelligence</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Granular predictive modeling down to the household level for precise messaging.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Strategic Insight Quote -->
+<section class="py-xl px-margin-mobile">
+<div class="bg-primary text-on-primary p-lg rounded-xl shadow-2xl relative overflow-hidden">
+<div class="absolute -top-12 -right-12 opacity-10">
+<span class="material-symbols-outlined text-[120px]" data-icon="format_quote">format_quote</span>
+</div>
+<blockquote class="relative z-10">
+<p class="font-headline-md text-headline-md italic mb-md leading-relaxed">
+                        "The transition from Knowledge to Action is the only metric that matters in the high-stakes theater of modern governance."
+                    </p>
+<footer class="font-label-md text-label-md text-secondary-container uppercase tracking-widest">
+                        — Chief Strategist, Innovation Consult
+                    </footer>
+</blockquote>
+</div>
+</section>
+<!-- Pricing Plans -->
+<section class="py-xl px-margin-mobile bg-surface">
+<div class="mb-lg text-center">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-xs">Scale Your Influence</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Deployment tiers for every scope.</p>
+</div>
+<div class="flex flex-col gap-md">
+<!-- Plan 1 -->
+<div class="p-lg bg-white border border-outline-variant rounded-xl flex flex-col shadow-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase mb-xs">Basic</span>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-1">Ward Edition</h3>
+<div class="mb-md">
+<span class="text-[32px] font-bold text-primary">$499</span>
+<span class="text-body-sm text-on-surface-variant">/mo</span>
+</div>
+<ul class="flex flex-col gap-sm mb-lg">
+<li class="flex items-center gap-xs font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="check_circle">check_circle</span>
+Canvas Map Optimization
+</li>
+<li class="flex items-center gap-xs font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="check_circle">check_circle</span>
+Standard Voter Lists
+</li>
+<li class="flex items-center gap-xs font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="check_circle">check_circle</span>
+Field Agent Reporting
+</li>
+</ul>
+<button class="w-full border border-primary text-primary font-label-md text-label-md h-12 uppercase tracking-widest rounded-lg hover:bg-surface-container transition-colors active:scale-95">
+Get Started
+</button>
+</div>
+<!-- Plan 2 (Featured) -->
+<div class="p-lg bg-primary text-on-primary border-4 border-secondary-container rounded-xl flex flex-col relative scale-105 z-10 shadow-2xl my-md">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary-container text-on-secondary-container px-sm py-1 font-label-md text-label-md uppercase rounded-full shadow-lg">
+Most Popular
+</div>
+<span class="font-label-md text-label-md text-secondary-fixed uppercase mb-xs">Professional</span>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile mb-1">Municipal Edition</h3>
+<div class="mb-md">
+<span class="text-[32px] font-bold text-secondary-container">$1,499</span>
+<span class="text-body-sm text-on-primary/70">/mo</span>
+</div>
+<ul class="flex flex-col gap-sm mb-lg">
+<li class="flex items-center gap-xs font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary-container text-[20px]" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+Multi-Ward Syncing
+</li>
+<li class="flex items-center gap-xs font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary-container text-[20px]" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+Demographic Sentiment Analysis
+</li>
+<li class="flex items-center gap-xs font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary-container text-[20px]" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+24/7 Strategic Support
+</li>
+</ul>
+<button class="w-full bg-secondary-container text-on-secondary-container font-label-md text-label-md h-12 uppercase tracking-widest rounded-lg hover:opacity-90 transition-opacity active:scale-95">
+Get Started
+</button>
+</div>
+<!-- Plan 3 -->
+<div class="p-lg bg-white border border-outline-variant rounded-xl flex flex-col shadow-sm">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase mb-xs">Enterprise</span>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-1">Provincial/Metro</h3>
+<div class="mb-md">
+<span class="text-[32px] font-bold text-primary">Custom</span>
+<span class="text-body-sm text-on-surface-variant">/annual</span>
+</div>
+<ul class="flex flex-col gap-sm mb-lg">
+<li class="flex items-center gap-xs font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="check_circle">check_circle</span>
+Predictive Voter Modeling
+</li>
+<li class="flex items-center gap-xs font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="check_circle">check_circle</span>
+API Integration Tier
+</li>
+<li class="flex items-center gap-xs font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="check_circle">check_circle</span>
+Custom War Room Setup
+</li>
+</ul>
+<button class="w-full border border-primary text-primary font-label-md text-label-md h-12 uppercase tracking-widest rounded-lg hover:bg-surface-container transition-colors active:scale-95">
+Contact Sales
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-primary dark:bg-tertiary-container w-full py-xl px-margin-mobile flex flex-col gap-md">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-on-primary" data-icon="security">security</span>
+<span class="font-headline-md text-headline-md text-on-primary tracking-tight font-bold">CAMPAIGN OS</span>
+</div>
+<nav class="flex flex-col gap-sm">
+<a class="font-body-sm text-body-sm text-on-primary/70 hover:text-secondary-container transition-colors cursor-pointer" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-primary/70 hover:text-secondary-container transition-colors cursor-pointer" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-primary/70 hover:text-secondary-container transition-colors cursor-pointer" href="#">Security Architecture</a>
+<a class="font-body-sm text-body-sm text-on-primary/70 hover:text-secondary-container transition-colors cursor-pointer" href="#">Global Compliance</a>
+</nav>
+<div class="pt-lg border-t border-on-primary/10">
+<p class="font-body-sm text-body-sm text-on-primary/50 text-center">
+                © 2024 Campaign OS. Institutional Grade Strategy. <br/>Innovation Consult Africa Group.
+            </p>
+</div>
+</footer>
+<script>
+        // Micro-interactions
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('touchstart', function() {
+                this.classList.add('scale-95');
+            });
+            button.addEventListener('touchend', function() {
+                this.classList.remove('scale-95');
+            });
+        });
+
+        // Sticky Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('shadow-md');
+            } else {
+                header.classList.remove('shadow-md');
+            }
+        });
+    </script>
+</body></html>

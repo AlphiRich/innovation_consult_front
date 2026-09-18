@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>30-Day Municipal Sentiment Summary Report | INNOVATION CONSULT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;600;700&amp;family=Public+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#040c30", // Navy
+                        "secondary": "#795907", // Gold
+                        "error": "#ba1a1a", // Maroon/Red
+                        "on-background": "#0b1c30",
+                        "inverse-on-surface": "#eaf1ff",
+                        "outline-variant": "#c6c5cf",
+                        "tertiary-container": "#252521",
+                        "tertiary-fixed": "#e5e2dc",
+                        "primary-container": "#1a2246",
+                        "surface-tint": "#545c84",
+                        "on-primary-container": "#8289b4",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary-container": "#8d8c87",
+                        "tertiary-fixed-dim": "#c9c6c1",
+                        "inverse-primary": "#bdc4f1",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#bdc4f1",
+                        "on-surface": "#0b1c30",
+                        "inverse-surface": "#213145",
+                        "on-secondary-fixed": "#261900",
+                        "surface-container-high": "#dce9ff",
+                        "background": "#f8f9ff",
+                        "secondary-fixed": "#ffdea1",
+                        "surface-dim": "#cbdbf5",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed-variant": "#3d456b",
+                        "on-error-container": "#93000a",
+                        "on-surface-variant": "#46464e",
+                        "outline": "#76767f",
+                        "tertiary": "#10100d",
+                        "surface-variant": "#d3e4fe",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#474743",
+                        "secondary-fixed-dim": "#ebc169",
+                        "secondary-container": "#fdd178",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#785805",
+                        "surface-container": "#e5eeff",
+                        "primary-fixed": "#dde1ff",
+                        "on-primary-fixed": "#10193c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "32px",
+                        "max-width": "1440px",
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Archivo Narrow"],
+                        "display-lg-mobile": ["Archivo Narrow"],
+                        "label-caps": ["Archivo Narrow"],
+                        "body-md": ["Public Sans"],
+                        "display-lg": ["Archivo Narrow"],
+                        "data-mono": ["Public Sans"],
+                        "body-lg": ["Public Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #f1f3f6;
+            color: #0b1c30;
+            -webkit-print-color-adjust: exact;
+        }
+        .report-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 40px auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 100px;
+            color: rgba(4, 12, 48, 0.03);
+            font-family: 'Archivo Narrow', sans-serif;
+            font-weight: 900;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 0;
+            text-transform: uppercase;
+        }
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .report-page { margin: 0; box-shadow: none; width: 100%; height: auto; }
+            .no-print { display: none; }
+        }
+        .administrative-border {
+            border-left: 4px solid #040c30;
+        }
+        .gold-accent {
+            color: #795907;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md">
+<!-- Top Navigation Bar (Shared) -->
+<header class="bg-primary text-on-primary font-body-md text-body-md flex justify-between items-center w-full px-margin-desktop h-16 z-50 border-b border-outline-variant/20 no-print">
+<div class="flex items-center gap-6 h-full">
+<div class="flex items-center gap-2">
+<img alt="Innovation Consult" class="h-10 w-10 object-contain invert grayscale brightness-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhSlo6-t9K09sT0rWe8wDarN1tgGUfNXoF-UueeKLWiVpr37_T5Z3xTFvYAcAiKEsSLODRvEwwJ7Q_bNU8M1BK4b22XrnXcUQL7i06z7SwiKjR2vRdKu8JJN1daPjpSTGr5TkCxDv1uaKvDOSycvOo9-GRsdA7oaiBhTI4HmCdpMtHRzeFMcfmfTXn6um0lw_sSW9i02q_j7L9LlwcsUkYCxSl93Qk8xm3crJA7p3kGb_S4YrwvcVtYsUFgGwzcnHbZTjx67nSiw"/>
+<span class="font-headline-md text-headline-md font-bold text-white tracking-tight">INNOVATION CONSULT</span>
+</div>
+<div class="hidden md:flex gap-4 h-full items-center">
+<a class="text-white border-b-2 border-secondary h-full flex items-center px-2" href="#">Strategic Reports</a>
+<a class="text-on-primary/70 hover:text-on-primary transition-colors px-2" href="#">Engagement</a>
+<a class="text-on-primary/70 hover:text-on-primary transition-colors px-2" href="#">Analytics</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-primary/70 cursor-pointer">notifications</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="User Profile" class="object-cover w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACk_fLHopX2HxiOcQwxysTeVHU523yZ6xGDjM0oaNsWD7Dhd5XVtfgd8EO7iGGfCl3Un5kTd8BO9_bX_xVM9NlhqFOowngMZSEHNxK_CYpgaApaAJbQX1X56vy3fxvFz_ym4lZaaLUzD1XyXA7gcmHvCKHR9tXIdKJzW9uJV3dXxmeDzhtnzGzRbnlCq616Ms9DItCaP-Spqiameft7J9GZ2RuIKxeHCg_HUU6TKwm-UG6BR6cny66dZO74kxKCIiCMZnWoCNBRA"/>
+</div>
+</div>
+</header>
+<main class="flex justify-center pb-20">
+<!-- Main Report Container -->
+<article class="report-page z-10 relative">
+<div class="watermark">STRICTLY CONFIDENTIAL</div>
+<!-- Header Section -->
+<header class="flex justify-between items-start border-b-4 border-primary pb-6 mb-8">
+<div class="flex gap-6">
+<img alt="Brand Logo" class="w-16 h-16 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhSlo6-t9K09sT0rWe8wDarN1tgGUfNXoF-UueeKLWiVpr37_T5Z3xTFvYAcAiKEsSLODRvEwwJ7Q_bNU8M1BK4b22XrnXcUQL7i06z7SwiKjR2vRdKu8JJN1daPjpSTGr5TkCxDv1uaKvDOSycvOo9-GRsdA7oaiBhTI4HmCdpMtHRzeFMcfmfTXn6um0lw_sSW9i02q_j7L9LlwcsUkYCxSl93Qk8xm3crJA7p3kGb_S4YrwvcVtYsUFgGwzcnHbZTjx67nSiw"/>
+<div>
+<h1 class="font-display-lg text-[32px] leading-tight text-primary uppercase tracking-tight font-bold">30-Day Ward Sentiment Summary</h1>
+<div class="mt-2 flex gap-4 text-primary font-label-caps text-label-caps">
+<span class="bg-primary text-white px-2 py-0.5 font-bold">IC-2024-MS-30D</span>
+<span class="flex items-center gap-1 border border-primary/20 px-2 py-0.5 font-medium">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+                            JUNE 19 — JULY 19, 2024
+                        </span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<div class="font-headline-md text-headline-md text-primary font-bold">SA ELECTIONS 2024</div>
+<div class="font-label-caps text-label-caps text-secondary font-bold">MUNICIPAL COMMAND CENTER</div>
+</div>
+</header>
+<!-- Executive Summary -->
+<section class="mb-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<h2 class="font-label-caps text-label-caps text-primary border-b-2 border-primary/10 flex-1 py-1 font-bold">EXECUTIVE SUMMARY</h2>
+</div>
+<div class="grid grid-cols-12 gap-8 items-start">
+<div class="col-span-8">
+<p class="text-body-md leading-relaxed text-on-surface mb-4">
+                        The aggregate sentiment index for the reporting period concludes at <strong class="text-primary font-bold">+12.4</strong>, representing a steady but fragile stabilization of public perception across the metropolitan area. While the overall trend remains positive, volatility levels have spiked in the southern industrial corridors (Wards 18-31) following localized infrastructure disruptions.
+                    </p>
+<p class="text-body-md leading-relaxed text-on-surface">
+                        Strategic focus remains centered on addressing water security concerns, which currently act as the primary anchor against further positive sentiment growth. Field reports suggest high correlation between prompt maintenance responses and localized sentiment recovery.
+                    </p>
+</div>
+<div class="col-span-4 bg-primary text-white p-6 shadow-md">
+<div class="mb-6">
+<div class="font-label-caps text-[10px] text-white/70 tracking-widest">AGGREGATE INDEX</div>
+<div class="text-[42px] font-bold text-white flex items-center justify-between">
+                            +12.4
+                            <span class="material-symbols-outlined text-secondary text-4xl">trending_up</span>
+</div>
+<div class="text-label-caps text-secondary font-bold">▲ 2.1% FROM PREV. PERIOD</div>
+</div>
+<div>
+<div class="font-label-caps text-[10px] text-white/70 tracking-widest">VOLATILITY LEVEL</div>
+<div class="text-[20px] font-bold text-white uppercase tracking-tighter">MODERATE RISK</div>
+<div class="h-2 w-full bg-white/20 mt-2">
+<div class="bg-secondary h-full w-[65%]"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Sentiment Leaderboard -->
+<section class="mb-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">format_list_numbered</span>
+<h2 class="font-label-caps text-label-caps text-primary border-b-2 border-primary/10 flex-1 py-1 font-bold">SENTIMENT LEADERBOARD (AGGREGATE)</h2>
+</div>
+<div class="grid grid-cols-2 gap-8">
+<!-- Positive Wards -->
+<div>
+<h3 class="font-label-caps text-[11px] text-primary mb-3 flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified</span> TOP PERFORMING WARDS
+                    </h3>
+<table class="w-full text-left font-data-mono text-data-mono border-collapse">
+<thead class="bg-primary text-white">
+<tr>
+<th class="p-3 text-[11px] border-r border-white/10">WARD ID</th>
+<th class="p-3 text-[11px] border-r border-white/10">SCORE</th>
+<th class="p-3 text-[11px]">TREND</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30 border-x border-b border-outline-variant/30">
+<tr class="bg-surface-container-lowest">
+<td class="p-3 font-bold border-r border-outline-variant/10">WARD 04</td>
+<td class="p-3 font-bold border-r border-outline-variant/10">+42.1</td>
+<td class="p-3 text-secondary font-bold">STABLE</td>
+</tr>
+<tr>
+<td class="p-3 font-bold border-r border-outline-variant/10">WARD 12</td>
+<td class="p-3 font-bold border-r border-outline-variant/10">+38.5</td>
+<td class="p-3 text-secondary font-bold">RISING</td>
+</tr>
+<tr class="bg-surface-container-lowest">
+<td class="p-3 font-bold border-r border-outline-variant/10">WARD 09</td>
+<td class="p-3 font-bold border-r border-outline-variant/10">+31.0</td>
+<td class="p-3 text-secondary font-bold">STABLE</td>
+</tr>
+<tr>
+<td class="p-3 font-bold border-r border-outline-variant/10">WARD 02</td>
+<td class="p-3 font-bold border-r border-outline-variant/10">+29.4</td>
+<td class="p-3 text-secondary font-bold">STABLE</td>
+</tr>
+<tr class="bg-surface-container-lowest">
+<td class="p-3 font-bold border-r border-outline-variant/10">WARD 15</td>
+<td class="p-3 font-bold border-r border-outline-variant/10">+26.8</td>
+<td class="p-3 text-secondary font-bold">RISING</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Negative Wards -->
+<div>
+<h3 class="font-label-caps text-[11px] text-error mb-3 flex items-center gap-1 font-bold">
+<span class="material-symbols-outlined text-[16px]">warning</span> AT-RISK WARDS (CRITICAL)
+                    </h3>
+<table class="w-full text-left font-data-mono text-data-mono border-collapse">
+<thead class="bg-error text-white">
+<tr>
+<th class="p-3 text-[11px] border-r border-white/10">WARD ID</th>
+<th class="p-3 text-[11px] border-r border-white/10">SCORE</th>
+<th class="p-3 text-[11px]">TREND</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30 border-x border-b border-outline-variant/30">
+<tr class="bg-surface-container-lowest">
+<td class="p-3 font-bold border-r border-outline-variant/10">WARD 07</td>
+<td class="p-3 font-bold border-r border-outline-variant/10">-18.4</td>
+<td class="p-3 text-error font-bold">VOLATILE</td>
+</tr>
+<tr>
+<td class="p-3 font-bold border-r border-outline-variant/10">WARD 22</td>
+<td class="p-3 font-bold border-r border-outline-variant/10">-15.2</td>
+<td class="p-3 text-error font-bold">CRITICAL</td>
+</tr>
+<tr class="bg-surface-container-lowest">
+<td class="p-3 font-bold border-r border-outline-variant/10">WARD 31</td>
+<td class="p-3 font-bold border-r border-outline-variant/10">-12.8</td>
+<td class="p-3 text-error font-bold">SINKING</td>
+</tr>
+<tr>
+<td class="p-3 font-bold border-r border-outline-variant/10">WARD 18</td>
+<td class="p-3 font-bold border-r border-outline-variant/10">-09.1</td>
+<td class="p-3 text-secondary font-bold">NEUTRAL</td>
+</tr>
+<tr class="bg-surface-container-lowest">
+<td class="p-3 font-bold border-r border-outline-variant/10">WARD 40</td>
+<td class="p-3 font-bold border-r border-outline-variant/10">-04.5</td>
+<td class="p-3 text-secondary font-bold">NEUTRAL</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Driver Impact Analysis -->
+<section class="mb-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">priority_high</span>
+<h2 class="font-label-caps text-label-caps text-primary border-b-2 border-primary/10 flex-1 py-1 font-bold">SENTIMENT DRIVER ANALYSIS</h2>
+</div>
+<div class="flex gap-4">
+<div class="flex-1 border-t-4 border-error p-5 bg-surface-container-low shadow-sm">
+<div class="font-label-caps text-error text-[10px] font-bold mb-1">PRIMARY DRIVER</div>
+<h4 class="font-bold text-primary text-lg">Water Security</h4>
+<p class="text-[13px] mt-2 text-on-surface leading-tight">Highly influential. Recent outages in the North Cluster have triggered 60% of negative social spikes.</p>
+<div class="mt-4 pt-3 border-t border-error/10 text-[14px] font-bold text-error">IMPACT: -14.2 PTS</div>
+</div>
+<div class="flex-1 border-t-4 border-secondary p-5 bg-surface-container-low shadow-sm">
+<div class="font-label-caps text-secondary text-[10px] font-bold mb-1">SECONDARY DRIVER</div>
+<h4 class="font-bold text-primary text-lg">Public Safety</h4>
+<p class="text-[13px] mt-2 text-on-surface leading-tight">Stable positive trend following increased community patrols in Ward 04 and Ward 12.</p>
+<div class="mt-4 pt-3 border-t border-secondary/10 text-[14px] font-bold text-primary">IMPACT: +8.5 PTS</div>
+</div>
+<div class="flex-1 border-t-4 border-primary p-5 bg-surface-container-low shadow-sm">
+<div class="font-label-caps text-primary text-[10px] font-bold mb-1">TERTIARY DRIVER</div>
+<h4 class="font-bold text-primary text-lg">Job Creation</h4>
+<p class="text-[13px] mt-2 text-on-surface leading-tight">Economic recovery initiatives in industrial zones show early positive discourse engagement.</p>
+<div class="mt-4 pt-3 border-t border-primary/10 text-[14px] font-bold text-primary">IMPACT: +5.1 PTS</div>
+</div>
+</div>
+</section>
+<!-- Sentiment Heatmap -->
+<section class="mb-12">
+<div class="flex justify-between items-center mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">map</span>
+<h2 class="font-label-caps text-label-caps text-primary font-bold">MUNICIPAL SENTIMENT HEATMAP (30-DAY)</h2>
+</div>
+<div class="flex gap-6 items-center">
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 bg-primary"></div> <span class="text-[10px] font-label-caps font-bold">OPTIMAL</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 bg-secondary"></div> <span class="text-[10px] font-label-caps font-bold">NEUTRAL</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 bg-error"></div> <span class="text-[10px] font-label-caps font-bold">CRITICAL</span>
+</div>
+</div>
+</div>
+<!-- Grid Map Container -->
+<div class="aspect-[21/8] bg-surface-container grid grid-cols-7 grid-rows-6 gap-0.5 border-2 border-primary">
+<div class="bg-primary flex items-center justify-center text-[11px] text-white font-bold">01</div>
+<div class="bg-primary/90 flex items-center justify-center text-[11px] text-white font-bold">02</div>
+<div class="bg-primary flex items-center justify-center text-[11px] text-white font-bold">03</div>
+<div class="bg-primary/90 flex items-center justify-center text-[11px] text-white font-bold">04</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">05</div>
+<div class="bg-secondary-container flex items-center justify-center text-[11px] text-on-secondary-container font-bold">06</div>
+<div class="bg-error flex items-center justify-center text-[11px] text-white font-bold">07</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">08</div>
+<div class="bg-primary flex items-center justify-center text-[11px] text-white font-bold">09</div>
+<div class="bg-primary/80 flex items-center justify-center text-[11px] text-white font-bold">10</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">11</div>
+<div class="bg-primary flex items-center justify-center text-[11px] text-white font-bold">12</div>
+<div class="bg-primary/70 flex items-center justify-center text-[11px] text-white font-bold">13</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">14</div>
+<div class="bg-primary flex items-center justify-center text-[11px] text-white font-bold">15</div>
+<div class="bg-secondary-container flex items-center justify-center text-[11px] text-on-secondary-container font-bold">16</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">17</div>
+<div class="bg-secondary flex items-center justify-center text-[11px] text-white font-bold">18</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">19</div>
+<div class="bg-primary/80 flex items-center justify-center text-[11px] text-white font-bold">20</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">21</div>
+<div class="bg-error flex items-center justify-center text-[11px] text-white font-bold">22</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">23</div>
+<div class="bg-primary/80 flex items-center justify-center text-[11px] text-white font-bold">24</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">25</div>
+<div class="bg-primary/80 flex items-center justify-center text-[11px] text-white font-bold">26</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">27</div>
+<div class="bg-secondary-container flex items-center justify-center text-[11px] text-on-secondary-container font-bold">28</div>
+<div class="bg-primary/80 flex items-center justify-center text-[11px] text-white font-bold">29</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">30</div>
+<div class="bg-error flex items-center justify-center text-[11px] text-white font-bold">31</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">32</div>
+<div class="bg-primary/80 flex items-center justify-center text-[11px] text-white font-bold">33</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">34</div>
+<div class="bg-secondary-container flex items-center justify-center text-[11px] text-on-secondary-container font-bold">35</div>
+<div class="bg-primary/80 flex items-center justify-center text-[11px] text-white font-bold">36</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">37</div>
+<div class="bg-primary/80 flex items-center justify-center text-[11px] text-white font-bold">38</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">39</div>
+<div class="bg-error/20 flex items-center justify-center text-[11px] text-error font-bold">40</div>
+<div class="bg-white flex items-center justify-center text-[11px] text-primary font-bold border border-primary/5">41</div>
+<div class="bg-primary/80 flex items-center justify-center text-[11px] text-white font-bold">42</div>
+</div>
+<div class="mt-3 text-[10px] font-label-caps text-primary/60 flex justify-between font-bold">
+<span>* MAPPED BY INNOVATION CONSULT STRATEGIC ANALYTICS ENGINE</span>
+<span>GENERATED: 2024-07-19 // 08:45:02 UTC</span>
+</div>
+</section>
+<!-- Footer Authorization -->
+<footer class="mt-auto border-t-2 border-primary pt-8 grid grid-cols-3 gap-8">
+<div>
+<div class="font-label-caps text-[10px] text-primary font-bold mb-4">AUTHORIZED REPRESENTATIVE</div>
+<div class="text-body-md font-bold text-primary">Marcus Thorne</div>
+<div class="text-[12px] opacity-70">Chief of Intelligence Operations</div>
+</div>
+<div>
+<div class="font-label-caps text-[10px] text-primary font-bold mb-4">VERIFICATION SIGNATURE</div>
+<div class="border-b-2 border-primary/40 h-8 font-serif italic text-primary/80 px-2 flex items-end">M. Thorne</div>
+</div>
+<div>
+<div class="font-label-caps text-[10px] text-primary font-bold mb-4">SYSTEM REGISTRY</div>
+<div class="font-data-mono text-data-mono text-primary font-bold">REF: IC-ZA2024-07-19</div>
+<div class="mt-1 text-[10px] flex items-center gap-1 text-secondary font-bold">
+<span class="material-symbols-outlined text-[14px]">shield_with_heart</span> SECURE PROTOCOL VERIFIED
+                </div>
+</div>
+</footer>
+<!-- Page Number -->
+<div class="absolute bottom-6 left-0 right-0 text-center font-label-caps text-[10px] text-primary/40 font-bold">
+            DOCUMENT ID: ICPMO-2024-719 — CLASSIFIED STRATEGIC ASSET
+        </div>
+</article>
+</main>
+<!-- Floating Print Button (No Print) -->
+<button class="fixed bottom-8 right-8 bg-primary text-white px-6 py-4 rounded-none border-l-4 border-secondary shadow-2xl flex items-center gap-3 no-print hover:translate-x-[-4px] transition-all active:scale-95" onclick="window.print()">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+<span class="font-label-caps font-bold tracking-widest">GENERATE PDF REPORT</span>
+</button>
+</body></html>

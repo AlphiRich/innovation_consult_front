@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Incident Triage Configuration | CIVIC ARCHITECT</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#fdd178",
+                    "secondary-fixed-dim": "#ebc169",
+                    "background": "#f8f9ff",
+                    "on-primary-container": "#8289b4",
+                    "inverse-surface": "#213145",
+                    "secondary-fixed": "#ffdea1",
+                    "primary-container": "#1a2246",
+                    "primary": "#040c30",
+                    "inverse-on-surface": "#eaf1ff",
+                    "outline-variant": "#c6c5cf",
+                    "on-tertiary-container": "#8d8c87",
+                    "surface-variant": "#d3e4fe",
+                    "on-surface": "#0b1c30",
+                    "surface-container-low": "#eff4ff",
+                    "on-secondary-container": "#785805",
+                    "on-tertiary-fixed-variant": "#474743",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#dde1ff",
+                    "on-background": "#0b1c30",
+                    "on-primary-fixed": "#10193c",
+                    "surface-container": "#e5eeff",
+                    "error": "#ba1a1a",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#545c84",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "surface-dim": "#cbdbf5",
+                    "surface": "#f8f9ff",
+                    "secondary": "#795907",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#252521",
+                    "outline": "#76767f",
+                    "tertiary-fixed-dim": "#c9c6c1",
+                    "on-surface-variant": "#46464e",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "tertiary": "#10100d",
+                    "surface-bright": "#f8f9ff",
+                    "primary-fixed-dim": "#bdc4f1",
+                    "on-secondary": "#ffffff",
+                    "inverse-primary": "#bdc4f1",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#dce9ff",
+                    "on-primary-fixed-variant": "#3d456b",
+                    "on-secondary-fixed": "#261900",
+                    "surface-container-highest": "#d3e4fe",
+                    "tertiary-fixed": "#e5e2dc"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "max-width": "1440px",
+                    "margin-desktop": "32px",
+                    "margin-mobile": "16px",
+                    "unit": "4px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Archivo Narrow"],
+                    "data-mono": ["Public Sans"],
+                    "label-caps": ["Archivo Narrow"],
+                    "display-lg-mobile": ["Archivo Narrow"],
+                    "headline-md": ["Archivo Narrow"],
+                    "body-md": ["Public Sans"],
+                    "body-lg": ["Public Sans"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c6c5cf; border-radius: 10px; }
+        
+        .active-inset { box-shadow: inset 0 0 0 2px #795907; }
+        
+        /* Architecture Outlines */
+        .card-outline { border: 1px solid rgba(4, 12, 48, 0.1); }
+        
+        /* Toggle Styling */
+        .toggle-checkbox:checked { right: 0; border-color: #040c30; background-color: #040c30; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #fdd178; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col md:flex-row">
+<!-- SideNavBar (Shared Component) -->
+<aside class="hidden md:flex flex-col h-screen sticky top-0 left-0 pt-4 pb-8 bg-surface-bright dark:bg-inverse-surface text-primary dark:text-primary-fixed border-r border-outline-variant/30 w-64 z-50">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-on-primary">account_balance</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-primary leading-tight">SA Elections 2024</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant/80 uppercase">Municipal Command</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-6 py-3 font-label-caps text-label-caps text-on-surface-variant dark:text-on-surface-variant/80 hover:bg-surface-container dark:hover:bg-primary-container/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>War Room</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 font-label-caps text-label-caps text-on-surface-variant dark:text-on-surface-variant/80 hover:bg-surface-container dark:hover:bg-primary-container/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">report_problem</span>
+<span>Incidents</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 font-label-caps text-label-caps text-on-surface-variant dark:text-on-surface-variant/80 hover:bg-surface-container dark:hover:bg-primary-container/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span>Voters</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 font-label-caps text-label-caps text-on-surface-variant dark:text-on-surface-variant/80 hover:bg-surface-container dark:hover:bg-primary-container/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">local_shipping</span>
+<span>Logistics</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 font-label-caps text-label-caps text-on-surface-variant dark:text-on-surface-variant/80 hover:bg-surface-container dark:hover:bg-primary-container/10 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span>Analytics</span>
+</a>
+<!-- Active Tab: Settings -->
+<a class="flex items-center gap-3 px-6 py-3 font-label-caps text-label-caps text-primary dark:text-primary-fixed border-l-4 border-secondary-fixed bg-surface-container-high dark:bg-primary-container/30 font-bold" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="px-6 mt-auto pt-8 border-t border-outline-variant/20 space-y-4">
+<button class="w-full py-3 bg-secondary text-on-primary font-label-caps text-label-caps rounded hover:opacity-90 active:scale-95 transition-all">
+                Launch Campaign
+            </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 py-2 font-label-caps text-label-caps text-on-surface-variant hover:text-primary" href="#">
+<span class="material-symbols-outlined text-[18px]">contact_support</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 py-2 font-label-caps text-label-caps text-on-surface-variant hover:text-primary" href="#">
+<span class="material-symbols-outlined text-[18px]">inventory_2</span>
+<span>Archive</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col min-w-0 bg-background overflow-y-auto">
+<!-- TopNavBar (Shared Component) -->
+<header class="flex justify-between items-center w-full px-margin-desktop h-16 z-50 bg-primary text-on-primary font-body-md text-body-md border-b border-outline-variant/20 sticky top-0">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md font-bold text-secondary-fixed">CIVIC ARCHITECT</span>
+<div class="hidden lg:flex items-center gap-6">
+<nav class="flex gap-6">
+<a class="text-on-primary/70 hover:text-on-primary transition-colors" href="#">Admin Dashboard</a>
+<a class="text-secondary-fixed border-b-2 border-secondary-fixed pb-1" href="#">Triage Config</a>
+<a class="text-on-primary/70 hover:text-on-primary transition-colors" href="#">User Access</a>
+</nav>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-primary-container/50 transition-colors rounded">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 hover:bg-primary-container/50 transition-colors rounded">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-[1px] bg-on-primary/20 mx-2"></div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="font-bold leading-none">Admin User</p>
+<p class="text-[10px] uppercase opacity-60 tracking-wider">Super Administrator</p>
+</div>
+<div class="w-8 h-8 bg-secondary-fixed rounded overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a municipal administrator in a suit, high-quality corporate photography style, clean studio background, professional and authoritative mood for a political campaign management interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAggYMuW3n0wQvWNeuTX4XWnse2XcxkHT68T1vw9E1-rfeSAHXErQoFy7O_rSCd99hSrkdNBv-DE5FaWCZ1ha6AiHchcwqAhxC9xU5k3J7nI67KgOox13L2EMrti98X-hDUIUg-6fU9pG2yCXJtR1XkqyOKKHxGBhv2B6XQbN3xXSnsMnNne7GAnEkg2WtKBCHnYA1n0PqD2FpaFL07kV9JMti5uxuiYywcuHSEKw1nHE45pPfnxZYQqL3FF9J7NQfy8rhrdKRzAg"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Configuration Body -->
+<section class="p-margin-desktop space-y-gutter">
+<!-- Breadcrumbs and Header -->
+<div class="mb-8">
+<nav class="flex items-center gap-2 text-label-caps font-label-caps text-on-surface-variant mb-2">
+<a class="hover:text-primary" href="#">Administration</a>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<a class="hover:text-primary" href="#">Incident Management</a>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-primary font-bold">Notification Configuration</span>
+</nav>
+<h2 class="font-display-lg text-display-lg text-primary">Incident Triage - Notification Configuration</h2>
+<p class="text-on-surface-variant max-w-2xl mt-2">Manage automated alert protocols for the Election War Room. Configure how and when strategic leads, field volunteers, and command units are notified of incident escalations.</p>
+</div>
+<!-- Bento Layout for Configuration Items -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-gutter">
+<!-- Left Column: Trigger Settings -->
+<div class="xl:col-span-8 space-y-gutter">
+<!-- Escalated Trigger Card -->
+<div class="card-outline bg-surface-container-lowest p-6 rounded relative group hover:border-secondary-fixed transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-error"></div>
+<div class="flex flex-col md:flex-row justify-between gap-6">
+<div class="space-y-4 flex-1">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">priority_high</span>
+<h3 class="font-headline-md text-headline-md text-primary">Status: Escalated</h3>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center cursor-pointer">
+<div class="relative">
+<input checked="" class="sr-only toggle-checkbox" type="checkbox"/>
+<div class="toggle-label block bg-outline-variant w-10 h-6 rounded-full"></div>
+<div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition toggle-checkbox:checked"></div>
+</div>
+<span class="ml-3 font-label-caps text-label-caps uppercase text-on-surface-variant">Active</span>
+</label>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 border-t border-outline-variant/10">
+<!-- Channels -->
+<div>
+<p class="font-label-caps text-label-caps uppercase text-on-surface-variant mb-3">Alert Channels</p>
+<div class="space-y-2">
+<label class="flex items-center gap-3 px-3 py-2 bg-background border border-outline-variant/20 rounded cursor-pointer hover:border-secondary transition-colors">
+<input checked="" class="rounded border-outline-variant text-primary focus:ring-secondary" type="checkbox"/>
+<span class="material-symbols-outlined text-primary">sms</span>
+<span class="text-body-md">SMS Direct</span>
+</label>
+<label class="flex items-center gap-3 px-3 py-2 bg-background border border-outline-variant/20 rounded cursor-pointer hover:border-secondary transition-colors">
+<input checked="" class="rounded border-outline-variant text-primary focus:ring-secondary" type="checkbox"/>
+<span class="material-symbols-outlined text-on-secondary-container">chat</span>
+<span class="text-body-md">WhatsApp Business</span>
+</label>
+</div>
+</div>
+<!-- Recipients -->
+<div>
+<p class="font-label-caps text-label-caps uppercase text-on-surface-variant mb-3">Recipients</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container text-primary font-label-caps text-[10px] uppercase rounded border border-outline-variant/30 flex items-center gap-1">
+                                                Assignee <span class="material-symbols-outlined text-[14px]">close</span>
+</span>
+<span class="px-2 py-1 bg-surface-container text-primary font-label-caps text-[10px] uppercase rounded border border-outline-variant/30 flex items-center gap-1">
+                                                Ward Captain <span class="material-symbols-outlined text-[14px]">close</span>
+</span>
+<button class="px-2 py-1 border border-dashed border-outline text-on-surface-variant font-label-caps text-[10px] uppercase rounded hover:bg-surface-container transition-colors">+ Add Role</button>
+</div>
+<div class="mt-4">
+<label class="font-label-caps text-label-caps uppercase text-[10px] block mb-1">Manual: Municipal Command</label>
+<input class="w-full bg-background border border-outline-variant/30 px-3 py-2 text-sm focus:ring-1 focus:ring-secondary focus:outline-none" placeholder="+27 82 000 0000" type="text"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Template Preview -->
+<div class="md:w-64 bg-surface-container-low p-4 rounded-lg flex flex-col justify-between">
+<div>
+<p class="font-label-caps text-label-caps uppercase text-on-surface-variant mb-2">Message Template</p>
+<div class="text-[13px] text-on-surface-variant leading-relaxed bg-white p-3 border border-outline-variant/20 italic">
+                                        "ALERT: Incident <span class="text-secondary font-bold">[ID]</span> in <span class="text-secondary font-bold">[Ward]</span> has been ESCALATED to <span class="text-secondary font-bold">[Dept]</span>."
+                                    </div>
+</div>
+<button class="mt-4 text-primary font-label-caps text-label-caps hover:underline flex items-center justify-end gap-1">
+<span class="material-symbols-outlined text-[16px]">edit</span> Edit Template
+                                </button>
+</div>
+</div>
+</div>
+<!-- Assigned to LET Card -->
+<div class="card-outline bg-surface-container-lowest p-6 rounded relative group hover:border-secondary-fixed transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary-container"></div>
+<div class="flex flex-col md:flex-row justify-between gap-6">
+<div class="space-y-4 flex-1">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">assignment_ind</span>
+<h3 class="font-headline-md text-headline-md text-primary">Status: Assigned to LET</h3>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center cursor-pointer">
+<div class="relative">
+<input checked="" class="sr-only toggle-checkbox" type="checkbox"/>
+<div class="toggle-label block bg-outline-variant w-10 h-6 rounded-full"></div>
+<div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition toggle-checkbox:checked"></div>
+</div>
+<span class="ml-3 font-label-caps text-label-caps uppercase text-on-surface-variant">Active</span>
+</label>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 border-t border-outline-variant/10">
+<div>
+<p class="font-label-caps text-label-caps uppercase text-on-surface-variant mb-3">Alert Channels</p>
+<div class="flex gap-4">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-outline-variant text-primary" type="checkbox"/>
+<span class="text-sm">WhatsApp</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="rounded border-outline-variant text-primary" type="checkbox"/>
+<span class="text-sm">SMS</span>
+</label>
+</div>
+</div>
+<div>
+<p class="font-label-caps text-label-caps uppercase text-on-surface-variant mb-3">Recipients</p>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container text-primary font-label-caps text-[10px] uppercase rounded border border-outline-variant/30 flex items-center gap-1">
+                                                LET Lead <span class="material-symbols-outlined text-[14px]">close</span>
+</span>
+<span class="px-2 py-1 bg-surface-container text-primary font-label-caps text-[10px] uppercase rounded border border-outline-variant/30 flex items-center gap-1">
+                                                Assignee <span class="material-symbols-outlined text-[14px]">close</span>
+</span>
+</div>
+</div>
+</div>
+</div>
+<div class="md:w-64 bg-surface-container-low p-4 rounded-lg flex flex-col justify-center">
+<div class="text-[13px] text-on-surface-variant italic">
+                                    "NOTIFICATION: Incident [ID] now assigned to Local Engineering Team for remediation."
+                                </div>
+</div>
+</div>
+</div>
+<!-- Resolved Trigger Card -->
+<div class="card-outline bg-surface-container-lowest p-6 rounded relative group hover:border-secondary-fixed transition-colors">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="flex flex-col md:flex-row justify-between gap-6">
+<div class="space-y-4 flex-1">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<h3 class="font-headline-md text-headline-md text-primary">Status: Resolved</h3>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center cursor-pointer">
+<div class="relative">
+<input class="sr-only toggle-checkbox" type="checkbox"/>
+<div class="toggle-label block bg-outline-variant w-10 h-6 rounded-full"></div>
+<div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition toggle-checkbox:checked"></div>
+</div>
+<span class="ml-3 font-label-caps text-label-caps uppercase text-on-surface-variant opacity-50">Inactive</span>
+</label>
+</div>
+</div>
+<p class="text-sm text-on-surface-variant/70 italic">Notifications for resolution events are currently disabled by global command policy.</p>
+</div>
+</div>
+</div>
+<div class="card-outline bg-surface-container-lowest p-6 rounded relative group hover:border-secondary-fixed transition-colors"><div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div><div class="flex flex-col md:flex-row justify-between gap-6"><div class="space-y-4 flex-1"><div class="flex items-center justify-between"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">shield_lock</span><h3 class="font-headline-md text-headline-md text-primary">Status: Encryption Alert</h3></div><div class="flex items-center"><label class="inline-flex items-center cursor-pointer"><div class="relative"><input checked="" class="sr-only toggle-checkbox" type="checkbox"/><div class="toggle-label block bg-outline-variant w-10 h-6 rounded-full"></div><div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition toggle-checkbox:checked"></div></div><span class="ml-3 font-label-caps text-label-caps uppercase text-on-surface-variant">Active</span></label></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4 border-t border-outline-variant/10"><div><p class="font-label-caps text-label-caps uppercase text-on-surface-variant mb-3">Alert Channels</p><div class="space-y-2"><label class="flex items-center gap-3 px-3 py-2 bg-background border border-outline-variant/20 rounded cursor-pointer hover:border-secondary transition-colors"><input checked="" class="rounded border-outline-variant text-primary focus:ring-secondary" type="checkbox"/><span class="material-symbols-outlined text-primary">sms</span><span class="text-body-md">SMS Direct</span></label><label class="flex items-center gap-3 px-3 py-2 bg-background border border-outline-variant/20 rounded cursor-pointer hover:border-secondary transition-colors"><input checked="" class="rounded border-outline-variant text-primary focus:ring-secondary" type="checkbox"/><span class="material-symbols-outlined text-on-secondary-container">chat</span><span class="text-body-md">WhatsApp Business</span></label></div></div><div><p class="font-label-caps text-label-caps uppercase text-on-surface-variant mb-3">Recipients</p><div class="flex flex-wrap gap-2"><span class="px-2 py-1 bg-surface-container text-primary font-label-caps text-[10px] uppercase rounded border border-outline-variant/30 flex items-center gap-1">INFRASTRUCTURE ARCHITECT <span class="material-symbols-outlined text-[14px]">close</span></span><span class="px-2 py-1 bg-surface-container text-primary font-label-caps text-[10px] uppercase rounded border border-outline-variant/30 flex items-center gap-1">DEVOPS ENGINEER <span class="material-symbols-outlined text-[14px]">close</span></span><button class="px-2 py-1 border border-dashed border-outline text-on-surface-variant font-label-caps text-[10px] uppercase rounded hover:bg-surface-container transition-colors">+ Add Role</button></div></div></div></div><div class="md:w-64 bg-surface-container-low p-4 rounded-lg flex flex-col justify-between"><div><p class="font-label-caps text-label-caps uppercase text-on-surface-variant mb-2">Message Template</p><div class="text-[13px] text-on-surface-variant leading-relaxed bg-white p-3 border border-outline-variant/20 italic">"SECURITY ALERT: Potential <span class="text-secondary font-bold">[Event]</span> detected in <span class="text-secondary font-bold">[Ward]</span>. System has initiated an automated AES-256 re-handshake protocol <span class="text-secondary font-bold">[ID]</span>. Infrastructure leads must verify handshake integrity via the security portal: <span class="text-secondary font-bold">[Link]</span>"</div></div><button class="mt-4 text-primary font-label-caps text-label-caps hover:underline flex items-center justify-end gap-1"><span class="material-symbols-outlined text-[16px]">edit</span> Edit Template</button></div></div></div></div>
+<!-- Right Column: Sidebar Actions & Context -->
+<div class="xl:col-span-4 space-y-gutter">
+<!-- Save / Action Card -->
+<div class="bg-primary text-on-primary p-6 rounded shadow-xl sticky top-24">
+<h4 class="font-headline-md text-headline-md text-secondary-fixed mb-4">Finalize Protocol</h4>
+<p class="text-sm opacity-80 mb-6">Changes to notification triggers take effect immediately across all active field operations.</p>
+<div class="space-y-3">
+<button class="w-full bg-secondary text-on-primary py-4 rounded font-label-caps text-label-caps tracking-widest uppercase hover:brightness-110 active:scale-95 transition-all">
+                                Save Configuration
+                            </button>
+<button class="w-full bg-primary-container text-on-primary py-4 rounded font-label-caps text-label-caps tracking-widest uppercase border border-outline-variant/20 hover:bg-primary-container/80 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]">send</span>
+                                Send Test Triage Alert
+                            </button>
+</div>
+<div class="mt-8 pt-6 border-t border-on-primary/10">
+<h5 class="font-label-caps text-label-caps uppercase mb-3 opacity-60">System Health</h5>
+<div class="flex items-center justify-between text-xs">
+<span>SMS Gateway</span>
+<span class="text-secondary-fixed flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed animate-pulse"></span> Operational
+                                </span>
+</div>
+<div class="flex items-center justify-between text-xs mt-2">
+<span>WhatsApp API</span>
+<span class="text-secondary-fixed flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed animate-pulse"></span> Operational
+                                </span>
+</div>
+</div>
+</div>
+<!-- Global Recipients Map -->
+<div class="card-outline bg-white p-6 rounded">
+<h4 class="font-label-caps text-label-caps uppercase text-primary mb-4">Recipient Role Mapping</h4>
+<div class="space-y-4">
+<div class="flex items-center gap-3 group">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center group-hover:bg-secondary-fixed transition-colors">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Strategic Lead</p>
+<p class="text-[11px] text-on-surface-variant">The current incident assignee.</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant">info</span>
+</div>
+<div class="flex items-center gap-3 group">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center group-hover:bg-secondary-fixed transition-colors">
+<span class="material-symbols-outlined text-primary">volunteer_activism</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Field Volunteer</p>
+<p class="text-[11px] text-on-surface-variant">The original reporter of the incident.</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant">info</span>
+</div>
+<div class="flex items-center gap-3 group">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center group-hover:bg-secondary-fixed transition-colors">
+<span class="material-symbols-outlined text-primary">location_city</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Ward Captain</p>
+<p class="text-[11px] text-on-surface-variant">Electoral head of the incident's ward.</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant">info</span>
+</div>
+<div class="flex items-center gap-3 group"><div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center group-hover:bg-secondary-fixed transition-colors"><span class="material-symbols-outlined text-primary">security</span></div><div class="flex-1"><p class="text-sm font-bold">Infrastructure Architect</p><p class="text-[11px] text-on-surface-variant">Oversees core system security and encryption protocols.</p></div><span class="material-symbols-outlined text-outline-variant">info</span></div><div class="flex items-center gap-3 group"><div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center group-hover:bg-secondary-fixed transition-colors"><span class="material-symbols-outlined text-primary">terminal</span></div><div class="flex-1"><p class="text-sm font-bold">DevOps Engineer</p><p class="text-[11px] text-on-surface-variant">Manages automated deployment and system recovery alerts.</p></div><span class="material-symbols-outlined text-outline-variant">info</span></div></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer / Credits -->
+<footer class="mt-auto border-t border-outline-variant/10 p-6 flex justify-between items-center bg-white">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">shield</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Secure Administrative Environment v4.2.0</span>
+</div>
+<div class="text-[10px] text-on-surface-variant uppercase tracking-tighter">
+                © 2024 Innovation Consult | Civic Architect OS
+            </div>
+</footer>
+</main>
+<!-- Mobile NavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-primary border-t border-on-primary/10 flex items-center justify-around z-50">
+<button class="flex flex-col items-center gap-1 text-on-primary/60">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-label-caps">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-primary/60">
+<span class="material-symbols-outlined">report_problem</span>
+<span class="text-[10px] font-label-caps">Incidents</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-secondary-fixed">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="text-[10px] font-label-caps">Config</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-primary/60">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-[10px] font-label-caps">Profile</span>
+</button>
+</nav>
+<script>
+        // Micro-interaction: Toggle Switch logic for display
+        document.querySelectorAll('.toggle-checkbox').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                const label = e.target.closest('label').querySelector('.text-on-surface-variant');
+                if (e.target.checked) {
+                    label.textContent = 'Active';
+                    label.classList.remove('opacity-50');
+                } else {
+                    label.textContent = 'Inactive';
+                    label.classList.add('opacity-50');
+                }
+            });
+        });
+
+        // Test alert simulation
+        document.querySelector('button:has(.material-symbols-outlined:contains("send"))')?.addEventListener('click', () => {
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Sending...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = '<span class="material-symbols-outlined text-secondary-fixed">check_circle</span> Alert Sent';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            }, 1500);
+        });
+    </script>
+</body></html>

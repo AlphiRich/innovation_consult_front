@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Civic Authority | Permissions Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;600;700&amp;family=Public+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "surface-container-low": "#eff4ff",
+                "on-tertiary-container": "#8d8c87",
+                "tertiary-fixed-dim": "#c9c6c1",
+                "tertiary-fixed": "#e5e2dc",
+                "surface-variant": "#d3e4fe",
+                "surface-container-high": "#dce9ff",
+                "surface-container": "#e5eeff",
+                "secondary": "#795907",
+                "on-tertiary-fixed-variant": "#474743",
+                "on-error-container": "#93000a",
+                "inverse-on-surface": "#eaf1ff",
+                "on-error": "#ffffff",
+                "on-surface": "#0b1c30",
+                "secondary-container": "#fdd178",
+                "on-secondary-fixed": "#261900",
+                "surface-bright": "#f8f9ff",
+                "on-primary-container": "#8289b4",
+                "tertiary": "#10100d",
+                "on-tertiary": "#ffffff",
+                "primary": "#040c30",
+                "on-surface-variant": "#46464e",
+                "on-primary-fixed": "#10193c",
+                "primary-container": "#1a2246",
+                "inverse-primary": "#bdc4f1",
+                "surface-tint": "#545c84",
+                "error": "#ba1a1a",
+                "background": "#f8f9ff",
+                "surface-dim": "#cbdbf5",
+                "on-secondary": "#ffffff",
+                "primary-fixed-dim": "#bdc4f1",
+                "on-tertiary-fixed": "#1c1c18",
+                "surface-container-lowest": "#ffffff",
+                "on-secondary-container": "#785805",
+                "surface": "#f8f9ff",
+                "outline-variant": "#c6c5cf",
+                "primary-fixed": "#dde1ff",
+                "outline": "#76767f",
+                "secondary-fixed": "#ffdea1",
+                "on-background": "#0b1c30",
+                "surface-container-highest": "#d3e4fe",
+                "inverse-surface": "#213145",
+                "on-primary": "#ffffff",
+                "on-secondary-fixed-variant": "#5c4300",
+                "on-primary-fixed-variant": "#3d456b",
+                "secondary-fixed-dim": "#ebc169",
+                "error-container": "#ffdad6",
+                "tertiary-container": "#252521"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "unit": "4px",
+                "margin-mobile": "16px",
+                "gutter": "16px",
+                "max-width": "1440px",
+                "margin-desktop": "32px"
+            },
+            "fontFamily": {
+                "headline-md": ["Archivo Narrow"],
+                "body-md": ["Public Sans"],
+                "body-lg": ["Public Sans"],
+                "display-lg-mobile": ["Archivo Narrow"],
+                "display-lg": ["Archivo Narrow"],
+                "label-caps": ["Archivo Narrow"],
+                "data-mono": ["Public Sans"]
+            },
+            "fontSize": {
+                "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "display-lg-mobile": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Public Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .permission-toggle:checked + .toggle-track { background-color: #040c30; }
+        .permission-toggle:checked + .toggle-track .toggle-thumb { transform: translateX(20px); background-color: #ffffff; }
+        .amber-accent { border-left: 4px solid #795907; }
+        .ink-outline { border: 1px solid rgba(4, 12, 48, 0.1); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Active Editing Mode Banner -->
+<div class="w-full bg-secondary text-on-secondary-fixed py-2 px-gutter flex justify-center items-center sticky top-0 z-50 shadow-sm">
+<span class="font-label-caps text-label-caps tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">edit_note</span>
+            ACTIVE EDITING MODE
+        </span>
+</div>
+<div class="flex h-screen overflow-hidden">
+<!-- Side Navigation Bar (Anchored Component) -->
+<aside class="fixed left-0 top-0 bottom-0 z-40 flex flex-col h-screen w-64 bg-surface dark:bg-background border-r border-outline-variant dark:border-outline">
+<div class="p-6 flex flex-col items-start gap-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed leading-tight">Civic Authority</h1>
+<p class="text-xs text-on-surface-variant font-label-caps">Strategic Planner</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-primary-container transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-primary-container transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">calculate</span>
+<span class="font-body-md text-body-md">Vote Calculator</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-primary-container transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-md text-body-md">Threshold Analyzer</span>
+</a>
+<!-- Active Item -->
+<a class="flex items-center gap-3 px-4 py-3 text-primary dark:text-primary-fixed font-bold border-r-4 border-secondary bg-surface-container-high dark:bg-primary-container transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings_applications</span>
+<span class="font-body-md text-body-md">Municipality Config</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-primary-container transition-all duration-150 ease-in-out" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-body-md text-body-md">Reports</span>
+</a>
+</nav>
+<div class="px-4 py-6 border-t border-outline-variant">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-md text-body-md">Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 overflow-y-auto bg-background">
+<!-- Top App Bar -->
+<header class="h-16 flex justify-between items-center px-margin-desktop w-full max-w-container-max mx-auto bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">admin_panel_settings</span>
+<h2 class="font-headline-md text-headline-md text-primary font-archivo-narrow">Municipal Team Lead Permissions</h2>
+</div>
+<div class="flex items-center gap-4">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 text-label-caps font-bold rounded-full tracking-wider">
+                        ROLE: STRATEGIC LEAD
+                    </span>
+<div class="h-8 w-8 bg-surface-variant rounded-full flex items-center justify-center overflow-hidden ink-outline">
+<img class="w-full h-full object-cover" data-alt="A professional, clean studio portrait of a high-level administrative official for an election management platform. The subject is wearing a neutral navy blue blazer, looking directly at the camera with a calm, authoritative expression. The lighting is soft and corporate, set against a pristine, minimalist light gray background that perfectly matches a high-end light-mode design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDtNfjCZfGyWBYuKSg8M5pRx4iJyTw-wOwDV1M1qaF9SUVq7hxIkg25nnbNctTP5u_wDnsBWxCUUjS--iwLIwS-et10CQtS97Qw1rHHNh3hKQuuiOmg_Aqy33rq2I7_UdySu8-gRvzKSxspJAYvjlcLSjAHfuV93HwLVmITbrjxs0KkDTRo3IDsVUCOR1-qxc9I3GLDOyg2pja7gNxFy9pSl7IWiVl5OmFV769-msuvCgntjbmNqGRzL5LJByUI8jRsdanLNXQcA"/>
+</div>
+</div>
+</header>
+<div class="p-margin-desktop max-w-5xl mx-auto">
+<!-- Role Overview Section -->
+<section class="mb-12">
+<div class="p-8 bg-surface ink-outline amber-accent relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+<span class="material-symbols-outlined text-9xl">shield_person</span>
+</div>
+<h3 class="font-label-caps text-label-caps text-on-tertiary-container mb-2">ROLE OVERVIEW</h3>
+<p class="font-body-lg text-body-lg text-primary max-w-2xl leading-relaxed">
+                            Primary administrative head for a specific municipal jurisdiction. Responsible for tactical deployment, reporting, and team coordination.
+                        </p>
+</div>
+</section>
+<!-- Capability Matrix Section -->
+<section class="space-y-6">
+<div class="flex items-center justify-between border-b border-outline-variant pb-4">
+<h3 class="font-headline-md text-headline-md text-primary font-archivo-narrow">Capability Matrix</h3>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">info</span>
+<span class="text-xs font-label-caps">INDIVIDUAL PERMISSION OVERRIDE ENABLED</span>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<!-- Permission Row: Field Operations -->
+<div class="group flex items-center justify-between p-6 bg-surface-container-lowest ink-outline hover:bg-surface-container transition-colors duration-200">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container-high rounded-lg text-primary">
+<span class="material-symbols-outlined text-2xl">map</span>
+</div>
+<div>
+<h4 class="font-body-md text-body-md font-bold text-primary">Field Operations</h4>
+<p class="text-on-surface-variant text-sm">Manage routes, assign tasks, oversee volunteers.</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-data-mono text-data-mono text-primary font-bold">ENABLED</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only permission-toggle" type="checkbox"/>
+<div class="toggle-track w-11 h-6 bg-outline-variant rounded-full transition-colors">
+<div class="toggle-thumb absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform border border-outline-variant"></div>
+</div>
+</label>
+</div>
+</div>
+<!-- Permission Row: Intelligence & Analytics -->
+<div class="group flex items-center justify-between p-6 bg-surface-container-lowest ink-outline hover:bg-surface-container transition-colors duration-200">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container-high rounded-lg text-primary">
+<span class="material-symbols-outlined text-2xl">insights</span>
+</div>
+<div>
+<h4 class="font-body-md text-body-md font-bold text-primary">Intelligence &amp; Analytics</h4>
+<p class="text-on-surface-variant text-sm">View ward sentiment, access keyword data, export reports.</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-data-mono text-data-mono text-primary font-bold">ENABLED</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only permission-toggle" type="checkbox"/>
+<div class="toggle-track w-11 h-6 bg-outline-variant rounded-full transition-colors">
+<div class="toggle-thumb absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform border border-outline-variant"></div>
+</div>
+</label>
+</div>
+</div>
+<!-- Permission Row: Incident Management -->
+<div class="group flex items-center justify-between p-6 bg-surface-container-lowest ink-outline hover:bg-surface-container transition-colors duration-200">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container-high rounded-lg text-primary">
+<span class="material-symbols-outlined text-2xl">notification_important</span>
+</div>
+<div>
+<h4 class="font-body-md text-body-md font-bold text-primary">Incident Management</h4>
+<p class="text-on-surface-variant text-sm">Triage reports, escalate to LET, configure WhatsApp alerts.</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-data-mono text-data-mono text-primary font-bold">ENABLED</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only permission-toggle" type="checkbox"/>
+<div class="toggle-track w-11 h-6 bg-outline-variant rounded-full transition-colors">
+<div class="toggle-thumb absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform border border-outline-variant"></div>
+</div>
+</label>
+</div>
+</div>
+<!-- Permission Row: Team Management -->
+<div class="group flex items-center justify-between p-6 bg-surface-container-lowest ink-outline hover:bg-surface-container transition-colors duration-200">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container-high rounded-lg text-primary">
+<span class="material-symbols-outlined text-2xl">group_add</span>
+</div>
+<div>
+<h4 class="font-body-md text-body-md font-bold text-primary">Team Management</h4>
+<p class="text-on-surface-variant text-sm">Recruit volunteers, assign VD captains.</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-data-mono text-data-mono text-primary font-bold">ENABLED</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only permission-toggle" type="checkbox"/>
+<div class="toggle-track w-11 h-6 bg-outline-variant rounded-full transition-colors">
+<div class="toggle-thumb absolute top-[2px] left-[2px] bg-white w-5 h-5 rounded-full transition-transform border border-outline-variant"></div>
+</div>
+</label>
+</div>
+</div>
+<!-- Permission Row: Governance & Compliance (Disabled) -->
+<div class="group flex items-center justify-between p-6 bg-surface opacity-60 grayscale ink-outline cursor-not-allowed">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container-high rounded-lg text-primary">
+<span class="material-symbols-outlined text-2xl">gavel</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h4 class="font-body-md text-body-md font-bold text-primary">Governance &amp; Compliance</h4>
+<span class="material-symbols-outlined text-sm text-error">lock</span>
+</div>
+<p class="text-on-surface-variant text-sm italic">Restricted to Campaign Manager</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-data-mono text-data-mono text-on-surface-variant">LOCKED</span>
+<label class="relative inline-flex items-center cursor-not-allowed">
+<input class="sr-only" disabled="" type="checkbox"/>
+<div class="toggle-track w-11 h-6 bg-outline-variant rounded-full">
+<div class="toggle-thumb absolute top-[2px] left-[2px] bg-surface-dim w-5 h-5 rounded-full transition-transform"></div>
+</div>
+</label>
+</div>
+</div>
+<!-- Permission Row: Financial Oversight (Disabled) -->
+<div class="group flex items-center justify-between p-6 bg-surface opacity-60 grayscale ink-outline cursor-not-allowed">
+<div class="flex items-center gap-6">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container-high rounded-lg text-primary">
+<span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h4 class="font-body-md text-body-md font-bold text-primary">Financial Oversight</h4>
+<span class="material-symbols-outlined text-sm text-error">lock</span>
+</div>
+<p class="text-on-surface-variant text-sm italic">Restricted to Finance Officer</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-data-mono text-data-mono text-on-surface-variant">LOCKED</span>
+<label class="relative inline-flex items-center cursor-not-allowed">
+<input class="sr-only" disabled="" type="checkbox"/>
+<div class="toggle-track w-11 h-6 bg-outline-variant rounded-full">
+<div class="toggle-thumb absolute top-[2px] left-[2px] bg-surface-dim w-5 h-5 rounded-full transition-transform"></div>
+</div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Activity Log / Spacer -->
+<div class="mt-16 h-24 border-t border-outline-variant flex items-center justify-center opacity-40">
+<span class="font-label-caps text-label-caps tracking-widest text-on-surface-variant">END OF PERMISSION MANIFEST</span>
+</div>
+</div>
+</main>
+</div>
+<!-- Sticky Bottom Action Bar -->
+<div class="fixed bottom-0 left-64 right-0 bg-surface border-t border-outline-variant py-4 px-margin-desktop z-40 flex justify-end gap-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+<button class="px-8 py-3 bg-transparent text-primary hover:bg-surface-container-high font-label-caps text-label-caps transition-colors duration-200">
+            DISCARD CHANGES
+        </button>
+<button class="px-8 py-3 bg-primary text-on-primary hover:bg-primary-container font-label-caps text-label-caps tracking-widest transition-all duration-200 flex items-center gap-2 group">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" style="font-variation-settings: 'FILL' 1;">save</span>
+            SAVE PERMISSIONS
+        </button>
+</div>
+<script>
+        // Micro-interaction for toggle switches
+        const toggles = document.querySelectorAll('.permission-toggle');
+        toggles.forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const statusSpan = this.parentElement.previousElementSibling;
+                if (this.checked) {
+                    statusSpan.textContent = 'ENABLED';
+                    statusSpan.classList.add('text-primary');
+                    statusSpan.classList.remove('text-on-surface-variant');
+                } else {
+                    statusSpan.textContent = 'DISABLED';
+                    statusSpan.classList.remove('text-primary');
+                    statusSpan.classList.add('text-on-surface-variant');
+                }
+            });
+        });
+
+        // Simple button click feedback
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const originalContent = this.innerHTML;
+                if (this.textContent.includes('SAVE')) {
+                    this.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span> SAVING...';
+                    this.disabled = true;
+                    setTimeout(() => {
+                        this.innerHTML = '<span class="material-symbols-outlined">check_circle</span> SAVED';
+                        this.classList.remove('bg-primary');
+                        this.classList.add('bg-secondary');
+                        setTimeout(() => {
+                            this.innerHTML = originalContent;
+                            this.disabled = false;
+                            this.classList.add('bg-primary');
+                            this.classList.remove('bg-secondary');
+                        }, 2000);
+                    }, 1000);
+                }
+            });
+        });
+    </script>
+</body></html>

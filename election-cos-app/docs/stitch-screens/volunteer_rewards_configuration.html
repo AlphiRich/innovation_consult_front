@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Volunteer Rewards Configuration | Innovation Consult</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom scrollbar for administrative precision */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #faf8ff; }
+        ::-webkit-scrollbar-thumb { background: #c6c5cf; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #76767f; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#dc6672",
+                        "tertiary-fixed-dim": "#ffb2b7",
+                        "inverse-primary": "#bdc4f1",
+                        "primary-fixed-dim": "#bdc4f1",
+                        "on-surface": "#141a31",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#292f47",
+                        "primary": "#040c30",
+                        "on-secondary-fixed": "#261900",
+                        "surface-container-high": "#e4e7ff",
+                        "secondary-fixed": "#ffdea1",
+                        "background": "#faf8ff",
+                        "surface-container-highest": "#dce1ff",
+                        "on-background": "#141a31",
+                        "inverse-on-surface": "#eff0ff",
+                        "outline-variant": "#c6c5cf",
+                        "tertiary-fixed": "#ffdadb",
+                        "primary-container": "#1a2246",
+                        "tertiary-container": "#510013",
+                        "surface-tint": "#545c84",
+                        "on-primary-container": "#8289b4",
+                        "secondary": "#795907",
+                        "surface-bright": "#faf8ff",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#ebc169",
+                        "on-tertiary-fixed-variant": "#832331",
+                        "secondary-container": "#fdd178",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "surface-container-low": "#f3f2ff",
+                        "on-error": "#ffffff",
+                        "surface-container": "#ebedff",
+                        "primary-fixed": "#dde1ff",
+                        "on-primary-fixed": "#10193c",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#785805",
+                        "surface-dim": "#d3d9f7",
+                        "on-primary-fixed-variant": "#3d456b",
+                        "surface": "#faf8ff",
+                        "on-surface-variant": "#46464e",
+                        "on-error-container": "#93000a",
+                        "outline": "#76767f",
+                        "tertiary": "#290006",
+                        "surface-variant": "#dce1ff",
+                        "on-tertiary-fixed": "#40000d",
+                        "error": "#ba1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "margin-desktop": "64px",
+                        "unit": "4px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-lg": ["Archivo Narrow"],
+                        "headline-md": ["Archivo Narrow"],
+                        "headline-sm": ["Archivo Narrow"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Archivo Narrow"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+<!-- Sidebar Navigation (From JSON) -->
+<aside class="hidden md:flex flex-col h-full py-6 px-4 bg-primary dark:bg-primary-container h-screen w-64 fixed left-0 top-0 border-r border-outline-variant dark:border-outline z-50">
+<div class="flex items-center gap-3 mb-10 px-2">
+<img alt="Innovation Consult Logo" class="w-10 h-10 rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkJGr1IaUi0izL5xGpTQ82rm6MqBaz3FKBlrDfedNEzo_4d6S5r8mTIvK0BPxLt0GT8RJK3j_JiRJuLtd7HfkPgNOPMLFJB7SVOOqOEqvvBarVokxkeV2GBMAfn_ZQYB0DHE0zcep5lIuf1VdtG2swlCnML5xnzLnUnS-031ABLkAprNPdJF4Idn7eyh_E4kmcyI7sinigmmyAUgBd-Cp2b3fC0Hdy-HqoC4PXLEnf5ZVESEMcD0o43xtRyKIlcWD6aFrwWzDt8A"/>
+<div>
+<h1 class="font-headline-sm text-headline-sm text-on-primary">Innovation Consult</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-primary/60">Campaign Command</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="text-on-primary/70 hover:text-on-primary flex items-center gap-3 px-4 py-3 hover:bg-on-primary/10 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">War Room</span>
+</a>
+<a class="bg-secondary-container text-on-secondary-container rounded-xl flex items-center gap-3 px-4 py-3 transition-transform active:scale-95" href="#">
+<span class="material-symbols-outlined fill-icon" data-icon="volunteer_activism">volunteer_activism</span>
+<span class="font-label-md text-label-md">Volunteers</span>
+</a>
+<a class="text-on-primary/70 hover:text-on-primary flex items-center gap-3 px-4 py-3 hover:bg-on-primary/10 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-label-md text-label-md">Team</span>
+</a>
+<a class="text-on-primary/70 hover:text-on-primary flex items-center gap-3 px-4 py-3 hover:bg-on-primary/10 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="report_problem">report_problem</span>
+<span class="font-label-md text-label-md">Incidents</span>
+</a>
+</nav>
+<div class="pt-6 border-t border-on-primary/10 space-y-2">
+<a class="text-on-primary/70 hover:text-on-primary flex items-center gap-3 px-4 py-3 hover:bg-on-primary/10 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="text-on-primary/70 hover:text-on-primary flex items-center gap-3 px-4 py-3 hover:bg-on-primary/10 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-label-md text-label-md">Archive</span>
+</a>
+<button class="w-full mt-4 bg-secondary text-on-secondary py-3 rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:brightness-110 transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+                New Initiative
+            </button>
+</div>
+</aside>
+<!-- Top Navigation Bar (From JSON) -->
+<header class="flex justify-between items-center px-gutter w-full sticky top-0 z-40 bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline h-16 md:pl-72">
+<div class="flex items-center gap-4">
+<h2 class="font-headline-md text-headline-md text-primary dark:text-primary-fixed">Volunteer Rewards Configuration</h2>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A formal professional headshot of a high-level political consultant in a navy suit, clear lighting, minimalist white office background, emphasizing competence and authority in light-mode design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9MNfXtHNF7eJJXLMHKYRxA48OjcxA1jc9tv3OsztVGUbzTrL08QU9WTAzu80BUlqiks2R4qcRDi1BYzII9WUKpCRPVnvCVkjquLEzzYkb3pCVGy9472JmzFxnE_4P6v0SuvXkmy-j6lvDEFhuHrITa7j7MczlSEsSjsxryf4xDVF4AjLAPVwAX25tCZxmhP9GicGJ-vIv8VR6miyKtaOifORcUikq4gEnxfHu_XNugWAKEH4H6QsBUKhv2w_gVspF0MaUE_xLiQ"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="md:ml-64 p-gutter max-w-screen-2xl mx-auto space-y-12">
+<!-- Header Actions -->
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<p class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-1">Incentive Architecture</p>
+<h3 class="font-headline-lg text-headline-lg text-primary">Reward Tiers &amp; Achievement Governance</h3>
+</div>
+<div class="flex gap-3">
+<button class="px-6 py-2 border border-outline text-primary font-label-md text-label-md rounded hover:bg-surface-container-low transition-all">Export Rules</button>
+<button class="px-6 py-2 bg-secondary text-on-secondary font-label-md text-label-md rounded flex items-center gap-2 shadow-sm hover:shadow-md transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="save">save</span>
+                    Publish Changes
+                </button>
+</div>
+</section>
+<!-- Bento Grid: Tiers & Task Values -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Section 1: Reward Tiers Table (L-8) -->
+<div class="lg:col-span-8 bg-surface-container-lowest border border-outline-variant p-6 shadow-sm rounded-xl">
+<div class="flex items-center justify-between mb-6">
+<h4 class="font-headline-sm text-headline-sm text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="military_tech">military_tech</span>
+                        Reward Tiers
+                    </h4>
+<span class="bg-surface-container-high px-3 py-1 rounded font-label-md text-label-md text-on-surface-variant">4 Tiers Defined</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant">
+<th class="pb-4 font-label-md text-label-md text-on-surface-variant uppercase">Tier Level</th>
+<th class="pb-4 font-label-md text-label-md text-on-surface-variant uppercase">Points Req.</th>
+<th class="pb-4 font-label-md text-label-md text-on-surface-variant uppercase text-center">Badge</th>
+<th class="pb-4 font-label-md text-label-md text-on-surface-variant uppercase">Core Benefits</th>
+<th class="pb-4"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest/50 transition-colors">
+<td class="py-5 font-headline-sm text-headline-sm text-on-surface">Bronze</td>
+<td class="py-5 font-label-md text-label-md">500 pts</td>
+<td class="py-5 text-center">
+<span class="material-symbols-outlined text-orange-600 fill-icon text-3xl" data-icon="workspace_premium">workspace_premium</span>
+</td>
+<td class="py-5">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[11px] rounded">Branded Cap</span>
+<span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[11px] rounded">Email Badge</span>
+</div>
+</td>
+<td class="py-5 text-right">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest/50 transition-colors">
+<td class="py-5 font-headline-sm text-headline-sm text-on-surface">Silver</td>
+<td class="py-5 font-label-md text-label-md">1,500 pts</td>
+<td class="py-5 text-center">
+<span class="material-symbols-outlined text-slate-400 fill-icon text-3xl" data-icon="workspace_premium">workspace_premium</span>
+</td>
+<td class="py-5">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[11px] rounded">Silver T-Shirt</span>
+<span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[11px] rounded">Certificate</span>
+</div>
+</td>
+<td class="py-5 text-right">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest/50 transition-colors bg-secondary-container/5">
+<td class="py-5 font-headline-sm text-headline-sm text-on-surface">Gold</td>
+<td class="py-5 font-label-md text-label-md">5,000 pts</td>
+<td class="py-5 text-center">
+<span class="material-symbols-outlined text-secondary-fixed-dim fill-icon text-3xl" data-icon="workspace_premium">workspace_premium</span>
+</td>
+<td class="py-5">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container text-[11px] rounded">VIP Rally Access</span>
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container text-[11px] rounded">Candidate Townhall</span>
+</div>
+</td>
+<td class="py-5 text-right">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest/50 transition-colors">
+<td class="py-5 font-headline-sm text-headline-sm text-on-surface">Platinum</td>
+<td class="py-5 font-label-md text-label-md">10,000 pts</td>
+<td class="py-5 text-center">
+<span class="material-symbols-outlined text-primary-container fill-icon text-3xl" data-icon="stars">stars</span>
+</td>
+<td class="py-5">
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[11px] rounded">Dinner with Candidate</span>
+<span class="px-2 py-1 bg-surface-container text-on-surface-variant text-[11px] rounded">Lobby Day Invite</span>
+</div>
+</td>
+<td class="py-5 text-right">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined" data-icon="edit">edit</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Section 2: Task Point Values (L-4) -->
+<div class="lg:col-span-4 bg-surface-container-lowest border border-outline-variant p-6 shadow-sm rounded-xl">
+<div class="mb-6">
+<h4 class="font-headline-sm text-headline-sm text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="settings_suggest">settings_suggest</span>
+                        Task Point Values
+                    </h4>
+<p class="text-on-surface-variant text-body-sm mt-1">Configure contribution weights for various actions.</p>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 border border-outline-variant hover:border-secondary transition-all rounded">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary/60" data-icon="meeting_room">meeting_room</span>
+<span class="font-body-md">Door Knocking (per hr)</span>
+</div>
+<input class="w-16 text-right bg-transparent border-none font-label-md focus:ring-0 text-primary" type="number" value="100"/>
+</div>
+<div class="flex items-center justify-between p-3 border border-outline-variant hover:border-secondary transition-all rounded">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary/60" data-icon="how_to_reg">how_to_reg</span>
+<span class="font-body-md">Voter Registration</span>
+</div>
+<input class="w-16 text-right bg-transparent border-none font-label-md focus:ring-0 text-primary" type="number" value="150"/>
+</div>
+<div class="flex items-center justify-between p-3 border border-outline-variant hover:border-secondary transition-all rounded">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary/60" data-icon="share">share</span>
+<span class="font-body-md">Social Media Sharing</span>
+</div>
+<input class="w-16 text-right bg-transparent border-none font-label-md focus:ring-0 text-primary" type="number" value="25"/>
+</div>
+<div class="flex items-center justify-between p-3 border border-outline-variant hover:border-secondary transition-all rounded">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary/60" data-icon="podium">podium</span>
+<span class="font-body-md">Town Hall Attendance</span>
+</div>
+<input class="w-16 text-right bg-transparent border-none font-label-md focus:ring-0 text-primary" type="number" value="200"/>
+</div>
+<div class="flex items-center justify-between p-3 border border-outline-variant hover:border-secondary transition-all rounded">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary/60" data-icon="call">call</span>
+<span class="font-body-md">Phone Bank (per hr)</span>
+</div>
+<input class="w-16 text-right bg-transparent border-none font-label-md focus:ring-0 text-primary" type="number" value="75"/>
+</div>
+<button class="w-full mt-4 py-2 text-primary font-label-md text-label-md border-b-2 border-primary hover:bg-surface-container transition-colors">Add Custom Task</button>
+</div>
+</div>
+</div>
+<!-- Section 3: Reward Catalog Grid -->
+<section>
+<div class="flex items-center justify-between mb-8">
+<div>
+<h4 class="font-headline-md text-headline-md text-primary">Inventory &amp; Physical Catalog</h4>
+<p class="text-on-surface-variant text-body-md">Track physical stock levels and redemption costs.</p>
+</div>
+<button class="bg-primary text-on-primary px-5 py-2 rounded font-label-md text-label-md active:scale-95 transition-all">Add Item</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+<!-- Item 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant group hover:shadow-lg transition-all rounded-xl overflow-hidden">
+<div class="h-40 bg-surface-container relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A professional product shot of a navy blue campaign baseball cap with a subtle gold logo, clean studio lighting, soft shadows, high-end commercial aesthetic for a political reward." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDt6oY0bWpgf9DejqI-3bqOvHeQvAvXsbObgljqFwMAcRBn9XRUiBixy882TO7WdlYIawk9y3lfsr0g3Xb_F6zXhggSLSddfzMYkd8DeVHeXIEakj2ZhzJcBEIhBbg7r3GbtIQHO3IfEYvGCalSslYxdUd0QP7HPVhrgGIpAyiczTdvz7D0nQwnt_HUXiwqg_zxT7j86oBhZcs3-k-xqOzLlJ-iCO9atCndCY5-NYQ0xm4LLQ7ltrdECtMtIJkGu2Fi-oRc_O8eEw"/>
+<div class="absolute top-2 right-2 bg-primary/90 text-on-primary px-2 py-1 text-[10px] font-bold rounded">LEVEL 1</div>
+</div>
+<div class="p-5">
+<h5 class="font-headline-sm text-headline-sm mb-1">Official Campaign Cap</h5>
+<div class="flex justify-between items-center mb-4">
+<span class="font-label-md text-label-md text-secondary">350 Points</span>
+<span class="text-body-sm text-on-surface-variant">Stock: 142</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 70%"></div>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant group hover:shadow-lg transition-all rounded-xl overflow-hidden">
+<div class="h-40 bg-surface-container relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A minimalist white stainless steel water bottle with a vertical gold stripe and deep navy typography, studio lighting, crisp reflections, premium corporate branding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBstlhG8Ol0P47gQlCVOlUvkyz2TkNRtMqzmRgLu5dkOojw9nAljzIjMjgBayX9JcS-ral6purzWV48vRGhTd0wzGlZzCqPuJEudjamKUY_E1oG9FG50Tgwr18pZPvb4FoBY7ubM6i4ORHStkXMO608tZ9TbBuQKyen6Bw9vYSQi4OUAP8xlC2l-uiASNi5DKdUUaXytsuLv_BH209osSOfdrcdlyFKEHkHaQeisDqMgIWVfSsMMMq3BxQ70dDNTXnGHqXdDDMxVw"/>
+<div class="absolute top-2 right-2 bg-primary/90 text-on-primary px-2 py-1 text-[10px] font-bold rounded">LEVEL 2</div>
+</div>
+<div class="p-5">
+<h5 class="font-headline-sm text-headline-sm mb-1">Eco-Steel Bottle</h5>
+<div class="flex justify-between items-center mb-4">
+<span class="font-label-md text-label-md text-secondary">800 Points</span>
+<span class="text-body-sm text-on-tertiary-fixed-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="error">error</span>
+                                Stock: 12
+                            </span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-error h-full" style="width: 15%"></div>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant group hover:shadow-lg transition-all rounded-xl overflow-hidden">
+<div class="h-40 bg-surface-container relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A sleek black high-capacity power bank with a gold metallic finish on the edges, displayed on a dark surface with sharp directional lighting, technology-focused political gift." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDM3dgjnsRVFmRxSkQJci0CPdqlDOS98GwvubtAo8yuFeH8F10XUOivAAGI9NpGM43KE2AyQVmKd2gnDG1Qxs5b-z7ImNe6vPHQkj9v0C6YJA0vzYOzUn5dHFq_o4pWBSGGOvqXBydNlZEHiv8Wevge7GkcPDFCcFuwJ76cOtC2e6IGGEUOWTFgJCLLb5vN3y_OrkZpR7quBDHDRXz-McyBHwES6WE9uEGg4DAFGfj_R1zZlXPCb8MyKGMgxDvHDJEuGmSEQ-ognQ"/>
+<div class="absolute top-2 right-2 bg-primary/90 text-on-primary px-2 py-1 text-[10px] font-bold rounded">LEVEL 3</div>
+</div>
+<div class="p-5">
+<h5 class="font-headline-sm text-headline-sm mb-1">Ultra-Charge Hub</h5>
+<div class="flex justify-between items-center mb-4">
+<span class="font-label-md text-label-md text-secondary">2,500 Points</span>
+<span class="text-body-sm text-on-surface-variant">Stock: 48</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 45%"></div>
+</div>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="bg-surface-container-lowest border border-outline-variant group hover:shadow-lg transition-all rounded-xl overflow-hidden">
+<div class="h-40 bg-surface-container relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A premium heavy cotton hooded sweatshirt in heather grey with a deep navy chest embroidery, modern streetwear aesthetic for political campaigners, high-quality fabric detail." src="https://lh3.googleusercontent.com/aida-public/AB6AXuArvSQopwT41k4fG5x3GHtjQJKpt1UZb2g44FwqtvUB6TFhXpJx0FEqP1ilTjNw7hdi-D0paBrGsrrPNqkJi4hzxuqqZi5JWVVMgjs_ttiXWGBz3QKcuAZrZ9hcJGNdeNyVE4U3D96mz0lsQMwv6gNZfzm5_YIFfelis9gKl8fSPoPpGkYPgB0bAB3RRTTE69UJTDYtVQkag3ClaRN31fXroIg0xOHZPDDkBiiRdOK1Dj0SbGoAunSwY14-a80bgB8yerPLXX1mbg"/>
+<div class="absolute top-2 right-2 bg-primary/90 text-on-primary px-2 py-1 text-[10px] font-bold rounded">LEVEL 2</div>
+</div>
+<div class="p-5">
+<h5 class="font-headline-sm text-headline-sm mb-1">Signature Hoodie</h5>
+<div class="flex justify-between items-center mb-4">
+<span class="font-label-md text-label-md text-secondary">1,200 Points</span>
+<span class="text-body-sm text-on-surface-variant">Stock: 89</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 60%"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Fulfillment Queue -->
+<section class="bg-surface-container-lowest border border-outline-variant shadow-sm rounded-xl overflow-hidden">
+<div class="p-6 border-b border-outline-variant flex items-center justify-between">
+<div>
+<h4 class="font-headline-sm text-headline-sm text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="pending_actions">pending_actions</span>
+                        Fulfillment Queue
+                    </h4>
+<p class="text-on-surface-variant text-body-sm mt-1">Claims awaiting administrative processing.</p>
+</div>
+<div class="flex items-center gap-2">
+<div class="relative">
+<input class="pl-10 pr-4 py-2 border border-outline-variant rounded-lg text-body-sm focus:ring-secondary focus:border-secondary" placeholder="Search queue..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-2 text-on-surface-variant text-sm" data-icon="search">search</span>
+</div>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase">Volunteer</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase">Reward Item</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase">Date Claimed</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase">Status</th>
+<th class="px-6 py-4 font-label-md text-label-md text-on-surface-variant uppercase text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-container text-on-primary flex items-center justify-center font-label-md">JH</div>
+<div>
+<div class="font-body-md font-semibold text-primary">Julianne Hayes</div>
+<div class="text-[10px] text-on-surface-variant">Silver Tier Volunteer</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 font-body-md text-on-surface">Signature Hoodie (M)</td>
+<td class="px-6 py-5 font-label-md text-label-md text-on-surface-variant">Oct 24, 2023</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-secondary-container/30 text-on-secondary-container text-[11px] font-bold rounded-full">Pending Shipment</span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="px-4 py-1.5 bg-secondary text-on-secondary font-label-md text-label-md rounded shadow-sm hover:brightness-110 active:scale-95 transition-all">Mark Fulfilled</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-container text-on-primary flex items-center justify-center font-label-md">MR</div>
+<div>
+<div class="font-body-md font-semibold text-primary">Marcus Rivera</div>
+<div class="text-[10px] text-on-surface-variant">Gold Tier Volunteer</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 font-body-md text-on-surface">Official Campaign Cap</td>
+<td class="px-6 py-5 font-label-md text-label-md text-on-surface-variant">Oct 23, 2023</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-tertiary-container/10 text-on-tertiary-container text-[11px] font-bold rounded-full">Low Stock Alert</span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="px-4 py-1.5 bg-secondary text-on-secondary font-label-md text-label-md rounded shadow-sm hover:brightness-110 active:scale-95 transition-all">Mark Fulfilled</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary-container text-on-primary flex items-center justify-center font-label-md">AL</div>
+<div>
+<div class="font-body-md font-semibold text-primary">Aisha Lawson</div>
+<div class="text-[10px] text-on-surface-variant">Bronze Tier Volunteer</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-5 font-body-md text-on-surface">Eco-Steel Bottle</td>
+<td class="px-6 py-5 font-label-md text-label-md text-on-surface-variant">Oct 23, 2023</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-surface-container text-on-surface-variant text-[11px] font-bold rounded-full">Ready for Pickup</span>
+</td>
+<td class="px-6 py-5 text-right">
+<button class="px-4 py-1.5 bg-secondary text-on-secondary font-label-md text-label-md rounded shadow-sm hover:brightness-110 active:scale-95 transition-all">Mark Fulfilled</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-outline-variant bg-surface-container-lowest text-center">
+<button class="text-primary font-label-md text-label-md hover:underline">View All 28 Pending Claims</button>
+</div>
+</section>
+</main>
+<!-- Footer Space -->
+<footer class="md:ml-64 p-gutter border-t border-outline-variant mt-12 mb-20 text-on-surface-variant text-body-sm flex justify-between items-center">
+<div>© 2023 Innovation Consult Strategy Group. All rights reserved.</div>
+<div class="flex gap-6">
+<a class="hover:text-primary transition-colors" href="#">System Status</a>
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Support Center</a>
+</div>
+</footer>
+<!-- Bottom Navigation Bar (Mobile only) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-container-lowest border-t border-outline-variant flex justify-around items-center px-4 z-50">
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px]">War Room</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-secondary">
+<span class="material-symbols-outlined fill-icon" data-icon="volunteer_activism">volunteer_activism</span>
+<span class="text-[10px] font-bold">Volunteers</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="text-[10px]">Team</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px]">Settings</span>
+</button>
+</nav>
+<script>
+        // Micro-interactions for administrative inputs
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('border-primary', 'bg-surface-container-low');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('border-primary', 'bg-surface-container-low');
+            });
+        });
+
+        // Toggle fulfilled state animation
+        document.querySelectorAll('.px-4.py-1\\.5.bg-secondary').forEach(button => {
+            button.addEventListener('click', function() {
+                const row = this.closest('tr');
+                this.innerHTML = '<span class="material-symbols-outlined text-sm">check</span>';
+                this.classList.remove('bg-secondary');
+                this.classList.add('bg-green-600');
+                row.style.opacity = '0.5';
+                row.style.pointerEvents = 'none';
+                setTimeout(() => {
+                    row.style.transition = 'all 0.5s ease';
+                    row.style.transform = 'translateX(20px)';
+                    row.style.opacity = '0';
+                    setTimeout(() => row.remove(), 500);
+                }, 800);
+            });
+        });
+    </script>
+</body></html>
