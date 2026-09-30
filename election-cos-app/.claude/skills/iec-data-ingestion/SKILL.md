@@ -65,7 +65,11 @@ ward file (entry 32.1).
 
 Both download. Both are labelled in the output and in every run manifest.
 Promote an entry only after fetching it and looking at the file, and say
-who and when in the note.
+who and when in the note. A **supplier** who fetched it and recorded the
+row count satisfies that rule — that is how six rows came to be
+`CONFIRMED` while this environment still cannot reach the hosts — but such
+a note must also state plainly that this build has not fetched it. A guard
+in `acquisitionTool.test.ts` enforces both halves.
 
 Every run writes a manifest to `_runs/` with each source's outcome, byte
 count and SHA-256. Exit `0` only when every selected source succeeded,
@@ -213,8 +217,20 @@ failure modes this project has already met:
 - **An over-wide ID mask.** Anything showing more than the last four
   digits, and especially anything leading with a date of birth, is refused
   — `src/lib/saIdNumber.ts`.
-- **Arithmetic that does not close.** Do the sums. Three of the four
-  supplied datasets in this project failed one of the checks above.
+- **A code reused for a different municipality.** `NW405` is JB Marks and
+  was Merafong City — now Gauteng's `GT484` — in the IEC's 2006 North West
+  file. Check `src/modules/reference/municipalCodeHistory.ts` before
+  joining any result across election years. Both records are correct; only
+  the join is wrong, so no amount of validation catches it (entry 36.2).
+- **A file that arrives intact and short.** Right content-type, right
+  magic bytes, plausible size, a fraction of the rows — a filter or page
+  limit applied server-side. Put the expected count in `expect.min_rows`
+  (entry 36.4).
+- **Arithmetic that does not close.** Do the sums. Four of the six
+  supplied datasets in this project failed one of the checks above; the
+  two that passed were the IEC annexure and the NW repository manifest,
+  both of which were computed rather than asserted and both of which named
+  every file they came from.
 
 ## Where to record what you did
 

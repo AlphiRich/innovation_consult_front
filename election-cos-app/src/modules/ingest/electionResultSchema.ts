@@ -33,7 +33,21 @@
  * inputs a person chooses, and reconciliation against ward reference
  * data. Both are stated on `ResultUse`, and `electionResultSchema.test.ts`
  * fails if a third is quietly added.
+ *
+ * A CODE IS NOT AN IDENTIFIER ACROSS CYCLES
+ *
+ * `validateResult` also consults `municipalCodeHistory.ts`, because
+ * `NW405` is JB Marks today and was Merafong City — now a Gauteng
+ * municipality — in the IEC's 2006 North West results. Nothing about
+ * either record is wrong; charting them together is. That check is here
+ * rather than in the ingester because a hand-entered result has exactly
+ * the same problem.
  */
+import {
+  codeMeaningAt,
+  crossCycleJoinProblem,
+  nameMatchesCodeForYear,
+} from '@/modules/reference/municipalCodeHistory';
 
 /** What a result may be used for in this product. Deliberately closed. */
 export type ResultUse =
@@ -99,6 +113,8 @@ export interface ElectionResult {
 }
 
 export type ResultProblemCode =
+  | 'CODE_MEANT_ANOTHER_MUNICIPALITY'
+  | 'RETIRED_MUNICIPALITY_CODE'
   | 'NO_PARTIES'
   | 'VOTES_DO_NOT_SUM'
   | 'NEGATIVE_FIGURE'
@@ -219,6 +235,35 @@ export function validateResult(result: ElectionResult, now: Date = new Date()): 
 
   if (!result.uses || result.uses.length === 0) {
     blocking('NO_DECLARED_USE', 'A stored result has to say what it may be used for.');
+  }
+
+  // A municipal code is not a stable identifier across election years.
+  // This is the one defect in this area that arithmetic cannot catch:
+  // both records are correct and only the join is wrong. See
+  // municipalCodeHistory.ts.
+  const meaning = codeMeaningAt(result.municipalityCode, result.electionYear);
+  if (meaning.status === 'REASSIGNED') {
+    if (!nameMatchesCodeForYear(result.municipalityCode, result.electionYear, result.municipalityName)) {
+      blocking(
+        'CODE_MEANT_ANOTHER_MUNICIPALITY',
+        `This record is labelled "${result.municipalityName}". ` +
+          crossCycleJoinProblem(result.municipalityCode, result.electionYear) +
+          ' Stored as it stands, it would appear in this municipality’s own history.',
+      );
+    } else {
+      // Correctly labelled. Still worth saying out loud, because the next
+      // person to chart it by code will not know.
+      warning(
+        'CODE_MEANT_ANOTHER_MUNICIPALITY',
+        crossCycleJoinProblem(result.municipalityCode, result.electionYear) +
+          ' This record names it correctly. Do not chart it beside later results carrying the same code.',
+      );
+    }
+  } else if (meaning.status === 'RETIRED' || meaning.status === 'NOT_YET') {
+    blocking(
+      'RETIRED_MUNICIPALITY_CODE',
+      crossCycleJoinProblem(result.municipalityCode, result.electionYear) ?? 'Code and year do not agree.',
+    );
   }
 
   return problems;

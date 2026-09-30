@@ -1103,3 +1103,146 @@ a dropped municipality row; removing the Schedule 2 refusal from
 including the all-214 invariant); and downgrading the ward-count
 contradiction from BLOCKING to WARNING. All fail; reverted clean; 875
 tests pass.
+
+---
+
+## Session 36 — NW_07_Repository_Manifest.xlsx
+
+Supplied 30 September 2026, no covering instruction. SHA-256
+`e9ac6cb6…efc8`, six sheets, compiled 23 September 2026 from the IEC's
+2000–2021 North West results files and the MDB's final 2026 ward layer.
+Full review: `docs/nw-repository-manifest-review.md`.
+
+### Entry 36.1 — The first supplied dataset that needed no correction
+
+**Accepted in full.** Four of the five datasets supplied to this project
+before now failed a check: generated lattice geometry (32.1), a per-party
+ordinal sold as a ward number (NW candidate list §1), an ETL script whose
+network calls were commented out (33.1), a deviation norm with no source
+(33.2). This one is computed rather than asserted, names every file it was
+computed from with a retrieval date and row count, and audits an earlier
+report rather than repeating it.
+
+Everything checkable was checked against the proclaimed delimitation and
+**every point agreed**: 402 wards for North West, 18 local municipalities,
+4 districts, all eighteen per-municipality ward counts exactly, Moretele
+at 25, JB Marks at 34, Merafong City sitting in Gauteng as GT484, and all
+five retired codes genuinely absent from the 2026 baseline.
+
+The 402 is the one worth restating. The MDB layer is a geometry file from
+the Demarcation Board; the annexure is a table from the Commission. Two
+artefacts, two production paths, the same 402 wards across the same
+eighteen codes — the strongest corroboration the baseline has, and now a
+permanent test rather than a note.
+
+**Not imported:** the historical per-year ward counts (2000–2021). This
+build holds none of those IEC files and cannot check them, so they are
+recorded in the review document as supplied figures and are not
+application data. Only the 2026 column is confirmed.
+
+### Entry 36.2 — A municipal code is not an identifier across cycles
+
+**Built.** `src/modules/reference/municipalCodeHistory.ts`.
+
+`NW405` is JB Marks. In the IEC's 2006 North West results it is **Merafong
+City** — 26 wards, subsequently moved to Gauteng, now `GT484`. A campaign
+that charts "NW405 2006" beside NW405 2021 has put a Gauteng
+municipality's history under JB Marks' name, and nothing about the result
+looks wrong: the code matches, the province matches, the arithmetic
+closes.
+
+This is the one defect class in this area that verification cannot catch,
+because **both records are correct and only the join is wrong**. So the
+discontinuities are data and `validateResult()` consults them:
+
+- A 2006 NW405 result labelled "JB Marks" is **BLOCKING**, and the message
+  says it would otherwise appear in this municipality's own history.
+- The same result labelled "Merafong City" is allowed with a **WARNING** —
+  it is what the IEC published — telling the reader not to chart it beside
+  later results on the same code.
+- A result under a code retired by that year (`NW402` in 2021), or dated
+  before its municipality existed (`NW405` in 2011, formed from NW401 +
+  NW402), is **BLOCKING**.
+
+Also registered: `NW391 + NW395 → NW397`, and `predecessorsOf()` so that
+asking for JB Marks' pre-2016 history points at NW401 and NW402 rather
+than returning nothing.
+
+**Coverage is stated, not implied.** The manifest covers one province.
+`COVERAGE_BASIS` says a code absent from the registry has *not* been shown
+to be continuous — it has not been examined — and `codeHistoryCoverage()`
+returns `['North West']` so a caller can tell "no discontinuity" from "no
+information". A registry implying national coverage would be worse than no
+registry, and a guard asserts that sentence stays.
+
+### Entry 36.3 — The acquisition registry, rebuilt on real endpoints
+
+**Corrected.** The biggest standing gap in `sources.json` was that its
+URLs were reconstructions. The manifest's `Source_Log` supplies the real
+ones: the MDB ArcGIS item `c59982d9f42a4b07929f3781883754e5` (updated
+2026-09-01) with its data endpoint, and five IEC results files with row
+counts.
+
+- The two guessed IEC ward-results URLs are **removed** — they were
+  inferred URL shapes and are now superseded by confirmed VD-level ones.
+- `mdb-ward-boundaries-2026` pointed at a human-facing "explore" page; it
+  now points at the download endpoint.
+- Six rows read `CONFIRMED`. The registry's own promotion rule is
+  "somebody fetched it and checked what came back", and the manifest's
+  compiler did, on a recorded date, with a recorded row count.
+
+**The honesty guard moved rather than being dropped.** It used to assert
+that nothing could be `CONFIRMED` because nothing had been fetched from
+here. It now asserts that every `CONFIRMED` row names its verifier and its
+date **and states that this build has not fetched it** — which remains
+true, since the environment still denies these hosts at CONNECT.
+
+### Entry 36.4 — `expect.min_rows`: the check min_bytes cannot make
+
+**Built.** `min_bytes` catches an empty or truncated download. It cannot
+catch a portal that answers with the right content-type, the right
+magic bytes, a plausible size, and a fraction of the data — a filter
+applied server-side, a page limit, a province parameter ignored. That
+failure lands on disk and reports success.
+
+A published results file's row count is known in advance now, so it is
+asserted. A floor rather than an equality, deliberately: the IEC may
+republish with late adjustments, and a run failing because three more rows
+arrived would teach an operator to ignore the check.
+
+The self-test gained a case for it — an export silently truncated to 20 of
+500 rows — which fails and leaves nothing on disk.
+
+### Entry 36.5 — Two independent audits, one conclusion
+
+Worth recording for its own sake. The manifest's `Allow_Audit` sheet
+checks an earlier "Extraction Protocol Complete" report and finds it
+*"FALSE at the time. No files existed. The ETL script it relied on has
+`pass` stubs and a commented-out API call."*
+
+That is the finding this project reached independently in session 33 from
+reading the script (entry 33.1). Two reviews, no contact, same conclusion.
+
+**Guards proven by injection:** removing the code-history check from
+`validateResult` (4 tests fail); making the 2006 name check always pass
+(2 fail); and skipping the row check after download (the acquisition
+self-test fails and reports the short export as accepted). Reverted clean;
+902 tests pass.
+
+### Carried forward from the manifest's open items
+
+- **VD → 2026 ward assignment** — the largest remaining data gap.
+  Historical results cannot be restated on today's wards without a spatial
+  join of 2026 voting districts to the 2026 ward layer. Nothing in the
+  build attempts that restatement and nothing should until the join
+  exists.
+- **Registered voters per 2026 ward** — the band is no longer the missing
+  half of the deviation check (Annexure A publishes it for every warded
+  municipality); per-ward registration figures are. The MDB ward
+  information tables would supply them. Held for NW405 only, from the
+  provincial notice.
+- **The other five provinces** — ward counts are already in the baseline;
+  the results history and the delimitation notices are not.
+- **Turnout denominators** — `RegisteredVoters` repeats on every party row
+  in the IEC schema; de-duplicate by voting district × ballot before
+  summing. For whoever writes the VD-level mapping.

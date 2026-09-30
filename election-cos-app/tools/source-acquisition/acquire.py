@@ -247,6 +247,50 @@ def verify_payload(head: bytes, total_bytes: int, content_type: str | None, expe
     return None
 
 
+def count_data_rows(path: Path) -> int:
+    """
+    Non-empty lines in a text file, less the header.
+
+    Cheap and streaming. It is not a CSV parse: a quoted field containing a
+    newline would be miscounted, and that does not matter here, because the
+    check this feeds is "did roughly the whole file arrive", not "is every
+    row well formed".
+    """
+    lines = 0
+    with path.open("rb") as handle:
+        for raw in handle:
+            if raw.strip():
+                lines += 1
+    return max(0, lines - 1)
+
+
+def verify_rows(path: Path, expect: dict[str, Any]) -> str | None:
+    """
+    Check a delimited file carries at least the rows it should.
+
+    `min_bytes` catches an empty or truncated download; it does not catch a
+    portal that answers a results query with the right shape and a fraction
+    of the data — a filter silently applied, a paginated export, a province
+    parameter ignored. A published results file's row count is known in
+    advance (the repository manifest supplied on 30 September 2026 records
+    it for all five North West cycles), so it can be asserted.
+
+    Deliberately a floor rather than an equality: the IEC may republish a
+    file with late adjustments, and a run failing because three more rows
+    arrived would teach an operator to ignore the check.
+    """
+    expected = expect.get("min_rows")
+    if expected is None:
+        return None
+    rows = count_data_rows(path)
+    if rows < int(expected):
+        return (
+            f"{rows} data rows, expected at least {expected}. The file arrived intact but is short — "
+            "a filter or a page limit was probably applied server-side."
+        )
+    return None
+
+
 # --------------------------------------------------------------------------
 # fetching
 # --------------------------------------------------------------------------
@@ -349,6 +393,11 @@ def fetch(source: Source, out_dir: Path, timeout: int, retries: int, force: bool
                         written += len(chunk)
 
             problem = verify_payload(head, written, content_type, source.expect)
+            # The row check needs the whole file, which only exists once the
+            # stream has finished — so it runs here, still on the .part
+            # file, before anything is renamed into place.
+            if not problem:
+                problem = verify_rows(temporary, source.expect)
             if problem:
                 temporary.unlink(missing_ok=True)
                 last = Result(
@@ -638,6 +687,10 @@ def self_test() -> int:
         "/truncated.pdf": (200, "application/pdf", b"%PDF-1.7\n"),
         "/notpdf.pdf": (200, "application/pdf", b"NOTAPDF" + b"x" * 4096),
         "/server-error.pdf": (500, "text/plain", b"boom"),
+        # A results export that arrives intact and short: right headers,
+        # right shape, a fraction of the rows. min_bytes cannot see it.
+        "/full.csv": (200, "text/csv", b"a,b\n" + b"1,2\n" * 500),
+        "/short.csv": (200, "text/csv", b"a,b\n" + b"1,2\n" * 20),
     }
     server = HTTPServer(("127.0.0.1", 0), _SelfTestHandler)
     port = server.server_port
@@ -653,12 +706,17 @@ def self_test() -> int:
         ("notpdf.pdf", FAILED_VERIFY, "right size, right content-type, wrong bytes"),
         ("server-error.pdf", FAILED_HTTP, "an upstream 500"),
     ]
+    row_expect = {"content_type": "text/csv", "min_bytes": 64, "min_rows": 500}
+    row_cases = [
+        ("full.csv", OK, "a results export with every row present"),
+        ("short.csv", FAILED_VERIFY, "a results export silently truncated to 20 rows"),
+    ]
 
     failures = 0
     with tempfile.TemporaryDirectory() as temp:
         out = Path(temp)
         print("\n  Self-test — the verifier, against a local server:\n")
-        for name, expected, description in cases:
+        for name, expected, description in cases + row_cases:
             source = Source(
                 id=name,
                 url=f"http://127.0.0.1:{port}/{name}",
@@ -666,7 +724,7 @@ def self_test() -> int:
                 category="SelfTest",
                 filename=name,
                 status="CONFIRMED",
-                expect=expect,
+                expect=row_expect if name.endswith(".csv") else expect,
             )
             result = fetch(source, out, timeout=10, retries=2, force=True)
             passed = result.outcome == expected

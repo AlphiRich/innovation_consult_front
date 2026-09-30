@@ -412,3 +412,81 @@ describe('what the baseline says about itself', () => {
     expect(text).not.toMatch(/\b(forecast|predict|projection)\b/i);
   });
 });
+
+describe('North West, cross-checked against the MDB’s own 2026 ward layer', () => {
+  /**
+   * `NW_07_Repository_Manifest.xlsx` (supplied 30 September 2026) counted
+   * wards per municipality from the MDB's final 2026 ward shapefile — 402
+   * features for North West — independently of the Commission's annexure.
+   * These are that sheet's 2026 column, transcribed.
+   *
+   * The point of holding them here is that they are a second, differently
+   * sourced count of the delimitation this build treats as authoritative.
+   * The shapefile is a geometry layer produced by the Demarcation Board;
+   * the annexure is a table consolidated by the Commission. Agreement
+   * across all eighteen is the strongest corroboration the baseline has.
+   */
+  const MDB_2026_NORTH_WEST: Record<string, number> = {
+    NW371: 25,
+    NW372: 41,
+    NW373: 45,
+    NW374: 7,
+    NW375: 35,
+    NW381: 14,
+    NW382: 14,
+    NW383: 35,
+    NW384: 20,
+    NW385: 19,
+    NW392: 9,
+    NW393: 8,
+    NW394: 24,
+    NW396: 7,
+    NW397: 15,
+    NW403: 39,
+    NW404: 11,
+    NW405: 34,
+  };
+
+  const northWest = REGISTER_ENTRIES.filter((m) => m.province === 'North West');
+
+  it('agrees on every one of the eighteen local municipalities', () => {
+    const disagreements = Object.entries(MDB_2026_NORTH_WEST)
+      .filter(([code, wards]) => lookupMunicipality(code)?.wards !== wards)
+      .map(([code, wards]) => `${code}: layer ${wards}, baseline ${lookupMunicipality(code)?.wards}`);
+    expect(disagreements).toEqual([]);
+  });
+
+  it('agrees on the provincial totals', () => {
+    const warded = northWest.filter((m) => m.wards !== undefined);
+    expect(warded).toHaveLength(18);
+    expect(northWest.filter((m) => m.wards === undefined)).toHaveLength(4);
+    // 402 ward features in the MDB layer; 402 wards across the annexure's
+    // eighteen North West rows.
+    expect(warded.reduce((sum, m) => sum + (m.wards as number), 0)).toBe(402);
+    expect(Object.values(MDB_2026_NORTH_WEST).reduce((a, b) => a + b, 0)).toBe(402);
+  });
+
+  it('covers the same set of codes, in both directions', () => {
+    // A code in one and not the other would mean the two documents
+    // disagree about which municipalities exist.
+    const baselineCodes = northWest
+      .filter((m) => m.wards !== undefined)
+      .map((m) => m.code)
+      .sort();
+    expect(baselineCodes).toEqual(Object.keys(MDB_2026_NORTH_WEST).sort());
+    expect(northWest.filter((m) => m.wards === undefined).map((m) => m.code).sort()).toEqual([
+      'DC37',
+      'DC38',
+      'DC39',
+      'DC40',
+    ]);
+  });
+
+  it('locates the single province-wide change in Moretele', () => {
+    // The manifest puts North West at 403 wards in 2021 and 402 for this
+    // election, the whole net change being Moretele dropping from 26 to
+    // 25. The baseline's 25 is the half of that this build can verify.
+    expect(lookupMunicipality('NW371')?.name).toBe('Moretele');
+    expect(lookupMunicipality('NW371')?.wards).toBe(25);
+  });
+});

@@ -24,7 +24,14 @@ const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const TOOL = path.join(REPO_ROOT, 'tools', 'source-acquisition');
 const script = readFileSync(path.join(TOOL, 'acquire.py'), 'utf8');
 const registry = JSON.parse(readFileSync(path.join(TOOL, 'sources.json'), 'utf8')) as {
-  sources: { id: string; url: string; status: string; note?: string; expect?: Record<string, unknown> }[];
+  sources: {
+    id: string;
+    url: string;
+    filename: string;
+    status: string;
+    note?: string;
+    expect?: Record<string, number | string | boolean>;
+  }[];
 };
 
 describe('the acquisition script cannot claim a completion it did not reach', () => {
@@ -131,12 +138,37 @@ describe('the source registry is honest about what has been checked', () => {
     }
   });
 
-  it('ships nothing as CONFIRMED, because nothing has been fetched from here', () => {
-    // The network policy in the build environment denies these hosts at
-    // CONNECT. An entry may only be promoted by an operator who fetched
-    // it and looked at the file.
+  it('makes every CONFIRMED entry name its verifier and admit we did not fetch it', () => {
+    // Until session 36 this asserted that nothing could be CONFIRMED,
+    // because nothing had been fetched and the environment denies these
+    // hosts at CONNECT. A supplied repository manifest then provided
+    // endpoints its compiler had fetched, with row counts — which
+    // satisfies the registry's own promotion rule (somebody fetched it and
+    // recorded what came back). The guard therefore moved rather than
+    // being dropped: a promotion must still say who verified it, when, and
+    // that this build has not.
     for (const source of registry.sources) {
-      expect(source.status, `${source.id} claims CONFIRMED — who fetched it?`).toBe('UNCONFIRMED');
+      if (source.status !== 'CONFIRMED') continue;
+      const note = source.note ?? '';
+      expect(note, `${source.id} is CONFIRMED but names no date`).toMatch(/\d{4}-\d{2}-\d{2}/);
+      expect(note, `${source.id} is CONFIRMED without saying who verified it`).toMatch(
+        /confirmed by the supplier|fetched by/i,
+      );
+      expect(note, `${source.id} is CONFIRMED without admitting this build has not fetched it`).toMatch(
+        /has NOT fetched it/,
+      );
+    }
+  });
+
+  it('gives every CONFIRMED delimited export a row count to check against', () => {
+    // A row count is the one payload check that catches a portal answering
+    // with the right shape and a fraction of the data. Where a supplier
+    // recorded one, it has to be in `expect`, or it is a fact in a note
+    // that nothing acts on.
+    for (const source of registry.sources) {
+      if (source.status !== 'CONFIRMED') continue;
+      if (!source.filename.endsWith('.csv')) continue;
+      expect(source.expect?.min_rows, `${source.id} is a CONFIRMED CSV with no min_rows`).toBeGreaterThan(0);
     }
   });
 

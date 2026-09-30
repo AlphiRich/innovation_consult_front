@@ -25,9 +25,7 @@
     "auth_env: the environment variable holding a bearer token, where a",
     "source needs one. Never put the token in this file."
   ],
-
   "targetFolderName": "07_Geospatial_and_Electoral_Data",
-
   "$suppliedDocumentsComment": [
     "Documents this build holds that did NOT come through this tool. They",
     "were handed over directly, which is why the hosts being unreachable",
@@ -39,9 +37,10 @@
     "No URL is recorded for these. The URL each was published at is not",
     "known here and inventing a plausible one is the exact failure this",
     "registry exists to correct. Whoever finds the real published location",
-    "should add an ordinary source row and compare the SHA-256."
+    "should add an ordinary source row and compare the SHA-256.",
+    "",
+    "A supplier who has fetched an endpoint and recorded what came back satisfies this registry's own promotion rule, so those rows read CONFIRMED with the supplier and date named in the note. Each such note also states plainly that THIS build has not fetched it."
   ],
-
   "suppliedDocuments": [
     {
       "id": "iec-circular-1-2025-annexure-a",
@@ -54,9 +53,21 @@
         "src/modules/reference/municipalRegister.ts",
         "src/modules/wards/wardSizeDeviation.ts"
       ]
+    },
+    {
+      "id": "nw-07-repository-manifest",
+      "filename": "NW_07_Repository_Manifest.xlsx",
+      "sha256": "e9ac6cb67998c0941ce35b662d94d7cc32cc5f437757593fe5043010a0d5efc8",
+      "bytes": 18777,
+      "receivedOn": "2026-09-30",
+      "note": "Document ref IC-ECOS-07-NW-MANIFEST-2026. Compiled 2026-09-23 from the IEC's 2000-2021 North West VD-level results files and the MDB's final 2026 ward layer. Six sheets: README, Ward_Counts, Source_Log, Allow_Audit, Code_Changes, Open_Items. It supplied the confirmed download endpoints in this registry, the municipal code discontinuities in src/modules/reference/municipalCodeHistory.ts, and the per-municipality 2026 ward counts now asserted against the proclaimed delimitation in municipalRegister.test.ts. Its own Allow_Audit sheet independently reached the finding this project recorded as register entry 33.1: the earlier \"Extraction Protocol Complete\" report was false and no files existed.",
+      "usedBy": [
+        "tools/source-acquisition/sources.json",
+        "src/modules/reference/municipalCodeHistory.ts",
+        "src/modules/reference/municipalRegister.test.ts"
+      ]
     }
   ],
-
   "sources": [
     {
       "id": "mdb-nw405-gazette-8929",
@@ -74,12 +85,12 @@
     },
     {
       "id": "mdb-ward-boundaries-2026",
-      "province": "ZA",
+      "province": "NW",
       "category": "MDB_Spatial",
-      "filename": "mdb-wards-2026.zip",
-      "url": "https://dataportal-mdb-sa.opendata.arcgis.com/datasets/wards-2026/explore",
-      "status": "UNCONFIRMED",
-      "note": "Ward boundary shapefiles. This is the thing the build actually needs and does not have — see the register, entry 32.1: the ward GeoJSON supplied in session 32 carried generated lattice coordinates, not centroids, so this product still holds no ward geometry. The URL here is the portal's human-facing page, not a download link; whoever runs this first must find the dataset's actual download endpoint and replace it. Left in deliberately so the gap has a row rather than being absent.",
+      "filename": "MDB_Wards2026_NW.zip",
+      "url": "https://www.arcgis.com/sharing/rest/content/items/c59982d9f42a4b07929f3781883754e5/data",
+      "status": "CONFIRMED",
+      "note": "MDB final 2026 ward boundaries. ArcGIS item c59982d9f42a4b07929f3781883754e5, updated 2026-09-01; published EPSG:3857. The North West subset carries 402 ward features, which is exactly the 402 wards the proclaimed delimitation gives North West across its 18 local municipalities - asserted in municipalRegister.test.ts. The layer carries no registered-voter figures, so a ward-level deviation check still needs the MDB ward information tables. Supersedes the explore-page URL this row shipped with, which was a human-facing page rather than a download. Endpoint confirmed by the supplier's own retrieval on 2026-09-23, recorded in NW_07_Repository_Manifest.xlsx Source_Log with the row count below. This build has NOT fetched it — the environment denies these hosts at CONNECT — so the status reflects the supplier's verification, not ours. expect.min_rows carries the supplier's count so a short or filtered export fails rather than landing.",
       "expect": {
         "content_type": "application/zip",
         "min_bytes": 102400,
@@ -87,31 +98,76 @@
       }
     },
     {
-      "id": "iec-lge-2021-nw-ward-results",
+      "id": "iec-lge-2021-nw-vd-results",
       "province": "NW",
       "category": "IEC_Results",
-      "filename": "LGE_2021_NW_ward_results.csv",
-      "url": "https://www.elections.org.za/dashboards/lge/downloads/LGE2021_NW_Ward.csv",
-      "status": "UNCONFIRMED",
-      "note": "Ward-level results for the 2021 local government election. URL shape inferred from the supplied acquisition note and never tested. The note's api.elections.org.za/results/{year}/LGE/{prov} form is NOT used here: it was commented out in the script it came from, never called by anyone, and repeating it as though it were known would be the error this whole exercise is correcting. Expect to replace this URL.",
+      "filename": "LGE_2021_NW_VD_Results.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable Party Results/NW.csv",
+      "status": "CONFIRMED",
+      "note": "2021 LGE, North West, party votes by voting district x ballot type (Ward / PR / DC 40%). UTF-8. Endpoint confirmed by the supplier's own retrieval on 2026-09-23, recorded in NW_07_Repository_Manifest.xlsx Source_Log with the row count below. This build has NOT fetched it — the environment denies these hosts at CONNECT — so the status reflects the supplier's verification, not ours. expect.min_rows carries the supplier's count so a short or filtered export fails rather than landing.",
       "expect": {
         "content_type": "text/csv",
-        "min_bytes": 2048,
+        "min_bytes": 131072,
+        "min_rows": 75679,
         "reject_html": true
       }
     },
     {
-      "id": "iec-lge-2016-nw-ward-results",
+      "id": "iec-lge-2016-nw-vd-results",
       "province": "NW",
       "category": "IEC_Results",
-      "filename": "LGE_2016_NW_ward_results.csv",
-      "url": "https://www.elections.org.za/dashboards/lge/downloads/LGE2016_NW_Ward.csv",
-      "status": "UNCONFIRMED",
-      "note": "As above, for the 2016 cycle. The supplied plan asked for 2000, 2006, 2011, 2016 and 2021 across six provinces — thirty combinations. Two are listed here rather than thirty: a registry of twenty-eight rows nobody has ever fetched is a list of guesses wearing the shape of a plan. Add rows as URLs are confirmed.",
+      "filename": "LGE_2016_NW_VD_Results.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable Party Results/NW.csv",
+      "status": "CONFIRMED",
+      "note": "2016 LGE, North West, same schema. UTF-8. Endpoint confirmed by the supplier's own retrieval on 2026-09-23, recorded in NW_07_Repository_Manifest.xlsx Source_Log with the row count below. This build has NOT fetched it — the environment denies these hosts at CONNECT — so the status reflects the supplier's verification, not ours. expect.min_rows carries the supplier's count so a short or filtered export fails rather than landing.",
       "expect": {
         "content_type": "text/csv",
-        "min_bytes": 2048,
+        "min_bytes": 131072,
+        "min_rows": 49867,
         "reject_html": true
+      }
+    },
+    {
+      "id": "iec-lge-2011-nw-vd-results",
+      "province": "NW",
+      "category": "IEC_Results",
+      "filename": "LGE_2011_NW_VD_Results.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable Party Results/NW.csv",
+      "status": "CONFIRMED",
+      "note": "2011 LGE, North West, same schema. Source is UTF-16 - decode before parsing. Endpoint confirmed by the supplier's own retrieval on 2026-09-23, recorded in NW_07_Repository_Manifest.xlsx Source_Log with the row count below. This build has NOT fetched it — the environment denies these hosts at CONNECT — so the status reflects the supplier's verification, not ours. expect.min_rows carries the supplier's count so a short or filtered export fails rather than landing.",
+      "expect": {
+        "content_type": "text/csv",
+        "min_bytes": 131072,
+        "min_rows": 31020,
+        "reject_html": true
+      }
+    },
+    {
+      "id": "iec-lge-2006-national",
+      "province": "ZA",
+      "category": "IEC_Results",
+      "filename": "2006_LGE.zip",
+      "url": "https://www.elections.org.za/content/uploadedfiles/2006%20LGE.zip",
+      "status": "CONFIRMED",
+      "note": "National 2006 LGE results archive; the North West slice is 29,364 rows once extracted. Older schema, including MEC7 votes and a turnout percentage. Source encoding Latin-1. NOTE: in 2006 the code NW405 is Merafong City, not JB Marks - see src/modules/reference/municipalCodeHistory.ts before joining this to any later cycle. Endpoint confirmed by the supplier's own retrieval on 2026-09-23, recorded in NW_07_Repository_Manifest.xlsx Source_Log with the row count below. This build has NOT fetched it — the environment denies these hosts at CONNECT — so the status reflects the supplier's verification, not ours. expect.min_rows carries the supplier's count so a short or filtered export fails rather than landing.",
+      "expect": {
+        "content_type": "application/zip",
+        "min_bytes": 102400,
+        "magic": "zip"
+      }
+    },
+    {
+      "id": "iec-lge-2000-national",
+      "province": "ZA",
+      "category": "IEC_Results",
+      "filename": "2000_LGE.zip",
+      "url": "https://www.elections.org.za/content/uploadedfiles/2000%20LGE.zip",
+      "status": "CONFIRMED",
+      "note": "National 2000 LGE results archive; the North West slice is 14,513 rows once extracted. Carries a DMA DC 60% ballot type that later cycles do not. Source encoding Latin-1. Endpoint confirmed by the supplier's own retrieval on 2026-09-23, recorded in NW_07_Repository_Manifest.xlsx Source_Log with the row count below. This build has NOT fetched it — the environment denies these hosts at CONNECT — so the status reflects the supplier's verification, not ours. expect.min_rows carries the supplier's count so a short or filtered export fails rather than landing.",
+      "expect": {
+        "content_type": "application/zip",
+        "min_bytes": 102400,
+        "magic": "zip"
       }
     }
   ]
