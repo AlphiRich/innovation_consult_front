@@ -29,6 +29,8 @@ import {
   DELIMITATION_VERSION,
   checkAgainstRegister,
 } from './municipalRegister';
+import { provinceSummary } from './provinceDelimitation';
+import { provinceReviewStatus } from './municipalCodeHistory';
 
 const fmt = (n: number) => n.toLocaleString('en-ZA');
 
@@ -55,6 +57,10 @@ export function MunicipalRegisterPanel(props: MunicipalRegisterPanelProps) {
   });
 
   const { baseline } = check;
+  const province = baseline ? provinceSummary(baseline.province) : null;
+  const review = baseline
+    ? provinceReviewStatus().find((p) => p.province === baseline.province)
+    : undefined;
 
   return (
     <div
@@ -135,6 +141,30 @@ export function MunicipalRegisterPanel(props: MunicipalRegisterPanelProps) {
           )}
           <p className="text-body-md font-body text-slate">{BAND_BASIS}</p>
         </div>
+      )}
+
+      {/*
+        * Where this municipality sits in its province. A campaign in one
+        * municipality still negotiates provincially, and the delimitation
+        * baseline covers all nine provinces, so the figures are free.
+        */}
+      {province && baseline && (
+        <p className="text-body-md font-body text-slate">
+          {province.province}: {fmt(province.locals)} local
+          {province.locals === 1 ? '' : 's'}
+          {province.metros > 0 ? ` and ${fmt(province.metros)} metro${province.metros === 1 ? '' : 's'}` : ''} in{' '}
+          {fmt(province.districts)} district{province.districts === 1 ? '' : 's'} · {fmt(province.wards)} wards ·{' '}
+          {fmt(province.councillors)} council seats ({fmt(province.prSeats)} PR) ·{' '}
+          {fmt(province.registeredVoters)} registered voters.
+        </p>
+      )}
+
+      {review && !review.reviewed && (
+        <p className="text-body-md font-body text-slate">
+          Municipal code changes have not been reviewed for {review.province}. That does not affect this
+          cycle&rsquo;s figures above — it means results from earlier elections in this province have not been
+          checked for codes that were reused for a different municipality.
+        </p>
       )}
 
       <p className="text-body-md font-body text-slate">{BASELINE_AUTHORITY}</p>

@@ -48,6 +48,7 @@
  * would be worse than no registry.
  */
 import { lookupMunicipality } from './municipalRegister';
+import { PROVINCES } from './provinceDelimitation';
 
 export const COVERAGE_BASIS =
   'Municipal code changes have been reviewed for North West only, from a repository manifest compiled off ' +
@@ -60,6 +61,42 @@ export const REVIEWED_PROVINCES = ['North West'] as const;
 
 export function codeHistoryCoverage(): readonly string[] {
   return REVIEWED_PROVINCES;
+}
+
+export interface ProvinceReview {
+  province: string;
+  reviewed: boolean;
+  /** What a caller may and may not conclude for this province. */
+  note: string;
+}
+
+/**
+ * Every province, saying whether its code history has been reviewed.
+ *
+ * Exported as a list rather than left implicit so the gap is something the
+ * application can show an operator. A campaign in Limpopo asking why its
+ * historical figures are not cross-checked deserves the answer "nobody has
+ * reviewed Limpopo's code changes yet", not silence that reads as "there
+ * are none".
+ */
+export function provinceReviewStatus(): ProvinceReview[] {
+  const reviewed = new Set<string>(REVIEWED_PROVINCES);
+  return PROVINCES.map((province) => ({
+    province,
+    reviewed: reviewed.has(province),
+    note: reviewed.has(province)
+      ? 'Code changes reviewed against the IEC’s 2000–2021 results files for this province.'
+      : 'Not reviewed. Before joining results across election years here, check this province’s codes ' +
+        'the same way North West’s were — a code reused for a different municipality produces a ' +
+        'chart that looks correct and is not.',
+  }));
+}
+
+/** Provinces still to be reviewed. Empty would mean the work is done. */
+export function unreviewedProvinces(): string[] {
+  return provinceReviewStatus()
+    .filter((p) => !p.reviewed)
+    .map((p) => p.province);
 }
 
 /**

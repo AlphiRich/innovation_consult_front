@@ -28,6 +28,8 @@ const registry = JSON.parse(readFileSync(path.join(TOOL, 'sources.json'), 'utf8'
     id: string;
     url: string;
     filename: string;
+    province: string;
+    category: string;
     status: string;
     note?: string;
     expect?: Record<string, number | string | boolean>;
@@ -188,5 +190,50 @@ describe('the source registry is honest about what has been checked', () => {
     for (const source of registry.sources) {
       expect(source.url, source.id).not.toMatch(/api\.elections\.org\.za/);
     }
+  });
+});
+
+describe('the registry covers every province, and says which are guesses', () => {
+  const IEC_PROVINCE_TOKENS = ['EC', 'FS', 'GP', 'KZN', 'LP', 'MP', 'NC', 'NW', 'WC'];
+
+  it('carries results rows for all nine provinces', () => {
+    // A national product cannot ship one province's history. The five the
+    // supplied manifest named as outstanding, plus the three it did not,
+    // because the URL shape is identical and stopping at five would be
+    // arbitrary.
+    const withRows = new Set(
+      registry.sources.filter((s) => s.category === 'IEC_Results' && s.province !== 'ZA').map((s) => s.province),
+    );
+    expect([...withRows].sort()).toEqual([...IEC_PROVINCE_TOKENS].sort());
+  });
+
+  it('never claims an unfetched province row is confirmed', () => {
+    // Only North West was fetched. Every other province's URL has an
+    // inferred province token, and inference is not verification.
+    for (const source of registry.sources) {
+      if (source.category !== 'IEC_Results') continue;
+      if (source.province === 'NW' || source.province === 'ZA') continue;
+      expect(source.status, `${source.id} claims CONFIRMED`).toBe('UNCONFIRMED');
+      expect(source.note, `${source.id} does not say what is inferred`).toMatch(/province token is INFERRED/);
+      expect(source.note, `${source.id} does not say what is confirmed`).toMatch(/event id in this path is CONFIRMED/);
+    }
+  });
+
+  it('withholds min_rows where no row count is known', () => {
+    // min_rows is a real assertion about the payload. Inventing one for a
+    // province nobody has fetched would make the check a guess that fails
+    // honest downloads.
+    for (const source of registry.sources) {
+      if (source.status === 'CONFIRMED') continue;
+      expect(source.expect?.min_rows, `${source.id} has a min_rows nobody measured`).toBeUndefined();
+    }
+  });
+
+  it('keeps the national MDB layer as one row, not nine', () => {
+    const mdb = registry.sources.filter((s) => s.id.startsWith('mdb-wards-2026'));
+    expect(mdb).toHaveLength(1);
+    expect(mdb[0].province).toBe('ZA');
+    // And it must not imply the 4,488 national ward count came from the layer.
+    expect(mdb[0].note).toMatch(/has not been checked against the layer/);
   });
 });

@@ -139,8 +139,13 @@ Still fully open, and the largest remaining data gap in the product:
   today's wards without a spatial join of 2026 voting districts to the
   2026 ward layer. Nothing in this build attempts that restatement, and
   nothing should until the join exists.
-- **The other five provinces** (its #4). Ward counts for all of them are
-  in the delimitation baseline already; the results history is not.
+- **The other five provinces** (its #4). **Addressed as far as this build
+  can** — see `docs/national-delimitation-baseline.md`. Ward counts,
+  council sizes and district structure for all nine provinces are derived
+  from the delimitation baseline and verified by 44 district
+  reconciliations; `sources.json` carries results rows for all nine. What
+  remains is fetching them: only North West's files have been retrieved,
+  and only North West's code history has been reviewed.
 - **Turnout denominators** (its #5): `RegisteredVoters` repeats on every
   party row in the IEC schema, so de-duplicate by voting district ×
   ballot before summing. Recorded in the ingest notes for whoever writes

@@ -1246,3 +1246,139 @@ self-test fails and reports the short export as accepted). Reverted clean;
 - **Turnout denominators** — `RegisteredVoters` repeats on every party row
   in the IEC schema; de-duplicate by voting district × ballot before
   summing. For whoever writes the VD-level mapping.
+
+---
+
+## Session 37 — The other provinces
+
+"Proceed with the other five provinces" — the repository manifest's open
+item #4, which named GP, FS, LP, EC and KZN as outstanding against the NW
+work already done.
+
+**Done for all eight remaining provinces, not five.** The manifest's index
+covered six; the delimitation baseline covers nine, the work is one loop,
+and shipping a national product with three provinces missing for no reason
+would be an arbitrary stopping point. Flagged here rather than done
+quietly. Full figures: `docs/national-delimitation-baseline.md`.
+
+### Entry 37.1 — What could be done without the files, and what could not
+
+The manifest's pipeline was for **historical results**, 2000–2021. This
+build holds none of those files and the environment still denies the hosts,
+so no province's results history has been ingested and none is claimed.
+
+What was available was better than expected: the delimitation baseline
+already covers all nine provinces. Ward counts, council sizes, PR splits,
+district structure and the roll for every municipality in the country were
+already in hand and only needed deriving and checking. That is the
+province-level work; the results history is the download that follows.
+
+### Entry 37.2 — 44 district reconciliations
+
+**Built.** `src/modules/reference/provinceDelimitation.ts`.
+
+A district municipality's registered voters are the sum of the locals
+inside it. The annexure carries no column linking the two — but the codes
+do: the two digits after the province prefix are the district number, so
+`NW371` sits in `DC37`, `EC441` in `DC44`, `WC011` in `DC1` (leading zero
+dropped), `KZN212` in `DC21`.
+
+That is an inference, so it is asserted nowhere. It is proved by
+consequence: derive membership for all 206 locals, sum each district,
+compare against the district row. **All 44 reconcile, every one to the
+voter.** Two things follow — the mapping is right, and the annexure's
+district rows and local rows agree across the whole country.
+
+Session 35 could only make this check on the whole table at once (total
+category C voters equals total category B voters). This is the same check
+at a resolution 44 times finer, and it localises a fault instead of only
+detecting one: adding a single voter to KZN235 breaks exactly one district
+and names it, which is how it was verified.
+
+**Metros are excluded, not assigned.** A category A municipality has
+exclusive authority and sits in no district; its code carries no district
+digits, so `districtCodeFor()` returns null. A guard fails if it ever
+returns a district for any of the eight.
+
+### Entry 37.3 — Per-province delimitation, derived and surfaced
+
+`provinceSummary()` and `allProvinceSummaries()` give each province its
+metros, locals, districts, wards, council seats, PR seats and roll — all
+derived, none stored. Guards hold `councillors == wards + prSeats` for
+every province and the nine provinces adding to the national figures.
+
+Registered voters and council seats exclude district councils, because a
+district row repeats its locals' voters. A guard checks the Gauteng summary
+is below the double-counted figure, which is the shape of the mistake.
+
+Surfaced on the Wards page beside the municipality's own figures: a
+campaign in one municipality still negotiates provincially, and the numbers
+were free.
+
+### Entry 37.4 — Results endpoints for every province, honestly graded
+
+`sources.json` goes from 7 rows to 31.
+
+The URL shape is now known from confirmed North West rows:
+`.../LGEPublicReports/{eventId}/Downloadable Party Results/{PROV}.csv`,
+with event ids 1091 (2021), 402 (2016) and 197 (2011). So 24 rows were
+added — eight provinces × three cycles — and the grading is split at
+exactly the line where knowledge stops:
+
+- The **event id** is `CONFIRMED`: it is the id North West was fetched from
+  for that cycle.
+- The **province token** is `INFERRED` from that one confirmed URL. Only
+  `NW.csv` has ever been fetched.
+- So every new row is `UNCONFIRMED`, its note says which half is which, and
+  **no `min_rows` is set** — inventing a row count for a file nobody has
+  fetched would make the check a guess that fails honest downloads.
+
+Guards enforce all three: no non-NW results row may read `CONFIRMED`, each
+must state what is inferred and what is confirmed, and no `UNCONFIRMED` row
+may carry `min_rows`.
+
+The MDB row also became what it actually is — **one national item**, not
+nine provincial ones. The province subset is a local operation on one
+download. Its note records that the layer should carry 4,488 ward features
+nationally *and that this figure is ours, from the baseline, not counted
+off the layer*.
+
+### Entry 37.5 — Code-history coverage made visible per province
+
+`provinceReviewStatus()` returns all nine provinces with a review flag;
+`unreviewedProvinces()` returns the eight. The Wards page now tells an
+operator in an unreviewed province what that means for them.
+
+This matters because silence reads as absence. A campaign in Limpopo
+seeing no code warnings would reasonably conclude Limpopo has no
+discontinuities — which nobody has established. North West produced six
+from twenty-four codes.
+
+### Entry 37.6 — The published table cannot drift
+
+`docs/national-delimitation-baseline.md` is a deliverable somebody will
+quote in a meeting, so its table is parsed back in the test suite and
+compared cell by cell against the computed summaries. A figure edited in
+the doc, or a figure that changes in the data, fails the build.
+
+**Guards proven by injection:** one voter added to KZN235 (the containment
+check names DC23 and the national total fails); the leading-zero rule
+dropped from district derivation (4 tests fail); metros assigned to a
+district by guesswork; and a ward count altered in the published doc table.
+All fail; reverted clean; 927 tests pass.
+
+### Still open after this session
+
+- **Results history for every province including North West.** The
+  endpoints are in place and graded; nothing has been fetched, because the
+  environment denies the hosts. This is a download, not a research task.
+- **Code history for eight provinces.** Needs each province's 2000–2021
+  results files: list the codes present per cycle, identify every code
+  whose municipality changed.
+- **Registered voters per 2026 ward**, nationally. The band is published
+  for all 214 warded municipalities; per-ward registration is not in the
+  annexure and not in the MDB layer. The MDB ward information tables would
+  supply it. Held for NW405 only.
+- **VD → 2026 ward assignment.** Still the largest gap. Historical results
+  cannot be restated on today's wards without a spatial join, and nothing
+  in the build attempts that restatement.

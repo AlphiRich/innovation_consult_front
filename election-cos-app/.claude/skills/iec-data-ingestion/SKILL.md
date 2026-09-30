@@ -121,6 +121,24 @@ The pattern to copy for the next table:
    all 258 rows of Annexure A gives a 44.3-million "national roll". The
    real figure is 27.7 million; districts repeat their locals.
 
+### Province coverage
+
+`src/modules/reference/provinceDelimitation.ts` derives every province's
+wards, council seats, PR split, district structure and roll from the
+baseline, and proves the lot with **44 district reconciliations**: district
+membership comes from the municipal code (two digits after the province
+prefix), and every district's published roll equals the sum of the locals
+derived into it. Copy that pattern for any table with a parent/child
+structure — derive the link, then prove it by summing, rather than
+asserting it.
+
+Grading endpoints for provinces nobody has fetched: split the row at the
+line where knowledge stops. The event id in an IEC results URL is confirmed
+(North West was fetched from it); the province token is inferred. So the
+row is `UNCONFIRMED`, the note says which half is which, and `min_rows` is
+left unset — a row count invented for an unfetched file is a check that
+fails honest downloads.
+
 Consuming it: `src/modules/reference/municipalRegister.ts`. This one is
 not a reference table to compare against — it is the **proclaimed
 delimitation for 4 November 2026** and the build treats it as the source

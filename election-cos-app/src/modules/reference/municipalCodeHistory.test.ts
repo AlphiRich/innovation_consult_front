@@ -23,6 +23,8 @@ import {
   lgeYears,
   nameMatchesCodeForYear,
   predecessorsOf,
+  provinceReviewStatus,
+  unreviewedProvinces,
 } from './municipalCodeHistory';
 import { lookupMunicipality } from './municipalRegister';
 import { validateResult, type ElectionResult } from '@/modules/ingest/electionResultSchema';
@@ -202,5 +204,37 @@ describe('coverage is stated, not implied', () => {
     // it was checked — which is exactly what COVERAGE_BASIS exists to say.
     expect(codeMeaningAt('GT484', 2006).status).toBe('SAME');
     expect(codeHistoryCoverage()).not.toContain('Gauteng');
+  });
+});
+
+describe('coverage, province by province', () => {
+  it('lists all nine provinces with a review status', () => {
+    const statuses = provinceReviewStatus();
+    expect(statuses).toHaveLength(9);
+    expect(statuses.filter((p) => p.reviewed).map((p) => p.province)).toEqual(['North West']);
+  });
+
+  it('leaves the other eight explicitly unreviewed', () => {
+    // The manifest named five as outstanding. The delimitation baseline
+    // covers nine, so eight are outstanding — and the product says which,
+    // rather than letting silence read as "no code changes here".
+    expect(unreviewedProvinces()).toEqual([
+      'Eastern Cape',
+      'Free State',
+      'Gauteng',
+      'KwaZulu-Natal',
+      'Limpopo',
+      'Mpumalanga',
+      'Northern Cape',
+      'Western Cape',
+    ]);
+  });
+
+  it('tells an operator in an unreviewed province what that means for them', () => {
+    const limpopo = provinceReviewStatus().find((p) => p.province === 'Limpopo');
+    expect(limpopo?.reviewed).toBe(false);
+    expect(limpopo?.note).toMatch(/Not reviewed/);
+    // Names the consequence, so it reads as a gap rather than a disclaimer.
+    expect(limpopo?.note).toMatch(/looks correct and is not/i);
   });
 });
