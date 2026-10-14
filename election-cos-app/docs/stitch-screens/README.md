@@ -76,6 +76,11 @@ branding or DevOps/infrastructure content already flagged as retired /
 out of scope in `docs/screen-findings.md` — check that note before
 building a module against one of these files.
 
+**See `docs/phase-1-screen-inventory.md` for the actual screen → route /
+BUILT / GAP / EXCLUDED / OUT OF SCOPE classification of all 47 files
+here** — that's the Phase 1 gate deliverable; this file is just the list
+of what got extracted.
+
 Full inventory (folder name → `html` / `png-only` / `none`) for the
 remaining 182 screens has not been transcribed here; re-open the source
 zip if the Phase 1 screen-inventory-to-route mapping needs it.
