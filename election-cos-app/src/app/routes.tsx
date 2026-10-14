@@ -28,6 +28,7 @@ import { PermissionsPage } from '@/modules/settings/PermissionsPage';
 import { PPFAThresholdsPage } from '@/modules/settings/PPFAThresholdsPage';
 import { DataSubjectRequestsPage } from '@/modules/settings/DataSubjectRequestsPage';
 import { CandidatesPage } from '@/modules/candidates/CandidatesPage';
+import { TasksPage } from '@/modules/tasks/TasksPage';
 import { SubscriptionPage } from '@/modules/settings/SubscriptionPage';
 import { GatheringsAdvisoryPage } from '@/modules/knowledge/GatheringsAdvisoryPage';
 import { ElectionTimetablePage } from '@/modules/knowledge/ElectionTimetablePage';
@@ -42,6 +43,7 @@ export const router = createBrowserRouter([
       { path: 'voters', element: <VotersPage /> },
       { path: 'voters/import', element: <BulkImportPage /> },
       { path: 'round', element: <RoundPage /> },
+      { path: 'tasks', element: <TasksPage /> },
       { path: 'incidents/new', element: <ReportIncidentPage /> },
       { path: 'wards', element: <WardsPage /> },
       { path: 'wards/:wardCode', element: <WardDetailPage /> },

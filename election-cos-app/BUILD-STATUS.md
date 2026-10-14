@@ -1731,6 +1731,94 @@ constant fails 1.
 **Verified:** `check:all` green — **395 tests** (up from 347), lint,
 typecheck, `check:hex`; `npm run build` succeeds.
 
+**Note found while writing session 31's entry below:** this file's own
+chronological log stopped here. Sessions 27–30 (SOP-02 through SOP-12,
+the entitlement gate wired into the app, `SubscriptionPage`,
+`dutyConcentration.ts`) happened and are real — logged instead in
+`docs/manual-and-legal-instruments.md`, not duplicated here. Not
+backfilled into this file from the outside, since restating someone
+else's session from its own already-accurate record risks getting a
+detail wrong; read that file directly for sessions 27–30. This file
+resumes being the build log from session 31 on.
+
+**Session 31 (14 Oct 2026) — re-supplied Stitch batch extracted; `/tasks`
+built; the domain/hosting architecture confirmed.** Three things, none
+dependent on the others.
+
+**(1) The Stitch re-supply landed.** `stitch_ic_election_management_
+suite_3_Aug_2026.zip` — 229 screen folders, 47 with a real `code.html` —
+uploaded directly to a prior turn of this session (not through the broken
+Drive connector blocker #1 above names). The 47 are extracted to
+`docs/stitch-screens/`. `docs/phase-1-screen-inventory.md` is the actual
+Phase 1 gate deliverable (`phase-1-ia-consolidation.md` §1) for this
+batch — every one of the 47 mapped to a route, BUILT, a named GAP,
+EXCLUDED (retired Civic Architect/Authority/SA-Elections-2024/DevOps
+shells, or a mismatched third-product skin that isn't this app),
+OUT OF SCOPE v1 (§8.3's Ward Intelligence spike, or no spec backing at
+all — "Volunteer Rewards" has neither a port nor a mention anywhere in
+`docs/`), or OUT OF SCOPE (marketing, `election-cos-landing`/
+`ic-corporate`'s content, left alone per the website/app split below).
+The other 182 folders are screenshot-only or empty — not classified, no
+markup to read.
+
+**(2) `/tasks` — the screen `src/dal/ports/tasks.ts` had been waiting on.**
+That port's header has said "field list provisional pending real screens"
+since it was written; the Firestore adapter was complete and tested and
+referenced from exactly nowhere in `src/modules/**`. Same defect class as
+SOP-05's canvassing queue (session 27) — logic built, never wired to a
+screen. Built against the inventory's `volunteer_tasks_innovation_
+consult_edition` reference: `src/modules/tasks/taskStatus.ts` (pure,
+tested — status ordering and the one-way OPEN → IN_PROGRESS → DONE
+transition; no capability gate, because `firestore.rules`' `/tasks/{id}`
+match only checks `inScope`, not a `tasks.*` capability — none exists)
+and `TasksPage.tsx`, reached from War Room's quick links alongside
+`/round`, for the same §3.2 nine-item-nav reason `VotersPage.tsx`
+already gives for that link. Deliberately not built: the reference
+screen's "Daily Quota 14/20 Voters" bar and route-optimised map — `Task`
+carries no quota or route field and nothing in this codebase tracks
+either; faking either would be the same mistake `WarRoomPage.tsx`
+already declined to make for its own dashboard.
+
+Also identified and **not** built this session (named in the inventory
+as GAPs, not acted on, to keep this session's surface area to one real
+feature built properly): a sync-conflict review screen for
+`src/offline/db.ts`'s `conflicts` table (§7.5 "conflicts must be
+visible" has a data layer and no UI anywhere), and an audit-log viewer.
+Both have a ready Stitch reference (`sync_reconciliation_terminal`,
+`server_side_audit_logs`).
+
+**(3) Domain and hosting architecture — confirmed by the human, recorded
+in `docs/phase-0-infra-plan.md`.** `innovationconsult.co.za` is
+registered and transferred (done, not a to-do). One domain, not two —
+the original plan's separate `electioncampaignos.co.za` is superseded:
+every application/Agentic/Generative-AI product line gets a subdomain of
+`innovationconsult.co.za` instead. The company website (book-a-demo,
+pain-point research reports — the stated primary acquisition instrument)
+goes on GCP or Cloudflare; every application service, Election Campaign
+OS included, goes on Firebase, consistent with the Firestore decision
+above (that decision was about the datastore, not hosting, but the two
+pair naturally and nothing here revisits it). Both sit behind Cloudflare
+DNS/WAF, TLS Full (strict) — explicitly **not** a revival of the
+`infrastructure-blueprint-review.md` proposal to drop Firestore for
+Cloud SQL + Cloud Run + Cloudflare, which stays declined; this is
+Cloudflare in front of the DNS, independent of that question. The actual
+subdomain name for this app (`ecos.innovationconsult.co.za` in the doc)
+is a **proposal**, not a decision — nobody has confirmed it, flagged the
+same way as D1–D7.
+
+Per this session's explicit instruction, the root `index.html` ("Innovation
+ConsultIt - Legal OS," unrelated static scaffold) and the company website
+generally were left untouched — out of scope for this app-build session,
+same as the build spec's own §2 split already said.
+
+**Verified:** `npm install` (`node_modules` had been cleared between
+sessions, same as session 19's note), then `check:all` green —
+**751 tests** (up from 395 at the point this file's log paused; the real
+count moved well past that across sessions 27–30 and this session added
+9 for `taskStatus.ts`) — lint, typecheck, `check:hex`; `npm run build`
+succeeds (same pre-existing `chunks larger than 500 kB` warning noted
+session 5, not addressed — not this session's concern).
+
 ---
 
 ## DECISION — seven roles; Compliance Officer stays (13 Sep 2026)

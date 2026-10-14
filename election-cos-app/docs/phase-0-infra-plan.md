@@ -28,28 +28,92 @@ leaving them to re-derive later.
 
 ## Domain and DNS architecture
 
-| Domain | Purpose | Target |
+**Superseded 14 Oct 2026 — one registered domain, subdomains per
+product, not two domains.** The table directly below this note is the
+original `03-implementation-rollout-plan.md` draft and is kept for
+the record, not deleted — see "What changed" underneath it.
+
+| Domain (original draft — superseded) | Purpose | Target |
 |---|---|---|
 | `innovationconsult.co.za` | Corporate site | GitHub Pages (`ic-corporate`, separate project) |
 | `www.electioncampaignos.co.za` | Product landing (`election-cos-landing`) | Firebase Hosting |
 | `app.electioncampaignos.co.za` | Application (`election-cos-app`, this repo) | Firebase Hosting |
 | `api.electioncampaignos.co.za` | API | Cloud Functions 2nd gen |
 
-Managed through Cloudflare DNS / WAF, TLS mode **Full (strict)**.
+### What changed
+
+The human confirmed directly: **`innovationconsult.co.za` is the one
+registered domain** (transfer already completed — not a to-do item
+anymore, unlike everything else in this file). There is no second
+`electioncampaignos.co.za` domain; Election Campaign OS is one product
+line among several the company will ship, and **every product and
+application service gets a subdomain of `innovationconsult.co.za`**, not
+its own domain. This is a real architecture change, not a renaming — it
+collapses the four-row table above into one registered domain plus a
+subdomain per product/service, confirmed in these words:
+
+- **Company website** — primary customer-acquisition instrument (book a
+  demo, research/analysis reports targeting specific customer pain
+  points) — hosted on **GCP or Cloudflare** (Cloudflare Pages is the
+  likely fit if going that route; GCP would mean Cloud Storage + Cloud
+  CDN or Cloud Run, not Firebase Hosting, since Firebase Hosting is
+  reserved for application services per the decision below). Which of
+  the two is not yet decided — flagged as open, not guessed.
+- **Every application service and Agentic/Generative AI product
+  line** (Election Campaign OS being the first, not the only one) —
+  hosted on **Firebase**, consistent with the `DECISION — Firestore is
+  the database` section in `BUILD-STATUS.md`: that decision is about the
+  datastore, not hosting, but Firebase Hosting + Firestore + Functions in
+  one project is the natural pairing it implies, and nothing today
+  revisits it.
+- **Both** the website and every app service sit behind **Cloudflare**
+  — DNS, WAF, and (per the original draft, still correct) TLS mode
+  **Full (strict)**. This is Cloudflare as a proxy/edge/security layer in
+  front of GCP-or-Cloudflare-hosted-pages and Firebase-hosted apps — it
+  is **not** a revival of the declined `docs/infrastructure-blueprint-
+  review.md` proposal to drop Firestore for Cloud SQL Postgres + Cloud
+  Run + Cloudflare. That proposal was about replacing the datastore and
+  was declined in the Firestore decision above; this is about what sits
+  in front of DNS, which both predates and survives that decision
+  independently. A future session should not read "Cloudflare" in this
+  file as grounds to reopen that closed question.
+
+### Subdomain naming — proposed, not decided
+
+No subdomain name was specified for Election Campaign OS itself; this is
+a **proposal** following the one pattern that's actually confirmed
+(product-line subdomains off the one registered domain), not a decision
+— flag it if any of this is wrong, the same as D1–D7 in `BUILD-STATUS.md`:
+
+| Subdomain (proposed) | Purpose | Target |
+|---|---|---|
+| `innovationconsult.co.za` (apex) + `www` | Company website — book-a-demo, research/analysis reports | GCP or Cloudflare (open) |
+| `ecos.innovationconsult.co.za` | Election Campaign OS application (`election-cos-app`, this repo) | Firebase Hosting, project `election2026-campaignms7-0` |
+| `api-ecos.innovationconsult.co.za` *(or a Hosting rewrite to the same host — see `firebase.json`'s existing `/api/**` rewrite, which already avoids needing a separate API subdomain at all)* | Election Campaign OS API | Cloud Functions 2nd gen, `africa-south1` |
+| `<product>.innovationconsult.co.za` | Each future application/Agentic/Generative-AI product line | Its own Firebase project, same pattern |
+
+All managed through Cloudflare DNS / WAF, TLS mode **Full (strict)**.
 
 `.env.example` and `.firebaserc.example` in this repo are annotated with
-these names — fill them in once the accounts below exist.
+the original `electioncampaignos.co.za` names — those need updating once
+the subdomain above is confirmed, not before; changing them on a proposal
+would plant an unconfirmed name as if it were decided.
 
-## Account register (none provisioned yet)
+## Account register
 
 1. Google Cloud + Firebase — **Blaze plan required** (Cloud Functions 2nd gen
-   won't deploy on Spark). Budget alerts at R500 / R2,000.
+   won't deploy on Spark). Budget alerts at R500 / R2,000. Not yet provisioned.
 2. GitHub Organisation (three repos: `election-cos-app`, `election-cos-landing`,
-   `ic-corporate` — see build spec §2).
-3. Cloudflare.
-4. ZACR domain registrar (`.co.za` TLD).
-5. Sentry — separate project per environment, per build spec §1.
-6. Email provider with SPF, DKIM, DMARC configured.
+   `ic-corporate` — see build spec §2). Not yet provisioned.
+3. Cloudflare — **account exists and holds the domain's DNS**, confirmed
+   14 Oct 2026 (see "What changed" above). Zone/WAF/TLS config against the
+   actual subdomain plan is still a to-do once that plan is confirmed.
+4. **`innovationconsult.co.za` — registered and transferred**, confirmed
+   14 Oct 2026. No longer a to-do; superseded the `-domain registrar`
+   provisioning step this line used to be (a `.co.za` TLD transfer still
+   goes through a ZACR-accredited registrar, but that's done).
+5. Sentry — separate project per environment, per build spec §1. Not yet provisioned.
+6. Email provider with SPF, DKIM, DMARC configured. Not yet provisioned.
 
 ## Compliance & PPFA dependencies
 

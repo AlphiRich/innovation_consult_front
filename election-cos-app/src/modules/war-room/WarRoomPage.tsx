@@ -36,6 +36,7 @@ const QUICK_LINKS = [
   { to: '/wards', label: 'Ward Mapping' },
   { to: '/diary', label: 'Field Diary' },
   { to: '/incidents', label: 'Incidents' },
+  { to: '/tasks', label: 'My Tasks' },
 ] as const;
 
 export function WarRoomPage() {
