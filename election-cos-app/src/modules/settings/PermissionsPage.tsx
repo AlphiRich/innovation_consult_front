@@ -33,6 +33,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { dal } from '@/dal';
 import { useSession } from '@/auth/useSession';
 import { SEED_ROLES } from '@/auth/seedRoles';
+import { BasisNote, Button, Card, DataLine, Field, PageHeader, SectionLabel } from '@/components/ui';
 import { ALL_CAPABILITIES } from '@/auth/allCapabilities';
 import { resolveEffectiveCapabilities } from '@/auth/capabilities';
 import type { StaffProfile, Capability } from '@/auth/types';
@@ -86,13 +87,12 @@ export function PermissionsPage() {
 
   if (!session) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/settings/permissions</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Permissions</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/settings/permissions" title="Permissions" />
         <p className="mt-3 text-body-md font-body text-slate">
           No active session — see BUILD-STATUS.md (no live Firebase project provisioned yet).
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -148,95 +148,100 @@ export function PermissionsPage() {
 
   return (
     <div className="space-y-8 max-w-3xl">
-      <div>
-        <p className="text-label-caps font-display uppercase text-slate">/settings/permissions</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Permissions</h1>
-      </div>
+      <PageHeader slug="/settings/permissions" title="Permissions" />
 
       <div className="space-y-2">
-        <h2 className="text-label-caps font-display uppercase text-slate">Roles (system-defined)</h2>
+        <SectionLabel as="h2">Roles (system-defined)</SectionLabel>
         {SEED_ROLES.map((role) => (
-          <div key={role.id} className="bg-white border border-ink/10 rounded p-3">
+          <Card key={role.id}>
             <p className="text-body-md font-body text-ink font-semibold">
               {role.label} <span className="text-data-mono font-mono text-slate">· {role.geoScope}</span>
             </p>
-            <p className="text-data-mono font-mono text-slate mt-1">{role.defaultCaps.join(', ') || '(none)'}</p>
-          </div>
+            <DataLine className="mt-1">{role.defaultCaps.join(', ') || '(none)'}</DataLine>
+          </Card>
         ))}
       </div>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-label-caps font-display uppercase text-slate">Staff</h2>
-          <button
-            type="button"
-            onClick={() => setAdding((open) => !open)}
-            className="px-3 py-1.5 border border-ink/20 rounded text-label-caps font-display uppercase text-ink"
-          >
+          <SectionLabel as="h2">Staff</SectionLabel>
+          <Button variant="ghost" onClick={() => setAdding((open) => !open)} aria-expanded={adding}>
             {adding ? 'Cancel' : 'Add a person'}
-          </button>
+          </Button>
         </div>
 
         {adding && (
-          <div className="bg-white border border-gold/60 rounded-lg p-4 space-y-3">
-            <p className="text-body-md font-body text-slate">{SIGN_IN_ID_BASIS}</p>
-            {newStaffScope === 'VD' && (
-              <p className="text-body-md font-body text-slate">{SPLIT_VD_BASIS}</p>
-            )}
+          <Card tone="accent" className="space-y-3">
+            <BasisNote>{SIGN_IN_ID_BASIS}</BasisNote>
+            {newStaffScope === 'VD' && <BasisNote>{SPLIT_VD_BASIS}</BasisNote>}
 
-            <label className="space-y-1 block">
-              <span className="text-label-caps font-display uppercase text-slate">Sign-in ID</span>
-              <input
-                className="w-full border border-ink/20 rounded px-2 py-1.5 text-data-mono font-mono"
-                value={newStaff.signInId}
-                onChange={(e) => setNewStaff((d) => ({ ...d, signInId: e.target.value }))}
-              />
-              {problemFor('signInId') && <span className="block text-body-md text-maroon">{problemFor('signInId')}</span>}
-            </label>
+            {/*
+             * The sign-in ID's validation message used to sit INSIDE its
+             * <label>, which made it part of the control's accessible
+             * name: a screen reader read the label and the error as one
+             * run of text, and the name changed as you typed. Field's
+             * `error` goes through aria-describedby instead. Same defect
+             * class as Voters and Field Diary — see this session's
+             * correction in src/components/ui/index.tsx.
+             */}
+            <Field label="Sign-in ID" mono error={problemFor('signInId')}>
+              {(props) => (
+                <input
+                  {...props}
+                  value={newStaff.signInId}
+                  onChange={(e) => setNewStaff((d) => ({ ...d, signInId: e.target.value }))}
+                />
+              )}
+            </Field>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <label className="space-y-1 block">
-                <span className="text-label-caps font-display uppercase text-slate">First name</span>
-                <input
-                  className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body"
-                  value={newStaff.firstName}
-                  onChange={(e) => setNewStaff((d) => ({ ...d, firstName: e.target.value }))}
-                />
-              </label>
-              <label className="space-y-1 block">
-                <span className="text-label-caps font-display uppercase text-slate">Last name</span>
-                <input
-                  className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body"
-                  value={newStaff.lastName}
-                  onChange={(e) => setNewStaff((d) => ({ ...d, lastName: e.target.value }))}
-                />
-              </label>
-              <label className="space-y-1 block">
-                <span className="text-label-caps font-display uppercase text-slate">Contact number</span>
-                <input
-                  className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body"
-                  value={newStaff.phone}
-                  onChange={(e) => setNewStaff((d) => ({ ...d, phone: e.target.value }))}
-                />
-              </label>
+              <Field label="First name">
+                {(props) => (
+                  <input
+                    {...props}
+                    value={newStaff.firstName}
+                    onChange={(e) => setNewStaff((d) => ({ ...d, firstName: e.target.value }))}
+                  />
+                )}
+              </Field>
+              <Field label="Last name">
+                {(props) => (
+                  <input
+                    {...props}
+                    value={newStaff.lastName}
+                    onChange={(e) => setNewStaff((d) => ({ ...d, lastName: e.target.value }))}
+                  />
+                )}
+              </Field>
+              <Field label="Contact number">
+                {(props) => (
+                  <input
+                    {...props}
+                    type="tel"
+                    value={newStaff.phone}
+                    onChange={(e) => setNewStaff((d) => ({ ...d, phone: e.target.value }))}
+                  />
+                )}
+              </Field>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <label className="space-y-1 block">
-                <span className="text-label-caps font-display uppercase text-slate">Role</span>
-                <select
-                  className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body bg-white"
-                  value={newStaff.roleId}
-                  onChange={(e) => setNewStaff((d) => ({ ...d, roleId: e.target.value }))}
-                >
-                  <option value="">Choose a role…</option>
-                  {SEED_ROLES.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <Field label="Role">
+                {(props) => (
+                  <select
+                    {...props}
+                    value={newStaff.roleId}
+                    onChange={(e) => setNewStaff((d) => ({ ...d, roleId: e.target.value }))}
+                  >
+                    <option value="">Choose a role…</option>
+                    {SEED_ROLES.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.label}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </Field>
               {/*
                * Only the scope the chosen role actually uses is offered.
                * The role decides this, not the person filling in the form —
@@ -245,24 +250,26 @@ export function PermissionsPage() {
                * record by inScope(). Both are refused in staffProvisioning.
                */}
               {(newStaffScope === 'WARD' || newStaffScope === 'VD') && (
-                <label className="space-y-1 block">
-                  <span className="text-label-caps font-display uppercase text-slate">Ward code</span>
-                  <input
-                    className="w-full border border-ink/20 rounded px-2 py-1.5 text-data-mono font-mono"
-                    value={newStaff.wardScope}
-                    onChange={(e) => setNewStaff((d) => ({ ...d, wardScope: e.target.value }))}
-                  />
-                </label>
+                <Field label="Ward code" mono>
+                  {(props) => (
+                    <input
+                      {...props}
+                      value={newStaff.wardScope}
+                      onChange={(e) => setNewStaff((d) => ({ ...d, wardScope: e.target.value }))}
+                    />
+                  )}
+                </Field>
               )}
               {newStaffScope === 'VD' && (
-                <label className="space-y-1 block">
-                  <span className="text-label-caps font-display uppercase text-slate">VD code</span>
-                  <input
-                    className="w-full border border-ink/20 rounded px-2 py-1.5 text-data-mono font-mono"
-                    value={newStaff.vdScope}
-                    onChange={(e) => setNewStaff((d) => ({ ...d, vdScope: e.target.value }))}
-                  />
-                </label>
+                <Field label="VD code" mono>
+                  {(props) => (
+                    <input
+                      {...props}
+                      value={newStaff.vdScope}
+                      onChange={(e) => setNewStaff((d) => ({ ...d, vdScope: e.target.value }))}
+                    />
+                  )}
+                </Field>
               )}
             </div>
 
@@ -276,15 +283,14 @@ export function PermissionsPage() {
               </ul>
             )}
 
-            <button
-              type="button"
+            <Button
+              variant="secondary"
               onClick={handleAdd}
               disabled={newStaffProblems.length > 0 || saveMutation.isPending}
-              className="px-4 py-2 bg-ink text-paper rounded text-label-caps font-display uppercase disabled:opacity-40"
             >
-              Add to the team
-            </button>
-          </div>
+              {saveMutation.isPending ? 'Adding…' : 'Add to the team'}
+            </Button>
+          </Card>
         )}
         {staffQuery.isLoading && <p className="text-body-md font-body text-slate">Loading…</p>}
         {staffQuery.isError && (
@@ -297,31 +303,38 @@ export function PermissionsPage() {
         )}
 
         {staff.map((profile) => (
-          <div key={profile.uid} className="bg-white border border-ink/10 rounded-lg p-4 space-y-2">
+          <Card key={profile.uid} className="space-y-2">
             <div className="flex items-start justify-between gap-3">
-              <div>
+              <div className="min-w-0">
                 <p className="text-body-md font-body text-ink font-semibold">
                   {profile.firstName} {profile.lastName}
                 </p>
-                <p className="text-data-mono font-mono text-slate">
+                <DataLine>
                   {roleLabel(profile.roleId)}
                   {profile.wardScope && ` · ${profile.wardScope}`}
                   {profile.vdScope && ` · VD ${profile.vdScope}`}
-                </p>
+                </DataLine>
               </div>
+              {/*
+               * Both controls name the person. "Deactivate" repeated down
+               * a staff list, with nothing to say whose account it ends,
+               * is the most consequential ambiguity on this page — and
+               * the only irreversible action on it.
+               */}
               <div className="flex gap-2">
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
                   onClick={() => startEdit(profile)}
-                  className="px-3 py-1.5 border border-ink/20 rounded text-label-caps font-display uppercase text-ink"
+                  aria-label={`Edit ${profile.firstName} ${profile.lastName}`}
                 >
                   Edit
-                </button>
+                </Button>
                 <button
                   type="button"
                   onClick={() => deactivateMutation.mutate(profile.uid)}
                   disabled={deactivateMutation.isPending}
-                  className="px-3 py-1.5 border border-maroon/40 rounded text-label-caps font-display uppercase text-maroon disabled:opacity-40"
+                  aria-label={`Deactivate ${profile.firstName} ${profile.lastName}`}
+                  className="inline-flex min-h-11 items-center rounded border border-maroon/40 px-3 py-1.5 text-label-caps font-display uppercase text-maroon disabled:opacity-40"
                 >
                   Deactivate
                 </button>
@@ -331,63 +344,75 @@ export function PermissionsPage() {
             {editingUid === profile.uid && (
               <div className="border-t border-ink/10 pt-3 space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <label className="space-y-1 block">
-                    <span className="text-label-caps font-display uppercase text-slate">Role</span>
-                    <select
-                      className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body bg-white"
-                      value={roleId}
-                      onChange={(e) => setRoleId(e.target.value)}
-                    >
-                      {SEED_ROLES.map((r) => (
-                        <option key={r.id} value={r.id}>
-                          {r.label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="space-y-1 block">
-                    <span className="text-label-caps font-display uppercase text-slate">Ward scope</span>
-                    <input
-                      className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body"
-                      value={wardScope}
-                      onChange={(e) => setWardScope(e.target.value)}
-                    />
-                  </label>
-                  <label className="space-y-1 block">
-                    <span className="text-label-caps font-display uppercase text-slate">VD scope</span>
-                    <input
-                      className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body"
-                      value={vdScope}
-                      onChange={(e) => setVdScope(e.target.value)}
-                    />
-                  </label>
+                  <Field label="Role">
+                    {(props) => (
+                      <select {...props} value={roleId} onChange={(e) => setRoleId(e.target.value)}>
+                        {SEED_ROLES.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.label}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </Field>
+                  <Field label="Ward scope" mono>
+                    {(props) => (
+                      <input {...props} value={wardScope} onChange={(e) => setWardScope(e.target.value)} />
+                    )}
+                  </Field>
+                  <Field label="VD scope" mono>
+                    {(props) => (
+                      <input {...props} value={vdScope} onChange={(e) => setVdScope(e.target.value)} />
+                    )}
+                  </Field>
                 </div>
 
+                {/*
+                 * Two <fieldset>s, because the two columns are 52
+                 * checkboxes with the same 26 names in both — "voters.edit"
+                 * appears once under granted and once under revoked, and
+                 * without the grouping a screen reader gives no way to
+                 * tell which column a given checkbox is in. On the screen
+                 * that decides who can do what, that is the difference
+                 * between granting a capability and taking it away.
+                 */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-label-caps font-display uppercase text-slate mb-1">
+                  <fieldset>
+                    <legend className="text-label-caps font-display uppercase text-slate mb-1">
                       Additional capabilities granted
-                    </p>
+                    </legend>
                     <div className="max-h-40 overflow-y-auto space-y-1 border border-ink/10 rounded p-2">
                       {ALL_CAPABILITIES.map((cap) => (
-                        <label key={cap} className="flex items-center gap-2 text-body-md font-body">
-                          <input type="checkbox" checked={granted.includes(cap)} onChange={() => setGranted((g) => toggle(g, cap))} />
+                        <label key={cap} className="flex min-h-11 items-center gap-2 text-body-md font-body">
+                          <input
+                            type="checkbox"
+                            className="h-5 w-5"
+                            checked={granted.includes(cap)}
+                            onChange={() => setGranted((g) => toggle(g, cap))}
+                          />
                           {cap}
                         </label>
                       ))}
                     </div>
-                  </div>
-                  <div>
-                    <p className="text-label-caps font-display uppercase text-slate mb-1">Capabilities revoked</p>
+                  </fieldset>
+                  <fieldset>
+                    <legend className="text-label-caps font-display uppercase text-slate mb-1">
+                      Capabilities revoked
+                    </legend>
                     <div className="max-h-40 overflow-y-auto space-y-1 border border-ink/10 rounded p-2">
                       {ALL_CAPABILITIES.map((cap) => (
-                        <label key={cap} className="flex items-center gap-2 text-body-md font-body">
-                          <input type="checkbox" checked={revoked.includes(cap)} onChange={() => setRevoked((r) => toggle(r, cap))} />
+                        <label key={cap} className="flex min-h-11 items-center gap-2 text-body-md font-body">
+                          <input
+                            type="checkbox"
+                            className="h-5 w-5"
+                            checked={revoked.includes(cap)}
+                            onChange={() => setRevoked((r) => toggle(r, cap))}
+                          />
                           {cap}
                         </label>
                       ))}
                     </div>
-                  </div>
+                  </fieldset>
                 </div>
 
                 {concentrations.length > 0 && (
@@ -403,7 +428,7 @@ export function PermissionsPage() {
                         </li>
                       ))}
                     </ul>
-                    <p className="text-body-md font-body text-slate">{CONCENTRATION_BASIS}</p>
+                    <BasisNote>{CONCENTRATION_BASIS}</BasisNote>
                   </div>
                 )}
 
@@ -422,29 +447,25 @@ export function PermissionsPage() {
                 )}
 
                 {saveMutation.isError && (
-                  <p className="text-body-md text-maroon">Save failed — check you hold team.manage.</p>
+                  <p className="text-body-md font-body text-maroon">Save failed — check you hold team.manage.</p>
                 )}
 
                 <div className="flex gap-3">
-                  <button
-                    type="button"
+                  <Button
+                    variant="secondary"
                     onClick={() => handleSave(profile)}
                     disabled={saveMutation.isPending}
-                    className="px-4 py-2 bg-ink text-paper rounded text-label-caps font-display uppercase disabled:opacity-40"
+                    aria-label={`Save changes to ${profile.firstName} ${profile.lastName}`}
                   >
                     {saveMutation.isPending ? 'Saving…' : 'Save'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setEditingUid(null)}
-                    className="px-4 py-2 border border-ink/20 rounded text-label-caps font-display uppercase text-ink"
-                  >
+                  </Button>
+                  <Button variant="ghost" onClick={() => setEditingUid(null)}>
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}
-          </div>
+          </Card>
         ))}
       </div>
     </div>
