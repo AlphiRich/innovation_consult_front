@@ -53,7 +53,7 @@ only the account holder can supply.
 - **PWA shell** — manifest, service worker that caches the app and never
   the data, update banner, 18 self-hosted woff2 faces.
 - **Design system** — tokens plus the shared primitives in
-  `src/components/ui`, with 20 of 27 pages migrated onto them.
+  `src/components/ui`, with 26 of 27 pages migrated onto them.
   `check-no-hex.mjs` fails the build on a raw hex in product source and
   `check-type-scale.mjs` on an off-token font size; both exist because
   `tailwind.config.js` extends its theme rather than replacing it, so
@@ -125,19 +125,27 @@ Not a backlog. Each of these is a decision.
 4. **Results history and code history for the other eight provinces.**
    NW is complete; `provinceReviewStatus()` reports the gap honestly and
    `unreviewedProvinces()` lists it.
-5. **Migrate the remaining 7 page components onto the UI primitives.**
-   20 of 27 are done (session 44). What is left, and they are the
-   largest: Candidates, the incident report, Data Subject Requests,
-   Municipality Config, PPFA Thresholds, Permissions, Bulk Import.
+5. **Migrate the last page component onto the UI primitives.**
+   26 of 27 are done (session 44). What is left is `PermissionsPage`,
+   the largest file in the build at 452 lines.
 
-   **Do it by hand, not by `sed`.** The first twenty turned up 9
-   unlabelled form controls, 3 selection states that existed only in
-   colour, ~125 buttons with no distinguishing accessible name, 3
-   headings that a naive substitution would have demoted to paragraphs,
-   2 tables with proportional figures in numeric columns, a duplicate
-   copy of `StatTile`, a real shared-mutation defect in Logistics, and
-   the type-scale drift `check-type-scale.mjs` now guards. None of it was
-   visible in a test run.
+   **Do it by hand, not by `sed`.** The first twenty-six turned up ~125
+   buttons with no distinguishing accessible name, 5 files off the type
+   scale, 3 selection states that existed only in colour, 3 checkbox
+   groups with no `fieldset`/`legend`, 3 headings a naive substitution
+   would have demoted to paragraphs, 2 tables with proportional figures
+   in numeric columns, 2 duplicate copies of `StatTile`, 2 genuinely
+   unlabelled controls, 2 accessible names polluted by hint text, and a
+   real shared-mutation defect in Logistics. None of it was visible in a
+   test run.
+
+   One finding is a correction rather than a defect, and it is the most
+   useful of the lot: the claim that these pages had "unlabelled inputs"
+   was **wrong**. A control nested inside its `<label>` is implicitly
+   associated. That claim had sat in `src/components/ui/index.tsx` since
+   session 38 and was repeated instead of checked. See changelog entry
+   44.2. **An existing comment asserting a defect is not evidence of the
+   defect.**
 
    Also: reach for a **prop**, not `className`, when a primitive does
    not offer what a call site wants. Appending `text-ink`,

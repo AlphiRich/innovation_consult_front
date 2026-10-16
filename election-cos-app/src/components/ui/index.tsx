@@ -33,8 +33,32 @@
  *  - Focus. Every interactive primitive keeps the gold focus ring from
  *    `index.css` rather than suppressing it.
  *  - Labels. `Field` ties its label to its control with a generated id,
- *    so a screen reader announces it — several hand-rolled forms wrapped
- *    the input in a bare `<label>` with no association at all.
+ *    and keeps hint and error text OUT of the label, wired through
+ *    `aria-describedby` instead.
+ *
+ * CORRECTION, SESSION 44
+ *
+ * This header used to claim the hand-rolled forms wrapped their inputs in
+ * "a bare `<label>` with no association at all", and session 44's
+ * migration repeated that claim in several commit messages. **It was
+ * wrong.** A control nested inside its `<label>` is implicitly associated
+ * — that is in the HTML spec, and screen readers honour it. Those fields
+ * were labelled.
+ *
+ * What was actually wrong, in two narrower places:
+ *
+ *  - On Voters and Field Diary the hint paragraph sat INSIDE the label, so
+ *    the accessible name became "Voting district No VD in your session
+ *    scope — enter one manually. A ward/VD picker (§6.1) isn't built
+ *    yet." Name pollution, not a missing name.
+ *  - Two controls genuinely had no label: Bulk Import's file input (none
+ *    at all) and Data Subject Requests' rejection-reason input (a
+ *    placeholder, which is not a label and disappears on the first
+ *    keystroke).
+ *
+ * Everything else `Field` improved on those pages is real but smaller:
+ * the 44px minimum target several `py-1.5` controls missed, consistent
+ * `aria-describedby` wiring, and one spelling instead of sixteen.
  */
 import { useId, type ReactNode } from 'react';
 
@@ -196,9 +220,12 @@ const CONTROL_TYPE_MONO = 'text-data-mono font-mono';
 /**
  * A labelled control.
  *
- * `children` is called with the id so the label is genuinely associated —
- * several hand-rolled forms wrapped the control in a bare `<label>` and a
- * screen reader announced nothing.
+ * `children` is called with the id, so the association is explicit rather
+ * than relying on nesting. The substantive difference from a hand-rolled
+ * `<label>` wrapper is not the association — nesting associates fine, see
+ * the correction in this file's header — but that hint and error text go
+ * through `aria-describedby` instead of landing inside the label and
+ * becoming part of the control's name.
  *
  * `mono` is for controls holding a code rather than prose — a ward code, a
  * VD number. It is a prop rather than something the caller appends to the

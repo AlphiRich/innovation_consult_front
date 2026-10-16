@@ -1955,17 +1955,43 @@ caller is the only one who knows which. This is the first change the
 primitives themselves have needed since they were built, and it came from
 using them rather than from reviewing them.
 
-### Entry 44.2 — Two of the most-used pages had unlabelled inputs
+### Entry 44.2 — The labelling claim was wrong, and here is what was true
 
-**Fixed.** Voters and Field Diary both wrapped their voting-district input
-in a bare `<label>` with no `htmlFor` and no `id`. A screen reader
-announced an unlabelled text field — on the two screens a canvasser spends
-the day in. `Field` generates the id and ties them together, and its
-control carries the 44px minimum height the hand-rolled inputs did not.
+**Corrected mid-session.** Entry 44.2 originally said Voters and Field
+Diary "wrapped their voting-district input in a bare `<label>` with no
+association" and that "a screen reader announced an unlabelled text
+field". That is **not correct**, and six commit messages in this session
+repeat it. A control nested inside its `<label>` is implicitly associated
+— HTML spec, honoured by screen readers. Those fields were labelled.
 
-The `Field` primitive was built in session 38 *for* this defect, with a
-header comment saying several hand-rolled forms had it. Writing that down
-did not fix them. Migrating did.
+The claim did not start here: `src/components/ui/index.tsx` has carried it
+since session 38, in the header justifying `Field`. It was taken at face
+value instead of checked, and then amplified into a tally. The code
+changes stand on their own merits; the reasoning attached to them did not.
+
+**What was actually wrong**, having gone back and read the originals:
+
+| Real defect | Where | Count |
+|---|---|---|
+| Hint text inside the `<label>`, so it became part of the control's accessible name | Voters, Field Diary | 2 |
+| No label at all | Bulk Import's file input | 1 |
+| A placeholder standing in for a label — not a label, and gone on the first keystroke | Data Subject Requests' rejection reason | 1 |
+| Checkbox groups with no `fieldset`/`legend`, so twelve related checkboxes read as twelve unrelated ones | Incident report | 3 groups |
+
+On Voters, the polluted name was literally *"Voting district No VD in your
+session scope — enter one manually. A ward/VD picker (§6.1) isn't built
+yet."*
+
+The other ~23 controls were correctly labelled already. What `Field` gave
+them is real but smaller, and should have been described as such from the
+start: the 44px minimum target several `py-1.5` controls missed, hint and
+error text wired through `aria-describedby` rather than nested in the
+label, and one spelling instead of sixteen.
+
+**The lesson is the project's own rule, broken by me.** An existing comment
+asserting a defect is not evidence of the defect. The discipline skill
+already says to prove a guard fails before trusting it; the same applies
+to a claim in a file header. Read the original, then describe it.
 
 ### Entry 44.3 — Three selection states that existed only in colour
 
@@ -2076,24 +2102,30 @@ tally is the argument against doing the remaining seven by `sed`:
 
 | Found | Count | Where |
 |---|---|---|
-| Unlabelled form controls (bare `<label>`, no `htmlFor`) | **9** | Voters, Field Diary, Threshold Analyzer, Audit Log, Round, Vote Calculator ×4 |
+| Buttons with no distinguishing accessible name | **~125** | Ward Detail's per-row Edit, Round's 25 doors × 4 outcomes, DSR, Candidates |
+| Off-token type scale | **5 files** | now guarded by `check-type-scale.mjs` |
 | Selection states that existed only in colour | **3** | Incidents filter, Voters view switch, Finance donor list |
-| Buttons with no distinguishing accessible name | **~125** | Ward Detail's per-row Edit, Round's 25 doors × 4 outcomes |
-| Headings that would have become paragraphs | **3** | War Room panels |
+| Checkbox groups with no `fieldset`/`legend` | **3** | Incident report's filter panel |
+| Headings that a naive substitution would have demoted to paragraphs | **3** | War Room panels |
 | Hand-rolled tables with proportional figures in numeric columns | **2** | Threshold Analyzer, Vote Calculator |
-| Duplicate copies of a primitive | **1** | Round's local `Stat` |
+| Duplicate copies of `StatTile` | **2** | Round, Bulk Import |
+| Genuinely unlabelled or placeholder-labelled controls | **2** | Bulk Import's file input, DSR's rejection reason |
+| Accessible names polluted by hint text inside the label | **2** | Voters, Field Diary |
 | Real behavioural defects | **1** | Logistics' shared-mutation Approve label |
-| Off-token type scale | **5 files** | now guarded |
+| Controls below the 44px target | **many** | every `py-1.5` and `py-2` control |
 
-Not one of these was visible in a test run, and every test passed
-throughout.
+This table replaces an earlier version of itself that claimed nine
+unlabelled form controls. See entry 44.2 — that count was wrong, and the
+correction is the more useful finding of the two.
+
+Not one of the items above was visible in a test run, and every test
+passed throughout.
 
 ### Still open after this session
 
-- **Seven page components** remain on the raw strings: Candidates, the
-  incident report, Data Subject Requests, Municipality Config, PPFA
-  Thresholds, Permissions, Bulk Import. They are the largest ones, and
-  on the evidence above they should be read, not scripted.
+- **One page component** remains on the raw strings: `PermissionsPage`,
+  the largest in the build at 452 lines. Read it rather than scripting
+  it.
 - Everything in `docs/session-handoff.md` under "blocked" and
   "deliberately unbuilt" is unchanged. **Deployment still waits on the
   account holder's two values.**

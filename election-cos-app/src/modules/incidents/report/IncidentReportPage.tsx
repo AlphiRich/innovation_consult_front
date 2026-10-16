@@ -29,6 +29,7 @@ import {
   PHOTO_BASIS,
   REPORT_BASIS,
 } from './incidentReport';
+import { BasisNote, Button, Card, Field, PageHeader, SectionLabel, StatTile } from '@/components/ui';
 
 const CATEGORIES = Object.keys(CATEGORY_LABEL) as IncidentCategory[];
 
@@ -92,13 +93,12 @@ export function IncidentReportPage() {
 
   if (!session) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/incidents/report</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Municipal incident report</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/incidents/report" title="Municipal incident report" />
         <p className="mt-3 text-body-md font-body text-slate">
           No active session — see BUILD-STATUS.md (no live Firebase project provisioned yet).
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -121,121 +121,110 @@ export function IncidentReportPage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div>
-        <p className="text-label-caps font-display uppercase text-slate">/incidents/report</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Municipal incident report</h1>
-        <p className="text-body-md font-body text-slate mt-2">{REPORT_BASIS}</p>
-      </div>
+      <PageHeader slug="/incidents/report" title="Municipal incident report" description={REPORT_BASIS} />
 
       <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
         {/* Filters */}
-        <div className="space-y-5 bg-white border border-ink/10 rounded-lg p-4">
-          <div className="space-y-2">
-            <p className="text-label-caps font-display uppercase text-slate">Period</p>
-            <label className="block space-y-1">
-              <span className="text-body-md font-body text-slate">From</span>
-              <input
-                type="date"
-                className="w-full border border-ink/20 rounded px-2 py-1.5 text-data-mono font-mono"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-              />
-            </label>
-            <label className="block space-y-1">
-              <span className="text-body-md font-body text-slate">To</span>
-              <input
-                type="date"
-                className="w-full border border-ink/20 rounded px-2 py-1.5 text-data-mono font-mono"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-              />
-            </label>
-            {rangeInvalid && (
-              <p className="text-body-md font-body text-maroon">The start date is after the end date.</p>
-            )}
-          </div>
+        {/*
+         * The three checkbox groups are <fieldset>/<legend> rather than a
+         * <p> above a run of checkboxes. The checkboxes themselves were
+         * always labelled — each sits inside its own <label> — but
+         * nothing tied them together, so a screen reader read twelve
+         * unrelated checkboxes instead of "Categories, group, 1 of 5".
+         * On a filter panel that decides what a report contains, the
+         * grouping is the meaning.
+         */}
+        <Card className="space-y-5">
+          <fieldset className="space-y-2">
+            <legend className="text-label-caps font-display uppercase text-slate">Period</legend>
+            <Field label="From" mono>
+              {(props) => (
+                <input {...props} type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+              )}
+            </Field>
+            <Field label="To" mono error={rangeInvalid ? 'The start date is after the end date.' : undefined}>
+              {(props) => <input {...props} type="date" value={to} onChange={(e) => setTo(e.target.value)} />}
+            </Field>
+          </fieldset>
 
-          <div className="space-y-2">
-            <p className="text-label-caps font-display uppercase text-slate">Categories</p>
+          <fieldset className="space-y-2">
+            <legend className="text-label-caps font-display uppercase text-slate">Categories</legend>
             {CATEGORIES.map((category) => (
-              <label key={category} className="flex items-center gap-2 text-body-md font-body">
+              <label key={category} className="flex min-h-11 items-center gap-2 text-body-md font-body">
                 <input
                   type="checkbox"
+                  className="h-5 w-5"
                   checked={categories.includes(category)}
                   onChange={() => setCategories((c) => toggle(c, category))}
                 />
                 {CATEGORY_LABEL[category]}
               </label>
             ))}
-          </div>
+          </fieldset>
 
-          <div className="space-y-2">
-            <p className="text-label-caps font-display uppercase text-slate">Severity</p>
+          <fieldset className="space-y-2">
+            <legend className="text-label-caps font-display uppercase text-slate">Severity</legend>
             {SEVERITY_ORDER.map((severity) => (
-              <label key={severity} className="flex items-center gap-2 text-body-md font-body">
+              <label key={severity} className="flex min-h-11 items-center gap-2 text-body-md font-body">
                 <input
                   type="checkbox"
+                  className="h-5 w-5"
                   checked={severities.includes(severity)}
                   onChange={() => setSeverities((s) => toggle(s, severity))}
                 />
                 {SEVERITY_META[severity].label}
               </label>
             ))}
-          </div>
+          </fieldset>
 
-          <div className="space-y-2">
-            <p className="text-label-caps font-display uppercase text-slate">Wards</p>
+          <fieldset className="space-y-2">
+            <legend className="text-label-caps font-display uppercase text-slate">Wards</legend>
             {wardsInRange.length === 0 && (
               <p className="text-body-md font-body text-slate">No wards in this period yet.</p>
             )}
             {wardsInRange.map((ward) => (
-              <label key={ward} className="flex items-center gap-2 text-data-mono font-mono">
+              <label key={ward} className="flex min-h-11 items-center gap-2 text-data-mono font-mono">
                 <input
                   type="checkbox"
+                  className="h-5 w-5"
                   checked={wardCodes.length === 0 || wardCodes.includes(ward)}
                   onChange={() => setWardCodes((w) => toggle(w.length === 0 ? wardsInRange : w, ward))}
                 />
                 {ward}
               </label>
             ))}
-            <p className="text-body-md font-body text-slate">
+            <BasisNote>
               Only wards you may read appear here, and only those with something logged in this period.
-            </p>
-          </div>
-        </div>
+            </BasisNote>
+          </fieldset>
+        </Card>
 
         {/* Summary and actions */}
         <div className="space-y-4">
           {incidentsQuery.isLoading && <p className="text-body-md font-body text-slate">Loading…</p>}
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-white border border-ink/10 rounded p-3">
-              <p className="text-label-caps font-display uppercase text-slate">In this report</p>
-              <p className="text-headline-md font-display text-ink">{report.summary.total}</p>
-            </div>
-            <div className="bg-white border border-ink/10 rounded p-3">
+            <StatTile label="In this report" value={report.summary.total} />
+            {/* Hand-rolled: the open count is maroon, which StatTile has
+                no state for. Same call as the Vote Calculator's tied-seats
+                tile. */}
+            <div className="rounded border border-ink/10 bg-white p-4">
               <p className="text-label-caps font-display uppercase text-slate">Still open</p>
-              <p className="text-headline-md font-display text-maroon">{report.summary.open}</p>
+              <p className="text-display-lg-mobile font-display text-maroon">{report.summary.open}</p>
             </div>
-            <div className="bg-white border border-ink/10 rounded p-3">
-              <p className="text-label-caps font-display uppercase text-slate">Wards affected</p>
-              <p className="text-headline-md font-display text-ink">{report.summary.wardsAffected.length}</p>
-            </div>
-            <div className="bg-white border border-ink/10 rounded p-3">
-              <p className="text-label-caps font-display uppercase text-slate">With photographs</p>
-              <p className="text-headline-md font-display text-ink">{report.summary.withPhotos}</p>
-            </div>
+            <StatTile label="Wards affected" value={report.summary.wardsAffected.length} />
+            <StatTile label="With photographs" value={report.summary.withPhotos} />
           </div>
 
-          <div className="bg-white border border-ink/10 rounded-lg p-4 space-y-2">
-            <p className="text-label-caps font-display uppercase text-slate">By category</p>
+          <Card className="space-y-2">
+            <SectionLabel as="h2">By category</SectionLabel>
             {CATEGORIES.map((category) => (
               <p key={category} className="text-body-md font-body text-ink">
                 {CATEGORY_LABEL[category]}{' '}
                 <span className="text-data-mono font-mono text-slate">{report.summary.byCategory[category]}</span>
               </p>
             ))}
-          </div>
+          </Card>
 
           {!profile && (
             <p className="text-body-md font-body text-maroon border-l-4 border-maroon bg-white p-3">
@@ -244,23 +233,22 @@ export function IncidentReportPage() {
             </p>
           )}
 
-          <p className="text-body-md font-body text-slate">{COMPLETENESS_BASIS}</p>
-          <p className="text-body-md font-body text-slate">{PHOTO_BASIS}</p>
+          <BasisNote>{COMPLETENESS_BASIS}</BasisNote>
+          <BasisNote>{PHOTO_BASIS}</BasisNote>
 
-          <div className="flex gap-3 flex-wrap">
-            <button
-              type="button"
+          <div className="flex flex-wrap gap-3">
+            <Button
+              variant="secondary"
               disabled={rangeInvalid || incidentsQuery.isLoading}
               onClick={() => {
                 const doc = buildDocument();
                 download(renderDocumentPdf(doc), `${documentFileStem(doc)}.pdf`, 'application/pdf');
               }}
-              className="bg-ink text-paper rounded px-4 py-2.5 text-label-caps font-display uppercase disabled:opacity-40"
             >
               Download PDF
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant="ghost"
               disabled={rangeInvalid || incidentsQuery.isLoading}
               onClick={() => {
                 const doc = buildDocument();
@@ -270,16 +258,15 @@ export function IncidentReportPage() {
                   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                 );
               }}
-              className="border border-ink/20 text-ink rounded px-4 py-2.5 text-label-caps font-display uppercase disabled:opacity-40"
             >
               Download Word
-            </button>
+            </Button>
           </div>
 
-          <p className="text-body-md font-body text-slate">
+          <BasisNote>
             Downloading sends nothing. A fault that needs formally referring is referred one at a time, from
             the incident itself, as an addressed and signed document.
-          </p>
+          </BasisNote>
         </div>
       </div>
     </div>
