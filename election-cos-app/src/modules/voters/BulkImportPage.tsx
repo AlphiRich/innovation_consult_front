@@ -33,6 +33,7 @@ import {
   type ConsentDeclaration,
   type ImportPlan,
 } from './bulkImport';
+import { BasisNote, Button, Card, DataLine, Field, PageHeader, SectionLabel, StatTile } from '@/components/ui';
 
 const METHOD_LABEL: Record<BulkConsentMethod, string> = {
   WRITTEN: 'Written — signed membership or consent forms',
@@ -80,13 +81,12 @@ export function BulkImportPage() {
 
   if (!session) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/voters/import</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Import a register</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/voters/import" title="Import a register" />
         <p className="mt-3 text-body-md font-body text-slate">
           No active session — see BUILD-STATUS.md (no live Firebase project provisioned yet).
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -126,95 +126,110 @@ export function BulkImportPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div>
-        <p className="text-label-caps font-display uppercase text-slate">/voters/import</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Import a register</h1>
-      </div>
+      <PageHeader slug="/voters/import" title="Import a register" />
 
-      <section className="bg-white border border-ink/10 rounded-lg p-4 space-y-3">
-        <h2 className="text-label-caps font-display uppercase text-slate">Consent declaration</h2>
-        <p className="text-body-md font-body text-slate">
+      {/*
+       * Five bare <label> wrappers before this, none of them associated —
+       * on the one screen in the product that takes a POPIA consent
+       * declaration. A form whose fields a screen reader cannot name is
+       * not a form somebody can be held to.
+       */}
+      <Card className="space-y-3">
+        <SectionLabel as="h2">Consent declaration</SectionLabel>
+        <BasisNote>
           Every person on this list needs a lawful basis that could be produced if it were ever questioned. A
           spreadsheet has no doorstep and no canvasser, so this declaration is the evidence.
-        </p>
+        </BasisNote>
 
-        <label className="space-y-1 block">
-          <span className="text-label-caps font-display uppercase text-slate">How they consented</span>
-          <select
-            className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body bg-white"
-            value={method}
-            onChange={(e) => setMethod(e.target.value as BulkConsentMethod)}
-          >
-            {(Object.keys(METHOD_LABEL) as BulkConsentMethod[]).map((key) => (
-              <option key={key} value={key}>
-                {METHOD_LABEL[key]}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Field label="How they consented">
+          {(props) => (
+            <select {...props} value={method} onChange={(e) => setMethod(e.target.value as BulkConsentMethod)}>
+              {(Object.keys(METHOD_LABEL) as BulkConsentMethod[]).map((key) => (
+                <option key={key} value={key}>
+                  {METHOD_LABEL[key]}
+                </option>
+              ))}
+            </select>
+          )}
+        </Field>
 
         <div className="grid grid-cols-2 gap-3">
-          <label className="space-y-1 block">
-            <span className="text-label-caps font-display uppercase text-slate">When</span>
-            <input
-              type="date"
-              className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body"
-              value={declaredAt}
-              onChange={(e) => setDeclaredAt(e.target.value)}
-            />
-          </label>
-          <label className="space-y-1 block">
-            <span className="text-label-caps font-display uppercase text-slate">Default voting district</span>
-            <input
-              className="w-full border border-ink/20 rounded px-2 py-1.5 text-data-mono font-mono"
-              placeholder="used for rows with no VD column"
-              value={defaultVdCode}
-              onChange={(e) => setDefaultVdCode(e.target.value)}
-            />
-          </label>
+          <Field label="When">
+            {(props) => (
+              <input
+                {...props}
+                type="date"
+                value={declaredAt}
+                onChange={(e) => setDeclaredAt(e.target.value)}
+              />
+            )}
+          </Field>
+          <Field
+            label="Default voting district"
+            mono
+            hint="Used for rows with no VD column."
+          >
+            {(props) => (
+              <input {...props} value={defaultVdCode} onChange={(e) => setDefaultVdCode(e.target.value)} />
+            )}
+          </Field>
         </div>
 
-        <label className="space-y-1 block">
-          <span className="text-label-caps font-display uppercase text-slate">Where that consent is recorded</span>
-          <input
-            className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body"
-            placeholder="Membership forms 001–112, Ikageng drive, 2 March 2026"
-            value={reference}
-            onChange={(e) => setReference(e.target.value)}
-          />
-        </label>
+        <Field label="Where that consent is recorded">
+          {(props) => (
+            <input
+              {...props}
+              placeholder="Membership forms 001–112, Ikageng drive, 2 March 2026"
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+            />
+          )}
+        </Field>
 
         {consentProblem && <p className="text-body-md font-body text-maroon">{consentProblem}</p>}
-      </section>
+      </Card>
 
-      <section className="bg-white border border-ink/10 rounded-lg p-4 space-y-3">
-        <h2 className="text-label-caps font-display uppercase text-slate">The file</h2>
+      <Card className="space-y-3">
+        <SectionLabel as="h2">The file</SectionLabel>
         {votingDistricts.length === 0 && (
           <p className="text-body-md font-body text-maroon">
             No voting districts are loaded for this tenant yet, so there is nowhere to put anybody. Seed the wards
             and voting districts from the demarcation notice first.
           </p>
         )}
-        <input
-          type="file"
-          accept=".csv,text/csv"
-          disabled={Boolean(consentProblem) || votingDistricts.length === 0}
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) void handleFile(file);
-          }}
-          className="text-body-md font-body"
-        />
-        {fileName && <p className="text-data-mono font-mono text-slate">{fileName}</p>}
-      </section>
+        {/*
+         * The file input had no label of any kind — a screen reader
+         * announced "file upload button" and nothing else, on the control
+         * that loads a membership register. Field's id is used and its
+         * control classes are not: a bordered, padded box around the
+         * browser's own file widget is not an improvement.
+         */}
+        <Field label="Register file (CSV)">
+          {({ id, 'aria-describedby': describedBy }) => (
+            <input
+              id={id}
+              aria-describedby={describedBy}
+              type="file"
+              accept=".csv,text/csv"
+              disabled={Boolean(consentProblem) || votingDistricts.length === 0}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) void handleFile(file);
+              }}
+              className="text-body-md font-body"
+            />
+          )}
+        </Field>
+        {fileName && <DataLine>{fileName}</DataLine>}
+      </Card>
 
       {committed !== null && (
         <p className="text-body-md font-body text-green">{committed} record(s) imported.</p>
       )}
 
       {plan && (
-        <section className="bg-white border border-gold/60 rounded-lg p-4 space-y-3">
-          <h2 className="text-label-caps font-display uppercase text-slate">The plan — nothing has been written</h2>
+        <Card tone="accent" className="space-y-3">
+          <SectionLabel as="h2">The plan — nothing has been written</SectionLabel>
 
           {plan.fileErrors.map((error) => (
             <p key={error} className="text-body-md font-body text-maroon">
@@ -223,10 +238,10 @@ export function BulkImportPage() {
           ))}
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <Stat label="Rows read" value={plan.totalRows} />
-            <Stat label="Ready" value={plan.ready.length} />
-            <Stat label="Rejected" value={plan.rejected.length} />
-            <Stat label="New doors" value={plan.households.length} />
+            <StatTile label="Rows read" value={plan.totalRows} />
+            <StatTile label="Ready" value={plan.ready.length} />
+            <StatTile label="Rejected" value={plan.rejected.length} />
+            <StatTile label="New doors" value={plan.households.length} />
           </div>
 
           {plan.withoutAddress > 0 && (
@@ -252,25 +267,15 @@ export function BulkImportPage() {
             </p>
           )}
 
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             disabled={plan.ready.length === 0 || commitMutation.isPending}
             onClick={() => commitMutation.mutate(plan)}
-            className="px-4 py-2 bg-ink text-paper rounded text-label-caps font-display uppercase disabled:opacity-40"
           >
-            Import {plan.ready.length} record(s)
-          </button>
-        </section>
+            {commitMutation.isPending ? 'Importing…' : `Import ${plan.ready.length} record(s)`}
+          </Button>
+        </Card>
       )}
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="border border-ink/10 rounded p-3">
-      <p className="text-label-caps font-display uppercase text-slate">{label}</p>
-      <p className="text-headline-md font-display text-ink">{value}</p>
     </div>
   );
 }

@@ -21,6 +21,7 @@ import {
   ERASURE_CAPABILITY_BASIS,
   erasurePosition,
 } from './dataSubjectErasure';
+import { BasisNote, Button, Card, DataLine, Field, PageHeader, Pill } from '@/components/ui';
 
 const SUBJECT_TYPE_LABEL: Record<DataSubjectType, string> = {
   VOTER: 'Voter',
@@ -83,13 +84,12 @@ export function DataSubjectRequestsPage() {
 
   if (!session) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/settings/data-requests</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Data Subject Requests</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/settings/data-requests" title="Data Subject Requests" />
         <p className="mt-3 text-body-md font-body text-slate">
           No active session — see BUILD-STATUS.md (no live Firebase project provisioned yet).
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -111,95 +111,93 @@ export function DataSubjectRequestsPage() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-label-caps font-display uppercase text-slate">/settings/data-requests</p>
-          <h1 className="text-headline-md font-display text-ink mt-1">Data Subject Requests</h1>
-          <p className="text-body-md font-body text-slate mt-1">
-            POPIA Condition 8. {RESPONSE_TARGET_BASIS}
-          </p>
-          <p className="text-body-md font-body text-slate mt-1">{ERASURE_CAPABILITY_BASIS}</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setShowForm(true)}
-          className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase whitespace-nowrap"
-        >
-          + Log request
-        </button>
-      </div>
+      <PageHeader
+        slug="/settings/data-requests"
+        title="Data Subject Requests"
+        description={`POPIA Condition 8. ${RESPONSE_TARGET_BASIS}`}
+        action={
+          <Button onClick={() => setShowForm(true)} className="whitespace-nowrap">
+            + Log request
+          </Button>
+        }
+      />
+      <BasisNote>{ERASURE_CAPABILITY_BASIS}</BasisNote>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="space-y-4 border border-gold/40 bg-white p-4 rounded">
-          <div className="grid grid-cols-2 gap-3">
-            <label className="space-y-1 block">
-              <span className="text-label-caps font-display uppercase text-slate">Subject type</span>
-              <select
-                className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
-                value={subjectType}
-                onChange={(e) => setSubjectType(e.target.value as DataSubjectType)}
+        <form onSubmit={handleSubmit}>
+          {/* Four bare <label> wrappers before this, none associated —
+              on the form that records a POPIA request. */}
+          <Card tone="accent" className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Subject type">
+                {(props) => (
+                  <select
+                    {...props}
+                    value={subjectType}
+                    onChange={(e) => setSubjectType(e.target.value as DataSubjectType)}
+                  >
+                    {(Object.keys(SUBJECT_TYPE_LABEL) as DataSubjectType[]).map((t) => (
+                      <option key={t} value={t}>
+                        {SUBJECT_TYPE_LABEL[t]}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </Field>
+              <Field label="Request type">
+                {(props) => (
+                  <select
+                    {...props}
+                    value={requestType}
+                    onChange={(e) => setRequestType(e.target.value as DataSubjectRequestType)}
+                  >
+                    {(Object.keys(REQUEST_TYPE_LABEL) as DataSubjectRequestType[]).map((t) => (
+                      <option key={t} value={t}>
+                        {REQUEST_TYPE_LABEL[t]}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </Field>
+            </div>
+
+            <Field label="Requester name" required>
+              {(props) => (
+                <input
+                  {...props}
+                  value={requesterName}
+                  onChange={(e) => setRequesterName(e.target.value)}
+                  required
+                />
+              )}
+            </Field>
+            <Field label="How they reached out" required hint="Phone, email, or in person.">
+              {(props) => (
+                <input
+                  {...props}
+                  value={requesterContact}
+                  onChange={(e) => setRequesterContact(e.target.value)}
+                  required
+                />
+              )}
+            </Field>
+
+            {logMutation.isError && <p className="text-body-md font-body text-maroon">Save failed.</p>}
+
+            <div className="flex gap-3">
+              <Button
+                type="submit"
+                variant="secondary"
+                disabled={!canSubmit || logMutation.isPending}
+                className="flex-1"
               >
-                {(Object.keys(SUBJECT_TYPE_LABEL) as DataSubjectType[]).map((t) => (
-                  <option key={t} value={t}>
-                    {SUBJECT_TYPE_LABEL[t]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="space-y-1 block">
-              <span className="text-label-caps font-display uppercase text-slate">Request type</span>
-              <select
-                className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
-                value={requestType}
-                onChange={(e) => setRequestType(e.target.value as DataSubjectRequestType)}
-              >
-                {(Object.keys(REQUEST_TYPE_LABEL) as DataSubjectRequestType[]).map((t) => (
-                  <option key={t} value={t}>
-                    {REQUEST_TYPE_LABEL[t]}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <label className="space-y-1 block">
-            <span className="text-label-caps font-display uppercase text-slate">Requester name</span>
-            <input
-              className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-              value={requesterName}
-              onChange={(e) => setRequesterName(e.target.value)}
-              required
-            />
-          </label>
-          <label className="space-y-1 block">
-            <span className="text-label-caps font-display uppercase text-slate">How they reached out</span>
-            <input
-              className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-              value={requesterContact}
-              onChange={(e) => setRequesterContact(e.target.value)}
-              placeholder="Phone, email, or in-person"
-              required
-            />
-          </label>
-
-          {logMutation.isError && <p className="text-body-md text-maroon">Save failed.</p>}
-
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              disabled={!canSubmit || logMutation.isPending}
-              className="flex-1 bg-ink text-paper rounded py-2.5 text-label-caps font-display uppercase disabled:opacity-40"
-            >
-              {logMutation.isPending ? 'Logging…' : 'Log request'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowForm(false)}
-              className="px-4 py-2.5 border border-ink/20 rounded text-label-caps font-display uppercase text-ink"
-            >
-              Cancel
-            </button>
-          </div>
+                {logMutation.isPending ? 'Logging…' : 'Log request'}
+              </Button>
+              <Button variant="ghost" onClick={() => setShowForm(false)}>
+                Cancel
+              </Button>
+            </div>
+          </Card>
         </form>
       )}
 
@@ -219,22 +217,18 @@ export function DataSubjectRequestsPage() {
           const fulfilBlocked = blocksFulfilment(req.subjectType, req.requestType);
           const erasure = req.requestType === 'DELETION' ? erasurePosition(req.subjectType) : null;
           return (
-            <div key={req.id} className="bg-white border border-ink/10 rounded-lg p-4 space-y-2">
+            <Card key={req.id} className="space-y-2">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-body-md font-body text-ink font-semibold">
                     {REQUEST_TYPE_LABEL[req.requestType]} — {SUBJECT_TYPE_LABEL[req.subjectType]}
                   </p>
-                  <p className="text-data-mono font-mono text-slate">
+                  <DataLine>
                     {req.requesterName} · {req.requesterContact} · received{' '}
                     {new Date(req.receivedAt).toLocaleDateString('en-ZA')}
-                  </p>
+                  </DataLine>
                 </div>
-                {overdue && (
-                  <span className="px-2 py-1 rounded bg-maroon/10 text-maroon text-label-caps font-display uppercase">
-                    Overdue
-                  </span>
-                )}
+                {overdue && <Pill className="bg-maroon/10 text-maroon">Overdue</Pill>}
               </div>
 
               {erasure && (
@@ -244,53 +238,79 @@ export function DataSubjectRequestsPage() {
               )}
 
               <div className="flex items-center gap-2 flex-wrap">
+                {/*
+                 * Every control below says which request it acts on in its
+                 * accessible name. A list of open requests otherwise
+                 * presents as a run of identical "Start", "Mark
+                 * fulfilled" and "Reject" buttons, which is the worst
+                 * possible ambiguity on a screen where the actions write
+                 * a compliance record.
+                 */}
                 {req.requestType === 'ACCESS' && (
+                  /* Hand-rolled: a gold outline, where Button's ghost
+                     variant is ink. Passing border-gold through className
+                     would race ghost's own border-ink/20 in the same
+                     Tailwind group — stylesheet order decides, not the
+                     class attribute. */
                   <button
                     type="button"
                     onClick={() => setPreparingId(req.id)}
-                    className="px-3 py-1.5 border border-gold rounded text-label-caps font-display uppercase text-ink"
+                    aria-label={`Prepare response for ${req.requesterName}`}
+                    className="inline-flex min-h-11 items-center rounded border border-gold px-3 py-1.5 text-label-caps font-display uppercase text-ink"
                   >
                     Prepare response
                   </button>
                 )}
                 {req.status === 'RECEIVED' && (
-                  <button
-                    type="button"
+                  <Button
+                    variant="secondary"
                     onClick={() => statusMutation.mutate({ id: req.id, status: 'IN_PROGRESS', detail: {} })}
-                    className="px-3 py-1.5 bg-ink text-paper rounded text-label-caps font-display uppercase"
+                    aria-label={`Start work on ${req.requesterName}'s request`}
                   >
                     Start
-                  </button>
+                  </Button>
                 )}
                 {req.status !== 'FULFILLED' && !fulfilBlocked && (
+                  /* Hand-rolled: green is an outcome colour Button has no
+                     variant for, and adding one here would decide what
+                     "confirm success" looks like product-wide. */
                   <button
                     type="button"
                     onClick={() => statusMutation.mutate({ id: req.id, status: 'FULFILLED', detail: {} })}
-                    className="px-3 py-1.5 bg-green text-white rounded text-label-caps font-display uppercase"
+                    aria-label={`Mark ${req.requesterName}'s request fulfilled`}
+                    className="inline-flex min-h-11 items-center rounded bg-green px-3 py-1.5 text-label-caps font-display uppercase text-white"
                   >
                     Mark fulfilled
                   </button>
                 )}
                 {rejectingId === req.id ? (
-                  <div className="flex items-center gap-2">
-                    <input
-                      className="border border-ink/20 rounded px-2 py-1 text-body-md font-body"
-                      value={rejectionReason}
-                      onChange={(e) => setRejectionReason(e.target.value)}
-                      placeholder="Reason"
-                    />
-                    <button
-                      type="button"
+                  <div className="flex flex-wrap items-end gap-2">
+                    {/* Was placeholder-only: a placeholder is not a label,
+                        it vanishes on the first keystroke, and this field
+                        is the written reason a refusal is recorded on. */}
+                    <Field label="Reason for refusal">
+                      {(props) => (
+                        <input
+                          {...props}
+                          value={rejectionReason}
+                          onChange={(e) => setRejectionReason(e.target.value)}
+                        />
+                      )}
+                    </Field>
+                    <Button
+                      variant="danger"
                       disabled={!rejectionReason.trim()}
                       onClick={() =>
                         statusMutation.mutate({ id: req.id, status: 'REJECTED', detail: { rejectionReason: rejectionReason.trim() } })
                       }
-                      className="px-3 py-1.5 bg-maroon text-white rounded text-label-caps font-display uppercase disabled:opacity-40"
+                      aria-label={`Confirm refusal of ${req.requesterName}'s request`}
                     >
                       Confirm
-                    </button>
+                    </Button>
                   </div>
                 ) : (
+                  /* Hand-rolled, same reason: a maroon outline and maroon
+                     text, both of which would race ghost's ink. */
                   <button
                     type="button"
                     onClick={() => {
@@ -302,13 +322,14 @@ export function DataSubjectRequestsPage() {
                         erasure?.disposition === 'RESTRICTED_BY_LAW' ? DONOR_ERASURE_REFUSAL_REASON : '',
                       );
                     }}
-                    className="px-3 py-1.5 border border-maroon/40 rounded text-label-caps font-display uppercase text-maroon"
+                    aria-label={`Reject ${req.requesterName}'s request`}
+                    className="inline-flex min-h-11 items-center rounded border border-maroon/40 px-3 py-1.5 text-label-caps font-display uppercase text-maroon"
                   >
                     {erasure?.disposition === 'RESTRICTED_BY_LAW' ? 'Refuse — retention required' : 'Reject'}
                   </button>
                 )}
               </div>
-            </div>
+            </Card>
           );
         })}
       </div>
