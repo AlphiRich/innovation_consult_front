@@ -15,18 +15,24 @@
  * details, a real Minister's name, internally-consistent province-level
  * statistics that sum correctly) — while still not being independently
  * verified by this build against the live Government Gazette.
+ *
+ * Session 44: was on Tailwind's default type scale rather than the
+ * product's tokens, so a reference page of statutory deadlines rendered
+ * at 14px against the product's 16px. `scripts/check-type-scale.mjs` now
+ * guards that.
  */
+import { BasisNote, Card, PageHeader } from '@/components/ui';
+
 export function ElectionTimetablePage() {
   return (
-    <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-3xl">
-      <p className="font-mono text-xs text-slate">/knowledge/election-timetable</p>
-      <h1 className="font-display text-2xl text-ink mt-1">2026 Local Government Elections — Timetable</h1>
-      <p className="mt-1 text-sm text-slate">
+    <Card className="max-w-3xl">
+      <PageHeader slug="/knowledge/election-timetable" title="2026 Local Government Elections — Timetable" />
+      <BasisNote>
         Source: Electoral Commission of South Africa, "Electoral Commission publishes the 2026 LGE Election
         Timetable," elections.org.za News.
-      </p>
+      </BasisNote>
 
-      <div className="mt-4 space-y-4 text-sm leading-relaxed text-ink">
+      <div className="mt-4 space-y-4 text-body-md font-body leading-relaxed text-ink">
         <p>
           <strong>Election Day: Wednesday, 4 November 2026.</strong> Proclaimed by the Minister of Cooperative
           Governance and Traditional Affairs, commencing the 89-day Election Timetable published in the Government
@@ -35,7 +41,7 @@ export function ElectionTimetablePage() {
         </p>
 
         <div>
-          <h2 className="font-display text-base text-ink">Voters' roll</h2>
+          <h2 className="text-body-lg font-display text-ink">Voters' roll</h2>
           <ul className="mt-1 list-disc pl-5 space-y-0.5">
             <li>Roll closed to new registrations/changes: midnight, 7 August 2026</li>
             <li>Provisional roll open for inspection: 11 August 2026</li>
@@ -46,7 +52,7 @@ export function ElectionTimetablePage() {
         </div>
 
         <div>
-          <h2 className="font-display text-base text-ink">Candidate nominations</h2>
+          <h2 className="text-body-lg font-display text-ink">Candidate nominations</h2>
           <ul className="mt-1 list-disc pl-5 space-y-0.5">
             <li>Nominations open: 7 August 2026 (21 calendar days)</li>
             <li>Nominations close: 17h00, 28 August 2026 — both the Online Candidate Nomination System (OCNS) and manual hand-delivery close at exactly this time</li>
@@ -56,7 +62,7 @@ export function ElectionTimetablePage() {
         </div>
 
         <div>
-          <h2 className="font-display text-base text-ink">Special votes</h2>
+          <h2 className="text-body-lg font-display text-ink">Special votes</h2>
           <ul className="mt-1 list-disc pl-5 space-y-0.5">
             <li>Applications open: 21 September 2026</li>
             <li>Applications close: 12 October 2026</li>
@@ -65,14 +71,14 @@ export function ElectionTimetablePage() {
         </div>
 
         <div>
-          <h2 className="font-display text-base text-ink">Other key dates</h2>
+          <h2 className="text-body-lg font-display text-ink">Other key dates</h2>
           <ul className="mt-1 list-disc pl-5 space-y-0.5">
             <li>List of voting stations (incl. mobile station routes) published: 14 August 2026</li>
           </ul>
         </div>
 
         <div>
-          <h2 className="font-display text-base text-ink">Nomination deposits</h2>
+          <h2 className="text-body-lg font-display text-ink">Nomination deposits</h2>
           <p className="mt-1">
             Refundable if the contestant obtains at least one PR seat, or ≥10% of valid votes in the applicable ward
             election; otherwise forfeited to the National Revenue Fund.
@@ -87,7 +93,7 @@ export function ElectionTimetablePage() {
         </div>
 
         <div className="border-l-4 border-gold bg-paper p-3">
-          <h2 className="font-display text-base text-ink">Kopanong Local Municipality — boundary stayed by court order</h2>
+          <h2 className="text-body-lg font-display text-ink">Kopanong Local Municipality — boundary stayed by court order</h2>
           <p className="mt-1">
             On 6 August 2026 the High Court of South Africa (Bloemfontein) stayed the Municipal Demarcation Board's
             2026 re-determination that split Kopanong Local Municipality (Free State) into two municipalities, until
@@ -102,6 +108,6 @@ export function ElectionTimetablePage() {
           Verify current dates directly at elections.org.za before relying on them for a filing deadline.
         </p>
       </div>
-    </div>
+    </Card>
   );
 }

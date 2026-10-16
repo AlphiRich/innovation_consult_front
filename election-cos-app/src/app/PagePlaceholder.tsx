@@ -8,7 +8,15 @@
  * routing real and testable now, without inventing screen content that
  * would have to be thrown away once the ~170 Stitch PNGs are re-supplied
  * (master index §7 — "Not reviewed all ~170 screens").
+ *
+ * Session 44: was the last place in the build still using Tailwind's
+ * default type scale (`text-xs`, `text-2xl`, `text-sm`) instead of the
+ * product's own tokens, which is why its body copy rendered at 14px where
+ * every real screen uses 16px. `scripts/check-type-scale.mjs` now fails
+ * the build on that class of drift the way `check-no-hex.mjs` does for
+ * colour.
  */
+import { Card, PageHeader } from '@/components/ui';
 interface PagePlaceholderProps {
   title: string;
   route: string;
@@ -24,11 +32,10 @@ const STATUS_LABEL: Record<PagePlaceholderProps['status'], string> = {
 
 export function PagePlaceholder({ title, route, status, note }: PagePlaceholderProps) {
   return (
-    <div className="rounded-lg border border-slate/30 bg-white p-6">
-      <p className="font-mono text-xs text-slate">{route}</p>
-      <h1 className="font-display text-2xl text-ink mt-1">{title}</h1>
-      <p className="mt-3 text-sm text-slate">{STATUS_LABEL[status]}</p>
-      {note && <p className="mt-2 text-sm text-maroon">{note}</p>}
-    </div>
+    <Card>
+      <PageHeader slug={route} title={title} />
+      <p className="mt-3 text-body-md font-body text-slate">{STATUS_LABEL[status]}</p>
+      {note && <p className="mt-2 text-body-md font-body text-maroon">{note}</p>}
+    </Card>
   );
 }

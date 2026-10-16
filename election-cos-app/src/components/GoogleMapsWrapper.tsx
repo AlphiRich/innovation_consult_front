@@ -18,7 +18,7 @@ export function GoogleMapsWrapper({ children }: { children: ReactNode }) {
           Map view isn't available — no Google Maps API key is configured for this environment.
         </p>
         <p className="text-body-md font-body text-slate/70 mt-1">
-          Set <code className="font-mono text-xs">VITE_GOOGLE_MAPS_API_KEY</code> to enable it (see
+          Set <code className="text-data-mono font-mono">VITE_GOOGLE_MAPS_API_KEY</code> to enable it (see
           .env.example).
         </p>
       </div>

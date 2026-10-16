@@ -27,8 +27,8 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="min-h-screen flex items-center justify-center bg-paper p-8">
           <div className="max-w-md rounded-lg border border-maroon/40 bg-white p-6 text-center">
             {/* String fixed by IC-ECOS-NAMING-2026-V1 §2.3. */}
-            <h1 className="font-display text-xl text-maroon">{PRODUCT_NAME} encountered an error</h1>
-            <p className="mt-2 text-sm text-slate">
+            <h1 className="text-headline-md font-display text-maroon">{PRODUCT_NAME} encountered an error</h1>
+            <p className="mt-2 text-body-md font-body text-slate">
               This has been logged. Reload the page, or contact support if it persists.
             </p>
           </div>

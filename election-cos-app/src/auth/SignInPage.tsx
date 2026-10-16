@@ -27,7 +27,7 @@ import { useState } from 'react';
 import { signInWithEmail, signInWithGoogle, signUpWithEmail } from './firebaseAuth';
 import { GoogleIcon } from './GoogleIcon';
 import { usingEmulators } from '@/dal/adapters/firestore/client';
-import { Button, Field } from '@/components/ui';
+import { Button, DataLine, Field } from '@/components/ui';
 import { NAV_FOOTER_LINE, PRODUCT_NAME } from '@/lib/legalText';
 
 export function SignInPage() {
@@ -144,7 +144,9 @@ export function SignInPage() {
           </div>
         )}
 
-        <p className="text-xs text-slate/60 text-center">{NAV_FOOTER_LINE}</p>
+        {/* Same line, same treatment as the nav footer in Shell.tsx — it
+            is the one piece of copy that appears in both places. */}
+        <DataLine className="text-center text-slate/60">{NAV_FOOTER_LINE}</DataLine>
       </div>
     </div>
   );
