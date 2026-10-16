@@ -53,7 +53,7 @@ only the account holder can supply.
 - **PWA shell** — manifest, service worker that caches the app and never
   the data, update banner, 18 self-hosted woff2 faces.
 - **Design system** — tokens plus the shared primitives in
-  `src/components/ui`, with 26 of 27 pages migrated onto them.
+  `src/components/ui`, with all 27 page components migrated onto them.
   `check-no-hex.mjs` fails the build on a raw hex in product source and
   `check-type-scale.mjs` on an off-token font size; both exist because
   `tailwind.config.js` extends its theme rather than replacing it, so
@@ -125,34 +125,43 @@ Not a backlog. Each of these is a decision.
 4. **Results history and code history for the other eight provinces.**
    NW is complete; `provinceReviewStatus()` reports the gap honestly and
    `unreviewedProvinces()` lists it.
-5. **Migrate the last page component onto the UI primitives.**
-   26 of 27 are done (session 44). What is left is `PermissionsPage`,
-   the largest file in the build at 452 lines.
+5. **Re-run the nine routes signed-in against the emulator.** The page
+   migration (session 44) touched all 27 page components. `check:all`
+   and `build` are green and the primitives are the same classes the
+   pages already used, but rule 8 is *run the thing* — and the one
+   thing the migration could plausibly have broken is layout, which no
+   test sees. Both viewports, watch the console. This is the only
+   follow-up the migration leaves.
 
-   **Do it by hand, not by `sed`.** The first twenty-six turned up ~125
-   buttons with no distinguishing accessible name, 5 files off the type
-   scale, 3 selection states that existed only in colour, 3 checkbox
-   groups with no `fieldset`/`legend`, 3 headings a naive substitution
-   would have demoted to paragraphs, 2 tables with proportional figures
-   in numeric columns, 2 duplicate copies of `StatTile`, 2 genuinely
-   unlabelled controls, 2 accessible names polluted by hint text, and a
-   real shared-mutation defect in Logistics. None of it was visible in a
-   test run.
+### What the migration established, for whoever touches the UI next
 
-   One finding is a correction rather than a defect, and it is the most
-   useful of the lot: the claim that these pages had "unlabelled inputs"
-   was **wrong**. A control nested inside its `<label>` is implicitly
-   associated. That claim had sat in `src/components/ui/index.tsx` since
-   session 38 and was repeated instead of checked. See changelog entry
-   44.2. **An existing comment asserting a defect is not evidence of the
-   defect.**
+All 27 page components are on the primitives in `src/components/ui`
+(session 44, nine commits). Three things are worth carrying forward:
 
-   Also: reach for a **prop**, not `className`, when a primitive does
-   not offer what a call site wants. Appending `text-ink`,
-   `text-data-mono` or `p-0` races the primitive's own class in the same
-   Tailwind group, and the winner is decided by stylesheet order rather
-   than by the class attribute. `SectionLabel` takes `tone` and `as`,
-   `Field` takes `mono`; nothing takes a padding override.
+**Do it by hand, not by `sed`.** The 27 turned up ~125 buttons with no
+distinguishing accessible name, 5 files off the type scale, 3 selection
+states that existed only in colour, 5 checkbox groups with no
+`fieldset`/`legend`, 3 headings a naive substitution would have demoted
+to paragraphs, 2 tables with proportional figures in numeric columns, 2
+duplicate copies of `StatTile`, 2 genuinely unlabelled controls, 3
+accessible names polluted by text inside the label, and a real
+shared-mutation defect in Logistics. None of it was visible in a test
+run.
+
+**One finding is a correction, and it is the most useful of the lot.**
+The claim that these pages had "unlabelled inputs" was **wrong** — a
+control nested inside its `<label>` is implicitly associated. That claim
+had sat in `src/components/ui/index.tsx` since session 38 and was
+repeated instead of checked. See changelog entry 44.2. **An existing
+comment asserting a defect is not evidence of the defect.**
+
+**Reach for a prop, not `className`.** Appending `text-ink`,
+`text-data-mono` or `p-0` races the primitive's own class in the same
+Tailwind group, and the winner is decided by stylesheet order rather
+than by the class attribute. `SectionLabel` takes `as` and `tone`,
+`Field` takes `mono`; nothing takes a padding override. Where a variant
+is genuinely one-off — a maroon alarm tile, a green confirm, a gold
+outline — the markup stays hand-rolled with the reason in the file.
 6. **A Cloud Function to resolve an email to a Firebase uid**, so an
    administrator can grant access without the new user reading their own
    uid off the "Awaiting access" screen.

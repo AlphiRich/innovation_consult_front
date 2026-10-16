@@ -2123,9 +2123,13 @@ passed throughout.
 
 ### Still open after this session
 
-- **One page component** remains on the raw strings: `PermissionsPage`,
-  the largest in the build at 452 lines. Read it rather than scripting
-  it.
+- **The page migration is complete**: 27 of 27, in nine verified
+  commits. `PermissionsPage` was the last and the worst — its sign-in-ID
+  error message sat inside the label (so the control's accessible name
+  changed as you typed), its two capability columns were 52 checkboxes
+  with the same 26 names in both and no `fieldset` to tell them apart,
+  and "Deactivate" repeated down the staff list with nothing to say
+  whose account it ended.
 - Everything in `docs/session-handoff.md` under "blocked" and
   "deliberately unbuilt" is unchanged. **Deployment still waits on the
   account holder's two values.**
