@@ -35,6 +35,7 @@ import { checkPrList, PR_LIST_EXPORT_BASIS, type PrListIssue } from './prList';
 import { buildWardRoll, COVERAGE_BASIS, DOUBLE_NOMINATION_BASIS } from './wardRoll';
 import { prListDocument } from './prListDocument';
 import { CandidateForm } from './CandidateForm';
+import { BasisNote, Button, Card, DataLine, Field, PageHeader } from '@/components/ui';
 
 function downloadPdf(bytes: Uint8Array, fileName: string): void {
   const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: 'application/pdf' }));
@@ -94,13 +95,12 @@ export function CandidatesPage() {
 
   if (!session) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/settings/candidates</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Candidates</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/settings/candidates" title="Candidates" />
         <p className="mt-3 text-body-md font-body text-slate">
           No active session — see BUILD-STATUS.md (no live Firebase project provisioned yet).
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -138,25 +138,24 @@ export function CandidatesPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-label-caps font-display uppercase text-slate">/settings/candidates</p>
-          <h1 className="text-headline-md font-display text-ink mt-1">Candidates & party list</h1>
-          <p className="text-body-md font-body text-slate mt-1">{PR_LIST_EXPORT_BASIS}</p>
-        </div>
-        {canManage && (
-          <button
-            type="button"
-            onClick={() => {
-              setEditing(null);
-              setShowForm(true);
-            }}
-            className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase whitespace-nowrap"
-          >
-            + Add candidate
-          </button>
-        )}
-      </div>
+      <PageHeader
+        slug="/settings/candidates"
+        title="Candidates & party list"
+        description={PR_LIST_EXPORT_BASIS}
+        action={
+          canManage ? (
+            <Button
+              onClick={() => {
+                setEditing(null);
+                setShowForm(true);
+              }}
+              className="whitespace-nowrap"
+            >
+              + Add candidate
+            </Button>
+          ) : undefined
+        }
+      />
 
       {!profileQuery.isLoading && !profile && (
         <p className="text-body-md font-body text-maroon border-l-4 border-maroon bg-white p-3">
@@ -186,10 +185,10 @@ export function CandidatesPage() {
       <section className="space-y-2">
         <div className="flex items-baseline justify-between gap-3 flex-wrap">
           <h2 className="text-headline-md font-display text-ink">The list, in order of preference</h2>
-          <p className="text-data-mono font-mono text-slate">
+          <DataLine>
             {result.ordered.length} of a cap of {result.maxListLength} · {result.womenCount} of{' '}
             {result.declaredCount} declared are women
-          </p>
+          </DataLine>
         </div>
 
         {result.ordered.length === 0 && (
@@ -197,46 +196,47 @@ export function CandidatesPage() {
         )}
 
         {result.ordered.map((candidate) => (
-          <div
-            key={candidate.id}
-            className="bg-white border border-ink/10 rounded p-3 flex items-center justify-between gap-3"
-          >
-            <div>
+          <Card key={candidate.id} className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
               <p className="text-body-md font-body text-ink">
-                <span className="font-mono text-slate">{candidate.listRank ?? '—'}</span> {candidate.fullName}
+                <span className="text-data-mono font-mono text-slate">{candidate.listRank ?? '—'}</span>{' '}
+                {candidate.fullName}
               </p>
-              <p className="text-data-mono font-mono text-slate">
+              <DataLine>
                 {candidate.idNumberMasked} · {candidate.gender ?? 'UNDISCLOSED'} · {candidate.verificationStatus}
-              </p>
+              </DataLine>
             </div>
             {canManage && (
-              <button
-                type="button"
+              /* The candidate's name in the accessible name: a party list
+                 is a column of identical "Edit" buttons otherwise, and
+                 the order of that list is the thing being edited. */
+              <Button
+                variant="ghost"
                 onClick={() => {
                   setEditing(candidate);
                   setShowForm(true);
                 }}
-                className="px-3 py-1.5 border border-ink/20 rounded text-label-caps font-display uppercase text-ink"
+                aria-label={`Edit ${candidate.fullName}`}
               >
                 Edit
-              </button>
+              </Button>
             )}
-          </div>
+          </Card>
         ))}
       </section>
 
       <section className="space-y-2">
         <div className="flex items-baseline justify-between gap-3 flex-wrap">
           <h2 className="text-headline-md font-display text-ink">Ward candidates</h2>
-          <p className="text-data-mono font-mono text-slate">
+          <DataLine>
             {wardRoll.covered.length} of {wardRoll.wardCount} wards have exactly one candidate
-          </p>
+          </DataLine>
         </div>
         <p className="text-body-md font-body text-slate">
           Nominated under section 17 of the Municipal Electoral Act, which is a different process from the
           party list above. None of the list checks apply to them and they are not on the exported list.
         </p>
-        <p className="text-body-md font-body text-slate">{COVERAGE_BASIS}</p>
+        <BasisNote>{COVERAGE_BASIS}</BasisNote>
 
         {wardRoll.wardCount === 0 && (
           <p className="text-body-md font-body text-maroon border-l-4 border-maroon bg-white p-3">
@@ -250,7 +250,7 @@ export function CandidatesPage() {
             <p className="text-label-caps font-display uppercase text-maroon">
               {wardRoll.missing.length} ward(s) with no candidate
             </p>
-            <p className="text-data-mono font-mono text-slate">{wardRoll.missing.join(', ')}</p>
+            <DataLine>{wardRoll.missing.join(', ')}</DataLine>
           </div>
         )}
 
@@ -259,8 +259,8 @@ export function CandidatesPage() {
             <p className="text-label-caps font-display uppercase text-maroon">
               {wardRoll.doubled.length} ward(s) with more than one candidate
             </p>
-            <p className="text-data-mono font-mono text-slate">{wardRoll.doubled.join(', ')}</p>
-            <p className="text-body-md font-body text-slate">{DOUBLE_NOMINATION_BASIS}</p>
+            <DataLine>{wardRoll.doubled.join(', ')}</DataLine>
+            <BasisNote>{DOUBLE_NOMINATION_BASIS}</BasisNote>
           </div>
         )}
 
@@ -281,8 +281,8 @@ export function CandidatesPage() {
         {wardRoll.entries
           .filter((entry) => entry.candidates.length > 0)
           .map((entry) => (
-            <div key={entry.wardCode} className="bg-white border border-ink/10 rounded p-3">
-              <p className="text-data-mono font-mono text-slate">{entry.wardCode}</p>
+            <Card key={entry.wardCode}>
+              <DataLine>{entry.wardCode}</DataLine>
               {entry.candidates.map((candidate) => (
                 <p key={candidate.id} className="text-body-md font-body text-ink">
                   {candidate.fullName}{' '}
@@ -291,28 +291,28 @@ export function CandidatesPage() {
                   </span>
                 </p>
               ))}
-            </div>
+            </Card>
           ))}
       </section>
 
       <section className="space-y-3 border-t border-ink/10 pt-4">
-        <label className="space-y-1 block max-w-sm">
-          <span className="text-label-caps font-display uppercase text-slate">Party name, for the document</span>
-          <input
-            className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-            value={partyName}
-            onChange={(e) => setPartyName(e.target.value)}
-            placeholder="As it must appear on the list"
-          />
-        </label>
-        <button
-          type="button"
-          disabled={!result.canExport}
-          onClick={handleExport}
-          className="bg-ink text-paper rounded px-4 py-2.5 text-label-caps font-display uppercase disabled:opacity-40"
-        >
+        {/* Was a bare <label> wrapping the input. This platform does not
+            know the party's name, and the name goes on the paper the
+            Commission is handed — so it is the last field anybody should
+            have to guess the purpose of. */}
+        <div className="max-w-sm">
+          <Field
+            label="Party name, for the document"
+            hint="Exactly as it must appear on the list."
+          >
+            {(props) => (
+              <input {...props} value={partyName} onChange={(e) => setPartyName(e.target.value)} />
+            )}
+          </Field>
+        </div>
+        <Button variant="secondary" disabled={!result.canExport} onClick={handleExport}>
           Download the checked list
-        </button>
+        </Button>
         {!result.canExport && result.ordered.length > 0 && (
           <p className="text-body-md font-body text-maroon">
             Resolve what is stopping the export above. Nothing is truncated or filled in for you.
