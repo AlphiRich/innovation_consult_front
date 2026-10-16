@@ -53,7 +53,7 @@ only the account holder can supply.
 - **PWA shell** — manifest, service worker that caches the app and never
   the data, update banner, 18 self-hosted woff2 faces.
 - **Design system** — tokens plus the shared primitives in
-  `src/components/ui`, with 13 of 27 pages migrated onto them.
+  `src/components/ui`, with 20 of 27 pages migrated onto them.
   `check-no-hex.mjs` fails the build on a raw hex in product source and
   `check-type-scale.mjs` on an off-token font size; both exist because
   `tailwind.config.js` extends its theme rather than replacing it, so
@@ -125,14 +125,26 @@ Not a backlog. Each of these is a decision.
 4. **Results history and code history for the other eight provinces.**
    NW is complete; `provinceReviewStatus()` reports the gap honestly and
    `unreviewedProvinces()` lists it.
-5. **Migrate the remaining 14 page components onto the UI primitives.**
-   13 of 27 are done (session 44). What is left: the three Analytics
-   sub-views, Candidates, the incident report, five Settings sub-views,
-   Subscription, Bulk Import, Round, Ward Detail. Mostly mechanical — but
-   do it by hand, not by `sed`: the first thirteen turned up unlabelled
-   inputs on the two pages a canvasser lives in, three selection states
-   that existed only in colour, a shared-mutation defect in Logistics,
-   and the type-scale drift that `check-type-scale.mjs` now guards.
+5. **Migrate the remaining 7 page components onto the UI primitives.**
+   20 of 27 are done (session 44). What is left, and they are the
+   largest: Candidates, the incident report, Data Subject Requests,
+   Municipality Config, PPFA Thresholds, Permissions, Bulk Import.
+
+   **Do it by hand, not by `sed`.** The first twenty turned up 9
+   unlabelled form controls, 3 selection states that existed only in
+   colour, ~125 buttons with no distinguishing accessible name, 3
+   headings that a naive substitution would have demoted to paragraphs,
+   2 tables with proportional figures in numeric columns, a duplicate
+   copy of `StatTile`, a real shared-mutation defect in Logistics, and
+   the type-scale drift `check-type-scale.mjs` now guards. None of it was
+   visible in a test run.
+
+   Also: reach for a **prop**, not `className`, when a primitive does
+   not offer what a call site wants. Appending `text-ink`,
+   `text-data-mono` or `p-0` races the primitive's own class in the same
+   Tailwind group, and the winner is decided by stylesheet order rather
+   than by the class attribute. `SectionLabel` takes `tone` and `as`,
+   `Field` takes `mono`; nothing takes a padding override.
 6. **A Cloud Function to resolve an email to a Firebase uid**, so an
    administrator can grant access without the new user reading their own
    uid off the "Awaiting access" screen.

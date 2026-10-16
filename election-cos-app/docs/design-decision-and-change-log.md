@@ -2037,13 +2037,63 @@ one class, so it is now written into the discipline skill: **a guard that
 fails on the sentence explaining it gets switched off, and then it guards
 nothing.** It blanks comments before scanning, preserving line numbers.
 
+### Entry 44.7 — The primitives needed props, not `className`
+
+**Three added, all for one reason.** Migrating turned up call sites that
+wanted a variation the primitive did not offer, and the obvious move —
+pass it through `className` — is quietly broken:
+
+| Wanted | Appending this | Why it loses |
+|---|---|---|
+| Ink heading instead of slate | `className="text-ink"` | both are colour utilities in the same Tailwind group |
+| Monospace input for a ward code | `className="text-data-mono font-mono"` | races the control's `text-body-md font-body` |
+| A table with no card padding | `className="p-0"` | races `Card`'s own `p-4` |
+
+In every case the winner is decided by the order Tailwind emits the two
+rules into the stylesheet, **not** by their order in the class attribute.
+It can look right in one build and change when an unrelated class is
+added elsewhere.
+
+So `SectionLabel` gained `tone`, `Field` gained `mono`, and the Threshold
+Analyzer's table is rendered bare rather than inside a `Card` — matching
+how `WardsPage` already renders the build's other table. A prop that
+*selects* a class cannot lose a specificity race; appending a second one
+can. **No primitive here accepts a padding override, deliberately.**
+
+Where a variation is genuinely one-off, the markup stays hand-rolled with
+the reason in the file: the Vote Calculator's pending-tied-seats tile
+(maroon alarm, which `StatTile` has no state for), its "Tied — needs
+manual resolution" heading (maroon, which `tone` does not offer), and the
+Round's Coverage panel (a wide explanatory block that leads with a figure,
+not a stat tile). Adding an alarm emphasis or a third tone on the way past
+a single call site is the wrong place to decide what either looks like
+across the product.
+
+### Entry 44.8 — What the migration has found, counted
+
+Twenty of twenty-seven page components done, in six verified commits. The
+tally is the argument against doing the remaining seven by `sed`:
+
+| Found | Count | Where |
+|---|---|---|
+| Unlabelled form controls (bare `<label>`, no `htmlFor`) | **9** | Voters, Field Diary, Threshold Analyzer, Audit Log, Round, Vote Calculator ×4 |
+| Selection states that existed only in colour | **3** | Incidents filter, Voters view switch, Finance donor list |
+| Buttons with no distinguishing accessible name | **~125** | Ward Detail's per-row Edit, Round's 25 doors × 4 outcomes |
+| Headings that would have become paragraphs | **3** | War Room panels |
+| Hand-rolled tables with proportional figures in numeric columns | **2** | Threshold Analyzer, Vote Calculator |
+| Duplicate copies of a primitive | **1** | Round's local `Stat` |
+| Real behavioural defects | **1** | Logistics' shared-mutation Approve label |
+| Off-token type scale | **5 files** | now guarded |
+
+Not one of these was visible in a test run, and every test passed
+throughout.
+
 ### Still open after this session
 
-- **Fourteen page components** remain on the raw strings: the three
-  Analytics sub-views, Candidates, the incident report, five Settings
-  sub-views, Subscription, Bulk Import, Round, Ward Detail. They render
-  correctly; the work is mechanical, and the guard now prevents the one
-  defect class that was invisible.
+- **Seven page components** remain on the raw strings: Candidates, the
+  incident report, Data Subject Requests, Municipality Config, PPFA
+  Thresholds, Permissions, Bulk Import. They are the largest ones, and
+  on the evidence above they should be read, not scripted.
 - Everything in `docs/session-handoff.md` under "blocked" and
   "deliberately unbuilt" is unchanged. **Deployment still waits on the
   account holder's two values.**
