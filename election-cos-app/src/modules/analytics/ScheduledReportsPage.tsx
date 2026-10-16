@@ -34,6 +34,7 @@ import { useSession } from '@/auth/useSession';
 import { SENTIMENT_META, SENTIMENT_ORDER } from '@/modules/voters/sentiment';
 import { TONE_PILL_CLASSES } from '@/design/toneClasses';
 import { summarizeSentiment } from './sentimentSummary';
+import { Button, Card, PageHeader, SectionLabel, StatTile } from '@/components/ui';
 
 function downloadCsv(filename: string, rows: (string | number)[][]) {
   const csv = rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
@@ -57,13 +58,12 @@ export function ScheduledReportsPage() {
 
   if (!session) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/analytics/scheduled-reports</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Sentiment Summary Report</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/analytics/scheduled-reports" title="Sentiment Summary Report" />
         <p className="mt-3 text-body-md font-body text-slate">
           No active session — see BUILD-STATUS.md (no live Firebase project provisioned yet).
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -92,53 +92,37 @@ export function ScheduledReportsPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-label-caps font-display uppercase text-slate">/analytics/scheduled-reports</p>
-          <h1 className="text-headline-md font-display text-ink mt-1">Sentiment Summary Report</h1>
-          <p className="text-body-md font-body text-slate mt-1">
-            Tenant-wide, on-demand — generated now from the same counters War Room reads, not on a schedule. See this
-            page's header comment for what "Automated Reporting" would still need to be fully real.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={handleExport}
-          disabled={!summary}
-          className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase whitespace-nowrap disabled:opacity-40"
-        >
-          Export CSV
-        </button>
-      </div>
+      <PageHeader
+        slug="/analytics/scheduled-reports"
+        title="Sentiment Summary Report"
+        description={
+          'Tenant-wide, on-demand — generated now from the same counters War Room reads, not on a schedule. ' +
+          'See this page\'s header comment for what "Automated Reporting" would still need to be fully real.'
+        }
+        action={
+          <Button onClick={handleExport} disabled={!summary} className="whitespace-nowrap">
+            Export CSV
+          </Button>
+        }
+      />
 
       {countersQuery.isLoading && <p className="text-body-md font-body text-slate">Loading…</p>}
 
       {summary && (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-ink text-paper rounded p-4">
-              <p className="text-label-caps font-display uppercase text-gold">Net sentiment index</p>
-              <p className="text-display-lg-mobile font-display">
-                {summary.netSentimentIndex > 0 ? '+' : ''}
-                {summary.netSentimentIndex}
-              </p>
-            </div>
-            <div className="bg-white border border-ink/10 rounded p-4">
-              <p className="text-label-caps font-display uppercase text-slate">Support</p>
-              <p className="text-display-lg-mobile font-display text-ink">{summary.supportPct}%</p>
-            </div>
-            <div className="bg-white border border-ink/10 rounded p-4">
-              <p className="text-label-caps font-display uppercase text-slate">Opposition</p>
-              <p className="text-display-lg-mobile font-display text-ink">{summary.oppositionPct}%</p>
-            </div>
-            <div className="bg-white border border-ink/10 rounded p-4">
-              <p className="text-label-caps font-display uppercase text-slate">Total voters captured</p>
-              <p className="text-display-lg-mobile font-display text-ink">{summary.totalVoters.toLocaleString('en-ZA')}</p>
-            </div>
+            <StatTile
+              emphasis
+              label="Net sentiment index"
+              value={`${summary.netSentimentIndex > 0 ? '+' : ''}${summary.netSentimentIndex}`}
+            />
+            <StatTile label="Support" value={`${summary.supportPct}%`} />
+            <StatTile label="Opposition" value={`${summary.oppositionPct}%`} />
+            <StatTile label="Total voters captured" value={summary.totalVoters.toLocaleString('en-ZA')} />
           </div>
 
-          <div className="bg-white border border-ink/10 rounded-lg p-4 space-y-3">
-            <h2 className="text-label-caps font-display uppercase text-slate">Breakdown by tier</h2>
+          <Card className="space-y-3">
+            <SectionLabel as="h2">Breakdown by tier</SectionLabel>
             <div className="flex flex-wrap gap-2">
               {SENTIMENT_ORDER.map((tier) => (
                 <span
@@ -149,7 +133,7 @@ export function ScheduledReportsPage() {
                 </span>
               ))}
             </div>
-          </div>
+          </Card>
 
           {summary.totalVoters === 0 && (
             <p className="text-body-md font-body text-slate border-l-4 border-gold bg-paper p-3">

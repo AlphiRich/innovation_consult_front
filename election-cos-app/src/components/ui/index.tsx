@@ -189,8 +189,9 @@ export function Button({
 
 /* ----------------------------------------------------------------- field */
 
-const CONTROL_CLASS =
-  'w-full min-h-11 border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white text-ink';
+const CONTROL_BASE = 'w-full min-h-11 border border-ink/20 rounded px-3 py-2 bg-white text-ink';
+const CONTROL_TYPE = 'text-body-md font-body';
+const CONTROL_TYPE_MONO = 'text-data-mono font-mono';
 
 /**
  * A labelled control.
@@ -198,14 +199,25 @@ const CONTROL_CLASS =
  * `children` is called with the id so the label is genuinely associated —
  * several hand-rolled forms wrapped the control in a bare `<label>` and a
  * screen reader announced nothing.
+ *
+ * `mono` is for controls holding a code rather than prose — a ward code, a
+ * VD number. It is a prop rather than something the caller appends to the
+ * supplied `className`, because `text-data-mono font-mono` appended after
+ * `text-body-md font-body` does not reliably win: both pairs are
+ * utilities in the same Tailwind groups, and which applies is decided by
+ * their order in the generated stylesheet, not in the class attribute.
+ * Swapping the classes out cannot lose that race; appending can.
  */
 export function Field({
   label,
   hint,
   error,
   required,
+  mono = false,
   children,
 }: {
+  /** Monospace the control, for a code rather than prose. */
+  mono?: boolean;
   label: string;
   hint?: string;
   error?: string;
@@ -225,7 +237,9 @@ export function Field({
       </label>
       {children({
         id,
-        className: `${CONTROL_CLASS} ${error ? 'border-maroon' : ''}`,
+        className: `${CONTROL_BASE} ${mono ? CONTROL_TYPE_MONO : CONTROL_TYPE} ${
+          error ? 'border-maroon' : ''
+        }`,
         'aria-describedby': describedBy,
       })}
       {hint && (
