@@ -112,16 +112,42 @@ const WEB_VARS = [
   'VITE_FIREBASE_APP_ID',
 ];
 const envFile = existsSync(path.join(ROOT, '.env')) ? read('.env') : '';
-const missingWeb = WEB_VARS.filter((key) => {
-  if (process.env[key]) return false;
-  return !new RegExp(`^${key}=.+`, 'm').test(envFile);
-});
+const readVar = (key) => {
+  if (process.env[key]) return process.env[key];
+  return new RegExp(`^${key}=(.+)$`, 'm').exec(envFile)?.[1]?.trim() ?? '';
+};
+const missingWeb = WEB_VARS.filter((key) => readVar(key) === '');
+
 if (missingWeb.length > 0) {
   add('web app config', 'FAIL', `${missingWeb.length} of ${WEB_VARS.length} missing: ${missingWeb.join(', ')}`,
     'Register a Web App in the Firebase console and copy its config into .env (see .env.example). ' +
     'Without these the deployed site loads and can reach no backend at all.');
 } else {
-  add('web app config', 'PASS', `all ${WEB_VARS.length} present`);
+  // Present is not the same as correct. A developer running against the
+  // emulator has six well-formed values for `demo-ecos` in .env, and
+  // deploying that build would publish a site whose every request goes
+  // to a project that does not exist. The config's own project id has to
+  // match the project being deployed to.
+  const configProject = readVar('VITE_FIREBASE_PROJECT_ID');
+  const deployProject = (() => {
+    try {
+      return JSON.parse(read('.firebaserc')).projects?.default ?? '';
+    } catch {
+      return '';
+    }
+  })();
+
+  if (readVar('VITE_FIREBASE_USE_EMULATORS') === 'true') {
+    add('web app config', 'FAIL', 'VITE_FIREBASE_USE_EMULATORS is true in .env',
+      'This .env points the app at the local emulator suite. Unset it before deploying, or the build ' +
+      'you publish is a development build.');
+  } else if (deployProject && configProject !== deployProject) {
+    add('web app config', 'FAIL', `config is for ${configProject}, deploying to ${deployProject}`,
+      'The web config compiled into the bundle names a different project than the one being deployed to. ' +
+      'The site would publish successfully and reach nothing.');
+  } else {
+    add('web app config', 'PASS', `all ${WEB_VARS.length} present, project ${configProject}`);
+  }
 }
 
 // ----------------------------------------------------------------- build
