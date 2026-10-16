@@ -9,7 +9,7 @@ Governing spec: `IC-ECOS-BUILD-2026-V2`. Product: a multi-tenant,
 offline-first PWA for South African political campaign field operations,
 built for Innovation Consult (Pty) Ltd as its first SaaS offering.
 
-These eleven rules are not style preferences. Each one is here because
+These twelve rules are not style preferences. Each one is here because
 breaking it cost a session, or would have shipped something false into a
 product that a campaign will make decisions with. The reasoning for each
 is in `election-cos-app/docs/design-decision-and-change-log.md`.
@@ -83,10 +83,17 @@ The protocol, every time:
 3. Revert clean and watch it pass.
 
 A guard that has never failed is not a guard — it is a line in a coverage
-report. Two caught in this build only because step 2 was actually run: a
-font-import guard whose regex was matching the import *inside a comment*,
-and a negative-regex test that was catching its own disclaimer text. Strip
-comments and known-good constants before asserting absence.
+report. Prove each branch separately: the defect fails, and a legitimate
+near-miss still passes.
+
+**Strip comments and known-good constants before asserting absence.** This
+defect class has now appeared three times: a font-import guard whose regex
+matched the import *inside a comment*, a negative-regex test catching its
+own disclaimer text, and the type-scale guard flagging its own header plus
+the comments that named the classes it had just removed. A guard that
+fails on the sentence explaining it gets switched off, and then it guards
+nothing — so blank comments rather than deleting them, and keep the line
+numbers honest.
 
 ## 5. Present is not correct.
 
@@ -183,9 +190,38 @@ Then commit and push to the working branch. Do **not** open a pull request
 unless explicitly asked. Keep model identifiers out of commit messages,
 PR bodies and code comments.
 
-Design tokens only — `scripts/check-no-hex.mjs` fails the build on a raw
-hex value in product source. The nav is fixed at **nine items** by §3.2
-and `nav.test.ts` guards the count.
+Design tokens only. Two guards enforce it, and both exist because
+`tailwind.config.js` *extends* its theme rather than replacing it, so
+off-token values keep working and nothing complains:
+
+- `scripts/check-no-hex.mjs` — no raw hex in product source.
+- `scripts/check-type-scale.mjs` — no `text-xs`…`text-9xl`, no
+  `text-[13px]`. Use `text-body-md`, `text-headline-md`,
+  `text-label-caps`, `text-data-mono`, `text-body-lg`,
+  `text-display-lg`, `text-display-lg-mobile`.
+
+The nav is fixed at **nine items** by §3.2 and `nav.test.ts` guards the
+count.
+
+## 12. Use the primitives, but never substitute one that merely looks close.
+
+`src/components/ui` holds the shared spelling of every pattern. Prefer it.
+But migrating a page is not a `sed` job, because three kinds of
+substitution are wrong even when the result is pixel-identical:
+
+- **A heading is not a paragraph.** `SectionLabel` defaults to `<p>`; pass
+  `as="h2"` where the label titles a section, or the document outline a
+  screen-reader user navigates by silently disappears.
+- **A link is not a button.** `Button` renders a real `<button>`.
+  Something that navigates stays a `<Link>` styled to match, or
+  middle-click, cmd-click and "copy link address" break.
+- **A counter is not a status pill.** `Pill` is a tinted status word. A
+  bordered `Contacted: 1 204` chip is a different pattern and keeps its
+  own markup.
+
+And where a control carries a selected state that exists only in colour,
+add `aria-pressed`. Colour alone tells a screen-reader user nothing about
+which filter, view or row is active.
 
 ---
 

@@ -52,7 +52,7 @@ field operations, built against `IC-ECOS-BUILD-2026-V2`.
   — the state of the build in one page: what is built, what is blocked and
   on whom, what is deliberately unbuilt and why.
 - [`.claude/skills/ecos-build-discipline/SKILL.md`](./.claude/skills/ecos-build-discipline/SKILL.md)
-  — the eleven working rules. Read before changing anything in the
+  — the twelve working rules. Read before changing anything in the
   application.
 - [`election-cos-app/docs/running-locally.md`](./election-cos-app/docs/running-locally.md)
   — emulators, seed data, custom claims, a signed-in local run.

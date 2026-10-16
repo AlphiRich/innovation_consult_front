@@ -9,7 +9,7 @@ Governing spec `IC-ECOS-BUILD-2026-V2`. Branch
 the application is the `election-cos-app/` subtree.
 
 **Read `.claude/skills/ecos-build-discipline/SKILL.md` before changing
-anything.** It holds the eleven rules this build arrived at the hard way,
+anything.** It holds the twelve rules this build arrived at the hard way,
 including the standing instruction on the proclaimed delimitation.
 
 ---
@@ -25,7 +25,7 @@ only the account holder can supply.
 
 | | |
 |---|---|
-| `npm run check:all` | green — 965 tests, 60 files (lint, typecheck, hex guard, font guard) |
+| `npm run check:all` | green — 965 tests, 60 files (lint, typecheck, hex guard, type-scale guard, font guard) |
 | `cd functions && npm test` | green — 52 tests, 2 files |
 | `npm run build` | green, with service-worker precache manifest |
 | `npm run preflight` | 2 failures, both the account holder's to clear (below) |
@@ -53,8 +53,11 @@ only the account holder can supply.
 - **PWA shell** — manifest, service worker that caches the app and never
   the data, update banner, 18 self-hosted woff2 faces.
 - **Design system** — tokens plus the shared primitives in
-  `src/components/ui`; `check-no-hex.mjs` fails the build on a raw hex in
-  product source.
+  `src/components/ui`, with 13 of 27 pages migrated onto them.
+  `check-no-hex.mjs` fails the build on a raw hex in product source and
+  `check-type-scale.mjs` on an off-token font size; both exist because
+  `tailwind.config.js` extends its theme rather than replacing it, so
+  off-token values otherwise keep working silently.
 - **The deploy path** — `npm run deploy` (checks → build → preflight →
   `firebase deploy`), and `.github/workflows/deploy-ecos.yml` for the
   route that does not need a credential in this container.
@@ -122,9 +125,14 @@ Not a backlog. Each of these is a decision.
 4. **Results history and code history for the other eight provinces.**
    NW is complete; `provinceReviewStatus()` reports the gap honestly and
    `unreviewedProvinces()` lists it.
-5. **Migrate the remaining pages onto the UI primitives.** Mechanical,
-   renders identically, was not worth risking in the same pass that built
-   them.
+5. **Migrate the remaining 14 page components onto the UI primitives.**
+   13 of 27 are done (session 44). What is left: the three Analytics
+   sub-views, Candidates, the incident report, five Settings sub-views,
+   Subscription, Bulk Import, Round, Ward Detail. Mostly mechanical — but
+   do it by hand, not by `sed`: the first thirteen turned up unlabelled
+   inputs on the two pages a canvasser lives in, three selection states
+   that existed only in colour, a shared-mutation defect in Logistics,
+   and the type-scale drift that `check-type-scale.mjs` now guards.
 6. **A Cloud Function to resolve an email to a Firebase uid**, so an
    administrator can grant access without the new user reading their own
    uid off the "Awaiting access" screen.
@@ -146,7 +154,7 @@ third set that matched neither; it was drift and has been corrected.
 
 | | |
 |---|---|
-| `.claude/skills/ecos-build-discipline/SKILL.md` | the eleven working rules |
+| `.claude/skills/ecos-build-discipline/SKILL.md` | the twelve working rules |
 | `docs/design-decision-and-change-log.md` | every decision, by session, with what it cost |
 | `docs/deploy-credentials-request.md` | the three deploy routes, exact IAM roles |
 | `docs/running-locally.md` | emulators, seed, claims, signed-in local run |

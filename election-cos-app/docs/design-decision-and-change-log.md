@@ -1929,3 +1929,121 @@ order to add two links to it.
 **Verified:** `npm run check:all` — 965 tests, 60 files green;
 `cd functions && npm test` — 52 tests green; `npm run build` green,
 27 assets precached.
+
+---
+
+## Session 44 — The migration, and the guard it exposed
+
+Worked unattended while the account holder was away, on the one task in
+`docs/session-handoff.md` that needed nothing from them: moving the pages
+onto the shared primitives built in session 38. Thirteen of twenty-seven
+page components done, in three verified commits.
+
+The migration was supposed to be mechanical. It was not, and the reason it
+was worth doing by hand rather than by `sed` is everything below.
+
+### Entry 44.1 — `SectionLabel` would have stripped the document outline
+
+**Caught before it shipped.** Three War Room panels title themselves with
+a real `<h2>`. `SectionLabel` renders a `<p>`. Substituting it would have
+looked pixel-identical and silently removed three headings from the
+document outline a screen-reader user navigates by.
+
+`SectionLabel` now takes `as`, defaulting to `'p'`. A label that titles a
+section is a heading; one that labels a field or a figure is not; the
+caller is the only one who knows which. This is the first change the
+primitives themselves have needed since they were built, and it came from
+using them rather than from reviewing them.
+
+### Entry 44.2 — Two of the most-used pages had unlabelled inputs
+
+**Fixed.** Voters and Field Diary both wrapped their voting-district input
+in a bare `<label>` with no `htmlFor` and no `id`. A screen reader
+announced an unlabelled text field — on the two screens a canvasser spends
+the day in. `Field` generates the id and ties them together, and its
+control carries the 44px minimum height the hand-rolled inputs did not.
+
+The `Field` primitive was built in session 38 *for* this defect, with a
+header comment saying several hand-rolled forms had it. Writing that down
+did not fix them. Migrating did.
+
+### Entry 44.3 — Three selection states that existed only in colour
+
+**Fixed.** The Incidents status filter, the Voters list/map switch and the
+Finance donor list all signalled the current choice with an inverted ink
+background and nothing in the markup. All three now carry `aria-pressed`.
+
+They stay hand-rolled rather than becoming `Button`s: `Button` has no
+selected state, and inventing one on the way past three call sites is the
+wrong place to decide what a selected button looks like across the
+product.
+
+### Entry 44.4 — Links that were dressed as buttons stay links
+
+**Deliberately not migrated.** The War Room quick links, Voters'
+round/import actions, the Incidents report link and "Back to the round"
+are navigations wearing button styling. `Button` renders a real
+`<button>`, so substituting it would have broken middle-click, cmd-click
+and "copy link address" on eight controls. They keep `<Link>` and match
+the variant's treatment by hand, including the 44px target.
+
+Also not forced: the counter chip rows (`Contacted: 1 204`) are bordered
+counters, not `Pill`'s tinted status words, and the gold left-rule notice
+is its own pattern. Substituting a primitive that merely looks close is
+how a design system starts lying about itself.
+
+### Entry 44.5 — One real defect in Logistics
+
+**Fixed.** Every REQUESTED row's Approve button read `isPending` off the
+one shared mutation, so approving a single item made every row say
+"Approving…" at once — on the page whose entire job is telling a
+coordinator what has been approved and what has not. The label now keys
+off `approveMutation.variables`. Disabling all of them stays: two
+approvals racing one mutation is not something to allow; claiming they are
+all in flight is.
+
+### Entry 44.6 — Nothing was guarding the type scale
+
+**The session's real find.** `check-no-hex.mjs` has guarded colour since
+session 2. Nothing guarded type, and `tailwind.config.js` *extends*
+`fontSize` rather than replacing it, so Tailwind's defaults kept working
+and five files were quietly setting their own sizes.
+
+Two of them matter:
+
+| Page | What it rendered at | What everything else uses |
+|---|---|---|
+| Gatherings advisory — quotes an Act and a ConCourt judgment | `text-sm`, 14px | 16px |
+| Election timetable — statutory deadlines, with a "verify before relying on this for a filing deadline" warning | `text-sm`, 14px | 16px |
+
+Small print on the two pages where small print is the worst possible
+signal, for two months, with every test passing throughout.
+
+`scripts/check-type-scale.mjs` catches `text-xs` through `text-9xl` and
+arbitrary sizes like `text-[13px]`, through any variant prefix, and is
+wired into `check:all`. It does not touch `text-ink` and the other colour
+utilities sharing the prefix, and a token's own name cannot be mistaken
+for a default — `text-display-lg` does not match `text-lg`.
+
+Proved by injection, all four branches: `text-sm` in a page FAILS,
+`md:text-[13px]` FAILS, `text-body-lg sm:text-display-lg` PASSES, clean
+tree PASSES. Reverted clean.
+
+**And it caught itself first.** The guard's opening run flagged its own
+header and the comments the migration had just added naming the classes
+it had removed. That is the same defect as the font guard in session 38,
+where the regex matched the import *inside* a comment. Two occurrences of
+one class, so it is now written into the discipline skill: **a guard that
+fails on the sentence explaining it gets switched off, and then it guards
+nothing.** It blanks comments before scanning, preserving line numbers.
+
+### Still open after this session
+
+- **Fourteen page components** remain on the raw strings: the three
+  Analytics sub-views, Candidates, the incident report, five Settings
+  sub-views, Subscription, Bulk Import, Round, Ward Detail. They render
+  correctly; the work is mechanical, and the guard now prevents the one
+  defect class that was invisible.
+- Everything in `docs/session-handoff.md` under "blocked" and
+  "deliberately unbuilt" is unchanged. **Deployment still waits on the
+  account holder's two values.**
