@@ -2371,3 +2371,142 @@ right amount of search-engine presence for it is none.
 **Verified:** `npm run check:all` green — 971 tests, 61 files (6 new);
 `npm run build` green; the landing card driven through all three probe
 branches; the preflight driven through both auth-domain branches.
+
+---
+
+## Session 47 — Cloudflare: DNS yes, Workers no; and the headers that were missing
+
+Prompted by the Wrangler documentation. The question it raises is real,
+because the phase-0 plan has assumed Cloudflare since session 2 and the
+domain was registered yesterday.
+
+### Entry 47.1 — Wrangler is not for this, and Workers would cost residency
+
+**Decided against, and the reason is not "we don't need it".**
+
+Nothing in this build is a Worker. The application is Firebase Hosting
+plus Cloud Functions, and the sync endpoint is already same-origin at
+`/api/**` behind a Hosting rewrite — which is exactly what lets
+`connect-src` stay `'self'` for it and the service worker treat it as
+same-origin and never cache it.
+
+A Worker would add a second compute platform, a second deploy path and a
+second credential that can drift out of step with the app it fronts.
+But the argument that settles it is **rule 1: `africa-south1`, for voter
+data.** Edge compute terminates and processes requests at whichever point
+of presence is nearest the user. That is the opposite of a data-residency
+commitment, and residency is a question a South African municipality will
+ask about a voter roll.
+
+Cloudflare as **DNS** is unaffected and still fine. One caveat now in
+§4.1 of the deploy document: the A records must be **DNS-only (grey
+cloud)** while Firebase issues the certificate, or validation is
+intercepted and the domain sits in "pending" while everything looks
+correct.
+
+### Entry 47.2 — Session 31's deferral, revisited on its own terms
+
+Session 31 reviewed a reverse-proxy Worker carrying a good header set and
+deferred it: *"it is deployment configuration, not a screen, and this
+build has no deployment target configured. Recorded in full because the
+header set is good and should be used when there is one."*
+
+There is one now. So the headers were implemented — **in Firebase
+Hosting, not in a Worker**, where they cost nothing extra to run, deploy
+with the app, and can be tested.
+
+Both of session 31's corrections were carried out, and both were checked
+against the real build rather than taken on trust:
+
+- **`X-XSS-Protection` is not set.** Deprecated, ignored by current
+  Chrome and Firefox, and its filtering mode has itself been a source of
+  vulnerabilities.
+- **`script-src` has no `'unsafe-inline'`.** Session 31 said it was not
+  required; verified — `dist/index.html` emits one
+  `<script type="module" src=…>` and nothing else.
+
+### Entry 47.3 — What was actually missing: all of it
+
+**The application had no security headers at all.** `firebase.json` had
+`public`, `ignore` and `rewrites`, and nothing else. A product holding a
+municipality's voter roll was shipping with no CSP, no HSTS, no
+frame-ancestors and no referrer policy.
+
+Now declared in `src/config/securityHeaders.ts` and generated into
+`firebase.json` by `scripts/sync-hosting-headers.mjs`, because a JSON
+file cannot import a module and hand-copying is how the two drift.
+`npm run check:headers` fails if they disagree and is wired into
+`check:all`.
+
+**The one concession, stated rather than buried.** `style-src` carries
+`'unsafe-inline'`. Three components set style attributes with values only
+known at runtime — `BarMeter`'s width percentage, `SchematicMap`'s
+per-ward alpha, the household map's height. An inline style *attribute*
+cannot be hashed, and a nonce cannot apply to an attribute, so the
+alternatives are this or losing those renders. It permits style
+injection, not code execution, and it is the only `'unsafe-*'` in the
+policy — which a test asserts.
+
+HSTS is one year **without `preload`**. Preload is baked into browsers
+and is slow and painful to reverse; it should be its own decision once
+the domain has been stable.
+
+### Entry 47.4 — The verification was vacuous twice before it was real
+
+The honest part of this session.
+
+**First attempt: "0 CSP violations across 25 routes."** False comfort.
+The production build has no emulator sign-in block — `usingEmulators()`
+checks `import.meta.env.PROD` first, deliberately, so a production bundle
+can never point at localhost. The drive script guarded the sign-in with
+`if (await emailField.count())`, found none, **skipped the click
+silently**, and walked 25 routes that all redirected to the sign-in page.
+It reported a clean pass having tested one screen.
+
+**Second attempt** rebuilt with `vite build --mode development`. Still no
+emulator block: `vite build` forces `NODE_ENV=production` regardless of
+`--mode`, so `PROD` stayed true. `NODE_ENV=development vite build` is
+what makes that branch exist.
+
+**Third attempt** reached the routes and stopped at "Awaiting access" —
+the emulator had been restarted, and emulator auth state does not
+persist, so the account had no claims.
+
+Each failure was caught only because the script was hardened after the
+first one to **exit non-zero when it cannot test anything**: it now fails
+if the sign-in block is absent, fails if it is still on the sign-in
+screen afterwards, and counts how many routes actually rendered rather
+than assuming.
+
+**The real result:** 25 of 25 routes rendered signed-in, against the
+exact production header set served from a local server reading
+`firebase.json`, with the emulator origins appended to `connect-src` for
+the test only. **Zero CSP violations.**
+
+This is the third time in three sessions that a measurement had to be
+corrected before its output meant anything — the type-scale guard
+flagging its own comments, `documentElement.scrollWidth` counting a
+scroll container's contents, and now a guard that skipped its own
+subject. The rule is earning its place: **a measurement is not evidence
+until the measurement has itself been checked**, and the cheapest way to
+check it is to make it fail loudly when it tests nothing.
+
+### Entry 47.5 — Guards, proved
+
+13 tests in `securityHeaders.test.ts`, each asserting a property somebody
+could plausibly weaken while fixing something else. Proved by injection:
+
+| Injected | Result |
+|---|---|
+| `'unsafe-inline'` into `script-src` | 3 tests fail |
+| `X-XSS-Protection` restored | 2 tests fail |
+| `sw.js` made cacheable | 2 tests fail |
+| `X-Frame-Options` removed from `firebase.json` by hand | `check:headers` fails |
+
+Reverted clean. A cached service worker is a device frozen on an old
+build, in an offline-first application whose users are in the field —
+which is why that one is a test and not a comment.
+
+**Verified:** `npm run check:all` green — 984 tests, 62 files (13 new);
+`npm run build` green; 25 routes driven signed-in under the production
+CSP with zero violations.

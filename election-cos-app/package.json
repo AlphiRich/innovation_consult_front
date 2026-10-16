@@ -6,8 +6,9 @@
   "description": "Election Campaign OS \u2014 application shell (election-cos-app). IC-ECOS-BUILD-2026-V2.",
   "scripts": {
     "build": "tsc -b && vite build && node scripts/build-sw.mjs",
-    "check:all": "npm run lint && npm run typecheck && npm run check:hex && npm run check:type-scale && npm run check:fonts && npm run test",
+    "check:all": "npm run lint && npm run typecheck && npm run check:hex && npm run check:type-scale && npm run check:headers && npm run check:fonts && npm run test",
     "check:fonts": "node tools/fonts/vendor-fonts.mjs --check",
+    "check:headers": "node scripts/sync-hosting-headers.mjs --check",
     "check:hex": "node scripts/check-no-hex.mjs",
     "check:type-scale": "node scripts/check-type-scale.mjs",
     "deploy": "npm run check:all && npm run build && npm run preflight && firebase deploy --project default",

@@ -241,6 +241,13 @@ everybody.**
    Cloudflare if DNS is there, as the phase-0 plan assumed). Apex domains
    need A records, not CNAME. Then wait — verification and the TLS
    certificate are not instant, and Firebase shows the state.
+
+   **If DNS is on Cloudflare, set those records to DNS-only (grey
+   cloud).** Proxying them (orange cloud) intercepts the HTTP validation
+   Firebase uses to issue the certificate, and the domain sits in
+   "pending" indefinitely while everything looks correct. You can turn
+   proxying on afterwards if you want the WAF, but see the note below
+   before you do.
 3. **Wait for Hosting to report the certificate as issued** and confirm
    `https://electioscos.co.za` actually serves the app.
 4. **Only then**, if you want it: set
@@ -264,6 +271,39 @@ declared once, in `election-cos-app/src/config/publicDomain.ts`, and a
 guard test fails if the landing page drifts from it or if a superseded
 name reappears. The PWA manifest and the service worker are
 origin-relative and need no change.
+
+### 4.2 Cloudflare: DNS yes, Workers no
+
+The phase-0 plan assumed Cloudflare for DNS and WAF. That still holds for
+**DNS**. Two things do not.
+
+**Wrangler and Workers are not part of this build, and should not
+become part of it.** Nothing here is a Worker — the application is
+Firebase Hosting plus Cloud Functions, and the sync endpoint is served
+same-origin at `/api/**` behind a Hosting rewrite. Adding a Worker would
+mean a second compute platform, a second deploy path and a second set of
+credentials that can drift out of step with the app it fronts. The
+stronger objection is rule 1 of the build spec: **`africa-south1`, for
+voter data.** Edge compute terminates and processes requests at whichever
+point of presence is nearest the user, which is the opposite of a data
+residency commitment — and residency is a question a municipality will
+ask.
+
+**The security headers a reverse-proxy Worker would have added are now
+served by Hosting itself.** Session 31 reviewed exactly such a Worker and
+deferred it because there was no deployment target; there is one now, so
+the headers were implemented where they cost nothing extra to run and can
+be tested. They are declared in `src/config/securityHeaders.ts`,
+generated into `firebase.json` by `npm run check:headers`, and verified
+by driving all 25 routes against the real policy. See §4.3 of the change
+log, session 47.
+
+**If you still want Cloudflare's WAF in front**, that is a reasonable
+thing to want and it works — but turn proxying on only after the
+certificate is issued (step 3), and know that you are then running two
+CDNs in series. Rate limiting is the part worth having; caching is
+already handled, and a second cache layer in front of a fingerprinted
+build mostly creates invalidation puzzles.
 
 ---
 
