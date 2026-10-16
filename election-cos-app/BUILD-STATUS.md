@@ -673,6 +673,62 @@ a real headless-browser screenshot (see above) — the first time in this
 build's history a session has actually run the app rather than only
 compiled/tested it.
 
+**Session 38 (16 Oct 2026) — the beta build; the app runs for the first
+time.** Four things, three of them finished.
+
+(1) **The brand typefaces had never been loaded.** Declared in
+`tailwind.config.js` and `tokens.ts` since session 1, asserted in sync by
+`tokens.test.ts` since then, and loaded by nothing — no `<link>`, no
+`@import`. Everything rendered in the browser's generic sans-serif for
+thirty-seven sessions. Now 18 self-hosted woff2 faces
+(`tools/fonts/vendor-fonts.mjs`), self-hosted rather than CDN-linked so
+the app renders offline and no third party sees a request on every page
+load of an application holding voter records.
+
+(2) **`functions/src/sync.ts` is implemented**, after being a declared
+skeleton since session 7. Split so the decisions are testable without the
+live Firestore this build has never had: `syncMerge.ts` is pure functions
+(33 tests), `sync.ts` is the shell. Per-field last-write-wins, tenant from
+the verified token only, idempotency that stores the response rather than
+a flag, one transaction per operation.
+
+(3) **The PWA shell exists** — manifest, icons, service worker,
+registration, update prompt. The worker caches the application and never
+the data; offline data stays in Dexie, which is tenant-scoped, clearable
+on sign-out and wiped when a phone changes hands.
+
+(4) **The application had never been run, by anyone.** `signInWithPopup`
+needs live Google OAuth, there was no emulator wiring, and no project has
+ever been reachable — so no signed-in screen of this product had ever been
+seen. `client.ts` now connects to the local emulator suite behind
+`VITE_FIREBASE_USE_EMULATORS` (refused in any production build), the
+sign-in screen offers email sign-in behind the same gate, and
+`tools/dev/grant-claims.mjs` + `tools/dev/seed-emulator.mjs` make it
+usable. See `docs/running-locally.md`.
+
+Running it immediately found three defects no test had: the fonts above,
+ward lists sorting 1, 10, 11, 2, 20 on a 34-ward municipality, and fixed
+grids cramping at 390px. All three fixed.
+
+**Blocker #2 is narrower but still stands.** The project
+`election2026-campaignms7-0` is real and reachable (the BigQuery
+connector authenticates against it), but BigQuery cannot deploy, `gcloud`
+has no credential, and `firebase login` needs an interactive browser.
+`firebase-tools` is now a devDependency, `npm run deploy` runs
+checks → build → preflight → deploy, and `scripts/deploy-preflight.mjs`
+verifies project, credential, web config, build freshness, function
+regions and rules before anything is sent. **It fails on exactly two
+items, both of which only the account owner can supply: a deploy
+credential (`GOOGLE_APPLICATION_CREDENTIALS` or `FIREBASE_TOKEN`) and the
+six `VITE_FIREBASE_*` web app config values.** Nothing has been deployed
+and nothing claims to have been.
+
+**Verified:** `npm run check:all` — 965 tests, lint/typecheck/hex/fonts
+green; `npm run build` green; nine routes driven in headless Chromium at
+two viewports, signed in against the emulator with the real NW405 seed
+loaded (34 wards, 136 VD records, 122,059 voters), no console errors.
+
+
 Read this before doing anything else in this repo. It says plainly what's
 real, what's a placeholder, and what's blocked on something only a human
 can unblock.

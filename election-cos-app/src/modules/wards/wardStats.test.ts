@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { totalsFor, defaultMunicipalityCode } from './wardStats';
+import { totalsFor, defaultMunicipalityCode , byWardCode, compareWardCodes } from './wardStats';
 import type { Ward } from '@/dal/ports/wards';
 
 function ward(overrides: Partial<Ward>): Ward {
@@ -41,5 +41,37 @@ describe('defaultMunicipalityCode', () => {
 
   it('uses the first ward’s municipality code', () => {
     expect(defaultMunicipalityCode([ward({ municipalityCode: 'NW405' })])).toBe('NW405');
+  });
+});
+
+describe('ward ordering', () => {
+  it('sorts the way a person reads, not the way Firestore returns ids', () => {
+    // The defect this exists for: lexicographic order puts W10 after W1
+    // and W2 after W19, on a list that looks sorted.
+    const codes = ['NW405-W10', 'NW405-W2', 'NW405-W1', 'NW405-W34', 'NW405-W3'];
+    expect([...codes].sort(compareWardCodes)).toEqual([
+      'NW405-W1',
+      'NW405-W2',
+      'NW405-W3',
+      'NW405-W10',
+      'NW405-W34',
+    ]);
+  });
+
+  it('keeps different municipalities grouped', () => {
+    expect(['NW404-W2', 'NW405-W1', 'NW404-W10'].sort(compareWardCodes)).toEqual([
+      'NW404-W2',
+      'NW404-W10',
+      'NW405-W1',
+    ]);
+  });
+
+  it('falls back to plain comparison for codes with no trailing number', () => {
+    expect(['BUF', 'CPT'].sort(compareWardCodes)).toEqual(['BUF', 'CPT']);
+  });
+
+  it('orders whole ward records', () => {
+    const wards = [{ wardCode: 'NW405-W10' }, { wardCode: 'NW405-W2' }];
+    expect(byWardCode(wards).map((w) => w.wardCode)).toEqual(['NW405-W2', 'NW405-W10']);
   });
 });

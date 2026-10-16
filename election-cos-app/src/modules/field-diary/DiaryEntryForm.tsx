@@ -112,7 +112,7 @@ export function DiaryEntryForm({ ctx, onDone, onCancel }: DiaryEntryFormProps) {
 
       <label className="space-y-1 block">
         <span className="text-label-caps font-display uppercase text-slate">Activity</span>
-        <div className="grid grid-cols-4 gap-1">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1">
           {ACTIVITY_ORDER.map((t) => (
             <button
               key={t}

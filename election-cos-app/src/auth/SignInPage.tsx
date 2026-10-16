@@ -5,15 +5,54 @@
  * and there was no way to actually reach a signed-in state. Google
  * Sign-in only (email/password functions exist in firebaseAuth.ts but
  * aren't exposed here — Google was the human's explicit ask).
+ *
+ * THE EMULATOR BLOCK (session 38)
+ *
+ * `signInWithPopup` loads apis.google.com, which no emulator can stand in
+ * for. That made the whole application unreachable locally: there was no
+ * way to get past this screen without a live Google OAuth round trip, so
+ * in thirty-seven sessions nobody had ever seen a signed-in screen of
+ * this product running.
+ *
+ * So when — and only when — the app is pointed at the local emulator
+ * suite, this screen also offers email sign-in, using the
+ * `signUpWithEmail`/`signInWithEmail` functions that have been in
+ * `firebaseAuth.ts` and tested since session 3 but were never exposed.
+ *
+ * `usingEmulators()` returns false in any production build by
+ * construction (it checks `import.meta.env.PROD` first), so this block
+ * cannot ship. `signInPage.test.ts` asserts that.
  */
 import { useState } from 'react';
-import { signInWithGoogle } from './firebaseAuth';
+import { signInWithEmail, signInWithGoogle, signUpWithEmail } from './firebaseAuth';
 import { GoogleIcon } from './GoogleIcon';
+import { usingEmulators } from '@/dal/adapters/firestore/client';
+import { Button, Field } from '@/components/ui';
 import { NAV_FOOTER_LINE, PRODUCT_NAME } from '@/lib/legalText';
 
 export function SignInPage() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  async function handleEmulatorSignIn() {
+    setPending(true);
+    setError(null);
+    try {
+      // Sign in if the account exists, create it if it does not. Against
+      // an emulator whose state is thrown away on restart, making the
+      // developer register first is friction with no benefit.
+      try {
+        await signInWithEmail({ email, password });
+      } catch {
+        await signUpWithEmail({ email, password });
+      }
+    } catch (err) {
+      setPending(false);
+      setError(err instanceof Error ? err.message : 'Emulator sign-in failed.');
+    }
+  }
 
   async function handleSignIn() {
     setPending(true);
@@ -63,6 +102,47 @@ export function SignInPage() {
           Signing in doesn't grant access on its own — an administrator still has to assign you a role and
           geographic scope in Settings → Permissions before you can see any data (§4.4).
         </p>
+
+        {usingEmulators() && (
+          <div className="border-t border-ink/10 pt-5 space-y-3">
+            <p className="text-label-caps font-display uppercase text-gold">Local emulator</p>
+            <p className="text-body-md font-body text-slate">
+              This build is pointed at the local Firebase emulator suite, so Google sign-in is unavailable.
+              Use any email and password; the account is created on first use and discarded when the emulator
+              stops.
+            </p>
+            <Field label="Email">
+              {(props) => (
+                <input
+                  {...props}
+                  type="email"
+                  autoComplete="username"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              )}
+            </Field>
+            <Field label="Password">
+              {(props) => (
+                <input
+                  {...props}
+                  type="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              )}
+            </Field>
+            <Button
+              variant="secondary"
+              className="w-full"
+              disabled={pending || email.trim() === '' || password === ''}
+              onClick={() => void handleEmulatorSignIn()}
+            >
+              {pending ? 'Signing in…' : 'Sign in to emulator'}
+            </Button>
+          </div>
+        )}
 
         <p className="text-xs text-slate/60 text-center">{NAV_FOOTER_LINE}</p>
       </div>

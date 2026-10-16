@@ -12,14 +12,55 @@
  * that `npm run build` / unit tests work without live Firebase credentials
  * (none exist yet for this project — see BUILD-STATUS.md). It throws only
  * when a consumer actually tries to use an uninitialised client.
+ *
+ * EMULATORS (session 38)
+ *
+ * Until now this file could only talk to a real project, and no real
+ * project has ever been reachable from this build — which meant the
+ * application had never been run against a backend of any kind, by
+ * anybody, in thirty-seven sessions. Everything was proven by unit test
+ * and review.
+ *
+ * Setting `VITE_FIREBASE_USE_EMULATORS=true` points Auth, Firestore,
+ * Storage and Functions at the local emulator suite (`npm run emulators`,
+ * ports from firebase.json). That is how a developer signs in, loads the
+ * NW405 seed and sees a screen with real data in it.
+ *
+ * Two safety rules, both guarded by `client.test.ts`:
+ *
+ *  - Emulator mode is refused in a production build. A bundle that shipped
+ *    pointing at localhost would silently fail for every user, and a
+ *    bundle that shipped pointing at an emulator somebody port-forwarded
+ *    would be worse.
+ *  - It only ever attaches to 127.0.0.1. The host is not configurable,
+ *    because a configurable emulator host is a way to send a tenant's
+ *    voter records somewhere else.
  */
 import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
-import { getAuth, type Auth } from 'firebase/auth';
-import { getFirestore, type Firestore } from 'firebase/firestore';
-import { getStorage, type FirebaseStorage } from 'firebase/storage';
-import { getFunctions, type Functions } from 'firebase/functions';
+import { connectAuthEmulator, getAuth, type Auth } from 'firebase/auth';
+import { connectFirestoreEmulator, getFirestore, type Firestore } from 'firebase/firestore';
+import { connectStorageEmulator, getStorage, type FirebaseStorage } from 'firebase/storage';
+import { connectFunctionsEmulator, getFunctions, type Functions } from 'firebase/functions';
 
 const FUNCTIONS_REGION = 'africa-south1'; // §0 rule 1 — every Cloud Function, no exceptions
+
+/** Ports as declared in firebase.json. Kept in step by client.test.ts. */
+export const EMULATOR_PORTS = {
+  auth: 9099,
+  firestore: 8080,
+  storage: 9199,
+  functions: 5001,
+} as const;
+
+/**
+ * Never configurable, and never in a production build. See the header.
+ */
+const EMULATOR_HOST = '127.0.0.1';
+
+export function usingEmulators(): boolean {
+  if (import.meta.env.PROD) return false;
+  return import.meta.env.VITE_FIREBASE_USE_EMULATORS === 'true';
+}
 
 function readConfig() {
   const env = import.meta.env;
@@ -53,24 +94,40 @@ function getFirebaseApp(): FirebaseApp {
 
 let authInstance: Auth | null = null;
 export function getFirebaseAuth(): Auth {
-  authInstance ??= getAuth(getFirebaseApp());
+  if (!authInstance) {
+    authInstance = getAuth(getFirebaseApp());
+    if (usingEmulators()) {
+      connectAuthEmulator(authInstance, `http://${EMULATOR_HOST}:${EMULATOR_PORTS.auth}`, {
+        disableWarnings: true,
+      });
+    }
+  }
   return authInstance;
 }
 
 let dbInstance: Firestore | null = null;
 export function getDb(): Firestore {
-  dbInstance ??= getFirestore(getFirebaseApp());
+  if (!dbInstance) {
+    dbInstance = getFirestore(getFirebaseApp());
+    if (usingEmulators()) connectFirestoreEmulator(dbInstance, EMULATOR_HOST, EMULATOR_PORTS.firestore);
+  }
   return dbInstance;
 }
 
 let storageInstance: FirebaseStorage | null = null;
 export function getStorageClient(): FirebaseStorage {
-  storageInstance ??= getStorage(getFirebaseApp());
+  if (!storageInstance) {
+    storageInstance = getStorage(getFirebaseApp());
+    if (usingEmulators()) connectStorageEmulator(storageInstance, EMULATOR_HOST, EMULATOR_PORTS.storage);
+  }
   return storageInstance;
 }
 
 let functionsInstance: Functions | null = null;
 export function getFunctionsClient(): Functions {
-  functionsInstance ??= getFunctions(getFirebaseApp(), FUNCTIONS_REGION);
+  if (!functionsInstance) {
+    functionsInstance = getFunctions(getFirebaseApp(), FUNCTIONS_REGION);
+    if (usingEmulators()) connectFunctionsEmulator(functionsInstance, EMULATOR_HOST, EMULATOR_PORTS.functions);
+  }
   return functionsInstance;
 }

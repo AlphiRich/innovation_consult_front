@@ -89,7 +89,7 @@ export function LogisticsItemForm({ ctx, onDone, onCancel }: LogisticsItemFormPr
 
       <label className="space-y-1 block">
         <span className="text-label-caps font-display uppercase text-slate">Delivery urgency</span>
-        <div className="grid grid-cols-3 gap-1">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-1">
           {URGENCY_ORDER.map((u) => (
             <button
               key={u}

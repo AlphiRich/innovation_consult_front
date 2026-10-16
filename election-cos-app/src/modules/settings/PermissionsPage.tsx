@@ -194,7 +194,7 @@ export function PermissionsPage() {
               {problemFor('signInId') && <span className="block text-body-md text-maroon">{problemFor('signInId')}</span>}
             </label>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <label className="space-y-1 block">
                 <span className="text-label-caps font-display uppercase text-slate">First name</span>
                 <input
@@ -221,7 +221,7 @@ export function PermissionsPage() {
               </label>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <label className="space-y-1 block">
                 <span className="text-label-caps font-display uppercase text-slate">Role</span>
                 <select
@@ -330,7 +330,7 @@ export function PermissionsPage() {
 
             {editingUid === profile.uid && (
               <div className="border-t border-ink/10 pt-3 space-y-3">
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <label className="space-y-1 block">
                     <span className="text-label-caps font-display uppercase text-slate">Role</span>
                     <select

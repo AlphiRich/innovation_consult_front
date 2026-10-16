@@ -78,7 +78,7 @@ export function MunicipalRegisterPanel(props: MunicipalRegisterPanelProps) {
       </div>
 
       {baseline && (
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="border border-ink/10 rounded p-3">
             <p className="text-label-caps font-display uppercase text-slate">Wards</p>
             <p className="text-headline-md font-display text-ink">

@@ -188,7 +188,7 @@ export function MunicipalityConfigPage() {
 
       {editing && (
         <form onSubmit={handleSubmit} className="space-y-4 border border-gold/40 bg-white p-4 rounded">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label className="space-y-1 block">
               <span className="text-label-caps font-display uppercase text-slate">Municipality code</span>
               <input
@@ -231,7 +231,7 @@ export function MunicipalityConfigPage() {
             </p>
             {baseline ? (
               <>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   <div>
                     <p className="text-label-caps font-display uppercase text-slate">Council</p>
                     <p className="text-headline-md font-display text-ink">{baseline.councillors}</p>

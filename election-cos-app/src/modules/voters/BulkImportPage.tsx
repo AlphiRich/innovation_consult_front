@@ -222,7 +222,7 @@ export function BulkImportPage() {
             </p>
           ))}
 
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Stat label="Rows read" value={plan.totalRows} />
             <Stat label="Ready" value={plan.ready.length} />
             <Stat label="Rejected" value={plan.rejected.length} />

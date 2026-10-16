@@ -13,7 +13,7 @@ import { dal } from '@/dal';
 import { useSession } from '@/auth/useSession';
 import type { Ward } from '@/dal/ports/wards';
 import { WardForm } from './WardForm';
-import { defaultMunicipalityCode, totalsFor } from './wardStats';
+import { byWardCode, defaultMunicipalityCode, totalsFor } from './wardStats';
 import { RECONCILIATION_BASIS, reconcileSeed } from './seedReconciliation';
 import {
   analyseWardSizes,
@@ -56,7 +56,9 @@ export function WardsPage() {
     );
   }
 
-  const wards = wardsQuery.data ?? [];
+  // Firestore returns lexicographic id order, which reads as 1, 10, 11,
+  // 2, 20 on a 34-ward municipality. See compareWardCodes.
+  const wards = byWardCode(wardsQuery.data ?? []);
   const totals = totalsFor(wards);
   const reconciliation = profileQuery.isLoading ? null : reconcileSeed(wards, profileQuery.data ?? null);
   const sizes = analyseWardSizes(wards);
@@ -77,7 +79,7 @@ export function WardsPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div className="bg-white border border-ink/10 rounded p-4">
           <p className="text-label-caps font-display uppercase text-slate">Wards</p>
           <p className="text-display-lg-mobile font-display text-ink">
