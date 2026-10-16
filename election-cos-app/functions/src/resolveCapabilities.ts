@@ -27,6 +27,11 @@
  * table is what it should be: static, generated from the client's copy by
  * `npm run gen:roles`, and guarded by `src/auth/roleMirror.test.ts`. If
  * tenant-defined roles ever arrive, this is the one place that changes.
+ *
+ * @deployable yes
+ *
+ * Mints the custom claims (tenantId, caps) every other check in this
+ * product reads. Complete and covered by roleModel/roleMirror tests.
  */
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { getAuth } from 'firebase-admin/auth';

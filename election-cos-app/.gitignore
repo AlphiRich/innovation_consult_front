@@ -12,3 +12,6 @@ ui-debug.log
 .DS_Store
 coverage
 *.tsbuildinfo
+
+# Vendored typefaces are committed deliberately (see tools/fonts/) — they
+# are part of the shell and must be available offline.

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#1A2246"/>
+  <!-- Ballot-cross mark on the gold accent: the one glyph that reads at
+       48px on a launcher and says "election" without words. -->
+  <rect x="104" y="104" width="304" height="304" rx="24" fill="none" stroke="#B7913F" stroke-width="20"/>
+  <path d="M176 262 L232 318 L344 194" fill="none" stroke="#F7F4EE" stroke-width="40"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

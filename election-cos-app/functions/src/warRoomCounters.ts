@@ -23,6 +23,11 @@
  * shapes (src/dal/ports/{voters,incidents,diary}.ts) — same rationale as
  * resolveCapabilities.ts: the two packages don't share a workspace yet.
  * Keep them in sync by hand until they do.
+ *
+ * @deployable yes
+ *
+ * Pre-aggregates the War Room counters so no page ever opens a live
+ * listener on voters or incidents. Covered by warRoomCounters.test.ts.
  */
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';

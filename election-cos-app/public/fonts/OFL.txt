@@ -1,0 +1,9 @@
+Archivo Narrow, Public Sans and IBM Plex Mono are licensed under the
+SIL Open Font License, Version 1.1, which permits redistribution of the
+font files bundled here.
+
+Full licence text: https://openfontlicense.org/
+
+Retrieved from Google Fonts by tools/fonts/vendor-fonts.mjs.
+Families: Archivo Narrow, Public Sans, IBM Plex Mono.
+Subsets: latin, latin-ext.
