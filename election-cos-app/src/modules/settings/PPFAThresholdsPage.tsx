@@ -20,6 +20,7 @@ import { useSession } from '@/auth/useSession';
 import type { AggregationRule, PPFAConfigDraft } from '@/dal/ports/ppfaConfig';
 import { defaultPPFAConfig, PPFA_GAZETTE_CITATION } from '@/modules/finance/ppfaDefaults';
 import { randToCents, formatZAR } from '@/lib/money';
+import { Button, Card, DataLine, Field, PageHeader, SectionLabel } from '@/components/ui';
 
 const MONTH_LABEL = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -68,13 +69,12 @@ export function PPFAThresholdsPage() {
 
   if (!session) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/settings/ppfa-thresholds</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">PPFA Threshold Config</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/settings/ppfa-thresholds" title="PPFA Threshold Config" />
         <p className="mt-3 text-body-md font-body text-slate">
           No active session — see BUILD-STATUS.md (no live Firebase project provisioned yet).
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -109,10 +109,7 @@ export function PPFAThresholdsPage() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <div>
-        <p className="text-label-caps font-display uppercase text-slate">/settings/ppfa-thresholds</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">PPFA Threshold Config</h1>
-      </div>
+      <PageHeader slug="/settings/ppfa-thresholds" title="PPFA Threshold Config" />
 
       {current ? (
         <div className="bg-ink text-paper rounded-lg p-4 space-y-1">
@@ -144,126 +141,135 @@ export function PPFAThresholdsPage() {
         </p>
       </div>
 
-      <button
-        type="button"
-        onClick={() => (showForm ? setShowForm(false) : openForm())}
-        className="px-4 py-2 bg-gold text-ink rounded text-label-caps font-display uppercase"
-      >
-        {showForm ? 'Cancel' : current ? '+ New configuration' : '+ Create configuration'}
-      </button>
+      <div>
+        <Button onClick={() => (showForm ? setShowForm(false) : openForm())} aria-expanded={showForm}>
+          {showForm ? 'Cancel' : current ? '+ New configuration' : '+ Create configuration'}
+        </Button>
+      </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="space-y-4 border border-gold/40 bg-white p-4 rounded">
-          <div className="grid grid-cols-2 gap-3">
-            <label className="space-y-1 block">
-              <span className="text-label-caps font-display uppercase text-slate">Disclosure threshold (ZAR)</span>
-              <input
-                type="number"
-                min="0"
-                className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-                value={disclosureRand}
-                onChange={(e) => setDisclosureRand(e.target.value)}
-                required
-              />
-            </label>
-            <label className="space-y-1 block">
-              <span className="text-label-caps font-display uppercase text-slate">Annual donor cap (ZAR)</span>
-              <input
-                type="number"
-                min="0"
-                className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-                value={capRand}
-                onChange={(e) => setCapRand(e.target.value)}
-                required
-              />
-            </label>
-            <label className="space-y-1 block">
-              <span className="text-label-caps font-display uppercase text-slate">Warning at (%)</span>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-                value={warningPct}
-                onChange={(e) => setWarningPct(e.target.value)}
-              />
-            </label>
-            <label className="space-y-1 block">
-              <span className="text-label-caps font-display uppercase text-slate">Financial year starts</span>
-              <select
-                className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
-                value={fyStartMonth}
-                onChange={(e) => setFyStartMonth(Number(e.target.value))}
-              >
-                {MONTH_LABEL.map((label, i) => (
-                  <option key={label} value={i + 1}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="space-y-1 block">
-              <span className="text-label-caps font-display uppercase text-slate">Aggregation rule</span>
-              <select
-                className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
-                value={aggregationRule}
-                onChange={(e) => setAggregationRule(e.target.value as AggregationRule)}
-              >
-                <option value="CUMULATIVE_PER_DONOR_PER_YEAR">Cumulative per donor per year</option>
-                <option value="PER_DONATION">Per donation</option>
-              </select>
-            </label>
-            <label className="space-y-1 block">
-              <span className="text-label-caps font-display uppercase text-slate">Effective date</span>
-              <input
-                type="date"
-                className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-                value={effectiveDate}
-                onChange={(e) => setEffectiveDate(e.target.value)}
-                required
-              />
-            </label>
-          </div>
+        <form onSubmit={handleSubmit}>
+          {/*
+           * Seven bare <label> wrappers before this, none associated —
+           * on the screen that records what the law is understood to
+           * require, with a source citation attached. The citation field
+           * in particular had a placeholder standing in for a label, and
+           * a placeholder vanishes the moment somebody types.
+           */}
+          <Card tone="accent" className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <Field label="Disclosure threshold (ZAR)" required>
+                {(props) => (
+                  <input
+                    {...props}
+                    type="number"
+                    min="0"
+                    value={disclosureRand}
+                    onChange={(e) => setDisclosureRand(e.target.value)}
+                    required
+                  />
+                )}
+              </Field>
+              <Field label="Annual donor cap (ZAR)" required>
+                {(props) => (
+                  <input
+                    {...props}
+                    type="number"
+                    min="0"
+                    value={capRand}
+                    onChange={(e) => setCapRand(e.target.value)}
+                    required
+                  />
+                )}
+              </Field>
+              <Field label="Warning at (%)">
+                {(props) => (
+                  <input
+                    {...props}
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={warningPct}
+                    onChange={(e) => setWarningPct(e.target.value)}
+                  />
+                )}
+              </Field>
+              <Field label="Financial year starts">
+                {(props) => (
+                  <select {...props} value={fyStartMonth} onChange={(e) => setFyStartMonth(Number(e.target.value))}>
+                    {MONTH_LABEL.map((label, i) => (
+                      <option key={label} value={i + 1}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </Field>
+              <Field label="Aggregation rule">
+                {(props) => (
+                  <select
+                    {...props}
+                    value={aggregationRule}
+                    onChange={(e) => setAggregationRule(e.target.value as AggregationRule)}
+                  >
+                    <option value="CUMULATIVE_PER_DONOR_PER_YEAR">Cumulative per donor per year</option>
+                    <option value="PER_DONATION">Per donation</option>
+                  </select>
+                )}
+              </Field>
+              <Field label="Effective date" required>
+                {(props) => (
+                  <input
+                    {...props}
+                    type="date"
+                    value={effectiveDate}
+                    onChange={(e) => setEffectiveDate(e.target.value)}
+                    required
+                  />
+                )}
+              </Field>
+            </div>
 
-          <label className="space-y-1 block">
-            <span className="text-label-caps font-display uppercase text-slate">Source citation</span>
-            <input
-              className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-              value={sourceCitation}
-              onChange={(e) => setSourceCitation(e.target.value)}
-              placeholder="e.g. Government Gazette No. XXXXX, DD Month YYYY"
+            <Field
+              label="Source citation"
               required
-            />
-          </label>
+              hint="For example: Government Gazette No. XXXXX, DD Month YYYY."
+            >
+              {(props) => (
+                <input
+                  {...props}
+                  value={sourceCitation}
+                  onChange={(e) => setSourceCitation(e.target.value)}
+                  required
+                />
+              )}
+            </Field>
 
-          {mutation.isError && (
-            <p className="text-body-md text-maroon">
-              {mutation.error instanceof Error ? mutation.error.message : 'Save failed.'}
-            </p>
-          )}
+            {mutation.isError && (
+              <p className="text-body-md font-body text-maroon">
+                {mutation.error instanceof Error ? mutation.error.message : 'Save failed.'}
+              </p>
+            )}
 
-          <button
-            type="submit"
-            disabled={!canSubmit || mutation.isPending}
-            className="w-full bg-ink text-paper rounded py-2.5 text-label-caps font-display uppercase disabled:opacity-40"
-          >
-            {mutation.isPending ? 'Saving…' : 'Create configuration'}
-          </button>
+            <Button type="submit" variant="secondary" disabled={!canSubmit || mutation.isPending} className="w-full">
+              {mutation.isPending ? 'Saving…' : 'Create configuration'}
+            </Button>
+          </Card>
         </form>
       )}
 
       {history.length > 0 && (
         <div className="space-y-2">
-          <h2 className="text-label-caps font-display uppercase text-slate">History</h2>
+          <SectionLabel as="h2">History</SectionLabel>
           {history.map((c) => (
-            <div key={c.id} className="bg-white border border-ink/10 rounded p-3">
+            <Card key={c.id}>
               <p className="text-body-md font-body text-ink">
                 {formatZAR(c.disclosureThresholdZAR)} disclosure / {formatZAR(c.annualDonorCapZAR)} cap
               </p>
-              <p className="text-data-mono font-mono text-slate">
+              <DataLine>
                 Effective {new Date(c.effectiveDate).toLocaleDateString('en-ZA')} · {c.sourceCitation}
-              </p>
-            </div>
+              </DataLine>
+            </Card>
           ))}
         </div>
       )}

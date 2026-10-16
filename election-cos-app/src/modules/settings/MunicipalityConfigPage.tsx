@@ -34,6 +34,7 @@ import {
   SCHEDULE_2_BASIS,
   delimitationFor,
 } from '@/modules/reference/municipalRegister';
+import { BasisNote, Button, Card, DataLine, Field, PageHeader, SectionLabel } from '@/components/ui';
 
 export function MunicipalityConfigPage() {
   const session = useSession();
@@ -125,28 +126,24 @@ export function MunicipalityConfigPage() {
 
   return (
     <div className="space-y-6 max-w-xl">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-label-caps font-display uppercase text-slate">/settings/municipality</p>
-          <h1 className="text-headline-md font-display text-ink mt-1">Municipality Config</h1>
-        </div>
-        {!editing && (
-          <button
-            type="button"
-            onClick={openForm}
-            className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase whitespace-nowrap"
-          >
-            {profile ? 'Edit' : '+ Set up'}
-          </button>
-        )}
-      </div>
+      <PageHeader
+        slug="/settings/municipality"
+        title="Municipality Config"
+        action={
+          !editing ? (
+            <Button onClick={openForm} className="whitespace-nowrap">
+              {profile ? 'Edit' : '+ Set up'}
+            </Button>
+          ) : undefined
+        }
+      />
 
       {!editing && profile && (
-        <div className="bg-white border border-ink/10 rounded-lg p-4 space-y-1">
+        <Card className="space-y-1">
           <p className="text-headline-md font-display text-ink">{profile.municipalityName}</p>
-          <p className="text-data-mono font-mono text-slate">
+          <DataLine>
             {profile.municipalityCode} · {profile.province}
-          </p>
+          </DataLine>
           <p className="text-body-md font-body text-ink">
             {profile.totalCouncilSeats} council seats ({profile.wardSeats} ward, {profile.prSeats} PR)
           </p>
@@ -179,7 +176,7 @@ export function MunicipalityConfigPage() {
               Election day: {new Date(profile.electionDate).toLocaleDateString('en-ZA', { dateStyle: 'long' })}
             </p>
           )}
-        </div>
+        </Card>
       )}
 
       {!editing && !profile && !profileQuery.isLoading && (
@@ -187,48 +184,40 @@ export function MunicipalityConfigPage() {
       )}
 
       {editing && (
-        <form onSubmit={handleSubmit} className="space-y-4 border border-gold/40 bg-white p-4 rounded">
+        <form onSubmit={handleSubmit}>
+         <Card tone="accent" className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label className="space-y-1 block">
-              <span className="text-label-caps font-display uppercase text-slate">Municipality code</span>
-              <input
-                className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-                value={municipalityCode}
-                onChange={(e) => onCodeChange(e.target.value)}
-                placeholder="NW405"
-                required
-              />
-            </label>
-            <label className="space-y-1 block">
-              <span className="text-label-caps font-display uppercase text-slate">Province</span>
-              <input
-                className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-                value={province}
-                onChange={(e) => setProvince(e.target.value)}
-                placeholder="North West"
-              />
-            </label>
+            {/* The code field is monospaced because it is a code, and it
+                is the field everything else on this form derives from. */}
+            <Field label="Municipality code" required mono hint="For example NW405.">
+              {(props) => (
+                <input {...props} value={municipalityCode} onChange={(e) => onCodeChange(e.target.value)} required />
+              )}
+            </Field>
+            <Field label="Province" hint="Filled in from the code where the baseline carries it.">
+              {(props) => (
+                <input {...props} value={province} onChange={(e) => setProvince(e.target.value)} />
+              )}
+            </Field>
           </div>
 
-          <label className="space-y-1 block">
-            <span className="text-label-caps font-display uppercase text-slate">Municipality name</span>
-            <input
-              className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-              value={municipalityName}
-              onChange={(e) => setMunicipalityName(e.target.value)}
-              placeholder="JB Marks Local Municipality"
-              required
-            />
-          </label>
+          <Field label="Municipality name" required hint="Filled in from the code where the baseline carries it.">
+            {(props) => (
+              <input
+                {...props}
+                value={municipalityName}
+                onChange={(e) => setMunicipalityName(e.target.value)}
+                required
+              />
+            )}
+          </Field>
 
           {/*
             * Read, not entered. See the file header: three free number
             * fields were three chances to disagree with the delimitation.
             */}
           <div className="border border-ink/10 rounded p-3 space-y-2">
-            <p className="text-label-caps font-display uppercase text-slate">
-              Seats · from the proclaimed delimitation
-            </p>
+            <SectionLabel as="h2">Seats · from the proclaimed delimitation</SectionLabel>
             {baseline ? (
               <>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -245,10 +234,10 @@ export function MunicipalityConfigPage() {
                     <p className="text-headline-md font-display text-ink">{baseline.prSeats ?? '—'}</p>
                   </div>
                 </div>
-                <p className="text-data-mono font-mono text-slate">
+                <DataLine>
                   Category {baseline.category} · {baseline.quotaSchedule === 'SCHEDULE_1' ? 'Schedule 1' : 'Schedule 2'}{' '}
                   · {DELIMITATION_VERSION.id}
-                </p>
+                </DataLine>
                 {baseline.quotaSchedule === 'SCHEDULE_2' && (
                   <p className="text-body-md font-body text-maroon">{SCHEDULE_2_BASIS}</p>
                 )}
@@ -262,40 +251,34 @@ export function MunicipalityConfigPage() {
             )}
           </div>
 
-          <label className="space-y-1 block">
-            <span className="text-label-caps font-display uppercase text-slate">Election day</span>
-            <input
-              type="date"
-              className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-              value={electionDate}
-              onChange={(e) => setElectionDate(e.target.value)}
-            />
-          </label>
+          <Field label="Election day">
+            {(props) => (
+              <input
+                {...props}
+                type="date"
+                value={electionDate}
+                onChange={(e) => setElectionDate(e.target.value)}
+              />
+            )}
+          </Field>
 
-          <p className="text-body-md font-body text-slate">{BASELINE_AUTHORITY}</p>
+          <BasisNote>{BASELINE_AUTHORITY}</BasisNote>
 
           {mutation.isError && (
-            <p className="text-body-md text-maroon">
+            <p className="text-body-md font-body text-maroon">
               {mutation.error instanceof Error ? mutation.error.message : 'Save failed.'}
             </p>
           )}
 
           <div className="flex gap-3">
-            <button
-              type="submit"
-              disabled={mutation.isPending}
-              className="flex-1 bg-ink text-paper rounded py-2.5 text-label-caps font-display uppercase disabled:opacity-40"
-            >
+            <Button type="submit" variant="secondary" disabled={mutation.isPending} className="flex-1">
               {mutation.isPending ? 'Saving…' : 'Save'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setEditing(false)}
-              className="px-4 py-2.5 border border-ink/20 rounded text-label-caps font-display uppercase text-ink"
-            >
+            </Button>
+            <Button variant="ghost" onClick={() => setEditing(false)}>
               Cancel
-            </button>
+            </Button>
           </div>
+         </Card>
         </form>
       )}
     </div>
