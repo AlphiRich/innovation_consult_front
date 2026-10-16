@@ -170,3 +170,21 @@ throws `unimplemented` as its entire body, so it cannot return a wrong
 answer.
 
 I will report what actually deployed, with the URLs, and nothing else.
+
+---
+
+## 5. The corporate landing page link needs nothing from you
+
+`index.html` at the repository root carries an Election Campaign OS
+launch card. It probes the application and becomes a real link only once
+the application answers; until then it reads "Launching soon" and renders
+no anchor at all, so a dead link on the public page is not a state it can
+reach.
+
+The moment the deploy succeeds, that link goes live by itself. Nobody has
+to come back and change it, and the landing page does not need
+redeploying.
+
+If the application ends up on a custom domain rather than
+`election2026-campaignms7-0.web.app`, change `APP_URL` in the script at
+the bottom of `index.html`. It is the only place the URL appears.

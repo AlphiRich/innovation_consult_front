@@ -153,6 +153,113 @@
             font-style: italic;
             font-weight: bold;
         }
+
+        /* ==========================================================
+           PRODUCT CARD — Election Campaign OS
+           ----------------------------------------------------------
+           The product mark below uses Election Campaign OS's OWN
+           palette (ink #1A2246 / gold #B7913F / paper #F7F4EE), not
+           this page's. That is deliberate and documented: see
+           election-cos-app/docs/innovation-consult-brand.md, which
+           states the corporate identity and the product tokens are
+           separate namespaces and must not be merged. The card's
+           chrome uses this page's variables so it belongs here; the
+           mark inside it is the product's.
+           ========================================================== */
+        .product-card {
+            background-color: white;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 40px;
+            padding: 28px;
+            border-radius: 8px;
+            border-top: 4px solid var(--navy-blue);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .product-mark {
+            flex: 0 0 auto;
+            width: 64px;
+            height: 64px;
+            border-radius: 12px;
+        }
+
+        .product-body { flex: 1 1 320px; min-width: 0; }
+
+        .product-body h2 {
+            color: var(--navy-blue);
+            margin: 0 0 4px 0;
+            font-size: 22px;
+        }
+
+        .product-kicker {
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin: 0 0 10px 0;
+        }
+
+        .product-body p { margin: 0 0 14px 0; line-height: 1.55; }
+
+        .product-meta {
+            font-size: 13px;
+            color: #5A5F6A;
+            margin: 0 0 16px 0;
+        }
+
+        /* The launch control has three states and renders exactly one.
+           It never renders an anchor until the app has answered. */
+        .launch-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+        .launch-btn {
+            display: inline-block;
+            background-color: var(--navy-blue);
+            color: white;
+            border: 2px solid var(--navy-blue);
+            padding: 13px 26px;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: inherit;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .launch-btn:hover, .launch-btn:focus-visible {
+            background-color: white;
+            color: var(--navy-blue);
+        }
+
+        .launch-btn[aria-disabled="true"] {
+            background-color: #E3E6EB;
+            border-color: #E3E6EB;
+            color: #6A6E7E;
+            cursor: not-allowed;
+        }
+
+        .launch-note { font-size: 13px; color: #5A5F6A; margin: 0; }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+            background: #9AA0AC;
+        }
+        .status-dot.live { background: #2F7E4A; }
+
+        @media (max-width: 640px) {
+            body { padding: 20px; }
+            .product-card { padding: 20px; }
+        }
     </style>
 </head>
 <body>
@@ -163,6 +270,68 @@
     </div>
 
     <button class="open-manual-btn" id="openManualBtn">📖 Open Legal OS User Manual</button>
+
+    <!-- ==============================================================
+         Election Campaign OS — launch card.
+
+         THE LINK VERIFIES ITSELF BEFORE IT OFFERS ITSELF.
+
+         A hard-coded anchor here would be a dead link on a public
+         corporate page for as long as the app is undeployed, which is
+         worse than no link at all. So the control starts disabled and
+         probes the app; it becomes a real anchor only once the app has
+         actually answered. When the deploy happens the link goes live
+         on its own — this page does not need redeploying, and nobody
+         has to remember to come back and change it.
+
+         To point it elsewhere (a custom domain, a staging host),
+         change APP_URL in the script at the bottom of this file. It is
+         the only place the URL appears.
+         ============================================================== -->
+    <section class="product-card" aria-labelledby="ecos-heading">
+        <!-- The product's own mark: ballot cross on the ink field.
+             Same geometry as election-cos-app/public/icon.svg. -->
+        <svg class="product-mark" viewBox="0 0 512 512" role="img" aria-label="Election Campaign OS">
+            <rect width="512" height="512" rx="64" fill="#1A2246"/>
+            <rect x="104" y="104" width="304" height="304" rx="24" fill="none" stroke="#B7913F" stroke-width="20"/>
+            <path d="M176 262 L232 318 L344 194" fill="none" stroke="#F7F4EE" stroke-width="40"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+
+        <div class="product-body">
+            <p class="product-kicker">Local government elections &middot; 4 November 2026</p>
+            <h2 id="ecos-heading">Election Campaign OS</h2>
+            <p>
+                Field operations for South African municipal campaigns &mdash; canvassing rounds, ward and
+                voting-district data, incident logging and PPFA donation compliance, built to keep working
+                when the signal does not.
+            </p>
+            <p class="product-meta">
+                Runs against the proclaimed delimitation for the 2026 local government election.
+                Installs to a phone and captures offline; work syncs when a connection returns.
+            </p>
+
+            <div class="launch-row">
+                <!-- Rendered as a button, not an anchor, until the probe
+                     succeeds. A disabled anchor is still clickable. -->
+                <button type="button" class="launch-btn" id="ecosLaunch" aria-disabled="true" disabled>
+                    Checking availability&hellip;
+                </button>
+                <p class="launch-note" id="ecosStatus">
+                    <span class="status-dot" id="ecosDot"></span>Contacting the application&hellip;
+                </p>
+            </div>
+
+            <noscript>
+                <p class="launch-note">
+                    This launch button checks that the application is reachable before offering a link, which
+                    needs JavaScript. The application itself is at
+                    <strong>election2026-campaignms7-0.web.app</strong> once it has been deployed.
+                </p>
+            </noscript>
+        </div>
+    </section>
+
 
     <div id="manualModal" class="modal-overlay">
         <div class="modal-content">
@@ -207,6 +376,104 @@
             </div>
         </div>
     </div>
+
+
+    <script>
+        /* ==========================================================
+           Election Campaign OS — availability probe.
+
+           WHY A PROBE AND NOT A PLAIN HREF
+
+           The app is deployed on its own schedule. A plain anchor on
+           this page would be a 404 for every visitor until that
+           happens, on the public face of the company. So the button
+           asks the app whether it is there, and only then becomes a
+           link.
+
+           HOW IT ASKS
+
+           By loading a small image from the app's own build
+           (/icon-192.png, part of its installable shell). An image
+           load is not subject to CORS for its load/error events,
+           where a fetch would be, and it proves the deployed
+           application is answering rather than merely that a domain
+           resolves.
+
+           It fails closed: anything other than a successful load
+           leaves the button disabled and the message honest.
+           ========================================================== */
+        (function () {
+            // The only place the application URL appears. Change this
+            // one line to point at a custom domain.
+            var APP_URL = "https://election2026-campaignms7-0.web.app";
+
+            // A file from the app's own build, not a generic path, so a
+            // parked domain or a placeholder page cannot pass.
+            var PROBE_PATH = "/icon-192.png";
+            var TIMEOUT_MS = 6000;
+
+            var btn = document.getElementById("ecosLaunch");
+            var status = document.getElementById("ecosStatus");
+            var dot = document.getElementById("ecosDot");
+            if (!btn || !status || !dot) return;
+
+            function setUnavailable(reason) {
+                btn.textContent = "Launching soon";
+                btn.setAttribute("aria-disabled", "true");
+                btn.disabled = true;
+                dot.className = "status-dot";
+                status.innerHTML = "";
+                status.appendChild(dot);
+                status.appendChild(document.createTextNode(reason));
+            }
+
+            function setLive() {
+                // Replace the button with a real anchor. Built as an
+                // element rather than innerHTML so the URL cannot be
+                // re-parsed as markup.
+                var link = document.createElement("a");
+                link.className = "launch-btn";
+                link.href = APP_URL;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer";
+                link.textContent = "Launch Election Campaign OS";
+                btn.parentNode.replaceChild(link, btn);
+
+                dot.className = "status-dot live";
+                status.innerHTML = "";
+                status.appendChild(dot);
+                status.appendChild(document.createTextNode("Live \u00b7 opens in a new tab"));
+            }
+
+            var settled = false;
+            var probe = new Image();
+
+            var timer = setTimeout(function () {
+                if (settled) return;
+                settled = true;
+                probe.src = "";
+                setUnavailable("Not responding yet \u00b7 the application has not been deployed.");
+            }, TIMEOUT_MS);
+
+            probe.onload = function () {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timer);
+                setLive();
+            };
+
+            probe.onerror = function () {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timer);
+                setUnavailable("Not available yet \u00b7 the application has not been deployed.");
+            };
+
+            // Cache-busted, so a previously failed probe is not served
+            // from cache after the app goes live.
+            probe.src = APP_URL + PROBE_PATH + "?probe=" + Date.now();
+        })();
+    </script>
 
     <script>
         const modal = document.getElementById("manualModal");

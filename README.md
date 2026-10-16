@@ -1,9 +1,20 @@
 # innovation_consult_front
 LegalOS1_1_UserManual
 
-## Election-COS1.0
+## Election Campaign OS
 
-`election-cos-app/` holds the Election-COS1.0 build — a multi-tenant,
+`index.html` (the corporate landing page) carries a launch card for the
+application. **The link verifies itself before it offers itself:** it
+probes the app and becomes a real anchor only once the app answers, so an
+undeployed app shows "Launching soon" rather than a dead link on a public
+page. When the deploy happens the link goes live on its own — this page
+needs no change and no redeploy.
+
+The application URL appears in exactly one place: `APP_URL` in the script
+at the bottom of `index.html`. Change that line to point at a custom
+domain.
+
+`election-cos-app/` holds the Election Campaign OS build — a multi-tenant,
 offline-first PWA for South African political campaign field operations,
 built against `IC-ECOS-BUILD-2026-V2`. See
 [`election-cos-app/BUILD-STATUS.md`](./election-cos-app/BUILD-STATUS.md) for
