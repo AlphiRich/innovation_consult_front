@@ -167,6 +167,44 @@ the Data tab. Same for Storage.
 This is rule 1 of the build spec and the one thing the preflight cannot
 check for you — reading it needs authentication.
 
+### 3.1 If it is wrong: what "a new project" actually involves
+
+Only read this if §3 came back as something other than `africa-south1`.
+
+I cannot create a project from this container — there is no Google
+credential here at all (`gcloud auth print-access-token` returns the
+literal string `proxy-injected`), so this is yours to do in the console
+or from your own `gcloud`. The steps, with the things that bite:
+
+1. **Pick the project ID carefully. It is permanent.** The name can be
+   edited forever; the ID never can. It must be 6–30 characters,
+   lowercase letters, digits and hyphens, start with a letter, not end
+   with one — and it **cannot reuse an ID that has ever existed**,
+   including a deleted one. So `election2026-campaignms7-0` is spent
+   whatever happens to it. Something like
+   `ic-ecos-2026-za` leaves room.
+2. **Create it**, then create Firestore and Storage **first**, before
+   anything else, choosing `africa-south1` for both. That ordering is
+   the whole point of the exercise.
+3. **Keep the old project alive until the new one serves.** A
+   soft-deleted project still counts against your project quota for 30
+   days and is only then fully removed, so deleting early buys nothing.
+4. **Tag it `environment=production`.** Create an `environment` tag key
+   and a `production` value, then attach it. The Cloud console then
+   shows a "Prod" badge in the project picker. On a project that will
+   hold a municipality's voter roll, a visual reminder of which project
+   is selected before somebody runs a destructive command is worth the
+   five minutes.
+5. **Then come back to §1 and §2 of this document**: new service
+   account, new six `VITE_FIREBASE_*` values, and
+   `election-cos-app/.firebaserc` updated to the new project ID. The
+   preflight already fails if the web config names a project other than
+   the one being deployed to, so a half-finished switch cannot ship.
+
+Nothing in the application code is tied to the project ID. Verified by
+grep: the only references are `.firebaserc`, `.env.example` (line 12 and
+a comment above it), your own `.env`, and the Actions variables.
+
 ---
 
 ## 4. Also worth enabling while you are there
