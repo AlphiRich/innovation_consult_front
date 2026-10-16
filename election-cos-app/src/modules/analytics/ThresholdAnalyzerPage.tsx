@@ -17,6 +17,7 @@ import { useMemo, useState } from 'react';
 import { NW405_2021_EXAMPLE } from './nw405Example';
 import { PartyRowsEditor, type PartyRow } from './PartyRowsEditor';
 import { meetsQualificationThreshold, pctOfTotal, votesNeededForThreshold } from './electoralThreshold';
+import { Card, Field, PageHeader, Pill, Table, Td, Th } from '@/components/ui';
 
 export function ThresholdAnalyzerPage() {
   const [totalValidVotes, setTotalValidVotes] = useState(NW405_2021_EXAMPLE.totalValidVotes);
@@ -35,65 +36,85 @@ export function ThresholdAnalyzerPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div>
-        <p className="text-label-caps font-display uppercase text-slate">/analytics/thresholds</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Threshold Analyzer</h1>
-        <p className="text-body-md font-body text-slate mt-1">
-          Electoral 1% qualification threshold (Municipal Structures Act Schedule 1) — not the PPFA funding
-          thresholds at Settings → PPFA Thresholds. This figure is a working assumption, not independently confirmed
-          against a primary source — see docs/unverified-source-documents.md.
-        </p>
-      </div>
+      <PageHeader
+        slug="/analytics/thresholds"
+        title="Threshold Analyzer"
+        description="Electoral 1% qualification threshold (Municipal Structures Act Schedule 1) — not the PPFA funding thresholds at Settings → PPFA Thresholds. This figure is a working assumption, not independently confirmed against a primary source — see docs/unverified-source-documents.md."
+      />
 
-      <div className="bg-white border border-ink/10 rounded-lg p-4 space-y-4">
-        <label className="space-y-1 block max-w-xs">
-          <span className="text-label-caps font-display uppercase text-slate">Total valid votes</span>
-          <input
-            type="number"
-            min="0"
-            className="w-full border border-ink/20 rounded px-2 py-1.5 text-body-md font-body"
-            value={totalValidVotes}
-            onChange={(e) => setTotalValidVotes(Number(e.target.value) || 0)}
-          />
-        </label>
+      <Card className="space-y-4">
+        {/* Was a bare <label> wrapping the input: nothing associated. */}
+        <div className="max-w-xs">
+          <Field label="Total valid votes">
+            {(props) => (
+              <input
+                {...props}
+                type="number"
+                min="0"
+                value={totalValidVotes}
+                onChange={(e) => setTotalValidVotes(Number(e.target.value) || 0)}
+              />
+            )}
+          </Field>
+        </div>
 
         <PartyRowsEditor rows={rows} onChange={setRows} showWardSeats={false} />
-      </div>
+      </Card>
 
-      <div className="bg-white border border-ink/10 rounded-lg overflow-x-auto">
-        <table className="w-full text-body-md font-body">
+      {/*
+       * The shared Table, which brings `tabular-nums` with it — the votes
+       * and percentage columns were proportional figures in a column
+       * before, which defeats the only reason to put them in one.
+       *
+       * Bare, not wrapped in a Card: that is how WardsPage renders the
+       * build's other table, and Card has no zero-padding mode — passing
+       * `p-0` would race its own `p-4` in the stylesheet, where the winner
+       * is decided by Tailwind's emission order rather than by what is
+       * written here.
+       */}
+      <Table caption="Each party's share of the total valid votes, and whether it clears the 1% qualification threshold">
           <thead>
-            <tr className="border-b border-ink/10 text-label-caps font-display uppercase text-slate">
-              <th className="text-left p-3">Party</th>
-              <th className="text-right p-3">Votes</th>
-              <th className="text-right p-3">% of total</th>
-              <th className="text-center p-3">Qualifies</th>
-              <th className="text-right p-3">Votes to qualify</th>
+            <tr>
+              <Th>Party</Th>
+              <Th numeric>Votes</Th>
+              <Th numeric>% of total</Th>
+              <Th>Qualifies</Th>
+              <Th numeric>Votes to qualify</Th>
             </tr>
           </thead>
           <tbody>
-            {[...analysis].sort((a, b) => b.pct - a.pct).map((p) => (
-              <tr key={p.id} className="border-b border-ink/5 last:border-0">
-                <td className="p-3 text-ink">{p.name || '(unnamed)'}</td>
-                <td className="p-3 text-right text-data-mono font-mono">{p.votes.toLocaleString('en-ZA')}</td>
-                <td className="p-3 text-right text-data-mono font-mono">{p.pct.toFixed(2)}%</td>
-                <td className="p-3 text-center">
-                  <span
-                    className={`px-2 py-1 rounded text-label-caps font-display uppercase ${
-                      p.meets ? 'bg-green/10 text-green' : 'bg-maroon/10 text-maroon'
-                    }`}
-                  >
-                    {p.meets ? 'Yes' : 'No'}
-                  </span>
-                </td>
-                <td className="p-3 text-right text-data-mono font-mono">
-                  {p.meets ? '—' : p.shortfall.toLocaleString('en-ZA')}
-                </td>
-              </tr>
-            ))}
+            {[...analysis]
+              .sort((a, b) => b.pct - a.pct)
+              .map((p) => (
+                <tr key={p.id}>
+                  <Td className="text-ink">{p.name || '(unnamed)'}</Td>
+                  <Td numeric mono>
+                    {p.votes.toLocaleString('en-ZA')}
+                  </Td>
+                  <Td numeric mono>
+                    {p.pct.toFixed(2)}%
+                  </Td>
+                  {/*
+                   * Centred with flex rather than `text-center`, because a
+                   * text-align class passed through Td's className would
+                   * race Td's own text-left in the stylesheet and the
+                   * winner depends on Tailwind's emission order, not on
+                   * the order written here.
+                   */}
+                  <Td>
+                    <span className="flex justify-center">
+                      <Pill className={p.meets ? 'bg-green/10 text-green' : 'bg-maroon/10 text-maroon'}>
+                        {p.meets ? 'Yes' : 'No'}
+                      </Pill>
+                    </span>
+                  </Td>
+                  <Td numeric mono>
+                    {p.meets ? '—' : p.shortfall.toLocaleString('en-ZA')}
+                  </Td>
+                </tr>
+              ))}
           </tbody>
-        </table>
-      </div>
+      </Table>
     </div>
   );
 }

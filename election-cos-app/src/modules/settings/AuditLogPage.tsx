@@ -20,6 +20,7 @@ import {
   groupByDay,
   isUnknownAction,
 } from './auditTrail';
+import { Card, DataLine, Field, PageHeader, SectionLabel } from '@/components/ui';
 
 const PAGE_SIZES = [50, 200, 500] as const;
 
@@ -35,13 +36,12 @@ export function AuditLogPage() {
 
   if (!session) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/settings/audit</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Audit log</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/settings/audit" title="Audit log" />
         <p className="mt-3 text-body-md font-body text-slate">
           No active session — see BUILD-STATUS.md (no live Firebase project provisioned yet).
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -51,29 +51,29 @@ export function AuditLogPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <p className="text-label-caps font-display uppercase text-slate">/settings/audit</p>
-          <h1 className="text-headline-md font-display text-ink mt-1">Audit log</h1>
-        </div>
-        <label className="space-y-1 block">
-          <span className="text-label-caps font-display uppercase text-slate">Show</span>
-          <select
-            className="border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
-            value={limitCount}
-            onChange={(e) => setLimitCount(Number(e.target.value))}
-          >
-            {PAGE_SIZES.map((size) => (
-              <option key={size} value={size}>
-                Most recent {size}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      <PageHeader
+        slug="/settings/audit"
+        title="Audit log"
+        action={
+          /* Was a bare <label> around the select — no association. */
+          <Field label="Show">
+            {(props) => (
+              <select {...props} value={limitCount} onChange={(e) => setLimitCount(Number(e.target.value))}>
+                {PAGE_SIZES.map((size) => (
+                  <option key={size} value={size}>
+                    Most recent {size}
+                  </option>
+                ))}
+              </select>
+            )}
+          </Field>
+        }
+      />
 
       <div className="border-l-4 border-gold bg-white p-3 space-y-2">
-        <p className="text-label-caps font-display uppercase text-ink">What this log is</p>
+        <SectionLabel as="h2" tone="ink">
+          What this log is
+        </SectionLabel>
         <p className="text-body-md font-body text-slate">{AUDIT_INTEGRITY_BASIS}</p>
         <p className="text-body-md font-body text-slate">{AUDIT_SCOPE_BASIS}</p>
       </div>
@@ -101,9 +101,9 @@ export function AuditLogPage() {
 
       {days.map((group) => (
         <section key={group.day} className="space-y-2">
-          <h2 className="text-label-caps font-display uppercase text-slate">
+          <SectionLabel as="h2">
             {new Date(group.day).toLocaleDateString('en-ZA', { dateStyle: 'long' })}
-          </h2>
+          </SectionLabel>
           {group.events.map((event) => (
             <div key={event.id} className="bg-white border border-ink/10 rounded p-3 space-y-1">
               <p className="text-body-md font-body text-ink">
@@ -114,10 +114,10 @@ export function AuditLogPage() {
                   </span>
                 )}
               </p>
-              <p className="text-data-mono font-mono text-slate">
+              <DataLine>
                 {new Date(event.occurredAt).toLocaleTimeString('en-ZA')} · {event.actorUid} ·{' '}
                 {event.targetType}/{event.targetId}
-              </p>
+              </DataLine>
             </div>
           ))}
         </section>

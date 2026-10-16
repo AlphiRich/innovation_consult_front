@@ -74,17 +74,28 @@ export function PageHeader({
  * screen-reader user navigates by, while looking identical on screen. A
  * label that titles a section is a heading; one that labels a field or a
  * figure is not. The caller knows which it is.
+ *
+ * `tone` exists for a less obvious reason. A call site that wants the ink
+ * weight rather than slate cannot get it with `className="text-ink"`: both
+ * are colour utilities in the same Tailwind group, so which one applies is
+ * decided by their order in the generated stylesheet, not by their order
+ * in the class attribute. A prop that *selects* the colour instead of
+ * appending a second one cannot lose that race. The same hazard is why
+ * nothing in this file accepts a padding override.
  */
 export function SectionLabel({
   children,
   className = '',
   as: Tag = 'p',
+  tone = 'slate',
 }: {
   children: ReactNode;
   className?: string;
   as?: 'p' | 'h2' | 'h3';
+  tone?: 'slate' | 'ink';
 }) {
-  return <Tag className={`text-label-caps font-display uppercase text-slate ${className}`}>{children}</Tag>;
+  const colour = tone === 'ink' ? 'text-ink' : 'text-slate';
+  return <Tag className={`text-label-caps font-display uppercase ${colour} ${className}`}>{children}</Tag>;
 }
 
 /** Codes, ids and figures. Monospaced so columns of them line up. */

@@ -10,6 +10,7 @@ import { useSession } from '@/auth/useSession';
 import type { VotingDistrict } from '@/dal/ports/votingDistricts';
 import { SchematicMap } from './SchematicMap';
 import { VDForm } from './VDForm';
+import { Button, Card, DataLine, PageHeader } from '@/components/ui';
 
 export function WardDetailPage() {
   const { wardCode } = useParams<{ wardCode: string }>();
@@ -33,9 +34,9 @@ export function WardDetailPage() {
 
   if (!session || !wardCode) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
+      <Card className="max-w-lg">
         <p className="text-body-md font-body text-slate">No active session.</p>
-      </div>
+      </Card>
     );
   }
 
@@ -49,26 +50,20 @@ export function WardDetailPage() {
         </Link>
       </div>
 
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-label-caps font-display uppercase text-slate">/wards/{wardCode}</p>
-          <h1 className="text-headline-md font-display text-ink mt-1">
-            {wardQuery.data?.name ?? (wardQuery.isLoading ? 'Loading…' : wardCode)}
-          </h1>
-          {wardQuery.data && (
-            <p className="text-data-mono font-mono text-slate mt-1">
-              {wardQuery.data.municipalityCode} · {wardQuery.data.registeredVoters.toLocaleString('en-ZA')} registered
-            </p>
-          )}
-        </div>
-        <button
-          type="button"
-          onClick={() => setShowForm({ mode: 'create' })}
-          className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase whitespace-nowrap"
-        >
-          + New VD
-        </button>
-      </div>
+      <PageHeader
+        slug={`/wards/${wardCode}`}
+        title={wardQuery.data?.name ?? (wardQuery.isLoading ? 'Loading…' : wardCode)}
+        action={
+          <Button onClick={() => setShowForm({ mode: 'create' })} className="whitespace-nowrap">
+            + New VD
+          </Button>
+        }
+      />
+      {wardQuery.data && (
+        <DataLine>
+          {wardQuery.data.municipalityCode} · {wardQuery.data.registeredVoters.toLocaleString('en-ZA')} registered
+        </DataLine>
+      )}
 
       <SchematicMap votingDistricts={vds} />
 
@@ -76,21 +71,24 @@ export function WardDetailPage() {
 
       <div className="space-y-2">
         {vds.map((vd) => (
-          <div key={vd.id} className="bg-white border border-ink/10 rounded-lg p-4 flex items-center justify-between">
-            <div>
+          <Card key={vd.id} className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
               <p className="text-headline-md font-display text-ink">{vd.name}</p>
-              <p className="text-data-mono font-mono text-slate">
+              <DataLine>
                 VD {vd.vdCode} · {vd.registeredVoters.toLocaleString('en-ZA')} registered
-              </p>
+              </DataLine>
             </div>
-            <button
-              type="button"
+            {/* An accessible name per row: eighteen buttons all announced
+                as "Edit" tell a screen-reader user nothing about which
+                voting district they are about to edit. */}
+            <Button
+              variant="ghost"
               onClick={() => setShowForm({ mode: 'edit', vd })}
-              className="px-3 py-1.5 border border-ink/20 rounded text-label-caps font-display uppercase text-ink"
+              aria-label={`Edit voting district ${vd.vdCode}`}
             >
               Edit
-            </button>
-          </div>
+            </Button>
+          </Card>
         ))}
       </div>
 
