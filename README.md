@@ -30,9 +30,20 @@ application shows "Launching soon" rather than a dead link on a public
 page. When the deploy happens the link goes live on its own — this page
 needs no change and no redeploy.
 
-The application URL appears in exactly one place: `APP_URL` in the script
-at the bottom of `index.html`. Change that one line to point at a custom
-domain.
+The application is served from **`electioscos.co.za`** (registered 16 Oct
+2026). The card probes that first and Firebase Hosting's own
+`election2026-campaignms7-0.web.app` second, linking to whichever answers
+— so a deploy that lands before `.co.za` DNS propagates still produces a
+working link.
+
+The domain is declared once, in
+[`election-cos-app/src/config/publicDomain.ts`](./election-cos-app/src/config/publicDomain.ts),
+with `APP_URL` in `index.html` held in step with it by a guard test. To
+move the application, change both; the test fails if you change only one.
+
+Connecting the domain is four console steps in a specific order — step 4
+before step 3 takes sign-in down for everybody. See §4.1 of
+[the deploy doc](./election-cos-app/docs/deploy-credentials-request.md).
 
 Its palette is the canonical Innovation Consult corporate identity —
 `#13244A` / `#C9A227` / `#7B1E30` / `#F4EFE2`, from the letterheads and
@@ -52,7 +63,7 @@ field operations, built against `IC-ECOS-BUILD-2026-V2`.
   — the state of the build in one page: what is built, what is blocked and
   on whom, what is deliberately unbuilt and why.
 - [`.claude/skills/ecos-build-discipline/SKILL.md`](./.claude/skills/ecos-build-discipline/SKILL.md)
-  — the twelve working rules. Read before changing anything in the
+  — the thirteen working rules. Read before changing anything in the
   application.
 - [`election-cos-app/docs/running-locally.md`](./election-cos-app/docs/running-locally.md)
   — emulators, seed data, custom claims, a signed-in local run.

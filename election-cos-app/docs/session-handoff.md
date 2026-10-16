@@ -9,7 +9,7 @@ Governing spec `IC-ECOS-BUILD-2026-V2`. Branch
 the application is the `election-cos-app/` subtree.
 
 **Read `.claude/skills/ecos-build-discipline/SKILL.md` before changing
-anything.** It holds the twelve rules this build arrived at the hard way,
+anything.** It holds the thirteen rules this build arrived at the hard way,
 including the standing instruction on the proclaimed delimitation.
 
 ---
@@ -27,6 +27,7 @@ only the account holder can supply.
 |---|---|
 | `npm run check:all` | green — 965 tests, 60 files (lint, typecheck, hex guard, type-scale guard, font guard) |
 | Route drive | 25 routes × phone and desktop, signed in: clean (session 45) |
+| Landing card | all three probe branches driven: custom / fallback / fails closed (session 46) |
 | `cd functions && npm test` | green — 52 tests, 2 files |
 | `npm run build` | green, with service-worker precache manifest |
 | `npm run preflight` | 2 failures, both the account holder's to clear (below) |
@@ -116,17 +117,25 @@ Not a backlog. Each of these is a decision.
 ## Real work remaining, in rough order of value
 
 1. **Deploy**, once the two values land, and confirm the region.
-2. **Registered voters per 2026 ward** — the annexure gives municipal
+2. **Connect `electioscos.co.za`** (registered 16 Oct 2026). Four console
+   steps in a strict order — §4.1 of
+   `docs/deploy-credentials-request.md`. **Step 4 before step 3 takes
+   sign-in down for everybody**, and the preflight warns about exactly
+   that. Nothing in the build waits on this: the landing card probes the
+   custom domain first and Hosting's `.web.app` second, so the public
+   link works either way.
+
+3. **Registered voters per 2026 ward** — the annexure gives municipal
    totals, not per-ward. Needed before the ward-level figures mean
    anything outside NW405.
-3. **The VD → 2026-ward spatial join.** 26 of 108 NW405 station codes
+4. **The VD → 2026-ward spatial join.** 26 of 108 NW405 station codes
    split across wards, which is why `VotingDistrict.id` is
    `${wardCode}::${vdCode}`. The rest of the country needs the same
    treatment and it needs the shapefiles.
-4. **Results history and code history for the other eight provinces.**
+5. **Results history and code history for the other eight provinces.**
    NW is complete; `provinceReviewStatus()` reports the gap honestly and
    `unreviewedProvinces()` lists it.
-5. ~~**Re-run the routes against the emulator.**~~ **Done, session 45.**
+6. ~~**Re-run the routes against the emulator.**~~ **Done, session 45.**
    25 routes × 2 viewports, signed in with the NW405 seed: no console
    errors, no page errors, no horizontal overflow, no missing content.
    It found four real defects first — all of them in form *components*
@@ -167,10 +176,10 @@ than by the class attribute. `SectionLabel` takes `as` and `tone`,
 `Field` takes `mono`; nothing takes a padding override. Where a variant
 is genuinely one-off — a maroon alarm tile, a green confirm, a gold
 outline — the markup stays hand-rolled with the reason in the file.
-6. **A Cloud Function to resolve an email to a Firebase uid**, so an
+7. **A Cloud Function to resolve an email to a Firebase uid**, so an
    administrator can grant access without the new user reading their own
    uid off the "Awaiting access" screen.
-7. **A Firestore TTL policy** on `tenants/{tid}/_syncIdempotency`
+8. **A Firestore TTL policy** on `tenants/{tid}/_syncIdempotency`
    (`expiresAt`). Not urgent; the records are small but accumulate
    forever.
 
@@ -188,7 +197,7 @@ third set that matched neither; it was drift and has been corrected.
 
 | | |
 |---|---|
-| `.claude/skills/ecos-build-discipline/SKILL.md` | the twelve working rules |
+| `.claude/skills/ecos-build-discipline/SKILL.md` | the thirteen working rules |
 | `docs/design-decision-and-change-log.md` | every decision, by session, with what it cost |
 | `docs/deploy-credentials-request.md` | the three deploy routes, exact IAM roles |
 | `docs/running-locally.md` | emulators, seed, claims, signed-in local run |

@@ -1936,8 +1936,9 @@ touches PPFA.
 
 ## What session 2 added
 
-- **`docs/phase-0-infra-plan.md`** — real domain names
-  (`app.electioncampaignos.co.za` etc.), GCP project IDs
+- **`docs/phase-0-infra-plan.md`** — domain names (then planned as
+  `app.electioncampaignos.co.za` etc.; superseded 16 Oct 2026 by the
+  registered `electioscos.co.za`), GCP project IDs
   (`innovation-consult-ecos-{dev,prod}`), the account register, and the
   pre-launch checklist, sourced from `03-implementation-rollout-plan.md`.
   `.env.example` and `.firebaserc.example` updated to match. This partially
@@ -2116,10 +2117,13 @@ touches PPFA.
       `_MESSAGING_SENDER_ID`, `_APP_ID` (project ID is already filled in).
    3. Authentication → Sign-in method → enable **Google** as a provider,
       and confirm a support email is set (Google requires one).
-   4. Authentication → Settings → Authorized domains — add whatever
-      domain the app will actually be served from for local dev
-      (`localhost` is usually pre-authorized) and, later, the real
-      `app.electioncampaignos.co.za` once that's live.
+   4. Authentication → Settings → Authorized domains — `localhost` is
+      usually pre-authorized; add **`electioscos.co.za`** (registered
+      16 Oct 2026) once it is connected to Hosting. Sign-in from a domain
+      that is not on this list is refused.
+      (This step used to name `app.electioncampaignos.co.za`, which was
+      planned in session 2 and never registered — see
+      `docs/phase-0-infra-plan.md`.)
    5. Verify Firestore exists in **`africa-south1`** — build spec §0 rule
       1, and irreversible once set. If Firestore hasn't been created at
       all yet, create it there now, before anything writes to it.

@@ -9,7 +9,7 @@ Governing spec: `IC-ECOS-BUILD-2026-V2`. Product: a multi-tenant,
 offline-first PWA for South African political campaign field operations,
 built for Innovation Consult (Pty) Ltd as its first SaaS offering.
 
-These twelve rules are not style preferences. Each one is here because
+These thirteen rules are not style preferences. Each one is here because
 breaking it cost a session, or would have shipped something false into a
 product that a campaign will make decisions with. The reasoning for each
 is in `election-cos-app/docs/design-decision-and-change-log.md`.
@@ -178,7 +178,39 @@ literal string `proxy-injected` is not an expired token; it means no
 Google credential can exist here, and `.github/workflows/deploy-ecos.yml`
 exists because of it.
 
-## 11. Verify, then commit, every time.
+## 11. Never match a process pattern that matches your own shell.
+
+`pkill -f "firebase emulators"`, `pgrep -f "emulators:start"`,
+`pkill -f http-server` — each of these kills the shell running it,
+because the shell's own command line contains the pattern. Exit 144, and
+every command chained after it silently never runs. It has cost **four
+shells** on this project, twice in one session, and each time the real
+damage was the chained work that looked done and wasn't.
+
+Find the pid without a self-matching pattern, then kill by pid:
+
+```bash
+python3 -c "
+import os
+needle = 'http' + '-server'      # split, so this cmdline cannot match itself
+for pid in os.listdir('/proc'):
+    if not pid.isdigit(): continue
+    try: cmd = open(f'/proc/{pid}/cmdline','rb').read().replace(b'\0',b' ').decode()
+    except OSError: continue
+    if needle in cmd and 'python3' not in cmd: os.kill(int(pid), 15)
+"
+```
+
+Then confirm the port is actually free — a dead parent does not mean a
+dead listener:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}' --max-time 2 http://127.0.0.1:PORT
+```
+
+`000` is down. Anything else is still serving.
+
+## 12. Verify, then commit, every time.
 
 ```
 npm run check:all     # lint, typecheck, hex guard, font guard, tests
@@ -203,7 +235,7 @@ off-token values keep working and nothing complains:
 The nav is fixed at **nine items** by §3.2 and `nav.test.ts` guards the
 count.
 
-## 12. Use the primitives, but never substitute one that merely looks close.
+## 13. Use the primitives, but never substitute one that merely looks close.
 
 `src/components/ui` holds the shared spelling of every pattern. Prefer it.
 But migrating a page is not a `sed` job, because three kinds of

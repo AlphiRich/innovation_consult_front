@@ -303,9 +303,16 @@
          on its own — this page does not need redeploying, and nobody
          has to remember to come back and change it.
 
-         To point it elsewhere (a custom domain, a staging host),
-         change APP_URL in the script at the bottom of this file. It is
-         the only place the URL appears.
+         The registered domain is electioscos.co.za. Firebase Hosting's
+         own election2026-campaignms7-0.web.app is kept as a FALLBACK,
+         tried second, so the link goes live the moment either answers
+         rather than waiting on .co.za DNS propagation.
+
+         To point it elsewhere, change APP_URL in the script at the
+         bottom of this file. It is the only place the domain appears
+         here, and a guard test in the application
+         (src/config/publicDomain.test.ts) fails if it drifts from
+         src/config/publicDomain.ts.
          ============================================================== -->
     <section class="product-card" aria-labelledby="ecos-heading">
         <!-- The product's own mark: ballot cross on the ink field.
@@ -345,7 +352,7 @@
                 <p class="launch-note">
                     This launch button checks that the application is reachable before offering a link, which
                     needs JavaScript. The application itself is at
-                    <strong>election2026-campaignms7-0.web.app</strong> once it has been deployed.
+                    <strong>electioscos.co.za</strong> once it has been deployed.
                 </p>
             </noscript>
         </div>
@@ -422,9 +429,23 @@
            leaves the button disabled and the message honest.
            ========================================================== */
         (function () {
-            // The only place the application URL appears. Change this
-            // one line to point at a custom domain.
-            var APP_URL = "https://election2026-campaignms7-0.web.app";
+            // The registered domain for the application. The only place
+            // it appears on this page; change this one line to move it.
+            // Kept in step with election-cos-app/src/config/publicDomain.ts
+            // by a guard test (publicDomain.test.ts), which fails if the
+            // two disagree.
+            var APP_URL = "https://electioscos.co.za";
+
+            // Firebase Hosting's own address, which keeps working after a
+            // custom domain is attached.
+            //
+            // It is a fallback, not a second home. The card tries APP_URL
+            // first and only then this, so the link goes live the moment
+            // EITHER answers — otherwise a successful deploy would still
+            // read "Launching soon" on the public page for however long
+            // .co.za DNS takes to propagate, which is a worse outcome
+            // than the dead link the probe exists to prevent.
+            var FALLBACK_URL = "https://election2026-campaignms7-0.web.app";
 
             // A file from the app's own build, not a generic path, so a
             // parked domain or a placeholder page cannot pass.
@@ -446,13 +467,13 @@
                 status.appendChild(document.createTextNode(reason));
             }
 
-            function setLive() {
+            function setLive(href) {
                 // Replace the button with a real anchor. Built as an
                 // element rather than innerHTML so the URL cannot be
                 // re-parsed as markup.
                 var link = document.createElement("a");
                 link.className = "launch-btn";
-                link.href = APP_URL;
+                link.href = href;
                 link.target = "_blank";
                 link.rel = "noopener noreferrer";
                 link.textContent = "Launch Election Campaign OS";
@@ -465,32 +486,52 @@
             }
 
             var settled = false;
-            var probe = new Image();
 
-            var timer = setTimeout(function () {
+            // Tries each origin in turn and links to the first that
+            // answers. Still fails closed: if none of them loads the
+            // probe image, the button stays disabled and the message
+            // stays honest.
+            function probeNext(queue) {
                 if (settled) return;
-                settled = true;
-                probe.src = "";
-                setUnavailable("Not responding yet \u00b7 the application has not been deployed.");
-            }, TIMEOUT_MS);
+                if (queue.length === 0) {
+                    settled = true;
+                    setUnavailable("Not available yet \u00b7 the application has not been deployed.");
+                    return;
+                }
 
-            probe.onload = function () {
-                if (settled) return;
-                settled = true;
-                clearTimeout(timer);
-                setLive();
-            };
+                var origin = queue[0];
+                var rest = queue.slice(1);
+                var probe = new Image();
+                var done = false;
 
-            probe.onerror = function () {
-                if (settled) return;
-                settled = true;
-                clearTimeout(timer);
-                setUnavailable("Not available yet \u00b7 the application has not been deployed.");
-            };
+                var timer = setTimeout(function () {
+                    if (done || settled) return;
+                    done = true;
+                    probe.src = "";
+                    probeNext(rest);
+                }, TIMEOUT_MS);
 
-            // Cache-busted, so a previously failed probe is not served
-            // from cache after the app goes live.
-            probe.src = APP_URL + PROBE_PATH + "?probe=" + Date.now();
+                probe.onload = function () {
+                    if (done || settled) return;
+                    done = true;
+                    clearTimeout(timer);
+                    settled = true;
+                    setLive(origin);
+                };
+
+                probe.onerror = function () {
+                    if (done || settled) return;
+                    done = true;
+                    clearTimeout(timer);
+                    probeNext(rest);
+                };
+
+                // Cache-busted, so a previously failed probe is not served
+                // from cache after the app goes live.
+                probe.src = origin + PROBE_PATH + "?probe=" + Date.now();
+            }
+
+            probeNext([APP_URL, FALLBACK_URL]);
         })();
     </script>
 

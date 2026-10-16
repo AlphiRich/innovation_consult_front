@@ -2240,3 +2240,134 @@ requests, no blank pages, no horizontal overflow, no missing content.**
 One known 30px target, documented above.
 
 `npm run check:all` green — 965 tests, 60 files. `npm run build` green.
+
+---
+
+## Session 46 — The domain
+
+`electioscos.co.za` registered, 16 October 2026. The application is
+served from the **apex**, not an `app.` subdomain.
+
+### Entry 46.1 — Two things flagged before building it in
+
+**The spelling.** `electioscos` has no "n" — it reads as "electios-cos",
+not "election-cos". Raised in one line before wiring it in, and built so
+that changing it is two constants and a guard test. Proceeding as
+instructed; the flag is recorded here so that if it ever turns out to
+have been a slip, nobody has to reconstruct whether it was noticed.
+
+**The repository already assumed a different domain.** Session 2's
+`docs/phase-0-infra-plan.md` planned `app.electioncampaignos.co.za` with
+`www.` and `api.` siblings, and `BUILD-STATUS.md` referenced it in two
+places — including in the console checklist, as the domain to add to
+Firebase's authorised list. None of those names were ever registered.
+
+That table is now marked **superseded** with a live table beside it,
+rather than silently rewritten. The `api.` subdomain is explicitly not
+taken up: the sync endpoint is served same-origin at `/api/**` behind a
+Hosting rewrite, which is what lets the service worker treat it as
+same-origin and never cache it. A separate `api.` host would have made
+every sync request cross-origin for nothing.
+
+### Entry 46.2 — One declaration, and a guard that proves it
+
+`src/config/publicDomain.ts` holds `APP_DOMAIN`, `APP_ORIGIN`,
+`HOSTING_ORIGIN`, `CORPORATE_DOMAIN` and `SUPERSEDED_DOMAINS`.
+
+A domain is the one value in this build that is simultaneously public,
+printed on material, and expensive to change — and it had already drifted
+once before it was registered. So `publicDomain.test.ts` (6 tests) holds
+the line, including across a package boundary: the corporate landing page
+is plain HTML at the repository root and cannot import the constant, so
+the test reads `index.html` and asserts they agree.
+
+**Proved by injection, all four branches** — change the constant alone
+and the drift test fails; put `app.electioncampaignos.co.za` back in
+`index.html` and the supersession tripwire fails; add a second `APP_URL`
+assignment and the single-source test fails; delete `FALLBACK_URL` and
+the fallback test fails. Reverted clean.
+
+Comments are blanked before matching, up front this time. Third
+occurrence of that defect class in this repository and the first where it
+was handled before it bit.
+
+### Entry 46.3 — The launch card now probes two origins, in order
+
+**Changed, and the reason matters.** The card used to probe one origin.
+Pointed at a freshly registered `.co.za`, that would have meant a
+*successful* deploy still reading "Launching soon" on the company's
+public page for however long DNS and certificate issuance took — a worse
+outcome than the dead link the probe was built to prevent.
+
+It now tries `electioscos.co.za`, then
+`election2026-campaignms7-0.web.app`, and links to whichever answers
+first. Still fails closed: if neither loads the probe image, no anchor is
+rendered at all.
+
+**Verified by driving it**, with the two origins stubbed:
+
+| | Probed | Result |
+|---|---|---|
+| Custom domain answers | custom only | links to `electioscos.co.za`, "Live" |
+| Custom dead, Hosting answers | custom → fallback | links to the `.web.app`, "Live" |
+| Neither answers | custom → fallback | **no anchor**, "Launching soon" |
+
+The first row matters as much as the third: once the real domain works,
+the fallback is never probed, so the page cannot quietly settle on the
+`.web.app` address.
+
+### Entry 46.4 — The ordering that takes sign-in down
+
+**The expensive mistake available here**, now guarded.
+
+`VITE_FIREBASE_AUTH_DOMAIN` is where the Google OAuth handshake happens.
+Pointing it at `electioscos.co.za` is a legitimate and better end state —
+a party official signing in sees the campaign's own domain rather than
+`election2026-campaignms7-0.firebaseapp.com`, which to that reader looks
+like a phishing page. Firebase Hosting serves the `/__/auth/*` helpers on
+a custom domain, so it genuinely works.
+
+**But only after the domain is connected and its certificate issued.**
+Set it before that and every sign-in fails — the one failure that locks
+out the people who would otherwise fix it.
+
+So the preflight gained a check, and with it a third status. `WARN` is
+not `FAIL`, because the custom value is the correct destination; and it
+is not silence, because the order is what bites. The reporter previously
+printed anything that was not `PASS` as `FAIL`, which would have
+displayed this warning as a failure while not counting it as one —
+corrected in the same pass.
+
+Both branches proved: the Firebase default reads `ok`, a custom value
+reads `warn` with the preconditions and does not change the exit code.
+
+`.env.example` carries the same ordering at the line somebody would
+actually edit, and §4.1 of `docs/deploy-credentials-request.md` has the
+five console steps with the dependency spelled out.
+
+### Entry 46.5 — Rule 11, after the fourth shell
+
+`pkill -f "firebase emulators"` and `pkill -f http-server` kill the shell
+that runs them, because the shell's own command line contains the
+pattern. Exit 144, and everything chained after it silently never runs.
+
+Four shells now, two of them in this session — and each time the real
+cost was not the shell but the chained work that looked done and wasn't.
+It was a caveat in `docs/running-locally.md`; it is now **rule 11** of
+the discipline skill, with the pid-lookup that works and the port check
+that confirms a listener is actually gone. A dead parent does not mean a
+dead listener: `http-server`'s child kept serving after its parent was
+killed.
+
+### What did not need changing
+
+The PWA manifest (`start_url`, `scope`, `id` all `/`) and the service
+worker (`url.origin !== self.location.origin`) are origin-relative and
+work unchanged on any host. The app's own `index.html` keeps
+`noindex, nofollow` and gains no canonical or Open Graph tags: it is an
+authenticated application holding voter records under POPIA, and the
+right amount of search-engine presence for it is none.
+
+**Verified:** `npm run check:all` green — 971 tests, 61 files (6 new);
+`npm run build` green; the landing card driven through all three probe
+branches; the preflight driven through both auth-domain branches.

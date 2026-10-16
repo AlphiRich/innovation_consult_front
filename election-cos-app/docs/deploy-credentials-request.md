@@ -211,10 +211,59 @@ a comment above it), your own `.env`, and the Actions variables.
 
 - **Authentication → Sign-in method → Google.** The app is Google-only.
   Without this, sign-in fails for everybody.
-- **Authorised domains** must include the Hosting domain.
+- **Authorised domains** must include `electioscos.co.za` (and
+  `election2026-campaignms7-0.web.app`, which is there by default).
+  Sign-in from a domain not on that list is refused.
 - **Firestore TTL policy** on `tenants/{tid}/_syncIdempotency`, field
   `expiresAt`. Without it the sync idempotency records accumulate
   forever. Not urgent; they are small.
+
+---
+
+## 4.1 Connecting `electioscos.co.za` — the order matters
+
+The domain was registered on 16 October 2026. The application is served
+from the **apex**, `electioscos.co.za`, not from an `app.` subdomain.
+
+Nothing in the build is waiting on this: the landing page's launch card
+probes the custom domain **first** and Firebase Hosting's own
+`election2026-campaignms7-0.web.app` **second**, so the public link goes
+live the moment either answers. You can deploy before the domain resolves
+and nothing looks broken.
+
+**Do these in order. Step 4 before step 3 takes sign-in down for
+everybody.**
+
+1. **Firebase console → Hosting → Add custom domain.** Enter
+   `electioscos.co.za`. Firebase gives you a TXT record to prove
+   ownership, then A records to point at it.
+2. **Add those records at your `.co.za` registrar** (ZACR-accredited;
+   Cloudflare if DNS is there, as the phase-0 plan assumed). Apex domains
+   need A records, not CNAME. Then wait — verification and the TLS
+   certificate are not instant, and Firebase shows the state.
+3. **Wait for Hosting to report the certificate as issued** and confirm
+   `https://electioscos.co.za` actually serves the app.
+4. **Only then**, if you want it: set
+   `VITE_FIREBASE_AUTH_DOMAIN=electioscos.co.za` and rebuild.
+
+   This is optional and it is better product — the Google sign-in
+   handshake then happens on the campaign's own domain instead of
+   `election2026-campaignms7-0.firebaseapp.com`, which to a party
+   official looks like a phishing page. Firebase Hosting serves the
+   `/__/auth/*` helpers on a custom domain, so it genuinely works.
+
+   But set it before step 3 completes and **every sign-in fails**, which
+   is the one failure that locks out the people who would otherwise fix
+   it. `npm run preflight` warns whenever this is anything other than the
+   Firebase default, and names the preconditions.
+5. **Add `electioscos.co.za` to Authentication → Settings → Authorised
+   domains** (§4 above). Required whether or not you did step 4.
+
+Nothing else in the repository needs editing. `electioscos.co.za` is
+declared once, in `election-cos-app/src/config/publicDomain.ts`, and a
+guard test fails if the landing page drifts from it or if a superseded
+name reappears. The PWA manifest and the service worker are
+origin-relative and need no change.
 
 ---
 
@@ -252,6 +301,13 @@ The moment the deploy succeeds, that link goes live by itself. Nobody has
 to come back and change it, and the landing page does not need
 redeploying.
 
-If the application ends up on a custom domain rather than
-`election2026-campaignms7-0.web.app`, change `APP_URL` in the script at
-the bottom of `index.html`. It is the only place the URL appears.
+The card now probes **two** origins in order and links to the first that
+answers: `https://electioscos.co.za`, then
+`https://election2026-campaignms7-0.web.app`. That is why you can deploy
+before the domain resolves — the link goes live either way, and prefers
+the registered domain once it works.
+
+To move it, change `APP_URL` in the script at the bottom of `index.html`
+and `APP_DOMAIN` in `election-cos-app/src/config/publicDomain.ts`. A
+guard test fails if those two disagree, so it is not possible to change
+one and forget the other.

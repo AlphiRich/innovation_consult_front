@@ -28,6 +28,31 @@ leaving them to re-derive later.
 
 ## Domain and DNS architecture
 
+> **SUPERSEDED, 16 October 2026.** The plan below was written in session
+> 2 and the `electioncampaignos.co.za` names in it were **never
+> registered**. The registered domain for the application is
+> **`electioscos.co.za`**, and the three-subdomain split (`www.` / `app.`
+> / `api.`) was not taken up — the application is served from the apex.
+> Kept here as the record of what was planned; see the live table below
+> it. The canonical value lives in `src/config/publicDomain.ts` and a
+> guard test fails if anything reuses a superseded name.
+
+### Live (16 October 2026)
+
+| Domain | Purpose | Target |
+|---|---|---|
+| `innovationconsult.co.za` | Corporate site | separate project |
+| `electioscos.co.za` | **The application** (`election-cos-app`, this repo) | Firebase Hosting on `election2026-campaignms7-0` |
+| `election2026-campaignms7-0.web.app` | Hosting's own address; kept as the landing card's fallback | Firebase Hosting |
+
+The API is **not** on its own subdomain. The sync endpoint is served
+same-origin at `/api/**` behind a Hosting rewrite, which is what lets the
+service worker treat it as same-origin and never cache it — see
+`public/sw.js`. A separate `api.` host would have made every sync request
+cross-origin for no gain.
+
+### Planned in session 2, not registered
+
 | Domain | Purpose | Target |
 |---|---|---|
 | `innovationconsult.co.za` | Corporate site | GitHub Pages (`ic-corporate`, separate project) |

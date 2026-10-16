@@ -148,6 +148,38 @@ if (missingWeb.length > 0) {
   } else {
     add('web app config', 'PASS', `all ${WEB_VARS.length} present, project ${configProject}`);
   }
+
+  // ------------------------------------------------------- auth domain
+  //
+  // Added when electioscos.co.za was registered, because there is a
+  // tempting and expensive mistake available here.
+  //
+  // `authDomain` is where the Google OAuth handshake happens, served from
+  // `/__/auth/*`. Firebase Hosting serves those paths on a custom domain
+  // too, so pointing authDomain at electioscos.co.za is legitimate and
+  // better product — a party official signing in sees the campaign's own
+  // domain rather than election2026-campaignms7-0.firebaseapp.com.
+  //
+  // But it only works AFTER the custom domain is connected and its
+  // certificate issued. Set it first and sign-in fails for everybody,
+  // with a redirect to a host that is not yet serving the auth helpers —
+  // and sign-in is the one failure that locks out the people who would
+  // otherwise fix it.
+  //
+  // So: not a FAIL, because it is a correct end state. A loud WARN with
+  // the ordering, because getting the order wrong takes the whole
+  // product down.
+  const authDomain = readVar('VITE_FIREBASE_AUTH_DOMAIN');
+  const firebaseDefaults = [`${configProject}.firebaseapp.com`, `${configProject}.web.app`];
+
+  if (authDomain && !firebaseDefaults.includes(authDomain)) {
+    add('auth domain', 'WARN', `custom: ${authDomain}`,
+      `This only works once ${authDomain} is connected to Firebase Hosting on ${configProject} with its ` +
+      'certificate issued, AND is listed under Authentication -> Settings -> Authorised domains. If it is ' +
+      `not, every sign-in fails. Until then use ${firebaseDefaults[0]}.`);
+  } else if (authDomain) {
+    add('auth domain', 'PASS', `${authDomain} (Firebase default)`);
+  }
 }
 
 // ----------------------------------------------------------------- build
@@ -322,19 +354,36 @@ for (const [name, file] of [['firestore rules', 'firestore.rules'], ['storage ru
 // ------------------------------------------------------------- reporting
 
 const failures = checks.filter((c) => c.status === 'FAIL');
+// WARN is a third state, added with the custom domain: a configuration
+// that is correct as an end state but breaks the product if reached in
+// the wrong order. It must not block a deploy — the end state is the
+// goal — and it must not print as "FAIL" either, or the one thing the
+// reader needs to distinguish is the thing the output hides.
+const warnings = checks.filter((c) => c.status === 'WARN');
 
 if (json) {
-  console.log(JSON.stringify({ ready: failures.length === 0, region: REQUIRED_REGION, checks }, null, 2));
+  console.log(
+    JSON.stringify(
+      { ready: failures.length === 0, warnings: warnings.length, region: REQUIRED_REGION, checks },
+      null,
+      2,
+    ),
+  );
 } else {
   console.log('\nElection Campaign OS — deploy preflight\n');
   for (const check of checks) {
-    const mark = check.status === 'PASS' ? 'ok  ' : 'FAIL';
+    const mark = check.status === 'PASS' ? 'ok  ' : check.status === 'WARN' ? 'warn' : 'FAIL';
     console.log(`  ${mark}  ${check.name.padEnd(22)} ${check.detail}`);
-    if (check.remedy && check.status === 'FAIL') console.log(`        -> ${check.remedy}`);
+    if (check.remedy && check.status !== 'PASS') console.log(`        -> ${check.remedy}`);
   }
   console.log();
   if (failures.length === 0) {
-    console.log('  All preflight checks pass. Nothing has been deployed — this script only checks.');
+    const tail = warnings.length === 1 ? '' : 's';
+    console.log(
+      warnings.length === 0
+        ? '  All preflight checks pass. Nothing has been deployed — this script only checks.'
+        : `  Preflight passes with ${warnings.length} warning${tail}. Nothing has been deployed — this script only checks.`,
+    );
     console.log(`\n  BEFORE THE FIRST DEPLOY, verify in the console that Firestore and Storage were created`);
     console.log(`  in ${REQUIRED_REGION}. It is set at creation time, cannot be read from here, and cannot`);
     console.log('  be changed once data exists.\n');
