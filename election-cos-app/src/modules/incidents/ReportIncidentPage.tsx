@@ -24,6 +24,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSession } from '@/auth/useSession';
 import { IncidentForm } from './IncidentForm';
+import { Button, Card, PageHeader } from '@/components/ui';
 
 export function ReportIncidentPage() {
   const session = useSession();
@@ -31,25 +32,23 @@ export function ReportIncidentPage() {
 
   if (!session) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/incidents/new</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Report an incident</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/incidents/new" title="Report an incident" />
         <p className="mt-3 text-body-md font-body text-slate">
           No active session — see BUILD-STATUS.md (no live Firebase project provisioned yet).
         </p>
-      </div>
+      </Card>
     );
   }
 
   if (!session.caps.includes('incidents.create')) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/incidents/new</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Report an incident</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/incidents/new" title="Report an incident" />
         <p className="mt-3 text-body-md font-body text-slate">
           Your role does not include logging incidents.
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -57,15 +56,11 @@ export function ReportIncidentPage() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <div>
-        <p className="text-label-caps font-display uppercase text-slate">/incidents/new</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Report an incident</h1>
-        <p className="mt-2 text-body-md font-body text-slate">
-          A service delivery problem you can see: water, electricity, roads, or something affecting public
-          safety. Report the thing, not the household — an incident is about a street, not about the people on
-          it.
-        </p>
-      </div>
+      <PageHeader
+        slug="/incidents/new"
+        title="Report an incident"
+        description="A service delivery problem you can see: water, electricity, roads, or something affecting public safety. Report the thing, not the household — an incident is about a street, not about the people on it."
+      />
 
       {submitted ? (
         <div className="bg-white border border-green/50 rounded-lg p-4 space-y-3">
@@ -78,16 +73,13 @@ export function ReportIncidentPage() {
             </p>
           )}
           <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setSubmitted(false)}
-              className="px-4 py-2 bg-ink text-paper rounded text-label-caps font-display uppercase"
-            >
+            <Button variant="secondary" onClick={() => setSubmitted(false)}>
               Report another
-            </button>
+            </Button>
+            {/* A <Link>: it navigates. Matches Button's ghost variant. */}
             <Link
               to="/round"
-              className="px-4 py-2 border border-ink/20 rounded text-label-caps font-display uppercase text-ink"
+              className="inline-flex min-h-11 items-center rounded border border-ink/20 px-4 py-2 text-label-caps font-display uppercase text-ink"
             >
               Back to the round
             </Link>

@@ -5,6 +5,7 @@
  * party-list screen lives here rather than in the nine-item primary nav.
  */
 import { Link } from 'react-router-dom';
+import { PageHeader } from '@/components/ui';
 
 const SUB_VIEWS = [
   { to: '/settings/municipality', label: 'Municipality Config', description: 'Seat totals and election parameters.' },
@@ -39,10 +40,7 @@ const SUB_VIEWS = [
 export function SettingsPage() {
   return (
     <div className="space-y-6 max-w-2xl">
-      <div>
-        <p className="text-label-caps font-display uppercase text-slate">/settings</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Settings</h1>
-      </div>
+      <PageHeader slug="/settings" title="Settings" />
 
       <div className="grid gap-3">
         {SUB_VIEWS.map((view) => (

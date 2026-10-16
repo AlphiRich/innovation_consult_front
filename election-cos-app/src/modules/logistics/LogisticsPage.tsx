@@ -29,6 +29,7 @@ import { useSession } from '@/auth/useSession';
 import { TONE_PILL_CLASSES } from '@/design/toneClasses';
 import { LogisticsItemForm } from './LogisticsItemForm';
 import { STATUS_LABEL, URGENCY_META } from './logisticsMeta';
+import { Button, Card, DataLine, PageHeader } from '@/components/ui';
 
 export function LogisticsPage() {
   const session = useSession();
@@ -48,15 +49,22 @@ export function LogisticsPage() {
 
   if (!session) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/logistics</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Logistics</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/logistics" title="Logistics" />
         <p className="mt-3 text-body-md font-body text-slate">
           No active session — see BUILD-STATUS.md (no live Firebase project provisioned yet).
         </p>
-      </div>
+      </Card>
     );
   }
+
+  // Which row is actually being approved. `isPending` alone is the whole
+  // mutation's state, so every REQUESTED row read "Approving…" at once
+  // while one of them was in flight — on a page whose entire job is
+  // telling a coordinator what has been approved and what has not.
+  // Disabling them all stays: two approvals racing the same mutation is
+  // not a thing to allow. Saying they are all in flight is.
+  const approvingId = approveMutation.isPending ? approveMutation.variables : null;
 
   const items = [...(itemsQuery.data ?? [])].sort(
     (a, b) => new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime(),
@@ -64,19 +72,15 @@ export function LogisticsPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-label-caps font-display uppercase text-slate">/logistics</p>
-          <h1 className="text-headline-md font-display text-ink mt-1">Logistics</h1>
-        </div>
-        <button
-          type="button"
-          onClick={() => setShowForm(true)}
-          className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase whitespace-nowrap"
-        >
-          + Request materials
-        </button>
-      </div>
+      <PageHeader
+        slug="/logistics"
+        title="Logistics"
+        action={
+          <Button onClick={() => setShowForm(true)} className="whitespace-nowrap">
+            + Request materials
+          </Button>
+        }
+      />
 
       {itemsQuery.isLoading && <p className="text-body-md font-body text-slate">Loading…</p>}
       {itemsQuery.isError && (
@@ -90,17 +94,17 @@ export function LogisticsPage() {
 
       <div className="space-y-3">
         {items.map((item) => (
-          <div key={item.id} className="bg-white border border-ink/10 rounded-lg p-4 space-y-2">
+          <Card key={item.id} className="space-y-2">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-headline-md font-display text-ink">{item.itemName}</p>
-                <p className="text-data-mono font-mono text-slate">
+                <DataLine>
                   {item.quantityRequested > 0 && `Requested: ${item.quantityRequested}`}
                   {item.quantityRequested > 0 && item.quantityOnHand > 0 && ' · '}
                   {item.quantityOnHand > 0 && `On hand: ${item.quantityOnHand}`}
                   {item.wardCode && ` · ${item.wardCode}`}
                   {item.vdCode && ` · VD ${item.vdCode}`}
-                </p>
+                </DataLine>
               </div>
               <span
                 className={`px-2 py-1 rounded border text-label-caps font-display uppercase whitespace-nowrap ${TONE_PILL_CLASSES[URGENCY_META[item.urgency].tone]}`}
@@ -116,17 +120,16 @@ export function LogisticsPage() {
             <div className="flex items-center justify-between">
               <span className="text-label-caps font-display uppercase text-ink">{STATUS_LABEL[item.status]}</span>
               {item.status === 'REQUESTED' && (
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
                   disabled={approveMutation.isPending}
                   onClick={() => approveMutation.mutate(item.id)}
-                  className="px-3 py-1.5 bg-ink text-paper rounded text-label-caps font-display uppercase disabled:opacity-40"
                 >
-                  {approveMutation.isPending ? 'Approving…' : 'Approve'}
-                </button>
+                  {approvingId === item.id ? 'Approving…' : 'Approve'}
+                </Button>
               )}
             </div>
-          </div>
+          </Card>
         ))}
       </div>
 

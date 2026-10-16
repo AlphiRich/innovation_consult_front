@@ -20,6 +20,7 @@ import type { Donor } from '@/dal/ports/donors';
 import { DonorForm } from './DonorForm';
 import { DonorDetail } from './DonorDetail';
 import { DisclosureRegisterPanel } from './DisclosureRegisterPanel';
+import { BasisNote, Button, Card, PageHeader } from '@/components/ui';
 
 export function FinancePage() {
   const session = useSession();
@@ -40,13 +41,12 @@ export function FinancePage() {
 
   if (!session) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/finance</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Funding & Disclosure</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/finance" title="Funding & Disclosure" />
         <p className="mt-3 text-body-md font-body text-slate">
           No active session — see BUILD-STATUS.md (no live Firebase project provisioned yet).
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -55,19 +55,15 @@ export function FinancePage() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-label-caps font-display uppercase text-slate">/finance</p>
-          <h1 className="text-headline-md font-display text-ink mt-1">Funding & Disclosure</h1>
-        </div>
-        <button
-          type="button"
-          onClick={() => setShowDonorForm(true)}
-          className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase whitespace-nowrap"
-        >
-          + New donor
-        </button>
-      </div>
+      <PageHeader
+        slug="/finance"
+        title="Funding & Disclosure"
+        action={
+          <Button onClick={() => setShowDonorForm(true)} className="whitespace-nowrap">
+            + New donor
+          </Button>
+        }
+      />
 
       {!configQuery.isLoading && !config && (
         <p className="text-body-md font-body text-maroon border-l-4 border-maroon bg-white p-3">
@@ -81,11 +77,11 @@ export function FinancePage() {
       )}
 
       {config && (
-        <p className="text-body-md font-body text-slate">
+        <BasisNote>
           Governing figures: disclosure {(config.disclosureThresholdZAR / 100).toLocaleString('en-ZA')} ZAR · annual
           cap {(config.annualDonorCapZAR / 100).toLocaleString('en-ZA')} ZAR · effective{' '}
           {new Date(config.effectiveDate).toLocaleDateString('en-ZA')} · {config.sourceCitation}
-        </p>
+        </BasisNote>
       )}
 
       {config && (
@@ -118,7 +114,8 @@ export function FinancePage() {
               key={donor.id}
               type="button"
               onClick={() => setSelectedDonor(donor)}
-              className={`w-full text-left px-3 py-2 rounded border ${
+              aria-pressed={selectedDonor?.id === donor.id}
+              className={`flex min-h-11 w-full items-center rounded border px-3 py-2 text-left ${
                 selectedDonor?.id === donor.id ? 'bg-ink text-paper border-ink' : 'bg-white text-ink border-ink/10'
               }`}
             >
