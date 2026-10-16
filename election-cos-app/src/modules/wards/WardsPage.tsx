@@ -22,6 +22,7 @@ import {
   WORKLOAD_BASIS,
 } from './wardSizeDeviation';
 import { MunicipalRegisterPanel } from '@/modules/reference/MunicipalRegisterPanel';
+import { BarMeter, Table, Td, Th } from '@/components/ui';
 
 export function WardsPage() {
   const session = useSession();
@@ -62,6 +63,9 @@ export function WardsPage() {
   const totals = totalsFor(wards);
   const reconciliation = profileQuery.isLoading ? null : reconcileSeed(wards, profileQuery.data ?? null);
   const sizes = analyseWardSizes(wards);
+  // The bar is read against the biggest ward, not the municipal total:
+  // 34 bars at 3% each would all look identical.
+  const largestWard = wards.reduce((max, w) => Math.max(max, w.registeredVoters), 0);
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -216,36 +220,72 @@ export function WardsPage() {
         </p>
       )}
 
-      <div className="space-y-2">
-        {wards.map((ward) => (
-          <div key={ward.id} className="bg-white border border-ink/10 rounded-lg p-4 flex items-center justify-between">
-            <div>
-              <Link to={`/wards/${ward.wardCode}`} className="text-headline-md font-display text-ink hover:text-teal">
-                {ward.name}
-              </Link>
-              <p className="text-data-mono font-mono text-slate">
-                {ward.wardCode} · {ward.municipalityCode} · {ward.vdCodes.length} VD
-                {ward.vdCodes.length === 1 ? '' : 's'} · {ward.registeredVoters.toLocaleString('en-ZA')} registered
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setShowForm({ mode: 'edit', ward })}
-                className="px-3 py-1.5 border border-ink/20 rounded text-label-caps font-display uppercase text-ink"
-              >
-                Edit
-              </button>
-              <Link
-                to={`/wards/${ward.wardCode}`}
-                className="px-3 py-1.5 bg-ink text-paper rounded text-label-caps font-display uppercase"
-              >
-                View VDs
-              </Link>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/*
+        * A table rather than 34 stacked cards. Comparing two wards' voter
+        * counts meant most of a metre of scrolling, and the figures did
+        * not line up as a column. Pattern adopted from the screen-rebuild
+        * reference (session 39), which used this build's own tokens.
+        */}
+      {wards.length > 0 && (
+        <Table caption="Wards in this municipality, with voting districts and registered voters">
+          <thead>
+            <tr>
+              <Th>Ward</Th>
+              <Th>Code</Th>
+              <Th numeric>VDs</Th>
+              <Th numeric>Registered</Th>
+              <Th>Share of municipality</Th>
+              <Th className="sr-only">Actions</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {wards.map((ward) => (
+              <tr key={ward.id} className="hover:bg-paper">
+                <Td>
+                  <Link to={`/wards/${ward.wardCode}`} className="text-ink hover:text-teal font-medium">
+                    {ward.name}
+                  </Link>
+                </Td>
+                <Td mono>{ward.wardCode}</Td>
+                <Td numeric>{ward.vdCodes.length}</Td>
+                <Td numeric>{ward.registeredVoters.toLocaleString('en-ZA')}</Td>
+                <Td className="w-40">
+                  <BarMeter
+                    value={ward.registeredVoters}
+                    max={largestWard}
+                    label={`${ward.name}: ${ward.registeredVoters.toLocaleString('en-ZA')} registered voters`}
+                  />
+                </Td>
+                <Td className="whitespace-nowrap text-right">
+                  <button
+                    type="button"
+                    onClick={() => setShowForm({ mode: 'edit', ward })}
+                    className="min-h-11 px-3 text-label-caps font-display uppercase text-teal"
+                  >
+                    Edit
+                  </button>
+                  <Link
+                    to={`/wards/${ward.wardCode}`}
+                    className="inline-flex min-h-11 items-center px-3 text-label-caps font-display uppercase text-teal"
+                  >
+                    VDs
+                  </Link>
+                </Td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr className="bg-paper font-medium">
+              <Td>{totals.wardCount} wards</Td>
+              <Td mono>{defaultMunicipalityCode(wards)}</Td>
+              <Td numeric>{totals.vdCount}</Td>
+              <Td numeric>{totals.registeredVoters.toLocaleString('en-ZA')}</Td>
+              <Td />
+              <Td />
+            </tr>
+          </tfoot>
+        </Table>
+      )}
 
       {showForm.mode !== 'closed' && (
         <WardForm

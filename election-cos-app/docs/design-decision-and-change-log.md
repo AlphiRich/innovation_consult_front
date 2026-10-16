@@ -1585,3 +1585,86 @@ tests pass.
   primitives encode. They render identically; migrating them is
   mechanical and was not worth risking in the same pass that built the
   primitives.
+
+---
+
+## Session 39 — The screen-rebuild reference
+
+Two artifact links, which turn out to be one document and a copy of it
+(918,784 and 918,791 bytes — the seven are " (Copy)" in the title).
+"Election-COS1.0 — Screen Rebuilds": six screens rebuilt against this
+build's own tokens, with the three typefaces inlined as data URIs because
+the artifact sandbox blocks font CDNs.
+
+### Entry 39.1 — The reference is honest, and that is what makes it usable
+
+**Accepted as a design reference.** It does the thing this project has
+asked of every supplied asset and rarely got: it labels what is real.
+
+| Screen | What it says of itself | Verdict |
+|---|---|---|
+| War Room | Real page, illustrative numbers | Patterns adopted |
+| Vote Calculator | Real page, real Schedule 1 formula, real 2021 IEC result | Already built |
+| Role Permissions | Real page, real capabilities from `types.ts` | Already built |
+| Field Performance | *"concept reference — no route. Not a built feature."* | **Not built** |
+| Ward Sentiment Summary | *"concept reference — no route."* | **Not built** |
+| Ward Sentiment Drilldown | *"Ward code and voter counts are real; the sentiment figures are not."* | **Not built** |
+
+The three concept screens stay unbuilt, for the reason the reference
+itself gives: volunteer identity, hours and conversion have no data model
+here, and per-ward sentiment segmentation needs the counters document
+restructured and the Cloud Function triggers rewritten. Building them
+would mean shipping invented numbers in a product whose entire discipline
+is not doing that. The reference agreeing with that position is worth
+recording — it is the first supplied asset that drew the line itself.
+
+It also uses the real palette and the real type scale, with no drift. No
+correction needed anywhere in it, which has not happened before.
+
+### Entry 39.2 — The table the build never had
+
+**Adopted.** `Table`, `Th`, `Td` and `BarMeter` in `src/components/ui`.
+
+The reference's `table.data` pattern exposed a real gap: this build had no
+table component at all. The Wards page rendered 34 wards as 34 stacked
+cards — most of a metre of scrolling to compare two figures, with the
+numbers not even in a column to compare.
+
+Three details carry it, all from the reference: `tabular-nums` on numeric
+cells so digits line up (proportional figures in a column defeat the only
+reason to put them in one), headers in the tracked display face matching
+`SectionLabel`, and a horizontal scroll container rather than a reflow —
+a table that rewraps on a phone has stopped being a table.
+
+The ward table also carries a `BarMeter` per row, read against the largest
+ward rather than the municipal total: 34 bars at 3% each would all look
+identical.
+
+### Entry 39.3 — The empty slot in the chrome, filled
+
+**Corrected.** `Shell.tsx` carried a comment since session 9 explaining
+that §2.3 specifies the wordmark "with tenant name below", and that the
+slot stays empty because no tenant *name* exists — `SessionContext` has
+only an opaque `tenantId`, and the `Tenant.displayName` that would supply
+one lives in the unbuilt Postgres store.
+
+That reasoning was right about the tenant and wrong about the slot. The
+municipality profile carries `municipalityName` and `municipalityCode`,
+and the reference's top bar shows exactly that — "JB Marks Local
+Municipality · NW405". It is the one piece of context that tells somebody
+which campaign they are looking at before they read a figure.
+
+Rendered only when a real name exists. A tenant id there would still be
+worse than nothing: opaque, and it reads as a defect.
+
+### What was not taken
+
+The reference's own nav rail, wordmark lockup and "design reference — not
+live data" badge are scaffolding for a standalone page, not product
+chrome. Its single-theme choice matches this build, which has no dark mode
+for a stated reason — a field tool that must stay legible on a cracked
+Android screen in direct sun does not get one for free.
+
+**Verified:** `npm run check:all` — 965 tests green; `npm run build`
+green; the nine routes re-driven signed-in against the emulator with the
+real NW405 seed, both viewports, no console errors.

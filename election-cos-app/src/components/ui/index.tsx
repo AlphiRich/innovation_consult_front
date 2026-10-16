@@ -255,3 +255,109 @@ export function Pill({ children, className = '' }: { children: ReactNode; classN
 export function BasisNote({ children }: { children: ReactNode }) {
   return <p className="text-body-md font-body text-slate">{children}</p>;
 }
+
+/* ----------------------------------------------------------------- table */
+
+/**
+ * A scannable data table.
+ *
+ * Adopted from the screen-rebuild reference supplied in session 39, which
+ * used our own tokens and rebuilt six screens against them. The build had
+ * no table at all: the Wards page rendered 34 municipalities as 34 stacked
+ * cards, which is most of a metre of scrolling to compare two figures.
+ *
+ * Three details carry the weight:
+ *
+ *  - `tabular-nums` on numeric cells, so a column of voter counts lines up
+ *    digit over digit. Proportional figures in a column are unreadable as
+ *    a comparison, which is the only reason to put them in a column.
+ *  - Headers in the display face, tracked and uppercase — the same
+ *    treatment `SectionLabel` gives every other heading in the product.
+ *  - A horizontal scroll container rather than a reflow. A table that
+ *    rewraps on a phone stops being a table; one that scrolls sideways is
+ *    still readable, and the first column stays put.
+ */
+export function Table({ children, caption }: { children: ReactNode; caption?: string }) {
+  return (
+    <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+      <table className="w-full border-collapse text-body-md">
+        {caption && <caption className="sr-only">{caption}</caption>}
+        {children}
+      </table>
+    </div>
+  );
+}
+
+export function Th({
+  children,
+  numeric = false,
+  className = '',
+}: {
+  children: ReactNode;
+  numeric?: boolean;
+  className?: string;
+}) {
+  return (
+    <th
+      scope="col"
+      className={`whitespace-nowrap border-b border-ink/10 px-3 py-2.5 text-label-caps font-display uppercase text-slate ${
+        numeric ? 'text-right' : 'text-left'
+      } ${className}`}
+    >
+      {children}
+    </th>
+  );
+}
+
+export function Td({
+  children,
+  numeric = false,
+  mono = false,
+  className = '',
+}: {
+  /** Optional: a footer or spacer cell legitimately has none. */
+  children?: ReactNode;
+  numeric?: boolean;
+  mono?: boolean;
+  className?: string;
+}) {
+  return (
+    <td
+      className={`border-b border-ink/5 px-3 py-2.5 ${numeric ? 'text-right tabular-nums' : ''} ${
+        mono ? 'font-mono text-data-mono' : 'font-body'
+      } ${className}`}
+    >
+      {children}
+    </td>
+  );
+}
+
+/**
+ * A proportion drawn as a bar.
+ *
+ * `value` and `max` rather than a percentage, so the caller cannot hand it
+ * a figure it computed differently from the one it prints beside it.
+ */
+export function BarMeter({
+  value,
+  max,
+  tone = 'bg-teal',
+  label,
+}: {
+  value: number;
+  max: number;
+  tone?: string;
+  label: string;
+}) {
+  const pct = max > 0 ? Math.min(100, Math.max(0, (value / max) * 100)) : 0;
+  return (
+    <div
+      className="h-2 w-full overflow-hidden rounded bg-paper"
+      role="img"
+      aria-label={label}
+      title={label}
+    >
+      <div className={`h-full rounded ${tone}`} style={{ width: `${pct}%` }} />
+    </div>
+  );
+}

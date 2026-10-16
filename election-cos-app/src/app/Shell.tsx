@@ -33,6 +33,8 @@ import { SignInPage } from '@/auth/SignInPage';
 import { signOut } from '@/auth/firebaseAuth';
 import { NAV_FOOTER_LINE, PRODUCT_NAME_SHORT } from '@/lib/legalText';
 import { useEntitlements } from '@/auth/useEntitlements';
+import { useQuery } from '@tanstack/react-query';
+import { dal } from '@/dal';
 import { Button, Card, DataLine, SectionLabel } from '@/components/ui';
 import { ConnectionStatus } from './ConnectionStatus';
 import { PRIMARY_NAV, navItemAccess } from './nav';
@@ -41,6 +43,16 @@ export function Shell() {
   const { session, status, user } = useAuthState();
   const { entitlements } = useEntitlements();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  // The municipality this tenant is campaigning in. Until session 39 the
+  // chrome showed nothing here — the slot was left empty because no tenant
+  // *name* existed to put in it. A municipality name does, and it is the
+  // one piece of context that tells somebody which campaign they are
+  // looking at before they read a single figure.
+  const profileQuery = useQuery({
+    queryKey: ['municipalityProfile', session?.tenantId],
+    queryFn: () => dal.municipalityProfile.get(session!),
+    enabled: Boolean(session),
+  });
   const location = useLocation();
 
   // Navigating must close the drawer, or the user taps a link and stares
@@ -92,6 +104,12 @@ export function Shell() {
 
   const caps = session?.caps ?? [];
   const items = PRIMARY_NAV.filter((item) => navItemAccess(item, caps, entitlements).allowed);
+  const profile = profileQuery.data;
+  // Rendered only once a real name exists. A tenant id here would be worse
+  // than nothing: it is opaque and reads as a defect.
+  const municipality = profile?.municipalityName
+    ? `${profile.municipalityName} · ${profile.municipalityCode}`
+    : null;
 
   const navList = (
     <ul className="space-y-1">
@@ -140,7 +158,12 @@ export function Shell() {
 
       {/* Phone: a bar, and the nav behind it. */}
       <header className="md:hidden sticky top-0 z-30 flex items-center justify-between gap-3 bg-ink px-4 py-3 text-paper">
-        <span className="font-display text-headline-md tracking-wide">{PRODUCT_NAME_SHORT}</span>
+        <span className="min-w-0">
+          <span className="font-display text-headline-md tracking-wide block">{PRODUCT_NAME_SHORT}</span>
+          {municipality && (
+            <span className="block truncate text-data-mono font-mono text-paper/60">{municipality}</span>
+          )}
+        </span>
         <div className="flex items-center gap-3">
           <ConnectionStatus compact />
           <button
@@ -178,7 +201,10 @@ export function Shell() {
          * Tenant.displayName that would supply a real name lives in the V2
          * Postgres store, which is unbuilt.
          */}
-        <div className="font-display text-headline-md tracking-wide mb-6">{PRODUCT_NAME_SHORT}</div>
+        <div className="mb-6">
+          <p className="font-display text-headline-md tracking-wide">{PRODUCT_NAME_SHORT}</p>
+          {municipality && <DataLine className="text-paper/60 mt-0.5">{municipality}</DataLine>}
+        </div>
         {navList}
         {navFooter}
       </nav>
