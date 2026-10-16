@@ -24,6 +24,43 @@ publishes documents; the product is one thing that company builds).
 | Legal cover background | `#E4E7EA` | 3f (Legal & Compliance) cover only |
 | Fine-print slate | `#5A5648` | Footer/disclaimer text |
 
+### Re-confirmed against the current artifact (16 Oct 2026)
+
+The question raised earlier — *which* navy is the company's navy, since
+several were in circulation — is settled. The latest HTML version of the
+cover-pages and letterheads design artifact ("Letterhead & Covers",
+`claude.ai/artifact/9siMnzn6QVQff1HT5UEx69`, updated 7 Oct 2026) declares
+in its `:root`:
+
+```css
+--bg: #F4EFE2;  --ink: #13244A;  --gold: #C9A227;  --maroon: #7B1E30;
+```
+
+That is the table above, value for value. The 9 Aug canvas and the 7 Oct
+artifact agree, so this document needed no correction — **these four are
+the canonical corporate values** and anything that disagrees with them is
+drift, not an alternative.
+
+Three palettes were found in circulation, and only now can each be named:
+
+| Where | Navy | Gold | Maroon | Paper | Status |
+|---|---|---|---|---|---|
+| Letterheads & covers (this doc, the artifact) | `#13244A` | `#C9A227` | `#7B1E30` | `#F4EFE2` | **Canonical corporate** |
+| EC OS product tokens (`src/design/tokens.ts`) | `#1A2246` | `#B7913F` | `#7E1F2E` | `#F7F4EE` | **Correct — separate namespace, keep** |
+| Corporate landing page (`index.html`, repo root) | `#1C355E` | `#C4A464` | `#8B2332` | `#F4F6F8` | **Drift — corrected 16 Oct 2026** |
+
+The landing page's values matched neither system. They were not a third
+design decision; they were approximations that nothing had ever checked.
+`index.html` now carries the canonical four, with a comment naming this
+document and the artifact as its source so the next person does not have
+to re-derive it.
+
+The product namespace is deliberately **not** changed. `tokens.ts` stays
+as it is for the reason stated above: a company that publishes documents
+and one product that company builds are two identity systems, and the
+`check-no-hex.mjs` guard exists to keep the product's tokens the only
+colours in the product.
+
 ## Typography
 
 Poppins (sans-serif) throughout the actual document content — headings,

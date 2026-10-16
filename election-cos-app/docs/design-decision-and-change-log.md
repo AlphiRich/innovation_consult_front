@@ -1668,3 +1668,264 @@ Android screen in direct sun does not get one for free.
 **Verified:** `npm run check:all` — 965 tests green; `npm run build`
 green; the nine routes re-driven signed-in against the emulator with the
 real NW405 seed, both viewports, no console errors.
+
+---
+
+## Session 40 — The credential request, reissued
+
+*Logged late. This turn came before session 39's screen-rebuild work in
+wall-clock order and was never written up; it is recorded here rather than
+inserted above, because the entry numbers are referenced from code
+comments and renumbering them would break those references.*
+
+The request was "haven't received the requests, please reissue."
+
+### Entry 40.1 — There is no channel from here to a mobile phone
+
+**Stated plainly rather than worked around.** The original instruction was
+"for further permissions, send request to my mobile." That cannot be done:
+this session has no SMS gateway, no push channel to the account holder's
+handset, and no way to raise a notification outside the conversation. The
+first request was therefore written into the conversation and into
+`docs/deploy-credentials-request.md`, which is the only durable channel
+that exists — and the reason it appeared not to arrive is that nothing
+ever left this container.
+
+Saying so is the correction. Reissuing the same text into the same channel
+and hoping would have wasted another turn, and a CTO who cannot say "that
+channel does not exist" is worse than no CTO.
+
+What replaced it: the request became a committed document with three
+routes — self-deploy, GitHub Actions, or supply a credential to this
+environment — so the account holder reads it where the work is, not where
+a notification would have been.
+
+### Entry 40.2 — Present config is not correct config
+
+**Defect found by reissuing.** Rewriting the request meant re-running
+`npm run preflight` to quote its real output, and the web-config check
+**passed**. It should not have. The `.env` in this container is the
+emulator config: project `demo-ecos`, six well-formed values, every one of
+them wrong for a deploy.
+
+The check tested presence. Six present values for the wrong project would
+have deployed a site that loads perfectly, reaches nothing, and gives no
+clue why — the config is compiled into the bundle, so the failure surfaces
+as a silent inability to sign in.
+
+`scripts/deploy-preflight.mjs` now also fails if:
+
+- `VITE_FIREBASE_PROJECT_ID` names a project other than the one
+  `.firebaserc` is deploying to, and
+- `VITE_FIREBASE_USE_EMULATORS` is still set, which would publish a build
+  pointed at `127.0.0.1`.
+
+Both branches were proved by injection: the project-id mismatch by
+pointing `.env` at another project, the emulator flag by the `.env` that
+is actually there — which is why the preflight output in the request
+document now shows that second failure instead of a pass. Reverted clean
+in the first case; the second is the honest state of a development
+container and is left as it is.
+
+---
+
+## Session 41 — The launch card on the corporate landing page
+
+The request was to integrate a live UI/UX link to the application from the
+company's corporate landing page.
+
+### Entry 41.1 — A link that proves the thing it links to
+
+**Built.** `index.html` at the repository root carries an Election
+Campaign OS launch card.
+
+The obvious implementation — an `<a href>` to the Hosting URL — would have
+put a dead link on Innovation Consult's public page for as long as the
+deploy stays blocked. On a maiden SaaS offering that is a worse outcome
+than no link at all: a prospective client who clicks it and gets a 404
+has learned something about the company, and it is not true.
+
+So the card probes before it links. A script at the bottom of the page
+requests `/icon-192.png` from the application origin via `new Image()`,
+and only on load does it replace the inert "Launching soon" element with a
+real anchor. No fetch, no CORS preflight, no dependency on the
+application's CSP — an image load either succeeds or it does not.
+
+The consequence worth recording: **a dead link is not a state this page
+can reach.** When the deploy succeeds the link appears by itself, with
+nobody coming back to edit the landing page and no second deploy.
+
+### Entry 41.2 — `APP_URL` appears exactly once
+
+**By construction.** The application origin is a single `const` in that
+script, and the card's text, the anchor it builds and the probe URL are
+all derived from it. A custom domain later is a one-line change in one
+place, which is the only version of this that survives somebody else
+making it.
+
+---
+
+## Session 42 — Routing around the block
+
+The request was "retry."
+
+### Entry 42.1 — The block is a property of this container, not the project
+
+**Verified three independent ways, then routed around.** Deployment has
+been blocked for several sessions on credentials. The three checks:
+
+| Check | Result |
+|---|---|
+| `GOOGLE_APPLICATION_CREDENTIALS` / `FIREBASE_TOKEN` | neither set |
+| `gcloud projects describe election2026-campaignms7-0` | `CREDENTIALS_MISSING` |
+| `gcloud auth print-access-token` | returns the literal string `proxy-injected` |
+
+The third is the decisive one. It is not an expired token or a missing
+scope: no Google credential can exist in this container, because the
+egress proxy substitutes a placeholder. Retrying from here cannot succeed,
+and had not been going to succeed on any previous attempt either.
+
+The BigQuery MCP connector does authenticate and does reach
+`election2026-campaignms7-0`, which confirms the project is real and the
+account holder's connectors work. It cannot deploy Hosting, rules or
+functions.
+
+**So: `.github/workflows/deploy-ecos.yml`.** GitHub Actions has no such
+limitation, and a repository secret is a path the account holder already
+knows. One secret (`FIREBASE_SERVICE_ACCOUNT`), six Actions variables for
+the web config, and **Run workflow**. It is `workflow_dispatch` only —
+automatic deploys on every push, to a project holding a campaign's voter
+roll, is a decision for a person to make deliberately rather than inherit,
+so the `push` trigger is present and commented out.
+
+The workflow runs `check:all`, the build, and then the same preflight
+before anything is sent. It writes the service-account JSON to
+`$RUNNER_TEMP`, validates that it parses before the CLI can report
+something unrelated, and removes it under `if: always()`.
+
+### Entry 42.2 — The functions predeploy hook that was never there
+
+**Defect found by writing the workflow.** Spelling out the deploy steps
+for CI meant reading `firebase.json` closely, and the functions codebase
+had **no `predeploy` hook**.
+
+`functions/package.json` points `main` at `lib/index.js`, which exists
+only after `tsc` has run. `lib/` is gitignored. A deploy from a clean
+checkout — which is every CI run — would have uploaded a package whose
+entry point is absent: the deploy **succeeds**, and every function is dead
+on arrival. Nothing in 41 sessions would have caught it, because `lib/`
+existed in this container from local development.
+
+```json
+"predeploy": ["npm --prefix \"$RESOURCE_DIR\" ci", "npm --prefix \"$RESOURCE_DIR\" run build"]
+```
+
+And a preflight check, so it cannot silently go missing again: for each
+declared functions codebase, if `main` names a file that is absent and
+there is no predeploy hook to build it, that is a `FAIL`. Proved by
+deleting the hook — `functions build  FAIL` — and restoring it.
+
+This is the window's clearest instance of the pattern this project keeps
+hitting: **the defect is found by implementing the next thing, not by
+thinking harder about the last one.** Running the app for the first time
+found the fonts that had never loaded. Reissuing the credential request
+found the preflight's false pass. Writing the CI workflow found the
+functions that would have deployed dead.
+
+### Entry 42.3 — What is still blocked, and on whom
+
+Everything is in place except two values only the account holder can
+supply: a deploy credential, and the Firebase web app config. Both are
+documented in `docs/deploy-credentials-request.md` with the exact IAM
+roles, and neither should be pasted into the conversation — a
+service-account key is a standing credential on the project, and chat
+history is not a secret store. A web config is public by design and may
+be.
+
+One thing the preflight cannot check and nobody should skip: **Firestore
+and Storage must have been created in `africa-south1`.** The region is
+fixed at creation, is not expressible in `firebase.json`, cannot be
+changed once data exists, and reading it requires authenticating. If
+either was created elsewhere the remedy is a new project — far cheaper now
+than after a campaign has loaded a roll.
+
+---
+
+## Session 43 — The brand reconciliation
+
+The request was to commit the night's progress durably, and to settle the
+navy question against the latest cover-pages and letterheads artifact.
+
+### Entry 43.1 — Three navies, and only one of them was wrong
+
+**Resolved.** The current HTML version of the design artifact
+("Letterhead & Covers", updated 7 Oct 2026) declares
+`--ink: #13244A`, `--gold: #C9A227`, `--maroon: #7B1E30`,
+`--bg: #F4EFE2` — value for value what `docs/innovation-consult-brand.md`
+already recorded from the 9 August canvas. Two sources, two months apart,
+in exact agreement. The brand document needed no correction, which is
+worth stating because it is the first time a supplied asset and this
+repository's record of it have matched without one.
+
+What that agreement exposed is where the drift actually was:
+
+| Where | Navy | Status |
+|---|---|---|
+| Letterheads & covers | `#13244A` | **Canonical corporate** |
+| EC OS product tokens | `#1A2246` | **Correct — separate namespace** |
+| Corporate landing page | `#1C355E` | **Drift — corrected** |
+
+The landing page's four colours matched neither system. They were never a
+third design decision; they were approximations nothing had checked.
+`index.html` now carries the canonical four, with a comment naming the
+artifact and the brand document as its source so nobody has to re-derive
+this.
+
+**`src/design/tokens.ts` is deliberately unchanged.** The product's ink,
+gold, maroon and paper stay as they are, for the reason the brand document
+has carried since it was written: a company that publishes documents and
+one product that company builds are two identity systems, and merging them
+would make the product's `check-no-hex.mjs` guard enforce the wrong
+palette.
+
+### Entry 43.2 — The build discipline, written down where it loads
+
+**Added** `.claude/skills/ecos-build-discipline/SKILL.md`.
+
+Eleven working rules that this build arrived at the hard way — the
+guard-test-as-tripwire protocol, "present is not correct", `@deployable`
+markers, never fabricating statutory or roll figures, never drafting
+binding instruments, probe-before-link, and the standing instruction that
+the proclaimed delimitation is not to be second-guessed. They were
+scattered across forty-odd changelog entries and several file headers,
+which is to say they were not available at the moment of a decision.
+
+Also `docs/session-handoff.md`: the current state in one page — what is
+built, what is blocked and on whom, what is deliberately unbuilt and why.
+
+### Entry 43.3 — The README was a stale copy of the landing page
+
+**Corrected.** `README.md` at the repository root carried the entire
+corporate landing page pasted below its first paragraph — 235 lines,
+`<!DOCTYPE html>` and all. It had been there since the first scaffold
+commit, which means the original README *was* that HTML file and the
+scaffold only prepended a paragraph to it.
+
+GitHub renders a README, so the repository's front page was a
+half-rendered duplicate of a page that already exists as `index.html` —
+and the duplicate had drifted away from the original: superseded palette,
+no launch card. Diffed against `index.html` to confirm nothing in it was
+unique before removing it.
+
+Replaced with an actual README: what is in the repository, where the
+landing page's single `APP_URL` lives, the canonical palette and why the
+launch card inside it deliberately uses different colours, and pointers to
+the handoff document, the discipline skill, the local-run instructions and
+the deploy routes.
+
+Found the way everything in this window was found: by reading the file in
+order to add two links to it.
+
+**Verified:** `npm run check:all` — 965 tests, 60 files green;
+`cd functions && npm test` — 52 tests green; `npm run build` green,
+27 assets precached.

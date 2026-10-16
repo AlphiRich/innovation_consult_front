@@ -11,13 +11,19 @@ deploys anything.
 ```
   ok    project id             election2026-campaignms7-0
   FAIL  deploy credential      neither GOOGLE_APPLICATION_CREDENTIALS nor FIREBASE_TOKEN is set
-  FAIL  web app config         6 of 6 missing: VITE_FIREBASE_API_KEY, …
+  FAIL  web app config         VITE_FIREBASE_USE_EMULATORS is true in .env
   ok    build output           dist is newer than src
   ok    function region        africa-south1, pinned in every function
   ok    functions readiness    7 reviewed, 1 fails-closed pending infra
-  ok    firestore rules        present, no allow-all rule
-  ok    storage rules          present, no allow-all rule
+  ok    functions build        1 codebase(s) build before deploy
+  ok    firestore rules        firestore.rules present, no allow-all rule
+  ok    storage rules          storage.rules present, no allow-all rule
 ```
+
+The second failure is the local `.env` pointing at the emulator suite,
+which is correct for development and wrong to publish. On your machine or
+in CI, where `.env` carries the real web config and no emulator flag, that
+line reads `ok` — see §2.
 
 ---
 
