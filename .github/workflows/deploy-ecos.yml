@@ -1,0 +1,150 @@
+name: Deploy Election Campaign OS
+
+# WHY THIS EXISTS
+#
+# Deployment was blocked for several sessions on one thing: no Google
+# credential could reach the build container. That is a property of that
+# container, not of the project — GitHub Actions has no such limitation,
+# and a repository secret is a path the account owner already knows.
+#
+# So this routes around the block. Add one secret and a handful of
+# config values, press Run workflow, and the deploy happens here.
+#
+# WHAT IT REFUSES TO DO
+#
+# It will not deploy a build that has not passed the full check suite,
+# and it will not deploy past `npm run preflight` — the same preflight
+# that refuses a stale `dist`, a function missing its africa-south1
+# region pin, a rules file with an allow-all, or a web config naming a
+# different project than the one being deployed to.
+#
+# It is manual by default (`workflow_dispatch`). Automatic deploys on
+# every push to a repository holding a campaign's voter data is a
+# decision for a person to make deliberately — uncomment the `push`
+# trigger when that decision has been made.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: What to deploy
+        required: true
+        default: hosting
+        type: choice
+        options:
+          - hosting
+          - rules
+          - functions
+          - everything
+  # push:
+  #   branches: [main]
+  #   paths: ['election-cos-app/**']
+
+permissions:
+  contents: read
+
+concurrency:
+  # Two deploys racing each other to the same project is how a half-built
+  # bundle ends up live.
+  group: deploy-ecos
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: election-cos-app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: election-cos-app/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Install functions dependencies
+        run: npm ci --prefix functions
+
+      # The web config is compiled into the bundle, so it has to exist
+      # before the build, not before the deploy. These are not secrets —
+      # a Firebase web config is public by design and security comes from
+      # firestore.rules — but they are repository configuration, so they
+      # live in Actions variables rather than in the repository.
+      - name: Write .env
+        run: |
+          cat > .env <<EOF
+          VITE_FIREBASE_API_KEY=${{ vars.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN=${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID=${{ vars.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET=${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID=${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID=${{ vars.VITE_FIREBASE_APP_ID }}
+          VITE_DAL_ADAPTER=firestore
+          EOF
+          # Deliberately NOT written: VITE_FIREBASE_USE_EMULATORS. The
+          # preflight fails if it is set, because that build would point
+          # a published site at localhost.
+
+      - name: Checks
+        run: npm run check:all
+
+      - name: Build
+        run: npm run build
+
+      # Written to a file because the Firebase CLI reads a path, not a
+      # value. Under the runner's workspace, which is wiped with the job.
+      - name: Write service-account credential
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$SERVICE_ACCOUNT" ]; then
+            echo "::error::FIREBASE_SERVICE_ACCOUNT is not set. See election-cos-app/docs/deploy-credentials-request.md for the roles it needs."
+            exit 1
+          fi
+          printf '%s' "$SERVICE_ACCOUNT" > "$RUNNER_TEMP/sa.json"
+          # Fail loudly on a truncated or pasted-wrong secret rather than
+          # letting the CLI report something unrelated.
+          node -e "JSON.parse(require('fs').readFileSync(process.env.RUNNER_TEMP + '/sa.json','utf8'))" \
+            || { echo "::error::FIREBASE_SERVICE_ACCOUNT is not valid JSON."; exit 1; }
+
+      - name: Preflight
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+        run: npm run preflight
+
+      - name: Deploy
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/sa.json
+        run: |
+          case "${{ inputs.target }}" in
+            hosting)    ONLY="hosting" ;;
+            rules)      ONLY="firestore:rules,storage" ;;
+            functions)  ONLY="functions" ;;
+            everything) ONLY="" ;;
+          esac
+          if [ -n "$ONLY" ]; then
+            npx firebase deploy --only "$ONLY" --project default --non-interactive
+          else
+            npx firebase deploy --project default --non-interactive
+          fi
+
+      - name: Remove credential
+        if: always()
+        run: rm -f "$RUNNER_TEMP/sa.json"
+
+      - name: What went live
+        if: success()
+        run: |
+          echo "### Deployed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Target: \`${{ inputs.target }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "The landing page launch card probes the app and becomes a live link on its own — it needs no change." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Still verify by hand:** that Firestore and Storage were created in \`africa-south1\`. That is fixed at creation time, cannot be read without authenticating, and cannot be changed once data exists." >> "$GITHUB_STEP_SUMMARY"

@@ -43,7 +43,30 @@ npm run deploy
 will not deploy a stale build, a function in the wrong region, or a rules
 file with an allow-all.
 
-### Route B — I deploy, from this session
+### Route B — GitHub Actions deploys it (no secret reaches my container)
+
+Added in session 41, and probably the best of the three: it routes around
+the thing that has been blocking this all along. No Google credential can
+reach the build container I run in — `gcloud auth print-access-token`
+there returns the literal string `proxy-injected`. GitHub Actions has no
+such limitation.
+
+1. **Repository → Settings → Secrets and variables → Actions → Secrets.**
+   Add `FIREBASE_SERVICE_ACCOUNT` — paste the whole service-account JSON
+   from §1 as the value.
+2. **Same page → Variables.** Add the six `VITE_FIREBASE_*` values from
+   §2. Variables rather than secrets because a Firebase web config is
+   public by design; keeping them out of secrets means they show in logs
+   where they are useful for debugging.
+3. **Actions → Deploy Election Campaign OS → Run workflow.** Choose
+   `hosting`, `rules`, `functions` or `everything`.
+
+The workflow runs the full check suite, builds, and then runs the same
+preflight before anything is sent. It is manual on purpose — automatic
+deploys from every push, on a repository holding a campaign's voter data,
+is a decision to make deliberately rather than inherit.
+
+### Route C — I deploy, from this session
 
 I need the two things below added to the environment. Everything else is
 already in place.

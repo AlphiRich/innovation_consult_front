@@ -261,6 +261,47 @@ try {
   add('functions readiness', 'FAIL', `could not check: ${error.message}`);
 }
 
+// ------------------------------------------------- functions are compiled
+
+// `functions/package.json` points `main` at `lib/index.js`, which only
+// exists after tsc has run. Without a predeploy hook the CLI uploads a
+// package whose entry point is absent — the deploy reports success and
+// every function is dead on arrival. This was the state of firebase.json
+// until session 41.
+try {
+  const firebaseJson = JSON.parse(read('firebase.json'));
+  const codebases = Array.isArray(firebaseJson.functions)
+    ? firebaseJson.functions
+    : firebaseJson.functions
+      ? [firebaseJson.functions]
+      : [];
+
+  const problems = [];
+  for (const codebase of codebases) {
+    const dir = codebase.source ?? 'functions';
+    const pkgPath = path.join(ROOT, dir, 'package.json');
+    if (!existsSync(pkgPath)) continue;
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+    const entry = pkg.main ?? 'index.js';
+    const compiled = !existsSync(path.join(ROOT, dir, entry));
+    const hasHook = Array.isArray(codebase.predeploy) && codebase.predeploy.length > 0;
+    if (compiled && !hasHook) {
+      problems.push(`${dir}: main is ${entry}, which is absent, and there is no predeploy hook to build it`);
+    }
+  }
+
+  if (codebases.length === 0) {
+    add('functions build', 'PASS', 'no functions codebase declared');
+  } else if (problems.length > 0) {
+    add('functions build', 'FAIL', problems.join('; '),
+      'Add a predeploy hook that runs the build, or the deploy succeeds and every function is dead on arrival.');
+  } else {
+    add('functions build', 'PASS', `${codebases.length} codebase(s) build before deploy`);
+  }
+} catch (error) {
+  add('functions build', 'FAIL', `could not check: ${error.message}`);
+}
+
 // --------------------------------------------------------------- rules
 
 for (const [name, file] of [['firestore rules', 'firestore.rules'], ['storage rules', 'storage.rules']]) {

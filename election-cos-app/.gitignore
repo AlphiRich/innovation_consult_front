@@ -15,3 +15,6 @@ coverage
 
 # Vendored typefaces are committed deliberately (see tools/fonts/) — they
 # are part of the shell and must be available offline.
+
+# Compiled Cloud Functions output — built by the predeploy hook.
+functions/lib
