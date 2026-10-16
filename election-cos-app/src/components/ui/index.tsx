@@ -64,9 +64,27 @@ export function PageHeader({
   );
 }
 
-/** The small tracked capital label that titles almost every panel. */
-export function SectionLabel({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <p className={`text-label-caps font-display uppercase text-slate ${className}`}>{children}</p>;
+/**
+ * The small tracked capital label that titles almost every panel.
+ *
+ * `as` exists because migrating the pages onto these primitives in session
+ * 44 would otherwise have been a quiet accessibility regression: several
+ * panels title themselves with a real `<h2>`, and substituting a component
+ * that always renders a `<p>` would have stripped the document outline a
+ * screen-reader user navigates by, while looking identical on screen. A
+ * label that titles a section is a heading; one that labels a field or a
+ * figure is not. The caller knows which it is.
+ */
+export function SectionLabel({
+  children,
+  className = '',
+  as: Tag = 'p',
+}: {
+  children: ReactNode;
+  className?: string;
+  as?: 'p' | 'h2' | 'h3';
+}) {
+  return <Tag className={`text-label-caps font-display uppercase text-slate ${className}`}>{children}</Tag>;
 }
 
 /** Codes, ids and figures. Monospaced so columns of them line up. */

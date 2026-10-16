@@ -5,6 +5,7 @@
  * Summary Report.
  */
 import { Link } from 'react-router-dom';
+import { PageHeader } from '@/components/ui';
 
 const SUB_VIEWS = [
   { to: '/analytics/seat-calculator', label: 'Vote Calculator', description: 'MMP seat allocation (Schedule 1).' },
@@ -23,10 +24,7 @@ const SUB_VIEWS = [
 export function AnalyticsPage() {
   return (
     <div className="space-y-6 max-w-2xl">
-      <div>
-        <p className="text-label-caps font-display uppercase text-slate">/analytics</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Analytics</h1>
-      </div>
+      <PageHeader slug="/analytics" title="Analytics" />
 
       <div className="grid gap-3">
         {SUB_VIEWS.map((view) => (

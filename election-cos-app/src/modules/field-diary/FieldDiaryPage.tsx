@@ -16,6 +16,7 @@ import { dal } from '@/dal';
 import { useSession } from '@/auth/useSession';
 import { DiaryEntryCard } from './DiaryEntryCard';
 import { DiaryEntryForm } from './DiaryEntryForm';
+import { Button, Card, Field, PageHeader } from '@/components/ui';
 
 export function FieldDiaryPage() {
   const session = useSession();
@@ -30,13 +31,12 @@ export function FieldDiaryPage() {
 
   if (!session) {
     return (
-      <div className="rounded-lg border border-slate/30 bg-white p-6 max-w-lg">
-        <p className="text-label-caps font-display uppercase text-slate">/diary</p>
-        <h1 className="text-headline-md font-display text-ink mt-1">Field Diary</h1>
+      <Card className="max-w-lg">
+        <PageHeader slug="/diary" title="Field Diary" />
         <p className="mt-3 text-body-md font-body text-slate">
           No active session — see BUILD-STATUS.md (no live Firebase project provisioned yet).
         </p>
-      </div>
+      </Card>
     );
   }
 
@@ -46,35 +46,38 @@ export function FieldDiaryPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-label-caps font-display uppercase text-slate">/diary</p>
-          <h1 className="text-headline-md font-display text-ink mt-1">Field Diary</h1>
-        </div>
-        <button
-          type="button"
-          onClick={() => setShowForm(true)}
-          disabled={!session.vdScope}
-          className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase whitespace-nowrap disabled:opacity-40"
-        >
-          + New entry
-        </button>
-      </div>
+      <PageHeader
+        slug="/diary"
+        title="Field Diary"
+        action={
+          <Button onClick={() => setShowForm(true)} disabled={!session.vdScope} className="whitespace-nowrap">
+            + New entry
+          </Button>
+        }
+      />
 
-      <label className="block space-y-1 max-w-xs">
-        <span className="text-label-caps font-display uppercase text-slate">Voting district</span>
-        <input
-          className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
-          value={vdCode}
-          onChange={(e) => setVdCode(e.target.value)}
-          placeholder="e.g. 86910138"
-        />
-        {!session.vdScope && (
-          <p className="text-body-md font-body text-slate">
-            No VD in your session scope — enter one manually. A ward/VD picker (§6.1) isn't built yet.
-          </p>
-        )}
-      </label>
+      {/* Was a bare <label> wrapping the input, which associates nothing —
+          a screen reader announced an unlabelled text field. `Field`
+          generates the id and ties the two together. */}
+      <div className="max-w-xs">
+        <Field
+          label="Voting district"
+          hint={
+            session.vdScope
+              ? undefined
+              : "No VD in your session scope — enter one manually. A ward/VD picker (§6.1) isn't built yet."
+          }
+        >
+          {(props) => (
+            <input
+              {...props}
+              value={vdCode}
+              onChange={(e) => setVdCode(e.target.value)}
+              placeholder="e.g. 86910138"
+            />
+          )}
+        </Field>
+      </div>
 
       {entriesQuery.isLoading && <p className="text-body-md font-body text-slate">Loading…</p>}
       {entriesQuery.isError && (
