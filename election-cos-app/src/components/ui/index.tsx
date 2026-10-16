@@ -83,7 +83,20 @@ export function PageHeader({
         <h1 className="text-headline-md font-display text-ink mt-1">{title}</h1>
         {description && <p className="text-body-md font-body text-slate mt-2 max-w-prose">{description}</p>}
       </div>
-      {action && <div className="shrink-0">{action}</div>}
+      {/*
+       * NOT `shrink-0`, which is what it was until the post-migration
+       * route drive. `shrink-0` pins the action to its max-content width,
+       * so an action that is a *group* of controls — Voters has three —
+       * never gets narrow enough for its own `flex-wrap` to trigger. The
+       * Voters page was 428px wide in a 390px viewport as a direct
+       * result, and §3.3 forbids a horizontal page scroll.
+       *
+       * Allowing it to shrink lets a group wrap internally, and the outer
+       * `flex-wrap` still drops the whole action onto its own line when
+       * even that is not enough. A single button is unaffected: its
+       * min-content is the button.
+       */}
+      {action && <div className="min-w-0">{action}</div>}
     </div>
   );
 }

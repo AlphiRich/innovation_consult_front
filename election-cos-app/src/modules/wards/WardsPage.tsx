@@ -22,7 +22,7 @@ import {
   WORKLOAD_BASIS,
 } from './wardSizeDeviation';
 import { MunicipalRegisterPanel } from '@/modules/reference/MunicipalRegisterPanel';
-import { BarMeter, Table, Td, Th } from '@/components/ui';
+import { BarMeter, Button, Card, PageHeader, SectionLabel, StatTile, Table, Td, Th } from '@/components/ui';
 
 export function WardsPage() {
   const session = useSession();
@@ -69,45 +69,40 @@ export function WardsPage() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-label-caps font-display uppercase text-slate">/wards</p>
-          <h1 className="text-headline-md font-display text-ink mt-1">Wards</h1>
-        </div>
-        <button
-          type="button"
-          onClick={() => setShowForm({ mode: 'create' })}
-          className="bg-gold text-ink rounded px-4 py-2 text-label-caps font-display uppercase"
-        >
-          + New ward
-        </button>
-      </div>
+      {/*
+       * Session 44: this header and these tiles were still hand-rolled.
+       * The page counted as "migrated" in that session's first pass
+       * because it imports Table — a weaker test than actually using the
+       * primitives, and the route drive caught it: the "+ New ward"
+       * button was 32px tall, under the 44px Button carries.
+       */}
+      <PageHeader
+        slug="/wards"
+        title="Wards"
+        action={<Button onClick={() => setShowForm({ mode: 'create' })}>+ New ward</Button>}
+      />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <div className="bg-white border border-ink/10 rounded p-4">
-          <p className="text-label-caps font-display uppercase text-slate">Wards</p>
-          <p className="text-display-lg-mobile font-display text-ink">
-            {totals.wardCount}
-            {reconciliation?.expectedWardCount ? (
-              <span className="text-body-md font-body text-slate"> / {reconciliation.expectedWardCount}</span>
-            ) : null}
-          </p>
-        </div>
-        <div className="bg-white border border-ink/10 rounded p-4">
-          <p className="text-label-caps font-display uppercase text-slate">Voting districts</p>
-          <p className="text-display-lg-mobile font-display text-ink">{totals.vdCount}</p>
-        </div>
-        <div className="bg-ink text-paper rounded p-4">
-          <p className="text-label-caps font-display uppercase text-gold">Registered voters</p>
-          <p className="text-display-lg-mobile font-display">{totals.registeredVoters.toLocaleString('en-ZA')}</p>
-        </div>
+        <StatTile
+          label="Wards"
+          value={
+            <>
+              {totals.wardCount}
+              {reconciliation?.expectedWardCount ? (
+                <span className="text-body-md font-body text-slate"> / {reconciliation.expectedWardCount}</span>
+              ) : null}
+            </>
+          }
+        />
+        <StatTile label="Voting districts" value={totals.vdCount} />
+        <StatTile emphasis label="Registered voters" value={totals.registeredVoters.toLocaleString('en-ZA')} />
       </div>
 
       {reconciliation && reconciliation.issues.length > 0 && (
-        <div className="bg-white border border-ink/10 rounded-lg p-4 space-y-2">
-          <p className="text-label-caps font-display uppercase text-slate">
+        <Card className="space-y-2">
+          <SectionLabel as="h2">
             Seed check {reconciliation.reconciled ? '· consistent' : '· needs attention'}
-          </p>
+          </SectionLabel>
           <ul className="space-y-2">
             {reconciliation.issues.map((seedIssue) => (
               <li
@@ -125,7 +120,7 @@ export function WardsPage() {
             ))}
           </ul>
           <p className="text-body-md font-body text-slate">{RECONCILIATION_BASIS}</p>
-        </div>
+        </Card>
       )}
 
       {/*

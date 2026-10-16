@@ -203,6 +203,17 @@ export function BulkImportPage() {
          * that loads a membership register. Field's id is used and its
          * control classes are not: a bordered, padded box around the
          * browser's own file widget is not an improvement.
+         *
+         * It is also the one control in the product left under the 44px
+         * minimum, at 30px, and that is deliberate. The height of a file
+         * input is set by the user agent, and its hit area is the
+         * browser's own button, not the element — so `min-h-11` here
+         * would pad the box, leave the button exactly as small, and make
+         * the target audit pass while nothing improved. The real fix is
+         * to hide the native input behind a styled label, which costs
+         * keyboard and assistive-technology behaviour that works today.
+         * A guard that passes on a cosmetic change is the defect this
+         * project spends most of its time avoiding.
          */}
         <Field label="Register file (CSV)">
           {({ id, 'aria-describedby': describedBy }) => (

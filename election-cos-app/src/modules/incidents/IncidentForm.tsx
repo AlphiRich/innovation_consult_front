@@ -16,6 +16,7 @@ import type { SessionContext } from '@/dal/ports/session';
 import type { IncidentCategory, IncidentDraft, IncidentSeverity } from '@/dal/ports/incidents';
 import { useVdWard } from '@/lib/useVdWard';
 import { CATEGORY_LABEL, SEVERITY_META, SEVERITY_ORDER } from './incidentMeta';
+import { Button } from '@/components/ui';
 
 interface IncidentFormProps {
   ctx: SessionContext;
@@ -82,7 +83,7 @@ export function IncidentForm({ ctx, onDone, onCancel }: IncidentFormProps) {
             VD {vdCode} is split across wards — which one is this?
           </span>
           <select
-            className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
+            className="w-full min-h-11 border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
             value=""
             onChange={(e) => setSelectedWardCode(e.target.value)}
           >
@@ -108,7 +109,7 @@ export function IncidentForm({ ctx, onDone, onCancel }: IncidentFormProps) {
         <label className="space-y-1 block">
           <span className="text-label-caps font-display uppercase text-slate">Category</span>
           <select
-            className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
+            className="w-full min-h-11 border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
             value={category}
             onChange={(e) => setCategory(e.target.value as IncidentCategory)}
           >
@@ -122,7 +123,7 @@ export function IncidentForm({ ctx, onDone, onCancel }: IncidentFormProps) {
         <label className="space-y-1 block">
           <span className="text-label-caps font-display uppercase text-slate">Severity</span>
           <select
-            className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
+            className="w-full min-h-11 border border-ink/20 rounded px-3 py-2 text-body-md font-body bg-white"
             value={severity}
             onChange={(e) => setSeverity(e.target.value as IncidentSeverity)}
           >
@@ -138,7 +139,7 @@ export function IncidentForm({ ctx, onDone, onCancel }: IncidentFormProps) {
       <label className="space-y-1 block">
         <span className="text-label-caps font-display uppercase text-slate">Description</span>
         <textarea
-          className="w-full border border-ink/20 rounded px-3 py-2 text-body-md font-body"
+          className="w-full min-h-11 border border-ink/20 rounded px-3 py-2 text-body-md font-body"
           rows={3}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -158,21 +159,21 @@ export function IncidentForm({ ctx, onDone, onCancel }: IncidentFormProps) {
         </p>
       )}
 
+      {/*
+       * Session 44: these were 38px and the selects 39px, found by
+       * driving the routes after the page migration. This is the form a
+       * canvasser fills in standing at a gate, one-handed — it is the
+       * last place in the product that should be missing the 44px
+       * minimum. The page migration covered *Page.tsx only, and this
+       * form is a component, so nothing had reached it.
+       */}
       <div className="flex gap-3">
-        <button
-          type="submit"
-          disabled={!canSubmit || mutation.isPending}
-          className="flex-1 bg-ink text-paper rounded py-2.5 text-label-caps font-display uppercase disabled:opacity-40"
-        >
+        <Button type="submit" variant="secondary" disabled={!canSubmit || mutation.isPending} className="flex-1">
           {mutation.isPending ? 'Saving…' : 'Log incident'}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2.5 border border-ink/20 rounded text-label-caps font-display uppercase text-ink"
-        >
+        </Button>
+        <Button variant="ghost" onClick={onCancel}>
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );

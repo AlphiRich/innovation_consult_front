@@ -26,6 +26,7 @@ only the account holder can supply.
 | | |
 |---|---|
 | `npm run check:all` | green — 965 tests, 60 files (lint, typecheck, hex guard, type-scale guard, font guard) |
+| Route drive | 25 routes × phone and desktop, signed in: clean (session 45) |
 | `cd functions && npm test` | green — 52 tests, 2 files |
 | `npm run build` | green, with service-worker precache manifest |
 | `npm run preflight` | 2 failures, both the account holder's to clear (below) |
@@ -125,13 +126,17 @@ Not a backlog. Each of these is a decision.
 4. **Results history and code history for the other eight provinces.**
    NW is complete; `provinceReviewStatus()` reports the gap honestly and
    `unreviewedProvinces()` lists it.
-5. **Re-run the nine routes signed-in against the emulator.** The page
-   migration (session 44) touched all 27 page components. `check:all`
-   and `build` are green and the primitives are the same classes the
-   pages already used, but rule 8 is *run the thing* — and the one
-   thing the migration could plausibly have broken is layout, which no
-   test sees. Both viewports, watch the console. This is the only
-   follow-up the migration leaves.
+5. ~~**Re-run the routes against the emulator.**~~ **Done, session 45.**
+   25 routes × 2 viewports, signed in with the NW405 seed: no console
+   errors, no page errors, no horizontal overflow, no missing content.
+   It found four real defects first — all of them in form *components*
+   the page migration never covered. See changelog session 45.
+
+   **Start the emulators with `--only auth,firestore,storage`.**
+   `npm run emulators` takes the whole suite down in this container: the
+   functions emulator's startup gets a plaintext `request blocked` from
+   the egress proxy where it expects JSON. Details in
+   `docs/running-locally.md`.
 
 ### What the migration established, for whoever touches the UI next
 

@@ -104,9 +104,33 @@ cross-check actually pass.
 
 - **The emulator is not the project.** Rules are enforced, but region,
   indexes and quotas are not the real ones.
-- **Functions are not started by `npm run emulators`** as written — add
-  `--only functions` or drop the `--only` flag once `functions/` has been
-  built with `npm --prefix functions run build`.
+- **`npm run emulators` fails in a proxied container.** As written it
+  starts the functions emulator, whose own startup reaches out and gets a
+  plaintext `request blocked` back from the egress proxy where it expects
+  JSON. It then takes the whole suite down with
+  `Unable to parse JSON: SyntaxError: Unexpected token 'r', "request bl"`.
+  Start the three you need instead:
+
+  ```bash
+  npx firebase emulators:start --project demo-ecos --only auth,firestore,storage
+  ```
+
+  Everything in this document works against those three. What you lose is
+  the War Room counters, which are maintained by Firestore triggers.
+
+- **Do not stop the emulators with `pkill -f "firebase emulators"`** or
+  `pgrep -f "emulators:start"`. The pattern matches the shell's own
+  command line, so the shell kills itself and anything chained after it
+  silently never runs (exit 144). It has cost three shells on this
+  project. Check the ports instead — `curl -s -o /dev/null -w '%{http_code}'
+  http://127.0.0.1:8080` — and kill by the pid you actually want.
+
+  (This bullet replaces an older one claiming functions are *not* started
+  by `npm run emulators`. That was true when it was written; the
+  `firebase.json` change that added the functions predeploy hook made the
+  functions emulator part of the default set, which is what now breaks the
+  suite. To run the functions emulator deliberately, build first with
+  `npm --prefix functions run build`, and expect the proxy failure above.)
 - **`npm run deploy` will not work from a developer machine** without a
   deploy credential. Run `npm run preflight` to see exactly what is
   missing; it checks the project, credential, web config, build

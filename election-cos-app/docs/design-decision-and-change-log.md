@@ -2133,3 +2133,110 @@ passed throughout.
 - Everything in `docs/session-handoff.md` under "blocked" and
   "deliberately unbuilt" is unchanged. **Deployment still waits on the
   account holder's two values.**
+
+---
+
+## Session 45 — Running it, after the migration
+
+The page migration left one follow-up: drive the routes. Done — 25 routes
+at phone (390px) and desktop (1440px) width, signed in against the
+emulator with the real NW405 seed.
+
+**It found four defects, and corrected two of my own measurements.** Every
+test was green before and after; none of this was visible to them.
+
+### Entry 45.1 — The audit was wrong twice before it was right
+
+Worth leading with, because the first run reported 186 undersized targets
+and 4 pages overflowing, and **both numbers were inflated by the audit
+rather than by the product**.
+
+| First reading | What it actually was |
+|---|---|
+| 4 pages with horizontal overflow | **3.** `/wards` was fine: `documentElement.scrollWidth` counts descendants of an inner scroll container, so a table that correctly scrolls sideways inside its own box reads as page overflow. `body.scrollWidth` plus an explicit "is any ancestor a scroller" test is the honest measure, and under it `/wards` is 390 of 390. |
+| 186 targets under 40px | **~14 real.** The rest were the `sr-only` skip link (1px until focused, not a tap target) and inline links inside running prose. |
+| 8 pages missing expected text | **0.** My expectations were wrong — the page titles are "PPFA Threshold Config", "What your subscription includes", "Import a register" and "Advisory: Public gatherings…". All four rendered correctly; confirmed by reading their `<h1>` and body length directly. |
+
+Second time this window that a check has had to be corrected before its
+output could be trusted. The pattern is the same as the type-scale guard
+flagging its own comments: **a measurement is not evidence until the
+measurement itself has been checked.**
+
+### Entry 45.2 — The migration covered pages; the forms underneath were never in scope
+
+**This is the session's real finding.** Session 44 migrated every
+`*Page.tsx`. The editors and forms those pages render are *components*,
+and nothing had reached them. All four genuine defects live there:
+
+| Component | Defect |
+|---|---|
+| `PartyRowsEditor` | `grid-cols-[1fr_140px_120px_40px]` — 300px of fixed columns plus gaps plus an input's intrinsic minimum. The **Vote Calculator's content was 567px wide in a 390px viewport**, so the page scrolled sideways. §3.3 forbids that, on a field application. |
+| `PartyRowsEditor` | Its column headings were plain `<span>`s. **A span is not a label.** Every input in it was genuinely unnamed. |
+| `PartyRowsEditor` | The remove button was **16px tall** — the smallest thing on the screen was the control that deletes a party. |
+| `IncidentForm` | Two selects at 39px, two buttons at 38px. The form a canvasser fills in at a gate, one-handed. |
+
+`PartyRowsEditor` now stacks on a phone and keeps the grid from `sm:` up,
+every control has a real `<label htmlFor>` that is visible on a phone and
+`sm:sr-only` above it, and the remove button is a full-width 44px row on
+a phone and a 44px square on desktop.
+
+Note what the second row means for session 44's correction (entry 44.2).
+The claim "these inputs are unlabelled" was **wrong about the pages** —
+their inputs were nested inside their `<label>` and were correctly named.
+It is **right about this component**, which no one had looked at. The
+lesson stands and sharpens: read the markup, then describe it.
+
+### Entry 45.3 — `PageHeader` pinned its own action too wide
+
+**Fixed in the primitive.** The action slot was `shrink-0`, which pins it
+to max-content width — so an action that is a *group* never gets narrow
+enough for its own `flex-wrap` to fire. Voters has three controls there
+and was 428px wide in a 390px viewport as a direct result. Now `min-w-0`:
+a group wraps internally, the outer `flex-wrap` still drops the whole
+action to its own line when that is not enough, and a single button is
+unaffected because its min-content is the button.
+
+### Entry 45.4 — "Migrated" was measured by the import, not by the markup
+
+`WardsPage` counted as migrated in session 44 because it imports
+`Table` — which is a weaker test than using the primitives, and the drive
+caught it: its `+ New ward` button was 32px. Its header and stat tiles
+were still hand-rolled from session 39, when only the table was adopted.
+Now on `PageHeader`, `Button`, `StatTile` and `Card`.
+
+### Entry 45.5 — One control stays under 44px, deliberately
+
+Bulk Import's file input is 30px and is staying that way. A file input's
+height is set by the user agent and **its hit area is the browser's own
+button, not the element**, so `min-h-11` would pad the box, leave the
+button exactly as small, and make the audit pass while nothing improved.
+The real fix — hiding the native input behind a styled label — costs
+keyboard and assistive-technology behaviour that works today. Recorded in
+the file so the next person does not "fix" it.
+
+### Entry 45.6 — `npm run emulators` no longer works here
+
+**Found while setting up.** The script starts the functions emulator,
+whose startup reaches out and gets a plaintext `request blocked` from the
+egress proxy where it expects JSON — then takes the **whole suite** down
+with `Unable to parse JSON: SyntaxError: Unexpected token 'r', "request
+bl"`. `--only auth,firestore,storage` works and is enough for everything
+in `docs/running-locally.md`.
+
+That document also carried a now-false bullet saying functions are *not*
+started by `npm run emulators`. True when written; the `firebase.json`
+change that added the functions predeploy hook put them in the default
+set. Corrected, with the history, rather than quietly swapped.
+
+Also recorded there: **`pkill -f "firebase emulators"` kills the shell
+that runs it**, because the pattern matches that shell's own command
+line. Exit 144, and everything chained after it silently never runs. It
+has now cost three shells on this project.
+
+### Final state
+
+25 routes × 2 viewports: **no console errors, no page errors, no failed
+requests, no blank pages, no horizontal overflow, no missing content.**
+One known 30px target, documented above.
+
+`npm run check:all` green — 965 tests, 60 files. `npm run build` green.
