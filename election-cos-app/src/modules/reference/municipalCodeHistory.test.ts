@@ -15,8 +15,10 @@ import { describe, expect, it } from 'vitest';
 import {
   CODE_REASSIGNMENTS,
   COVERAGE_BASIS,
+  NAME_VARIANTS,
   RETIRED_CODES,
   baselineNameFor,
+  codeForName,
   codeHistoryCoverage,
   codeMeaningAt,
   crossCycleJoinProblem,
@@ -236,5 +238,38 @@ describe('coverage, province by province', () => {
     expect(limpopo?.note).toMatch(/Not reviewed/);
     // Names the consequence, so it reads as a gap rather than a disclaimer.
     expect(limpopo?.note).toMatch(/looks correct and is not/i);
+  });
+});
+
+describe('name variants', () => {
+  /**
+   * Added 17 Oct 2026. A historic asset spelled NW383 "Mahikeng" where
+   * the Annexure spells it "Mafikeng" — an ingest matching on name alone
+   * would have dropped every row for that municipality.
+   */
+  it('resolves the proclaimed spelling', () => {
+    expect(codeForName('Mafikeng', ['NW383', 'NW405'])).toBe('NW383');
+  });
+
+  it('resolves the official post-2010 spelling the Commission does not use', () => {
+    expect(codeForName('Mahikeng', ['NW383', 'NW405'])).toBe('NW383');
+  });
+
+  it('keeps the Annexure spelling as the name of record', () => {
+    // The variant is for matching only. What the build prints is what
+    // appears on a nomination form.
+    expect(baselineNameFor('NW383')).toBe('Mafikeng');
+    expect(NAME_VARIANTS.NW383).toContain('Mahikeng');
+  });
+
+  it('refuses a near-miss rather than guessing', () => {
+    // A wrong code attaches a result to the wrong municipality.
+    expect(codeForName('Mafik', ['NW383'])).toBeNull();
+    expect(codeForName('Greater Mafikeng', ['NW383'])).toBeNull();
+    expect(codeForName('', ['NW383'])).toBeNull();
+  });
+
+  it('will not match a code that is out of scope', () => {
+    expect(codeForName('Mahikeng', ['NW405'])).toBeNull();
   });
 });

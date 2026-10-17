@@ -14,6 +14,21 @@ including the standing instruction on the proclaimed delimitation.
 
 ---
 
+## T−18 days
+
+**Election day is 4 November 2026. This was written 17 October.**
+
+The 20-week plan in `municipal-gantt-planner-v2_1.xlsx` (reviewed in
+`docs/historic-assets-review-2026-10-17.md`) puts a **production code
+freeze at 28–31 October — 11 days out.**
+
+Against that: the build is verified and runnable, and **has never been
+deployed**, because it waits on two values only the account holder can
+supply (issues #4 and #5), plus the `africa-south1` confirmation that
+cannot be undone later (#6) and the domain connection (#16).
+
+Nothing in this document is more urgent than those four.
+
 ## Where it stands in one line
 
 The beta is built, verified and runnable; it has been driven end to end
@@ -204,3 +219,4 @@ third set that matched neither; it was drift and has been corrected.
 | `docs/national-delimitation-baseline.md` | the proclaimed baseline per province |
 | `docs/innovation-consult-brand.md` | corporate identity, and why it is separate |
 | `docs/unverified-source-documents.md` | what has not been verified against a primary source |
+| `docs/historic-assets-review-2026-10-17.md` | three historic assets reviewed; what was carried and what must not be |

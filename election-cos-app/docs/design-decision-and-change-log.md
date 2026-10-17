@@ -2510,3 +2510,148 @@ which is why that one is a test and not a comment.
 **Verified:** `npm run check:all` green — 984 tests, 62 files (13 new);
 `npm run build` green; 25 routes driven signed-in under the production
 CSP with zero violations.
+
+---
+
+## Session 48 — Three historic assets, reviewed
+
+Full review: `docs/historic-assets-review-2026-10-17.md`. The three
+verdicts in one line each, and the one change made.
+
+### Entry 48.1 — A dataset that is right in total and wrong in seven places
+
+`DOCTYPE_1.txt` (the "Mobile Control Tower" prototype) carries North West
+ward counts totalling **402** — which is exactly what the proclaimed
+delimitation totals for North West. Per municipality it disagrees in
+**7 of 18**, and in 3 of the 4 district rollups.
+
+| Code | Asset | Proclaimed |
+|---|---|---|
+| NW371 Moretele | 28 | **25** |
+| NW374 Kgetlengrivier | 6 | **7** |
+| NW375 Moses Kotane | 34 | **35** |
+| NW382 Tswaing | 15 | **14** |
+| NW384 Ditsobotla | 21 | **20** |
+| NW393 Mamusa | 9 | **8** |
+| NW397 Kagisano-Molopo | 11 | **15** |
+
+**This is the worst shape a bad dataset can take**: every aggregate
+reconciles, so the check somebody would actually run passes. Ward count
+feeds the seat quota, so seven municipalities would have been campaigned
+and projected on the wrong number.
+
+Nothing was ingested. It was checkable in minutes because
+`provinceDelimitation.test.ts` already reconciles all 44 districts
+against their locals — the guard earned its keep against a real dataset
+rather than a hypothetical one.
+
+### Entry 48.2 — The one thing carried forward: a name variant
+
+**Added** `NAME_VARIANTS` and `codeForName()` to
+`municipalCodeHistory.ts`, with 5 tests.
+
+The asset spells NW383 **Mahikeng**; the Annexure spells it
+**Mafikeng**. Both are the same municipality — the town was officially
+renamed in 2010 and the Commission's register still carries the older
+form. The Annexure's spelling stays as the name of record, because that
+is what appears on a nomination form. But an ingest matching on name
+alone would have **rejected every NW383 row as unrecognised**, which is
+a silent data loss rather than an error.
+
+`codeForName()` returns `null` rather than guessing: a near-miss on a
+municipality name is not something to resolve by similarity, because a
+wrong code attaches a result to the wrong place. `'Mafik'` and
+`'Greater Mafikeng'` both return null, and a variant will not match a
+code that is out of scope.
+
+### Entry 48.3 — V1 of the build spec: two rules now reversed
+
+`01-claude-code-build-spec_1.md` is **IC-ECOS-BUILD-2026-V1**. It cannot
+be merged with V2, only mined, because two of its five overriding rules
+are reversed:
+
+- §0.4 "There is **no** PPFA module… delete it and note it" — V2 §6.8
+  mandates it. This is also why the nav is nine items where V1's table
+  shows eight: the ninth is Funding & Disclosure. And why Finance Officer
+  is a seed role again.
+- §0.5 "No gatherings permit workflow" — **still in force**, and the
+  Gantt violates it.
+
+**A formula in V1 is wrong and was already disproved.** §8.2 presents,
+under the heading "Fix:", `Q = floor(totalValidVotes / (totalSeats + 1)) + 1`
+— a Droop quota. The build implements Schedule 1 Item 12,
+`Q = (A/(B−C−D))+1`, and session 8 disproved the Droop-adjacent form
+against a real IEC result. `SeatCalculatorPage.tsx` records this in its
+header precisely so it is not re-adopted from a document that states it
+authoritatively.
+
+**Four V1 disciplines checked. Two held, two do not exist:**
+
+| | |
+|---|---|
+| §4.3 Auth minimal footprint, CI-asserted | ✅ `firebaseAuth.test.ts` pins the permitted fields and asserts `updateProfile` clears the displayName Google populates |
+| §3.5 no "Blockchain Verified Hash" | ✅ guarded by two tests |
+| §6.2 informal-settlement addressing | ✅ `dwellingType` + `informalDescriptor` + GPS |
+| §5.2 one port suite run against both adapters | ❌ **issue #17** |
+| §7.4 dev read-counter failing over 50 reads/page | ❌ **issue #18** |
+
+The first gap is the serious one. **The entire justification for the DAL
+is that Phase 8 becomes a swap rather than a rewrite, and the thing that
+would prove it is a storage-agnostic suite passing against both
+adapters.** The ESLint boundary is enforced, but enforcing the boundary
+is not evidence of substitutability. "The DAL held" is currently an
+assertion.
+
+### Entry 48.4 — The Gantt: right schedule, wrong build, superseded figures
+
+`municipal-gantt-planner-v2_1.xlsx` describes AWS `af-south-1` (Cape
+Town) Postgres + Redis, Express + Prisma, a database-per-tenant, 4-level
+RBAC and Base64 photo uploads. V1 §3.5 already required af-south-1 →
+africa-south1 and V1 §6.4 already forbade Base64 in documents, so it
+predates both corrections.
+
+**Its PPFA figures are the superseded ones** — R80k warning, R100k
+critical, R15M cap. The build uses **R200,000 / R30,000,000** from
+`Government Gazette No. 53182, 18 August 2025`, warning at 80% =
+R160,000, and `ppfaDefaults.ts` already carries the comment *"never
+R80,000 (superseded)"*. Carrying the Gantt's numbers would set a
+disclosure trigger at half the statutory threshold.
+
+**WBS 2.3 is forbidden and also wrong about the law.** It schedules a
+permit-status scanner with T-7 and T-3 escalations. The Regulation of
+Gatherings Act is a **notice** regime — the convener notifies; the
+responsible officer may impose conditions or prohibit. There is no
+permit status to scan. A product doing this would tell a campaign it was
+compliant against a test the Act does not contain.
+
+**What it is genuinely worth is its schedule.** Two Sprint 4 tasks
+describe tests we do not have — a load runner at 120 devices / 1,200 sync
+payloads, and LWW reconciliation under 20% socket dropouts. We have 33
+pure-function tests over `syncMerge` and have never run the endpoint
+under concurrency or packet loss. **Issue #19.**
+
+Recorded not built: a 48-hour verbal-consent remediation dispatcher —
+whose *remediation* half is a good idea and whose *"cron purge"* half
+conflicts with the standing rule that field work is never silently
+discarded; an independent pen test at ZAR 120,000; ISO 27001; and a
+post-election councillor casework pivot at R2,500/month per ward, which
+reuses the incident capture and geolocation already built and is the most
+commercially interesting item in the set.
+
+**Two cost models that disagree**: the Gantt projects R250/ward/month,
+the prototype R93.37 against R843.06. Neither is sourced and both price
+the Phase-8 Postgres architecture rather than the Firestore build.
+Neither is usable as a price.
+
+### Entry 48.5 — T−18 days
+
+The most useful thing to come out of the review is a date. Election day
+is **4 November**; this was written on the 17th. The Gantt puts a
+production code freeze at **28–31 October**.
+
+The build is verified, runnable, and **has never been deployed**. Added
+to the top of `docs/session-handoff.md`, because nothing else in that
+document is more urgent than the two values the deploy waits on.
+
+**Verified:** `npm run check:all` green — 989 tests, 62 files (5 new);
+nothing ingested from any of the three assets.

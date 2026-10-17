@@ -318,3 +318,45 @@ export function nameMatchesCodeForYear(code: string, year: number, municipalityN
 export function baselineNameFor(code: string): string | null {
   return lookupMunicipality(code)?.name ?? null;
 }
+
+/* ------------------------------------------------------- name variants */
+
+/**
+ * Spellings a supplied dataset may use for a municipality whose
+ * proclaimed name is spelled differently.
+ *
+ * NOT corrections. The Annexure's spelling is the one the build keeps,
+ * because the Commission's spelling is what appears on a nomination form.
+ * These exist so that a dataset using the other spelling can still be
+ * matched to a code instead of being silently dropped as unrecognised.
+ *
+ * Added 17 Oct 2026, reviewing a historic asset that spelled NW383
+ * "Mahikeng" while the Annexure spells it "Mafikeng". Both refer to the
+ * same municipality; the town was officially renamed Mahikeng in 2010 and
+ * the Commission's register still carries the older form. An ingest that
+ * matched on name alone would have rejected every NW383 row.
+ */
+export const NAME_VARIANTS: Record<string, readonly string[]> = {
+  NW383: ['Mahikeng', 'Mafeking'],
+};
+
+/**
+ * Resolve a municipality name to its code, tolerating a known variant.
+ *
+ * Returns null rather than guessing. A near-miss on a municipality name
+ * is not something to resolve by similarity — a wrong code here attaches
+ * a result to the wrong place.
+ */
+export function codeForName(name: string, codesInScope: readonly string[]): string | null {
+  const given = name.trim().toLowerCase();
+  if (!given) return null;
+
+  for (const code of codesInScope) {
+    if ((baselineNameFor(code) ?? '').trim().toLowerCase() === given) return code;
+  }
+  for (const [code, variants] of Object.entries(NAME_VARIANTS)) {
+    if (!codesInScope.includes(code)) continue;
+    if (variants.some((v) => v.toLowerCase() === given)) return code;
+  }
+  return null;
+}
