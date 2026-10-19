@@ -11,7 +11,9 @@
  * status — previously every module page independently re-derived its own
  * "no session" message (and there was no sign-in UI to reach a signed-in
  * state at all). Three real states, not one: `loading` (still resolving
- * the ID token), `signed-out` (show SignInPage), and `signed-in` with
+ * the ID token), `signed-out` (show LandingPage, which reaches SignInPage
+ * itself — session 31 gave this state an actual page instead of going
+ * straight to the sign-in form), and `signed-in` with
  * `session === null` — a real Firebase Auth user who hasn't been
  * assigned a tenant/role yet (resolveCapabilities.ts hasn't stamped
  * custom claims), which is a different situation from "not signed in"
@@ -20,7 +22,7 @@
  */
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuthState } from '@/auth/useSession';
-import { SignInPage } from '@/auth/SignInPage';
+import { LandingPage } from '@/modules/landing/LandingPage';
 import { signOut } from '@/auth/firebaseAuth';
 import { NAV_FOOTER_LINE, PRODUCT_NAME_SHORT } from '@/lib/legalText';
 import { useEntitlements } from '@/auth/useEntitlements';
@@ -43,7 +45,7 @@ export function Shell() {
   }
 
   if (status === 'signed-out') {
-    return <SignInPage />;
+    return <LandingPage />;
   }
 
   if (status === 'signed-in' && !session) {
