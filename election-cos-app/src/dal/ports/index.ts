@@ -23,3 +23,4 @@ export * from './donationAlerts';
 export * from './dataSubjectRequests';
 export * from './warRoomCounters';
 export * from './municipalityProfile';
+export * from './sentimentBudget';

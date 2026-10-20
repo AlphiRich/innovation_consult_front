@@ -12,6 +12,7 @@ export {
   maintainDiaryCounters,
   maintainHouseholdCounters,
 } from './warRoomCounters';
+export { reserveSentimentRefresh, reportSentimentRefreshOutcome } from './sentimentBudget';
 
 // ppfaAggregation is deliberately NOT exported — see its file header and
 // build spec §6.8.1. Do not add it here without legal confirmation.

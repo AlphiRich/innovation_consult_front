@@ -267,6 +267,29 @@ service cloud.firestore {
       allow update, delete: if false; // append-only, never mutated or removed
     }
 
+    // ---- Ward-Sentiment Intelligence budget guardrail ----------------------
+
+    // Deliberately NOT the ppfaConfigs pattern (client create, append-only).
+    // A PPFA threshold is the party's own statutory setting; this cap is the
+    // platform's own cost-containment safeguard against its external
+    // NLP/social-API vendor bill. A tenant that could raise its own cap
+    // would defeat the guardrail it exists to be, so it is provisioned the
+    // same way entitlements are: server-side (Admin SDK) only. See
+    // src/dal/ports/sentimentBudget.ts.
+    match /tenants/{tid}/sentimentBudgetConfigs/{configId} {
+      allow read: if tenantOK(tid) && cap('analytics.view');
+      allow write: if false; // Admin SDK / ops action only, never a client write
+    }
+
+    // Written only by functions/src/sentimentBudget.ts inside a
+    // transaction (the reserve/refund guardrail itself); read-only to the
+    // client for display, narrowed to the caller's own ward when
+    // ward-scoped.
+    match /tenants/{tid}/sentimentUsage/{usageId} {
+      allow read: if tenantOK(tid) && cap('analytics.view') && inScope(tid, resource.data);
+      allow write: if false; // Cloud Functions (Admin SDK) only
+    }
+
     // ---- analytics counters (pre-aggregated, §7.4 / §8.1) ------------------
 
     match /tenants/{tid}/counters/{counterId} {

@@ -34,6 +34,7 @@ import { warRoomCountersRepository } from './adapters/firestore/warRoomCountersR
 import { municipalityProfileRepository } from './adapters/firestore/municipalityProfileRepository';
 import { fileStoreRepository } from './adapters/firestore/fileStoreRepository';
 import { entitlementsRepository } from './adapters/firestore/entitlementsRepository';
+import { sentimentBudgetRepository } from './adapters/firestore/sentimentBudgetRepository';
 
 const adapter = (import.meta.env.VITE_DAL_ADAPTER as string | undefined) ?? 'firestore';
 
@@ -76,6 +77,9 @@ export const dal = {
   // What the tenant bought, as opposed to what the user may do — see
   // src/auth/modules.ts. Read-only: provisioned server-side.
   entitlements: entitlementsRepository,
+  // ward-sentiment's metering guardrail. Read-only for the same reason as
+  // entitlements — see src/dal/ports/sentimentBudget.ts.
+  sentimentBudget: sentimentBudgetRepository,
 };
 
 export type { SessionContext, GeoScope, Page, PageRequest } from './ports/session';
