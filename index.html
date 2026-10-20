@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Innovation ConsultIt - Legal OS</title>
+    <title>Innovation ConsultIt - Election Campaign OS</title>
     <style>
         /* === BASE STYLES & BRANDING === */
         :root {
@@ -37,7 +37,7 @@
             margin-bottom: 40px;
             text-align: center;
         }
-        
+
         .app-header h1 {
             color: var(--navy-blue);
             margin: 0;
@@ -141,7 +141,7 @@
             font-weight: bold;
             color: var(--navy-blue);
         }
-        
+
         .infographic-placeholder {
             text-align: center;
             margin: 20px 0;
@@ -162,49 +162,50 @@
         <p>knowledge to action</p>
     </div>
 
-    <button class="open-manual-btn" id="openManualBtn">📖 Open Legal OS User Manual</button>
+    <button class="open-manual-btn" id="openManualBtn">📖 Open Operations Manual Overview</button>
 
     <div id="manualModal" class="modal-overlay">
         <div class="modal-content">
             <span class="close-btn" id="closeManualBtn">&times;</span>
-            
-            <h2>Legal OS User Manual</h2>
-            <p>Welcome to your complete South African Legal Practice management tool. Follow these steps to maximize your efficiency.</p>
 
-            <h3>1. The Gatekeeper: Initializing Your Session</h3>
+            <h2>Election Campaign OS — Operations Manual Overview</h2>
+            <p>Election Campaign OS (EC OS) is Innovation Consult's offline-first platform for South African municipal election campaign operations. This page is a short overview of the twelve Standard Operating Procedures the in-app Operations Manual covers — the manual itself is generated role-filtered, as PDF and Word, directly from this codebase.</p>
+
+            <h3>1. Onboarding & Roles</h3>
             <div class="step-box">
-                <p>Before uploading any documents, you must set the procedural ruleset for the AI.</p>
+                <p>An administrator records the municipality, signs in each team member, and gives them a role and a patch of ground to work — a ward or a voting district. Access is removed the same way when someone leaves.</p>
                 <ul>
-                    <li><span class="highlight">Step 1:</span> Select your Forum (e.g., Gauteng High Court, Magistrate's Court).</li>
-                    <li><span class="highlight">Step 2:</span> Select the Matter Type (Civil or Criminal).</li>
-                    <li><span class="highlight">Step 3:</span> Specify the filing method (e.g., CaseLines, CourtOnline, or Physical).</li>
+                    <li>Seed the municipality's gazetted wards and voting districts against the Demarcation Board notice.</li>
+                    <li>Import an existing membership register, with a recorded consent basis.</li>
+                    <li>Assign roles by capability, not by job title — a Ward Lead sees their ward, a VD Captain their voting district.</li>
                 </ul>
             </div>
-            
+
             <div class="infographic-placeholder">
-                [Insert Flowchart Image Here: Gatekeeper logic selecting between Civil and Criminal law]
+                [Insert Diagram Here: Role &rarr; capability &rarr; geographic scope]
             </div>
 
-            <h3>2. Document Generation</h3>
+            <h3>2. Field Operations: Canvassing, Incidents & Referrals</h3>
             <div class="step-box">
-                <p>Use precise prompts to generate court-ready documents.</p>
-                <p><strong>Example Prompt:</strong> <em>"Draft a Rule 35(12) notice for the Defendant's bank statements mentioned in the Answering Affidavit."</em></p>
-                <p>The app will automatically format the caption, apply the correct High Court terminology, and append a Commissioner of Oaths Jurat for affidavits.</p>
+                <p>A canvasser works a round door by door; every door ends in one of six recorded states, which decides whether it's offered again next round.</p>
+                <p>Service-delivery issues raised at the door become an incident, which a Ward Lead or Municipal Team Lead can escalate into a referral — a document addressed to the municipality, carrying no municipal or state authority of its own.</p>
             </div>
 
-            <h3>3. Taxation & Billing</h3>
+            <h3>3. Compliance: War Room, Donations & Data Requests</h3>
             <div class="step-box">
-                <p>Automate your Bill of Costs using Uniform Rule 70.</p>
+                <p>The War Room reports ward coverage and open incidents from the same records the field captures, not a separate estimate.</p>
                 <ul>
-                    <li>Upload your fee notes or time logs.</li>
-                    <li>Prompt the AI to generate a Bill of Costs on the <span class="highlight">Party and Party</span> or <span class="highlight">Attorney and Client</span> scale.</li>
-                    <li>The system will automatically calculate the 15% VAT and append the Taxing Master's Allocator.</li>
+                    <li>Donations are recorded against a PPFA disclosure register that tracks thresholds and alerts; it does not block a donation or file anything with the Electoral Commission.</li>
+                    <li>A POPIA data subject request is answered from the voter roll within the requester's own geographic scope, and discloses plainly what could and couldn't be searched.</li>
+                    <li>A PR candidate list can be prepared and exported for a party's own submission — a compliance aid, not automated filing.</li>
                 </ul>
             </div>
-            
+
             <div class="infographic-placeholder">
-                [Insert Diagram Image Here: Breakdown of a South African Bill of Costs]
+                [Insert Diagram Here: Field record &rarr; War Room tile, one source, two readers]
             </div>
+
+            <p><em>This overview is not the Operations Manual itself and is not contractual. Where the two differ, the in-app manual governs.</em></p>
         </div>
     </div>
 
