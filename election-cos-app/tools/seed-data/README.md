@@ -5,6 +5,16 @@ delimitation gazette into `Ward`/`VotingDistrict` seed records, per
 IC-ECOS-BUILD-2026-V2 §6.1. Kept as a separately-`npm install`-able tool
 directory, out of the app bundle — same rationale as `tools/docgen/`.
 
+## Other seed data in this directory
+
+`lge2026-candidates/` builds the national candidate database
+(`../seed-data/lge2026-candidate-database.csv`) from the IEC's certified
+candidate list PDFs — see its own README and
+`../../docs/lge2026-candidate-database.md`. Independent of the ward/VD
+ingest below; kept in the same `tools/seed-data/` parent only because it's
+the same class of task (turn a real government publication into a seed
+file, out of the app bundle).
+
 ## Provenance
 
 `../seed-data/jb-marks-nw405-wards-vds.json` was generated from a real,
