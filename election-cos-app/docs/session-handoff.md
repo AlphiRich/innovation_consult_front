@@ -29,6 +29,20 @@ cannot be undone later (#6) and the domain connection (#16).
 
 Nothing in this document is more urgent than those four.
 
+**And as of 25 October: CI has never run.** `ci.yml` sat at
+`election-cos-app/.github/workflows/`, which GitHub does not read — the
+Actions API reported zero workflows for this repository. Moved to the
+root and widened to `check:all`, with a guard test
+(`workflowLocation.test.ts`) so it cannot recur. **It is still not
+running**, because a workflow has to be on the **default branch** to
+execute or be dispatchable, and both workflows exist only on
+`claude/election-campaign-os-jlzsw3`.
+
+That is also why **deploy Route B cannot be used yet.** The "Run
+workflow" button for `deploy-ecos.yml` will not appear until the file is
+on `main`. Merging the branch is a decision for the account holder; no
+pull request has been opened.
+
 ## Where it stands in one line
 
 The beta is built, verified and runnable; it has been driven end to end
@@ -42,6 +56,8 @@ only the account holder can supply.
 |---|---|
 | `npm run check:all` | green — 965 tests, 60 files (lint, typecheck, hex guard, type-scale guard, font guard) |
 | Route drive | 25 routes × phone and desktop, signed in: clean (session 45) |
+| CI | **has never run** — workflows are not on `main`. See T−18 above |
+| `npm audit --omit=dev` | 0 critical · 5 high · 8 moderate, all transitive in the Firebase SDK. See below |
 | Landing card | all three probe branches driven: custom / fallback / fails closed (session 46) |
 | `cd functions && npm test` | green — 52 tests, 2 files |
 | `npm run build` | green, with service-worker precache manifest |
@@ -191,10 +207,25 @@ than by the class attribute. `SectionLabel` takes `as` and `tone`,
 `Field` takes `mono`; nothing takes a padding override. Where a variant
 is genuinely one-off — a maroon alarm tile, a green confirm, a gold
 outline — the markup stays hand-rolled with the reason in the file.
-7. **A Cloud Function to resolve an email to a Firebase uid**, so an
+7. **Upgrade `firebase` 10 → 13 — AFTER the election, not before.**
+   `npm audit` reports 5 high and 8 moderate advisories in production
+   dependencies. Every one is transitive inside the Firebase SDK
+   (`@firebase/firestore`, `@grpc/grpc-js`, `undici`), and the remedy
+   npm proposes is **`firebase@9.14.0`** — a downgrade of two majors
+   from the installed `10.14.1`, to a 2022 release. `npm audit fix
+   --force` would make the product materially worse.
+
+   The real remedy is `firebase@13.1.0`, two major versions up, with
+   breaking-change risk across auth, Firestore and storage. Doing that
+   **ten days before an election on a product that has never been
+   deployed** is the wrong trade. CI blocks on `critical` only and
+   reports high/moderate, which is why that job is green and honest
+   rather than red and ignored.
+
+8. **A Cloud Function to resolve an email to a Firebase uid**, so an
    administrator can grant access without the new user reading their own
    uid off the "Awaiting access" screen.
-8. **A Firestore TTL policy** on `tenants/{tid}/_syncIdempotency`
+9. **A Firestore TTL policy** on `tenants/{tid}/_syncIdempotency`
    (`expiresAt`). Not urgent; the records are small but accumulate
    forever.
 

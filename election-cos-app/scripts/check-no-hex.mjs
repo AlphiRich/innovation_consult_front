@@ -5,7 +5,7 @@
  * design tokens." ESLint's no-restricted-syntax struggles to reliably catch
  * hex strings buried in JSX className template literals and Tailwind
  * arbitrary-value classes (`bg-[#123456]`), so this is a source-text scan
- * run in CI (`npm run check:hex`) rather than a custom ESLint rule.
+ * run by `npm run check:hex` rather than a custom ESLint rule.
  *
  * Allow-listed files are the single source(s) of truth for colour.
  */

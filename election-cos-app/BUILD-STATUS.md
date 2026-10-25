@@ -1973,7 +1973,7 @@ touches PPFA.
   or `firebase/storage` — only `src/dal/adapters/firestore/**` can.
 - `scripts/check-no-hex.mjs`: fails on any raw hex colour literal outside
   `src/design/tokens.ts` (ESLint alone can't reliably catch these in JSX
-  template strings, so this is a source-text scan, run in CI).
+  template strings, so this is a source-text scan, run by `npm run check:hex`).
 - GitHub Actions CI (`.github/workflows/ci.yml`): lint → typecheck →
   hex-check → test → build, scoped to `election-cos-app/**` changes.
 - `firebase.json`, `firestore.rules`, `firestore.indexes.json`,

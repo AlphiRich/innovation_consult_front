@@ -2655,3 +2655,145 @@ document is more urgent than the two values the deploy waits on.
 
 **Verified:** `npm run check:all` green — 989 tests, 62 files (5 new);
 nothing ingested from any of the three assets.
+
+---
+
+## Session 49 — The CI that never ran
+
+A security-audit HTML document was supplied for review. It audits a
+different codebase; chasing one of its generic recommendations into our
+repository found something real and considerably worse.
+
+### Entry 49.1 — The supplied report is an audit of someone else's project
+
+`validate.ts`, `runtime-guards.ts`, `security-gate.py`, `security.ts`,
+`package_security.json`, `modsecurity-crs-custom.conf`,
+`0001_security_baseline.sql`, `pipeline.yml`, `architecture-and-tools.md`
+— **none of these files exist in this repository.** `AGENTS.md` appears
+only inside `node_modules/re2`, as a dependency's own file. There is no
+`CLAUDE.md`.
+
+Its stated central premise is to "prioritise the canonical PostgreSQL 16
++ PostGIS with RLS architecture, disregarding contradictory MySQL
+references". This build has **zero** occurrences of PostGIS, MySQL or
+ModSecurity. PostgreSQL is Phase 8, conditional on a signed paying
+customer, and `src/dal/index.ts` throws if the adapter is set to
+`postgres`. The canonical store is Firestore.
+
+It also recommends a ModSecurity CRS deployment. Session 47 decided
+against edge compute in front of Hosting eight days earlier, on
+data-residency grounds, and implemented the equivalent headers in
+Firebase Hosting instead.
+
+Three further observations, recorded because they bear on how much weight
+to give a document like this:
+
+- Every one of its ~50 inline citations resolves to **the same Notion
+  URL**, with index `|1`. It is one link, repeated, styled as a citation
+  apparatus.
+- Its footer reads **© 2024**, which V1 §3.5 of our own spec lists as a
+  copy correction to apply wherever found.
+- Its "Critical Gaps" are four generic statements — length-only
+  identifier validation, case-sensitive WAF rules, missing historic
+  secret scanning, incomplete dependency floors — none of which name
+  anything in this codebase. One is also mislabelled: "WAF rules are
+  case-sensitive by default" is a Cloudflare interface note, presented
+  under a red Critical banner as the conclusion of a discussion about a
+  CRS request-body bypass.
+
+**Nothing was adopted from it.** What follows was found by checking
+whether its one applicable theme — CI security gates — applied here.
+
+### Entry 49.2 — CI has never run. Not once.
+
+**The finding.** `ci.yml` lived at
+`election-cos-app/.github/workflows/ci.yml`. **GitHub reads workflows
+only from `.github/workflows/` at the root of a repository.** A nested
+`.github` is an ordinary directory with a suggestive name.
+
+Confirmed from the outside rather than inferred: the Actions API reports
+`total_count: 0` workflows for this repository. On `origin/main` the only
+workflow file present is the nested one.
+
+So since session 1, every check in that file has run exactly nowhere.
+`npm run check:all` has only ever been executed by hand, in a
+development container, by me. The guards are real and the 992 tests are
+real — but **"verified" has meant "verified locally", throughout**, and
+the documentation said "run in CI" in two places where that was not
+true. Both corrected.
+
+**It is still not running.** A workflow must be on the **default branch**
+to execute or to be dispatchable. Both `ci.yml` and `deploy-ecos.yml`
+exist only on `claude/election-campaign-os-jlzsw3`. Merging is the
+account holder's decision and no pull request has been opened.
+
+**This also means deploy Route B does not work yet** — the one I have
+twice described as ready and needing only a repository secret and six
+variables. `workflow_dispatch` offers no "Run workflow" button for a
+workflow that is not on `main`. The secret and the variables are still
+necessary; they are no longer sufficient.
+
+**Fixed, and guarded.** Moved to the root. `workflowLocation.test.ts`
+fails if a `.github/workflows` directory appears anywhere else, if the
+root one is missing, or if `ci.yml` stops calling `check:all`. Proved by
+injection: recreating the nested directory fails the first test;
+replacing `check:all` with `lint` fails the third. Reverted clean.
+
+### Entry 49.3 — The dead workflow was also three guards out of date
+
+Worth separating from the path bug, because it is a different failure.
+
+The workflow listed `lint`, `typecheck`, `check:hex` and `test`
+individually. Sessions 44, 46 and 47 added `check:type-scale`,
+`check:headers` and `check:fonts` to `check:all` — and nothing added
+them here, because nobody was watching a file that never produced
+output.
+
+It now calls **`npm run check:all`**, one command, so CI and a
+developer's machine cannot drift apart again. It also runs the functions
+tests, the build, and the deploy preflight in report-only mode.
+
+### Entry 49.4 — 5 high advisories, and why the fix would be the mistake
+
+The report's "integrate SCA as a mandatory gate" is sound advice that,
+applied literally here, would have done damage.
+
+`npm audit --omit=dev` on production dependencies: **0 critical, 5 high,
+8 moderate.** All five high are transitive inside the Firebase SDK —
+`@firebase/firestore`, `@firebase/firestore-compat`, `@grpc/grpc-js`,
+`undici`.
+
+**npm's proposed remedy is `firebase@9.14.0`.** The installed version is
+`10.14.1`. That is a downgrade of two major versions, to a release from
+2022. `npm audit fix --force` would turn the job green by making the
+product materially worse — on a product holding a voter roll.
+
+The real remedy is `firebase@13.1.0`: two majors up, with breaking-change
+risk across auth, Firestore and storage. **Ten days before an election,
+on a build that has never been deployed, that is the wrong trade.**
+Recorded as post-election work in `docs/session-handoff.md`.
+
+So the gate blocks on **critical** and reports high and moderate without
+failing. A gate that is red on arrival and whose only green path is
+destructive is a gate that gets ignored, or "fixed" destructively. This
+one is green and honest rather than red and theatrical.
+
+`dependency-review-action` is added on pull requests only, which is the
+only context where GitHub exposes the base/head dependency diff.
+
+### Entry 49.5 — What was deliberately not added
+
+**A third-party secret-scanning action.** The report is right that secret
+scanning matters and that history scanning matters more. But adding an
+unpinned third-party action to a workflow is precisely the supply-chain
+exposure the same document warns about two sections earlier, and pinning
+one by commit SHA requires a SHA I cannot verify from here — inventing
+one would be worse than the gap.
+
+The honest version: **GitHub's own secret scanning and push protection
+are repository settings**, not workflow steps, and switching them on is
+the account holder's to do. Recorded as a recommendation rather than
+implemented badly.
+
+**Verified:** `npm run check:all` green — 992 tests, 63 files (3 new).
+Nothing adopted from the supplied report.

@@ -1,0 +1,125 @@
+name: election-cos-app CI
+
+# WHY THIS FILE IS AT THE REPOSITORY ROOT
+#
+# It used to live at `election-cos-app/.github/workflows/ci.yml`, which
+# looks right and is not. GitHub reads workflows ONLY from `.github/
+# workflows/` at the root of the repository; a nested `.github` directory
+# is just a directory. The consequence, found on 25 October 2026: the
+# workflow had never run once, the Actions API reported zero workflows
+# for this repository, and every check in it had only ever been verified
+# by hand in a development container.
+#
+# `workflowLocation.test.ts` now fails if a `.github/workflows` directory
+# appears anywhere other than the root.
+#
+# A workflow also has to be on the DEFAULT BRANCH to be dispatchable
+# (`workflow_dispatch`) or to appear in the Actions tab. Until this file
+# and deploy-ecos.yml reach `main`, neither runs.
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+defaults:
+  run:
+    working-directory: election-cos-app
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: lint, typecheck, guards, tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: election-cos-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install functions dependencies
+        run: npm ci --prefix functions
+
+      # One command, deliberately. The previous version of this file
+      # listed lint, typecheck, check:hex and test individually — and by
+      # the time anyone noticed it had never run, it was also three
+      # guards out of date (check:type-scale, check:headers and
+      # check:fonts had all been added without it). Calling check:all
+      # means CI and a developer's machine cannot drift apart again.
+      - name: check:all (lint, typecheck, hex, type-scale, headers, fonts, 989 tests)
+        run: npm run check:all
+
+      - name: Cloud Functions tests
+        run: npm test --prefix functions
+
+      - name: Build
+        run: npm run build
+
+      # The preflight never deploys. Run here so a change that would
+      # break a deploy — a stale dist, a function missing its region
+      # pin, an allow-all rules file, a functions codebase with no
+      # predeploy hook — fails on the branch rather than at deploy time.
+      # The credential and web-config checks will report FAIL in CI
+      # because neither is present here, so this step is informational.
+      - name: Deploy preflight (report only)
+        run: npm run preflight || true
+
+  supply-chain:
+    name: dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: election-cos-app/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # CRITICAL fails the build. HIGH and MODERATE are reported and do
+      # not, and that is a deliberate decision rather than laxity.
+      #
+      # As of 25 Oct 2026 the production tree has 5 high and 8 moderate
+      # advisories, every one of them transitive inside the Firebase SDK,
+      # and `npm audit` proposes "firebase@9.14.0" as the remedy — which
+      # is a downgrade of two major versions from the installed 10.14.1,
+      # to a release from 2022. `npm audit fix --force` would therefore
+      # make the product materially worse while turning this job green.
+      #
+      # A gate that is red on arrival and whose only green path is
+      # destructive is a gate that gets ignored. So: critical blocks,
+      # high is surfaced, and the real remedy (firebase 10 -> 13) is
+      # recorded as post-election work in docs/session-handoff.md.
+      - name: Audit production dependencies — critical blocks
+        run: npm audit --omit=dev --audit-level=critical
+
+      - name: Audit production dependencies — high and moderate, reported
+        run: npm audit --omit=dev --audit-level=moderate || true
+
+      - name: Audit functions production dependencies — critical blocks
+        run: npm audit --omit=dev --audit-level=critical --prefix functions
+
+  # Only meaningful on a pull request, which is the only context in which
+  # GitHub exposes the base/head dependency diff.
+  dependency-review:
+    name: dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
