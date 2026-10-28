@@ -1973,5 +1973,156 @@ What is in it: **R100,000 and R15m, twice, with zero mentions of R200,000 or R30
 
 ---
 
+## 20. Batch 20 (28 Oct, 5 files + a paste) — the metered voice relay
+
+ID | Asset | Hash | Disposition | Note
+---|---|---|---|---
+A-115 | `check-no-hex.mjs` | `e72a0619` | **DEFECT — do not adopt** | §20.1 |
+A-116 | `gemini-code-…1745836.ts` | `7183301b` | **DUP of the §18.2 paste** | already on the §6 do-not-carry list |
+A-117 | `media_1793046597089_….zip` | `b6ded8d7` | **DUP of the §8 security bundle** | all nine files byte-identical |
+A-118 | `gemini-code-…3471827.py` | `7cc90084` | **SUPERSEDED by the paste** | the relay before metering; §20.3 |
+A-119 | `Untitled-2.py` | `e3b0c442` | — | **zero bytes** (`e3b0c442` is the empty-file hash) |
+A-120 | pasted metered voice relay + capability seed | not in the upload store | **RECONCILE — do not deploy** | §20.2–20.4 |
+
+### 20.1 A-115 would break the build on the first run
+
+It is a near-copy of our own `scripts/check-no-hex.mjs` with one entry
+removed from `ALLOW_LIST`: `src/auth/GoogleIcon.tsx`. I ran it against
+our source:
+
+```
+✗ check:hex failed — raw hex colours found outside src/design/tokens.ts:
+  src/auth/GoogleIcon.tsx: found raw hex literal "#4285F4"
+  … "#34A853"  … "#FBBC05"  … "#EA4335"
+exit=1
+```
+
+Those four are Google's brand mark, which is deliberately not a
+design-token decision — our copy says so in the comment the upload
+deleted. **Adopting A-115 fails `check:all` immediately.** Our version
+stands.
+
+### 20.2 Two claims in the covering note are false against the engine's own source
+
+The note is confident about the V2 metering engine. A-032's build bundle
+contains that engine, so both claims are checkable.
+
+1. **The capability seed will not run.** `capability` is exactly four
+   columns — `key`, `description`, `category`, `metered_cost`
+   (`010_v2_shared_tenancy.sql:95`). The proposed INSERT supplies eight,
+   including **`name`, `is_geospatial`, `is_strategic` and
+   `scope_level`, none of which exist.** The migration errors on the
+   first unknown column. (The key itself, `advisory.voice.chunk`, does
+   conform to the documented `{category}.{noun}.{qualifier}` convention.)
+
+2. **The soft-cap discount does not exist in code.** The note says a
+   tenant at the soft cap "instantly transitions to the discounted 50%
+   multiplier via the underlying `debit_tokens` stored procedure, with
+   zero changes required to the FastAPI layer." `debit_tokens` reads
+   `metered_cost` into `v_cost`, checks the balance, debits `v_cost`, and
+   then **writes** spend into `soft_cap_monthly`. Nothing reads that
+   table back, and nothing halves a cost. `p_token_cost_override` exists
+   but no caller computes a discounted value; the SDK only exposes a
+   `GET /soft-caps`. **The 50% drop is specified in pricing §5 and
+   implemented nowhere** — and the skill's own "Known gaps" section,
+   which is careful and lists three others, does not list this one.
+
+**A third premise is overstated rather than wrong.** The note says
+chunking is necessary because `reverse_debit()` "is strictly for
+60-second execution failures". The skill says the opposite about
+enforcement: *"there is no time check in the function — this is a known,
+documented gap"*, and the 60 seconds is policy enforced only in the
+SDK's `withMeteredAction`. The sound half of the argument survives:
+there is **no partial-refund primitive**, which on its own justifies
+chunking over a large up-front reservation.
+
+### 20.3 The relay itself — nine findings, in severity order
+
+1. **No authentication or authorisation at all.**
+   `/ws/live-advisory/{tenant_id}/{actor_id}/{session_id}` takes both
+   identities **from the URL path**, unverified. Anyone who can reach the
+   endpoint can name any tenant and spend that tenant's CampaignTokens,
+   and `actorId`/`actorName` are caller-asserted and written into the
+   metering audit trail. In a product sold to competing parties, that is
+   cross-tenant theft with falsified attribution. Everything below is
+   secondary to this.
+2. **The "drop the connection" behaviour does not work.**
+   `RuntimeError("Tokens depleted…")` is raised **inside a task**.
+   `asyncio.wait(…, FIRST_COMPLETED)` returns that task in `done` and
+   never re-raises; nothing calls `task.result()`. So the
+   `except RuntimeError` block is unreachable, the `close(code=4002)`
+   never fires, and the stream falls through `finally` and is marked
+   `COMPLETED`. **The constraint the whole design exists to enforce is
+   not enforced.**
+3. **"Insufficient tokens" is asserted on every failure.** `debit_chunk`
+   returns `False` on any exception and on any non-200 — a gateway
+   timeout, a 500, a 429. A campaign is told it is out of credit when the
+   metering service is merely unreachable, and its call is dropped.
+4. **The debit check is not atomic.** `hgetall` → compute → `hincrby`
+   across two round trips, with `client_to_gemini` and `gemini_to_client`
+   both calling it on one session. Both can read the same counters and
+   both debit, or neither. (The *database* debit is safe —
+   `debit_tokens` locks the wallet `FOR UPDATE` — so the unsafe
+   bookkeeping is entirely the relay's local Redis state.)
+5. **A timed-out debit is charged and lost.** `requestId` is
+   `f"{session_id}-{datetime.now().timestamp()}"`, a float. The skill
+   already records that `debit_tokens()` has **no request-level
+   idempotency constraint**, so a retry double-debits — and this relay
+   does not retry, so a debit that succeeds server-side but times out
+   client-side bills the tenant and drops the call.
+6. **One chunk per overrun.** A frame larger than the remaining
+   allowance buys a single further 500 KB block, so consumption can
+   outrun payment. It needs the number of chunks required, not one.
+7. **An unknown session gets a free chunk.** `hgetall` on a missing key
+   returns `{}`, so `prepaid_bytes` falls back to `CHUNK_SIZE_BYTES`.
+8. **Charged before the session exists.** The first `debit_chunk`
+   precedes `start_session`; if that write fails the tenant has paid for
+   a session that never began, and reversal is policy-bound to 60
+   seconds.
+9. Cancelled tasks are never awaited before the Gemini context closes;
+   Redis and the gateway are hardcoded to `localhost` with no auth; and
+   `gemini-2.0-flash-exp` is an experimental preview model under a
+   billed production feature.
+
+**A-118 is the same relay before metering**, and it carries the defect
+the covering question is about: `except Exception as e:` →
+`redis_client.hset(…, "error", str(e))`, which writes arbitrary exception
+text into a shared store.
+
+### 20.4 The question asked — port the `[REDACTED]` regex into the relay?
+
+**No. The instinct is right and the mechanism is wrong.**
+
+The instinct is right because A-118 does write raw exception text to
+Redis, and a stack trace from this stack can carry an ID number, a field
+worker's phone number, a SQL parameter list, or a base64 audio frame.
+
+Three reasons not to do it as proposed:
+
+- **`fn_sanitize_rejection_reason` is in nothing we hold.** Searched this
+  repository, `ElectionCOS1_0`, and every uploaded bundle including
+  A-032's migrations: **zero matches.** `reverse_debit` and
+  `debit_tokens` are real and were checked above; this function is not.
+  I will not port a regex I have never seen.
+- **A denylist regex over free text is a control this project has
+  already rejected once.** A-113 §2 flags the LET guardrail as
+  *"currently implemented as a denylist regex; should be a schema-level
+  allowlist — flagged weakness."* Copying that shape into a second place
+  doubles down on it. An SA ID pattern is also both over-inclusive (any
+  13 digits) and under-inclusive (spaced or hyphenated).
+- **Copying a regex across a language boundary forks it.** PostgreSQL
+  ARE and Python `re` differ on lookbehind, `\s`, and POSIX classes. Two
+  copies drift, and only the SQL one has tests.
+
+**What to do instead:** stop writing exception text into Redis. Log an
+error *class* and a correlation id, and keep the detail where it already
+has protection. A redaction pass over an arbitrary stack trace is a
+best-effort filter — and presenting a best-effort filter as a guarantee
+is exactly the `POPIA_MASKED` failure in §18.2. If a sanitiser is wanted
+regardless, it belongs in one shared, tested place and should allowlist
+what may be logged rather than denylist what may not.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
