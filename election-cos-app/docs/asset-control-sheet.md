@@ -252,8 +252,11 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
 2. **Entity identity (§0).** Blocked on the lodgement and the
    subsidiary's registration documents. Then: licensor/licensee split,
    effective-dated, and the three inline literals routed through config.
-3. **Role model.** Six documented (A-027) against seven seed roles and 26
-   capabilities built. One has to give.
+3. ~~**Role model.**~~ **CLOSED 28 Oct, §19.5.** A-111 §3.3 and Δ09 settle
+   it at **seven seed roles** with Finance Officer restored — and reframe
+   it: the permissions screen is a grants model
+   (`role_defaults ∪ user_overrides`), so the role *count* was the wrong
+   question. Our 7 roles / 26 capabilities are that model.
 4. ~~**Which stack.**~~ **CLOSED 28 Oct, §18.1.** Four descriptions were
    in circulation. The repositories settle it: `ElectionCOS1_0` holds a
    README and one ingestion branch, `Election-COS1.0_v2` is empty, and
@@ -267,12 +270,13 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
 7. **PPFA citation (A-043).** "6 Aug 2025 proclamation" against our
    verified *Gazette No. 53182, 18 Aug 2025*. Figures agree; provenance
    does not.
-8. **Palettes — now five.** A-049 introduced a fourth
-   (`#040c30` / `#795907`); A-085 adds a fifth
-   (`#1A253A` / `#722226` / `#C0A062`). Canonical remains corporate
-   `#13244A`/`#C9A227` and EC OS product tokens `#1A2246`/`#B7913F` —
-   but five is past the point where a default holds. **Needs a decision,
-   not a reconciliation** (§12.3).
+8. ~~**Palettes — now five.**~~ **CLOSED 28 Oct, §19.5.** D3 in A-111 and
+   §6 of A-113 name the product set — `#1A2246` ink, `#B7913F` gold,
+   `#F7F4EE` paper, `#7E1F2E` maroon, `#33427E` teal, `#2F7E4A` green,
+   `#6A6E7E` slate — and `tokens.ts` matches exactly. The corporate set
+   (`#13244A`/`#C9A227`) stays separate and deliberate. **A-049's
+   `#040c30`/`#795907` and A-085's `#1A253A`/`#722226`/`#C0A062` are
+   drift, not alternatives.** Nothing to decide.
 9. **The public-facing domain, in three spellings.** `electioscos.co.za`
    is registered and is what `publicDomain.ts` guards. A-084's footer
    and A-090 each use a different one (§12.3). The corporate site is
@@ -292,6 +296,12 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
 - **`electioncampaignos.co.za` and `electioncos.co.za`** as the product's
   address (A-084, A-090). The first is in `SUPERSEDED_DOMAINS`; the
   second was never ours.
+- **`Election_Campaign_OS_Business_Plan_v2.docx`** (A-114, §19.4). Its
+  "v2.0" is its own version number, dated 20 July — nineteen days before
+  the V2 artefact set — so it is **not** artefact 02-V2. It carries
+  R100,000 / R15m twice with no mention of the current figures, plus
+  "Section 4 notice", PostgreSQL 15+ and `af-south-1`. **Fifth artefact
+  with the repealed thresholds and the only investor-facing one.**
 - **PSP figures of R7,515 / "under 1%"** (A-020, A-021).
 - **"Cumulative cash dips negative in December"** (A-021).
 - **The fork as a merge source** (§3). Donor tree only.
@@ -412,6 +422,7 @@ A-078 | repeats of A-033/035/036/037/039 and the research skill | — | **DUP** 
 | 15 (28 Oct) | 4 | 1 |
 | 16 (28 Oct) | 2 | 1 |
 | 17 (28 Oct) | 2 | 2 |
+| 18–19 (28 Oct) | — | — |  *repositories and re-reads; no new uploads*
 | **total** | **184** | **128** |
 
 The 31 roll PDFs are 31 distinct hashes — no duplicates in that batch,
@@ -1888,6 +1899,77 @@ party's PR plus ward votes. So the chain now runs IEC primary export →
 our acquisition tool → A → quota → `allocateSeats`, with a SHA-256 at the
 first link. That is the strongest provenance in the register, and it is
 recorded in the test rather than left to a download being present.
+
+---
+
+## 19. The four governing documents — read at last, and the build already obeys them
+
+Registered long ago, never opened. Read 28 Oct.
+
+ID | Asset | Hash | Disposition
+---|---|---|---
+A-111 | `00-MASTER-INDEX-work-partition-map-v2.md` (IC-ECOS-MASTER-2026-V2, 8 Aug) | `0a786c0f` | **KEEP — the control document** |
+A-112 | `06-reconciliation-record-v2.md` (IC-ECOS-RECON-2026-V1, 8 Aug) | `74c51dbd` | **KEEP — decision register** |
+A-113 | `CLAUDE-HANDOFF.md` (9 Aug) | `c13f6f16` | **SUPERSEDED by A-111/A-112** — §19.3 |
+A-114 | `Election_Campaign_OS_Business_Plan_v2.docx` | `3a63dc94` | **DEFECT — not artefact 02-V2** — §19.4 |
+
+### 19.1 They were already governing the build
+
+The striking thing is that nothing here is news to the code. `src/dal/ports/documents.ts` line 5 cites *"master index §3.3, build spec §3.5"*. `src/modules/finance/escalation.ts` cites *"IC-ECOS-BUILD-2026-V2 §6.8.3"*. A prior session plainly had 00 and 01-V2 in hand; only this register had not caught up.
+
+So this was a conformance audit, not a build input. **Thirteen checkable mandates, thirteen conformant:**
+
+| # | Mandate | Source | Build |
+|---|---|---|---|
+| 1 | PPFA R200,000 / R30,000,000 | 00 §1.1, 06 §2 | `ppfaDefaults.ts` ✓ |
+| 2 | Warning at 80% = R160,000 | 06 §2 | `warningPercentage: 0.8` ✓ |
+| 3 | Thresholds are configuration, never constants | 06 §2.2 | tenant `ppfaConfigs` ✓ |
+| 4 | `ppfaConfigs` append-only, effective-dated | F-07 | `firestore.rules:277` `allow update, delete: if false` ✓ |
+| 5 | Tenant root: `donorLedger`, `donations`, `donationAlerts`, `ppfaConfigs` | Δ08 | all four present ✓ |
+| 6 | **Never hard-block a donation at the cap** — flag, escalate to a named human | 06 §2.2 | `escalation.ts` is pure classification; `requiresNamedAcknowledgement` ✓ |
+| 7 | Hold the aggregation function until Q1–Q3 land | 06 §5 | *"NOT wired up to run automatically yet"* ✓ |
+| 8 | PPFA online-only; Dexie carries no donor/donation tables | Δ11 | none in the Dexie schema ✓ |
+| 9 | **7 seed roles**, Finance Officer restored | 00 §3.3, Δ09 | 7 + 26 capabilities ✓ |
+| 10 | Tokens `#1A2246` / `#B7913F` / `#7E1F2E` / `#F7F4EE` | D3, A-113 §6 | `tokens.ts` exact ✓ |
+| 11 | Never "Blockchain Verified Hash" | 00 §3.3 | `documents.ts` says so and two tests assert no `/blockchain/i` ✓ |
+| 12 | Regulation of Gatherings Act, **Section 3** | A-113 §5 | only correct name appears; no "Section 4 notice" ✓ |
+| 13 | **Do not claim "all personal information is stored in South Africa"** | 00 §3.1 | `legal/facts.ts` lists it as a claim that must not be made, citing POPIA §72 ✓ |
+
+Mandate 13 is the one worth dwelling on. **00 §3.1 establishes that Firebase Auth has no data residency**: voter PII sits in `africa-south1`, but staff identity records sit in the United States. The mandated response is to keep the Auth record to a UID and a work email and put everything else in Firestore — and `staffProvisioning.ts` and `PermissionsPage.tsx` both state that role and scope are written *"to Firestore in South Africa and never to Auth."* The build reached the right answer and the register never recorded why.
+
+### 19.2 The governance rule worth keeping
+
+A-112 §1 is a documented case of a prior Claude Code session **attributing quotations to artefacts that do not contain them** — five of them, tabulated — and then proposing to build Phase 2 against a document set that existed only in its own context. The diagnosis in §1.1 is fair to everyone: a scope change was given conversationally, the session correctly refused to act on conversation alone, and then treated its own write-up of it as the formal re-issue.
+
+> **A change of scope must land in the artefact before it lands in the build.**
+
+That is now a standing rule here. It is also why this sheet records a hash for everything and why **[U]** marks what is not established — and it is the reason the §18.2 harvest service and the §14 white paper were registered rather than acted on.
+
+### 19.3 A-113 is superseded by a document one day older
+
+`CLAUDE-HANDOFF.md` is dated **9 August**, the V2 set **8 August** — and the 9th is the superseded one. It says so itself: it was *"compiled from claude.ai Project memory + live project_knowledge_search"*, and that knowledge base still held V1. So it asserts **PostgreSQL 15+ with RLS**, **AWS Cape Town `af-south-1`**, and a *"canonical 5-role list"* — all three reversed by A-111 the day before, and all three now also refuted by the repositories (§18.1).
+
+It is not worthless. Three of its corrections are real and all three are already applied: the Gatherings Act citation (Section 3, correct name), the POPIA 48-hour purge reframed as house policy rather than statute, and the seat calculator that *"allows 35 ward wins for 34 seats"* — the exact defect `seatCalculator.ts` opens by describing as fixed.
+
+### 19.4 A-114 is not the V2 business plan, and it carries the repealed thresholds
+
+Its title block reads **"Comprehensive Business Plan · v2.0 · Prepared: 20 July 2026"**. That is its own version number, nineteen days *before* the V2 artefact set, so it is **not** artefact 02-V2 and none of Δ14–Δ16 is in it.
+
+What is in it: **R100,000 and R15m, twice, with zero mentions of R200,000 or R30,000,000**; "Section 4 notice"; "PostgreSQL 15+ (row-level security)"; and `af-south-1`. **Fifth artefact in this register to carry the repealed thresholds — and the first that is investor-facing**, which is the worst place for them. A-112 §5's instruction applies directly: *"Discard all prior versions… Do not reconcile them against remembered or inferred content."*
+
+### 19.5 What closes, and what is still open
+
+**Closes — §5 item 3, the role model.** A-111 §3.3 ends it twice over: *"Seven seed roles, not six"*, and the count was the wrong question anyway, because the permissions screen shows a **grants model** — effective permissions are `role_defaults ∪ user_overrides`, which a fixed enum cannot express. Our 7 roles and 26 capabilities are that model.
+
+**Closes — §5 item 8, the palettes.** D3 names `#1A2246` / `#B7913F` / `#7E1F2E` as canonical and A-113 §6 gives the full set, including the `#33427E` and `#2F7E4A` that turned up in A-085's white paper. Ours match exactly. The other four palettes in the register are drift, not alternatives.
+
+**Still open, and now better specified:**
+
+- **Q1 — is R200,000 per donation, or cumulative per donor per year?** A-112 §2.1 shows the reporting genuinely conflicts and says plainly there is no safe default. We ship `CUMULATIVE_PER_DONOR_PER_YEAR` marked `// PROVISIONAL — §6.8.1 Q1 unresolved`, behind a strategy interface, so answering it is a config change. **Attorney.**
+- **Q2 — what is the financial year?** 1 April – 31 March is asserted in our build and A-112 says it is asserted, not sourced. If wrong, every quarterly boundary is wrong.
+- **Q3 — is the R30m cap per party or across all parties?** If per party, the platform sees only its own tenant's share and **must not present its figure as the donor's total exposure**. That is a UI honesty requirement.
+- **D7 — accept Firebase Auth's offshore staff identity, or defer for self-hosted auth?** The build has taken the "accept, disclose, minimise" default. It should be an explicit decision, not a default.
+- **D5 domains and D6 financial model** map onto §5 items 9 and the A-114 problem above.
 
 ---
 
