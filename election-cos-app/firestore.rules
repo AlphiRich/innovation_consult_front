@@ -295,6 +295,21 @@ service cloud.firestore {
       allow read, write: if false; // Cloud Functions (admin SDK) only
     }
 
+    // ---- membership OTP challenges ---------------------------------------
+    // One document per code sent (functions/src/membershipOtpCallables.ts).
+    // Holds a scrypt hash, its salt, an attempt counter and a phone MASK —
+    // never a number, and never the code.
+    //
+    // Clients get nothing, not even read. A client that could read the
+    // attempt counter could watch a lockout approach, and one that could
+    // write would own the counter outright. Everything a screen needs comes
+    // back from the callable's own return value. The default-deny above
+    // already covered this; it is written out so a reviewer does not have
+    // to derive it. Expiry is by TTL policy on `expireAt`.
+    match /tenants/{tid}/membershipOtpChallenges/{challengeId} {
+      allow read, write: if false; // Cloud Functions (admin SDK) only
+    }
+
     // ---- audit log — append-only, written by Cloud Functions --------------
 
     match /tenants/{tid}/auditLog/{eventId} {

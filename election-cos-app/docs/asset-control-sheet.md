@@ -3820,5 +3820,147 @@ decision about whether this product holds membership identity data.
 
 ---
 
+## §36 — The OTP flow, rebuilt as callables on Firestore
+
+Session 38, on instruction. The §35 service, rewritten in the stack this
+build actually runs: two Cloud Functions callables, `africa-south1`, one
+Firestore collection, no new dependency.
+
+### 36.1 What it confirms, stated narrowly
+
+That the person whose consent was captured on a membership form is
+reachable on the number written on it. It is evidence for a
+`popiaConsentReference` that already exists on the voter record — POPIA
+puts the burden of showing consent was given on the responsible party,
+and `WRITTEN` on its own shows nothing.
+
+**It is not identity verification.** A one-time code proves control of a
+handset. The same line `saIdNumber.ts` draws, for the same reason, and
+nothing in the new code may set anything that means otherwise.
+
+This also resolves most of the §35.8 objection without a new data class:
+the number is already held, the consent record already exists, and
+nothing here persists a phone number. The §35.8 question that *remains*
+open is the one about OCR'd membership cards, which is not built.
+
+### 36.2 The shape is the fix
+
+There is **no inbound endpoint**. The field agent is standing with the
+member; the member reads the code aloud and the agent types it into the
+app, which calls a Firebase callable carrying the agent's own token.
+Authentication, tenancy and capability become the platform's job, and
+they were already solved here.
+
+That single decision kills §35.1 (no signature to forget), §35.5 (no
+parser to 500 on a delivery receipt) and the exception leak with it.
+
+### 36.3 Each finding, and where it went
+
+| §35 | Fix | Guarded by |
+|---|---|---|
+| 1 — webhook authenticates nobody | Callable; uid, tenant and caps off the verified token; payload tenant ignored | `membershipOtpCaller.test.ts`, 7 tests |
+| 2 — fast hash, literal salt | scrypt N=16384, 16 random bytes per challenge | *costs enough per guess…* |
+| 3 — one typo locks the member out | Challenge is its own document; a wrong guess moves **only** the counter | *accepts the right code after a wrong one* |
+| 4 — expiry raises TypeError | Epoch millis both sides; boundary pinned | *expires exactly at its own deadline* |
+| 5 — status callbacks 500 | No webhook exists | — |
+| 6 — timing-unsafe compare | `timingSafeEqual`, with a length check so it returns rather than throws | **not guarded — see 36.5** |
+| 7 — no throttling | `MAX_ATTEMPTS = 5`, counted in a transaction | *counts down and then locks* |
+| 8 — no request timeout | `AbortSignal.timeout(10_000)` | — |
+| 9 — secrets at import | `defineSecret`, read inside the handler | — |
+| 10 — `str(e)` returned to caller | Detail to `logger`, generic `HttpsError` out | — |
+| 11 — Python 3.9, 2023 pins | Node 20, no new dependency | — |
+| 12 — `COPY . /app` | No container | — |
+
+**The measured difference on §35.2.** SHA-256 under a literal salt gave
+up a six-digit code in **0.67 s**. scrypt at N=16384 measures
+**38–90 ms per guess** depending on machine load, which puts the full
+10⁶ keyspace at **10–25 hours on one core** — and the test asserts a
+floor rather than the measured figure, so a slower box never fails the
+build while a *faster hash*, which is the actual regression, does.
+
+### 36.4 Two tests of my own that were too weak, found by injection
+
+Rule 4 cuts both ways, and it caught me twice:
+
+- **The uniformity test passed a biased generator.** `randomBytes(3) %
+  1000000` skews 6% toward low codes; ten buckets over 20 000 draws with a
+  ±30% band saw nothing. Replaced with a chi-square over 200 000 draws:
+  the biased generator scores ~110, a fair one under 10, threshold 45.
+- **The ordering test did not test ordering.** It used a challenge with no
+  attempts spent, so swapping the expiry and attempt checks changed
+  nothing it looked at. Now pinned with a challenge that is both out of
+  time and out of attempts.
+
+Both were found only because the injection *failed to fail*. A guard that
+passes its own defect is worse than no guard, because it is counted.
+
+### 36.5 What is not guarded, said plainly
+
+`timingSafeEqual` is in there for a property **no functional test can
+assert**. Injecting a plain `===` comparison changes no test outcome, and
+I am not going to write a timing assertion that would flake on a shared
+runner and then be deleted. It is correct because it is the right
+primitive, not because anything here proves it.
+
+### 36.6 The binding between the number and the record
+
+The caller supplies the number, so nothing decrypts `phoneEncrypted` and
+nothing waits on the KMS key `unmaskCandidateIdNumber` is blocked on.
+What stops an agent sending a code to a number of their own choosing is
+that the supplied number must mask to the voter's stored `phoneMasked`.
+
+**That is a real binding and not a perfect one**: the mask keeps three
+digits at each end, so on the order of 10⁴ numbers satisfy it. Stated
+rather than overstated. When the KMS key lands it becomes an exact
+comparison and the check strengthens without the flow changing.
+
+Two further preconditions: a voter with `popiaConsentGiven !== true` is
+**not messaged** — sending an unsolicited code to someone who has not
+consented to contact is exactly what that flag exists to prevent — and a
+soft-deleted record is treated as absent.
+
+### 36.7 Deliberate boundaries
+
+- **Nothing is written to the voter.** `popiaConsentMethod` and
+  `popiaConsentAt` record how consent was actually obtained, and a code
+  typed in afterwards does not change that history. The evidence is the
+  verified challenge plus its audit event. A `phoneVerifiedAt` on the
+  voter is a schema change across port, rules and adapter — its own turn.
+- **No new capability.** `voters.edit` gates it, which is the same gate as
+  editing the record and has exactly the right population: the canvasser
+  at the door. A capability nobody has been assigned is a feature that is
+  dead until someone edits a role. If outbound contact ever needs its own
+  gate it is one line plus a role assignment.
+- **The challenge collection is denied to clients outright**, not even
+  read. A client that could read the attempt counter could watch a lockout
+  approach; one that could write would own it. Everything a screen needs
+  comes back from the callable's return value.
+- **A locked challenge does not lock the member.** A new code can be
+  requested after the cooldown. A control that locks the person is a
+  denial of service anyone can trigger on anyone.
+
+### 36.8 What still blocks it
+
+`requestMembershipOtp` is **`@deployable fails-closed`**. There is no Meta
+Business account, no approved template and no token on this project, so
+it refuses — and refuses *before* writing, so it cannot leave a challenge
+nobody can answer. `verifyMembershipOtp` is complete; with no challenges
+in existence it has nothing to verify, which is true rather than broken.
+
+Preflight now reads **10 reviewed, 2 fails-closed pending infra**.
+
+To make it live: a Meta Business account, a `membership_otp_verify`
+template approved in `en_ZA` with two body parameters, and
+`WHATSAPP_API_TOKEN` / `WHATSAPP_PHONE_NUMBER_ID` in Secret Manager. A
+TTL policy on `tenants/{tenantId}/membershipOtpChallenges.expireAt`
+should go on at the same time.
+
+**No UI was built.** Two callables and no screen is deliberate: the
+screen should be designed against a flow somebody has stood at a door
+with, and the credential that would let anyone do that does not exist
+yet.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
