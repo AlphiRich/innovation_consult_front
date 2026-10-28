@@ -2524,5 +2524,129 @@ the one proposed here, which is itself the point.
 
 ---
 
+## 25. Batch 25 (28 Oct, 5 files) — the infographic, and an unenacted proposal labelled as statute
+
+ID | Asset | Hash | Disposition
+---|---|---|---
+A-133 | `gemini-code-…5732815.ts` | `6ac62bdd` | **DEFECT — does not compile** (§25.1) |
+A-134 | `…5712434.txt` (nginx) | `489a8428` | **DUP of A-129** — same bytes as the §23 paste |
+A-135 | `…5702768.txt` (requirements) | `33ca5116` | **DUP** — the §24.1 file, `google-genai==0.1.1` |
+A-136 | `…5688764.txt` (Dockerfile) | `18ac3621` | **DUP** — the §24.2 file |
+A-137 | `election_campaign_os_2026_infographic.html` | `990d627f` | **RECONCILE — §25.2–25.4** |
+
+### 25.1 The client snippet imports two things that do not exist
+
+```ts
+import { InnovationConsultVoiceClient } from '@/modules/voice/voice-agent-client';
+import { getApiWebSocketUrl } from '@/config/publicDomain';
+```
+
+`src/modules/voice` does not exist. And `publicDomain.ts` exports exactly
+five things — `APP_DOMAIN`, `APP_ORIGIN`, `HOSTING_ORIGIN`,
+`SUPERSEDED_DOMAINS`, `CORPORATE_DOMAIN`. **There is no
+`getApiWebSocketUrl`**, and no environment-keyed URL helper of any kind:
+the module is deliberately a small set of constants. Both imports fail
+at typecheck.
+
+It is also the first artefact to assume the relay belongs in *this*
+app's bundle, which §18.1 and §22.5 say it does not.
+
+### 25.2 The infographic gets a great deal right
+
+Checked against the proclaimed baseline and the primary data:
+
+- **4,488 wards** nationally ✓ · **402 wards** in North West ✓
+- **NW405: 34 ward + 33 PR = 67 seats, 122,059 voters** ✓ — all four
+- **Every quota in Scenarios 1–3 is arithmetically exact** under Item 12:
+
+  ```
+  S1  ⌊114,600 / 67⌋ + 1 = 1,711   stated 1,711  ✓
+  S2  ⌊110,000 / 67⌋ + 1 = 1,642   stated 1,642  ✓
+  S3  ⌊108,000 / 66⌋ + 1 = 1,637   stated 1,637  ✓   (C = 1, correctly)
+  ```
+- Scenario 3 handles the independent properly: votes excluded from A,
+  `B − C` contracted to 66, and the party votes still sum to A.
+- Seat allocation follows quota-then-largest-remainder correctly in every
+  scenario, and each totals 67.
+- The financial block is internally consistent: 1,113,000 − 239,000 =
+  874,000, less 1,100,000 = (226,000).
+
+### 25.3 Scenario 4 is an unenacted proposal presented as the statute
+
+Scenario 4 is labelled **"Excessive Ward Overhang (Schedule 1, Item 16)"**
+and states `Q_new = 1,667`. That figure is **not** Item 12:
+
+```
+as Item 12:  ⌊106,000 / 67⌋ + 1            = 1,583   ✗ (stated 1,667)
+the proposal: ⌊(106,000 − 6,000) / (67 − 7)⌋ + 1 = 1,667   ✓ exact
+```
+
+It recalculates the quota **excluding the overhang party's votes and its
+wards**. Our own registered source excerpt gives Item 16's entire
+operative text — the party gets no PR seats, its ward seats are
+unaffected — and then says:
+
+> *"It does not provide a resolution mechanism for the resulting
+> council-size overhang."* … The IEC's own deck proposes recalculating
+> the quota excluding the excessive-seats party's votes and wards, but
+> frames it **explicitly as a proposal, not enacted law. Do not implement
+> this as default behavior; if a user wants to model the proposed
+> amendment as a scenario, build it as an explicitly-labeled alternate
+> calculation path, never as the default."*
+
+The infographic does the proposal and calls it Item 16, beneath a footer
+reading *"Calculations compliant with Local Government: Municipal
+Structures Act (Act 117 of 1998, Schedule 1 as amended)."* **It is not
+compliant with the Act; it implements an amendment the Act does not
+contain.** The instruction not to do this is in our register, in those
+words.
+
+**Where it is right, and we differ:** Item 16 really does lock the
+overhang party's PR seats to zero while leaving its ward seats alone —
+Scenario 4 does that, and so does `allocateSeats` (`prSeats: 0`, ward
+seats retained). The divergence is only the unlegislated part:
+`seatCalculator.ts` **expands the council** (`councilSizeFinal >
+totalSeats`) rather than contracting the quota, and makes no claim of
+statutory authority for the choice. Both are decisions in a gap the law
+leaves open; only one of them says the Act decided it.
+
+Also, `Q = ⌊A/(B−C)⌋+1` is captioned **"the Hare Quota formula"**. Hare
+is `A/B` with no `+1` and no `−C`. The formula shown is Item 12; the name
+attached to it is wrong.
+
+### 25.4 Four more, and what not to publish
+
+- **"over 28.5 million registered voters nationwide"**, unsourced. Our
+  verified baseline is **27,723,675** (IEC Circular 1 of 2025, Annexure A,
+  which the build computes against). 2.8% growth over 20 months is
+  plausible — but §5 item 0's rule applies: a figure must name its source
+  and date, and this one does neither.
+- **"80% of new registrations in mid-2026 surges came from voters under
+  30"** — no source anywhere in the register.
+- **R1,113,000 as "Base Case Target"** picks one side of a conflict
+  A-113 §5 records as open: *"Revenue figures R969k vs R1,113k
+  inconsistency across GTM model and architecture doc — needs single
+  reconciled figure… not yet reconciled."* Presented here as settled.
+- **Scenario 2 invokes "2021 historical fragmentation" and gives ANC 30
+  seats.** The verified 2021 result is **ANC 33** (A-035, confirmed
+  against the IEC export in §18.4). A hypothetical is fine; attaching
+  2021 to it is not.
+- **A sixth palette** — slate/blue/cyan, none of the product tokens.
+
+**It is not an engine.** `scenarioData` is a hard-coded literal carrying
+pre-computed `ward`, `pr` and `total` for every party; the page renders a
+table from constants and computes nothing. "Interactive … Seat Allocation
+Engine" and "Simulate electoral quotas" describe a calculator that is not
+there — the §17.3 and §14 pattern again, a claim wider than the code.
+
+**Disposition: do not publish as-is.** Fix the Item 16 labelling or drop
+Scenario 4, source or remove the two voter-registration claims, pick a
+revenue figure deliberately, and either wire the engine to
+`allocateSeats` or stop calling it one. The electoral baseline numbers
+are sound and the arithmetic is careful — which is exactly why the
+compliance footer over the top of it is the problem.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
