@@ -254,9 +254,11 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
    effective-dated, and the three inline literals routed through config.
 3. **Role model.** Six documented (A-027) against seven seed roles and 26
    capabilities built. One has to give.
-4. **Which stack.** Four descriptions are in circulation — Firebase/
-   Firestore (built, A-024), AWS Postgres (A-023), Postgres/Prisma
-   (A-032), MySQL/Prisma (A-008). A-024 matches reality.
+4. ~~**Which stack.**~~ **CLOSED 28 Oct, §18.1.** Four descriptions were
+   in circulation. The repositories settle it: `ElectionCOS1_0` holds a
+   README and one ingestion branch, `Election-COS1.0_v2` is empty, and
+   the Postgres/AWS/agentic system exists only as documents. A-024 was
+   right, and `election-cos-app` is the only application there is.
 5. **The security package (A-004–A-010).** Wrong stack for EC OS and
    three files cannot pass their own gates. Rewrite only if the package
    has a destination.
@@ -295,6 +297,12 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
 - **The fork as a merge source** (§3). Donor tree only.
 - **Any legal entity name written to code before the registration
   documents land** (§0).
+- **`ElectoralHarvestService` as pasted** (§18.2). It calls an endpoint
+  the IEC does not publish, writes the roll into `voter` unconsented, and
+  labels an unsalted SHA-256 of a South African ID number `POPIA_MASKED`
+  in an append-only audit log. The hash is brute-forceable; the label is
+  a false compliance record. **Not a thing to fix and adopt** — the
+  Firestore ingestion in §15 is the shape this work already has.
 
 ---
 
@@ -1733,6 +1741,153 @@ with a confidence-and-gaps section. Sound instructions, and the same
 discipline this sheet runs on, but it is **tooling, not an EC OS
 artifact**. Registered so it is not mistaken for one of the ~30 agents in
 A-102 §3; it belongs to none of those layers.
+
+---
+
+## 18. Batch 18 (28 Oct) — the repositories, the IEC API, and a harvest service that must not be built
+
+Three things arrived together: two IEC URLs, a pasted `ElectoralHarvestService`,
+and instructions to clone ten repositories. The clones answer §5 item 4.
+
+### 18.1 The stack question is settled, and not by argument
+
+All ten were attached and cloned. The two at the centre of the entire corpus:
+
+| repository | refs | contents |
+|---|---|---|
+| **`AlphiRich/ElectionCOS1_0`** | `main`, `feat/voters-roll-ingestion` | `main`: **one file**, a README reading `# ElectionCOS1_0`. The branch: **25 files, byte-identical to A-103**, committed today |
+| **`AlphiRich/Election-COS1.0_v2`** | `main` only | **zero files. The repository is empty.** |
+
+`ElectionCOS1_0` is the repository `CLAUDE_CODE_BRIEF.md` names in its first
+line — *"Consumer: Claude Code, working in `AlphiRich/ElectionCOS1_0`"*.
+`Election-COS1.0_v2` is the name behind the v2 build plan.
+
+**So the application described by A-102, A-110, A-023 and A-031/A-032 — AWS
+`af-south-1`, Express, Prisma, PostgreSQL with PL/pgSQL triggers, BullMQ,
+~30 agents, the Monte Carlo simulator — does not exist in any of these
+repositories.** Not on `main`, not on a branch, not in a tag. The only
+thing ever pushed to `ElectionCOS1_0` is the ingestion package reviewed in
+§15, and `Election-COS1.0_v2` has never had a commit with a file in it.
+
+The only working application in the account is
+`innovation_consult_front/election-cos-app` — Firebase/Firestore,
+`africa-south1`, 65 files, 1,008 tests, green.
+
+**§5 item 4 and §14.1 close.** The question was never which of two systems
+wins. One system exists and the other is a set of documents. A-102's claim
+to supersede it was a claim about a repository with one README in it.
+
+The other eight, recorded for completeness: `psychekit` (16 entries),
+`adk-js` (25, 11 MB), `apphosting-adapters` (18, 44 MB), `eval_hub`
+(4, 59 MB), `.github` (5), `claude` (README only), `gemini-cli-`
+(README only), and **`npm-install-firebase`, which has no commits at all.**
+
+### 18.2 The pasted `ElectoralHarvestService` — do not build it
+
+Four findings, the first decisive and the second the most dangerous.
+
+1. **The endpoint does not exist.** I read `api.elections.org.za/Help`
+   directly this session. The API publishes `Delimitation`,
+   `LGESeatCalculationResults`, `LGECandidates`, `ContestingParties`,
+   `NPESeatCalculationResults` and per-person `Voters/IDNumber/{ID}`.
+   **There is no bulk voter-roll endpoint and no `wardId`/`vdCode` voter
+   query.** The base URL is also wrong — real paths are
+   `https://api.elections.org.za/api/v1/…`, so `${BASE}/voter-roll`
+   against a `/v1` base resolves to nothing either way. The IEC does not
+   publish the roll over this API; it publishes it as the certified PDFs
+   that IC-ECOS-DATA-2026-02 parsed.
+
+2. **`sha256(idNumber)` is not masking, and the audit log certifies that
+   it is.** The hash is unsalted and a South African ID number is a
+   narrow, structured space — `YYMMDD` + `SSSS` + citizenship + a digit +
+   a derived checksum. That is on the order of 10⁹ candidates, which is
+   a precomputation one machine can do; given an approximate date of
+   birth it collapses to about 10⁴, which is instant. **The hash is
+   reversible by brute force.** The code then writes
+   `complianceStatus: 'POPIA_MASKED'` into an append-only audit log —
+   so the record asserts a protection the code does not provide. That is
+   worse than no label: an auditor reading the trail is told the
+   obligation was met.
+
+3. **It writes the roll into `voter`.** `prisma.voter.createMany` with no
+   consent field at all. A-087 §5, the ingestion package's own
+   `CLAUDE.md` and §11.1 here all say the same thing: `voter` is
+   consent-gated by `trg_popia_consent_check`, and the roll is a target
+   list. If the trigger exists this code fails; if it succeeds the
+   trigger is not there. Both answers are bad.
+
+4. Smaller, but real: the two audit writes use different columns
+   (`complianceStatus` vs `severity`) for one table; `error.message` on a
+   `catch` binding does not compile under TS strict, where it is
+   `unknown`; and `skipDuplicates` needs a unique constraint the snippet
+   never declares. It is also Prisma — which, per §18.1, has no
+   repository to live in.
+
+The phone-number mask is the one part that is correct.
+
+### 18.3 The network premise changed, and two defects were hiding behind it
+
+`elections.org.za` **is reachable from this environment.** The skill, two
+module comments, a guard in `municipalRegister.test.ts` and the seed's
+own `notReachable` field all record it as denied at CONNECT. That was
+true; it is not true now, and the acquisition tool found two latent bugs
+the moment it could reach anything:
+
+- **27 of 31 registry URLs carried an unencoded space**
+  (`Downloadable Party Results/NW.csv`), which `urllib` rejects outright.
+  Those rows had never been fetchable and never could have been, by any
+  network. Percent-encoded: `--probe` went from **3 of 31 to 21 of 31**.
+- **Every IEC row expected `content_type: text/csv`.** The IEC serves
+  these CSVs as `application/octet-stream`, so the verifier correctly
+  refused a perfectly good file. `verify_payload` now accepts a list of
+  types; `--self-test` still rejects all six bad payloads, so the check
+  was corrected, not loosened.
+
+Still failing, honestly: **9 × HTTP 404** (KZN, LP, WC across all three
+years — every candidate token 404s and the directory index is 403, so the
+correct filenames cannot be derived from here and the skill forbids
+guessing one), and **1 TLS failure on `demarcation.org.za`** (CONNECT
+succeeds, the handshake does not; not our bug, and not blocking, since
+that gazette is the one document already in hand).
+
+### 18.4 The seat calculator now traces to a file we fetched ourselves
+
+`LGE_2021_NW_VD_Results.csv` was fetched through the tool and verified —
+**10,606,612 bytes, SHA-256 `a07f630d…`, 75,680 data rows**, which also
+independently confirms the supplier's `min_rows` on a row that was marked
+CONFIRMED with the note *"this build has NOT fetched it"*. It is
+gitignored; the run manifest is kept.
+
+It reconciles everything it touches:
+
+```
+registered voters, unique VD      113,218   = A-092's 2021 figure, exactly
+PR shares  ANC 47.72 · DA 25.40 · FF+ 13.58 · EFF 9.16 · PA 2.60
+                                          = A-092, all five to 2 dp
+wards           34, 64005001–64005034     = the ward-ID rule, a FIFTH time
+voting districts in 2021            113   → 108 (Nov 2025) → 106 (Aug 2026)
+```
+
+That VD series completes §13.3: stations consolidate over time, and 113 →
+108 → 106 is one trend, not three conflicting counts.
+
+**And it explains `A` for the first time.** Our test carried
+`A = 101439 // as published`, with no account of how it was composed:
+
+```
+PR ballot valid                 50,733
+Ward ballot valid             + 51,156
+                              = 101,889
+INDEPENDENT ward votes        −    450   (no PR list, so no PR seats)
+                              = 101,439  = A
+floor(101,439 / 67) + 1       =   1,515  = the published quota
+```
+
+**All nine party figures match the export exactly** — each is that
+party's PR plus ward votes. So the chain now runs IEC primary export →
+our acquisition tool → A → quota → `allocateSeats`, with a SHA-256 at the
+first link. That is the strongest provenance in the register, and it is
+recorded in the test rather than left to a download being present.
 
 ---
 

@@ -18,3 +18,11 @@ coverage
 
 # Compiled Cloud Functions output — built by the predeploy hook.
 functions/lib
+
+# Datasets fetched by tools/source-acquisition/acquire.py. Public IEC/MDB
+# data, not personal information — but 10 MB+ per province, re-fetchable
+# from sources.json, and its SHA-256 is recorded in the run manifest. The
+# manifests are kept; the payloads are not.
+07_Geospatial_and_Electoral_Data/**
+!07_Geospatial_and_Electoral_Data/_runs/
+!07_Geospatial_and_Electoral_Data/_runs/**

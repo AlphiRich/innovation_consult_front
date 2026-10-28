@@ -1,0 +1,23 @@
+{
+  "mode": "fetch",
+  "ranAt": "2026-10-28T14:24:35.616669+00:00",
+  "tool": "acquire.py 1.0",
+  "succeeded": 0,
+  "failed": 1,
+  "fromUnconfirmedSources": 0,
+  "results": [
+    {
+      "source_id": "iec-lge-2021-nw-vd-results",
+      "outcome": "FAILED_VERIFY",
+      "detail": "content-type 'application/octet-stream', expected 'text/csv'",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable%20Party%20Results/NW.csv",
+      "path": null,
+      "bytes_written": 10606612,
+      "sha256": null,
+      "content_type": "application/octet-stream",
+      "http_status": 200,
+      "source_status": "CONFIRMED",
+      "attempts": 2
+    }
+  ]
+}

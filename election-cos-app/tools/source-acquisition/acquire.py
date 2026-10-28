@@ -214,9 +214,19 @@ def verify_payload(head: bytes, total_bytes: int, content_type: str | None, expe
     if total_bytes < min_bytes:
         return f"{total_bytes} bytes, expected at least {min_bytes}"
 
+    # A registry row may name several acceptable types. The IEC serves its
+    # results CSVs as application/octet-stream, not text/csv — which is
+    # correct of them and was invisible here for as long as the host was
+    # unreachable, so every IEC row expected a type the server never sends.
+    # Widening this does not weaken the check: an HTML error page still
+    # fails `reject_html` and the row count below, which are what actually
+    # catch a portal answering with the wrong thing.
     wanted_type = expect.get("content_type")
-    if wanted_type and content_type and not content_type.lower().startswith(wanted_type.lower()):
-        return f"content-type {content_type!r}, expected {wanted_type!r}"
+    if wanted_type and content_type:
+        wanted = [wanted_type] if isinstance(wanted_type, str) else list(wanted_type)
+        got = content_type.lower()
+        if not any(got.startswith(w.lower()) for w in wanted):
+            return f"content-type {content_type!r}, expected {' or '.join(repr(w) for w in wanted)}"
 
     magic = expect.get("magic")
     if magic:

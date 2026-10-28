@@ -104,11 +104,14 @@
       "province": "NW",
       "category": "IEC_Results",
       "filename": "LGE_2021_NW_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable Party Results/NW.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable%20Party%20Results/NW.csv",
       "status": "CONFIRMED",
       "note": "2021 LGE, North West, party votes by voting district x ballot type (Ward / PR / DC 40%). UTF-8. Endpoint confirmed by the supplier's own retrieval on 2026-09-23, recorded in NW_07_Repository_Manifest.xlsx Source_Log with the row count below. This build has NOT fetched it — the environment denies these hosts at CONNECT — so the status reflects the supplier's verification, not ours. expect.min_rows carries the supplier's count so a short or filtered export fails rather than landing.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "min_rows": 75679,
         "reject_html": true
@@ -119,11 +122,14 @@
       "province": "NW",
       "category": "IEC_Results",
       "filename": "LGE_2016_NW_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable Party Results/NW.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable%20Party%20Results/NW.csv",
       "status": "CONFIRMED",
       "note": "2016 LGE, North West, same schema. UTF-8. Endpoint confirmed by the supplier's own retrieval on 2026-09-23, recorded in NW_07_Repository_Manifest.xlsx Source_Log with the row count below. This build has NOT fetched it — the environment denies these hosts at CONNECT — so the status reflects the supplier's verification, not ours. expect.min_rows carries the supplier's count so a short or filtered export fails rather than landing.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "min_rows": 49867,
         "reject_html": true
@@ -134,11 +140,14 @@
       "province": "NW",
       "category": "IEC_Results",
       "filename": "LGE_2011_NW_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable Party Results/NW.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable%20Party%20Results/NW.csv",
       "status": "CONFIRMED",
       "note": "2011 LGE, North West, same schema. Source is UTF-16 - decode before parsing. Endpoint confirmed by the supplier's own retrieval on 2026-09-23, recorded in NW_07_Repository_Manifest.xlsx Source_Log with the row count below. This build has NOT fetched it — the environment denies these hosts at CONNECT — so the status reflects the supplier's verification, not ours. expect.min_rows carries the supplier's count so a short or filtered export fails rather than landing.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "min_rows": 31020,
         "reject_html": true
@@ -177,11 +186,14 @@
       "province": "EC",
       "category": "IEC_Results",
       "filename": "LGE_2021_EC_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable Party Results/EC.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable%20Party%20Results/EC.csv",
       "status": "UNCONFIRMED",
       "note": "2021 LGE, Eastern Cape, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -191,11 +203,14 @@
       "province": "EC",
       "category": "IEC_Results",
       "filename": "LGE_2016_EC_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable Party Results/EC.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable%20Party%20Results/EC.csv",
       "status": "UNCONFIRMED",
       "note": "2016 LGE, Eastern Cape, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -205,11 +220,14 @@
       "province": "EC",
       "category": "IEC_Results",
       "filename": "LGE_2011_EC_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable Party Results/EC.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable%20Party%20Results/EC.csv",
       "status": "UNCONFIRMED",
       "note": "2011 LGE, Eastern Cape, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when. Source encoding for the 2011 cycle was UTF-16 in North West - expect the same here.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -219,11 +237,14 @@
       "province": "FS",
       "category": "IEC_Results",
       "filename": "LGE_2021_FS_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable Party Results/FS.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable%20Party%20Results/FS.csv",
       "status": "UNCONFIRMED",
       "note": "2021 LGE, Free State, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -233,11 +254,14 @@
       "province": "FS",
       "category": "IEC_Results",
       "filename": "LGE_2016_FS_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable Party Results/FS.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable%20Party%20Results/FS.csv",
       "status": "UNCONFIRMED",
       "note": "2016 LGE, Free State, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -247,11 +271,14 @@
       "province": "FS",
       "category": "IEC_Results",
       "filename": "LGE_2011_FS_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable Party Results/FS.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable%20Party%20Results/FS.csv",
       "status": "UNCONFIRMED",
       "note": "2011 LGE, Free State, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when. Source encoding for the 2011 cycle was UTF-16 in North West - expect the same here.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -261,11 +288,14 @@
       "province": "GP",
       "category": "IEC_Results",
       "filename": "LGE_2021_GP_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable Party Results/GP.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable%20Party%20Results/GP.csv",
       "status": "UNCONFIRMED",
       "note": "2021 LGE, Gauteng, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -275,11 +305,14 @@
       "province": "GP",
       "category": "IEC_Results",
       "filename": "LGE_2016_GP_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable Party Results/GP.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable%20Party%20Results/GP.csv",
       "status": "UNCONFIRMED",
       "note": "2016 LGE, Gauteng, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -289,11 +322,14 @@
       "province": "GP",
       "category": "IEC_Results",
       "filename": "LGE_2011_GP_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable Party Results/GP.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable%20Party%20Results/GP.csv",
       "status": "UNCONFIRMED",
       "note": "2011 LGE, Gauteng, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when. Source encoding for the 2011 cycle was UTF-16 in North West - expect the same here.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -303,11 +339,14 @@
       "province": "KZN",
       "category": "IEC_Results",
       "filename": "LGE_2021_KZN_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable Party Results/KZN.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable%20Party%20Results/KZN.csv",
       "status": "UNCONFIRMED",
       "note": "2021 LGE, KwaZulu-Natal, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -317,11 +356,14 @@
       "province": "KZN",
       "category": "IEC_Results",
       "filename": "LGE_2016_KZN_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable Party Results/KZN.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable%20Party%20Results/KZN.csv",
       "status": "UNCONFIRMED",
       "note": "2016 LGE, KwaZulu-Natal, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -331,11 +373,14 @@
       "province": "KZN",
       "category": "IEC_Results",
       "filename": "LGE_2011_KZN_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable Party Results/KZN.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable%20Party%20Results/KZN.csv",
       "status": "UNCONFIRMED",
       "note": "2011 LGE, KwaZulu-Natal, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when. Source encoding for the 2011 cycle was UTF-16 in North West - expect the same here.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -345,11 +390,14 @@
       "province": "LP",
       "category": "IEC_Results",
       "filename": "LGE_2021_LP_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable Party Results/LP.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable%20Party%20Results/LP.csv",
       "status": "UNCONFIRMED",
       "note": "2021 LGE, Limpopo, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -359,11 +407,14 @@
       "province": "LP",
       "category": "IEC_Results",
       "filename": "LGE_2016_LP_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable Party Results/LP.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable%20Party%20Results/LP.csv",
       "status": "UNCONFIRMED",
       "note": "2016 LGE, Limpopo, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -373,11 +424,14 @@
       "province": "LP",
       "category": "IEC_Results",
       "filename": "LGE_2011_LP_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable Party Results/LP.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable%20Party%20Results/LP.csv",
       "status": "UNCONFIRMED",
       "note": "2011 LGE, Limpopo, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when. Source encoding for the 2011 cycle was UTF-16 in North West - expect the same here.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -387,11 +441,14 @@
       "province": "MP",
       "category": "IEC_Results",
       "filename": "LGE_2021_MP_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable Party Results/MP.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable%20Party%20Results/MP.csv",
       "status": "UNCONFIRMED",
       "note": "2021 LGE, Mpumalanga, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -401,11 +458,14 @@
       "province": "MP",
       "category": "IEC_Results",
       "filename": "LGE_2016_MP_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable Party Results/MP.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable%20Party%20Results/MP.csv",
       "status": "UNCONFIRMED",
       "note": "2016 LGE, Mpumalanga, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -415,11 +475,14 @@
       "province": "MP",
       "category": "IEC_Results",
       "filename": "LGE_2011_MP_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable Party Results/MP.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable%20Party%20Results/MP.csv",
       "status": "UNCONFIRMED",
       "note": "2011 LGE, Mpumalanga, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when. Source encoding for the 2011 cycle was UTF-16 in North West - expect the same here.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -429,11 +492,14 @@
       "province": "NC",
       "category": "IEC_Results",
       "filename": "LGE_2021_NC_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable Party Results/NC.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable%20Party%20Results/NC.csv",
       "status": "UNCONFIRMED",
       "note": "2021 LGE, Northern Cape, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -443,11 +509,14 @@
       "province": "NC",
       "category": "IEC_Results",
       "filename": "LGE_2016_NC_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable Party Results/NC.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable%20Party%20Results/NC.csv",
       "status": "UNCONFIRMED",
       "note": "2016 LGE, Northern Cape, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -457,11 +526,14 @@
       "province": "NC",
       "category": "IEC_Results",
       "filename": "LGE_2011_NC_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable Party Results/NC.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable%20Party%20Results/NC.csv",
       "status": "UNCONFIRMED",
       "note": "2011 LGE, Northern Cape, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when. Source encoding for the 2011 cycle was UTF-16 in North West - expect the same here.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -471,11 +543,14 @@
       "province": "WC",
       "category": "IEC_Results",
       "filename": "LGE_2021_WC_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable Party Results/WC.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/1091/Downloadable%20Party%20Results/WC.csv",
       "status": "UNCONFIRMED",
       "note": "2021 LGE, Western Cape, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -485,11 +560,14 @@
       "province": "WC",
       "category": "IEC_Results",
       "filename": "LGE_2016_WC_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable Party Results/WC.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/402/Downloadable%20Party%20Results/WC.csv",
       "status": "UNCONFIRMED",
       "note": "2016 LGE, Western Cape, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }
@@ -499,11 +577,14 @@
       "province": "WC",
       "category": "IEC_Results",
       "filename": "LGE_2011_WC_VD_Results.csv",
-      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable Party Results/WC.csv",
+      "url": "https://results.elections.org.za/home/LGEPublicReports/197/Downloadable%20Party%20Results/WC.csv",
       "status": "UNCONFIRMED",
       "note": "2011 LGE, Western Cape, party votes by voting district x ballot type. The event id in this path is CONFIRMED: it is the same id the supplier fetched North West from for this cycle, recorded in NW_07_Repository_Manifest.xlsx. The province token is INFERRED from that one confirmed URL - only 'NW' has been fetched, and no row count is known for this province, so expect.min_rows is absent and this row stays UNCONFIRMED. Fetch it, check the file is this province and this cycle, record the row count in expect.min_rows, then promote it and say who and when. Source encoding for the 2011 cycle was UTF-16 in North West - expect the same here.",
       "expect": {
-        "content_type": "text/csv",
+        "content_type": [
+          "text/csv",
+          "application/octet-stream"
+        ],
         "min_bytes": 131072,
         "reject_html": true
       }

@@ -46,7 +46,31 @@ const PUBLISHED = [
   { id: 'ffp', name: 'Vryheidsfront Plus', votes: 13800, expected: 9 },
 ] as const;
 
-const A = 101439; // total valid votes, as published
+/**
+ * A, and where it comes from — established 28 Oct 2026, not inferred.
+ *
+ * This figure and every party total above were "as published" with no
+ * account of how they were composed. They are now reconciled against the
+ * IEC's own 2021 North West voting-district export, fetched through
+ * `tools/source-acquisition/acquire.py` and recorded in that run's
+ * manifest (SHA-256 a07f630d…, 10,606,612 bytes, 75,680 data rows):
+ *
+ *   PR ballot, valid votes            50,733
+ *   Ward ballot, valid votes        + 51,156
+ *                                   = 101,889
+ *   INDEPENDENT ward votes          −    450   (no PR list, no PR seats)
+ *                                   = 101,439  = A
+ *
+ * So A is the sum of BOTH ballots excluding independent candidates, and
+ * each party row above is likewise that party's PR plus ward votes — all
+ * nine match the export exactly. The quota then follows:
+ * floor(101,439 / 67) + 1 = 1,515, the published figure.
+ *
+ * The export itself is not committed (it is gitignored and re-fetchable
+ * from `sources.json`), so this block records what it showed rather than
+ * a test depending on a 10 MB download being present.
+ */
+const A = 101439;
 const B = 67; // council seats — matches the proclaimed Annexure A baseline
 const PUBLISHED_QUOTA = 1515;
 
