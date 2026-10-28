@@ -6,8 +6,8 @@ arrived under different names with identical content, and two arrived
 under the same name with different content.
 
 **Opened 28 October 2026 · T−7** (election day 4 November).
-**106 files received · 66 distinct · 40 redundant copies (38%)**, across
-nine batches. Running totals are in §7.3.
+**126 files received · 79 distinct · 47 redundant copies (37%)**, across
+ten batches. Running totals are in §7.3.
 
 Rows marked **[read]** have had their contents reviewed. Rows marked
 **[hash only]** are registered and deduplicated but not yet read — stated
@@ -352,7 +352,8 @@ A-078 | repeats of A-033/035/036/037/039 and the research skill | — | **DUP** 
 | 7 (28 Oct) | 7 | 3 |
 | 8 (28 Oct) | 2 | 2 |
 | 9 (28 Oct) | 10 | **0** |
-| **total** | **106** | **66** |
+| 10 (28 Oct) | 20 | 13 |
+| **total** | **126** | **79** |
 
 Redundancy is running at **38%**. The pattern is consistent: the same
 corpus re-exported from several conversations. Hash-keying is doing real
@@ -530,6 +531,109 @@ redaction functions both leak**, so the disposition does not improve.
 Combined with A-006 (the gate blocks every build) and A-007 (the pipeline
 can never go green), the package remains **DEFECT** across the board and
 still targets a stack this repo does not use.
+
+---
+
+## 9. Batch 10 — a fourth `Shell.tsx`, a landing page we don't have, 18 covers
+
+### 9.1 The pasted `Shell.tsx` is a fourth variant
+
+Three Shells were already known. This is a fourth:
+
+| | lines | signed-out renders | landing import |
+|---|---|---|---|
+| **this repo**, `src/app/Shell.tsx` | 217 | `<SignInPage />` | — none — |
+| the fork (A-031), `src/app/Shell.tsx` | 895 | `<LandingPage />` | `./LandingPage` |
+| the paste | ~140 | `<LandingPage />` | `@/modules/landing/LandingPage` |
+
+**It will not build here.** `find src -iname '*Landing*'` returns nothing
+— this repo has no landing component under any name, and the fork's sits
+at a different path. The import resolves in neither tree.
+
+**It fails our type-scale guard.** Six off-scale classes — `text-lg` ×1,
+`text-sm` ×1, `text-xs` ×4. Run against our own
+`scripts/check-type-scale.mjs`:
+
+```
+✗ check:type-scale failed — Tailwind's default font sizes used instead of the tokens:
+  …:6: "text-lg"   …:7: "text-sm"   …:9: "text-xs"   …:10: "text-xs"   …:11: "text-xs"
+```
+
+Our `Shell.tsx` is clean on that guard, so applying the paste would break
+`check:all` on the first run.
+
+**The duplicate margin class is benign — correcting my own first read.**
+`className="mt-auto pt-6 border-t border-paper/10 mt-6"` puts two
+utilities from the same group in one attribute, which is the documented
+class-race hazard. I flagged it as a possible layout break, then tested
+it: compiled Tailwind 3.4.17 and checked emission order.
+
+```
+emitted first: .mt-6
+emitted last : .mt-auto   <-- wins, equal specificity
+=> mt-6 is dead. The footer still sits at the bottom of the nav.
+```
+
+So it is dead code, not a break. Worth removing; not worth alarm. (Our
+Shell's equivalent line is `mt-auto pt-6 border-t border-paper/10
+space-y-1` — no clash.)
+
+### 9.2 The landing page in the screenshots
+
+Two screenshots show a landing page — "Knowledge to action.", four data
+chips, and seven role cards with per-role grant counts (20 / 11 / 10 / 8
+/ 5 / 6 / 4).
+
+**The content is ours.** Every figure traces to this codebase:
+`africa-south1` (9 hits in `src/`), R200,000 (7), Gazette 53182 (3),
+Dexie (7), `COMPANY_TAGLINE = 'knowledge to action'`,
+`PRODUCT_NAME_SHORT = 'EC OS'`. The seven roles include Compliance
+Officer and Finance Officer, which is our seed set — not the "canonical
+six" the uploaded RLS and membership-capture documents name.
+
+**The component is not.** `"Knowledge to action"` appears nowhere in this
+repo, and not in the fork's `LandingPage.tsx` either. So the page was
+built from this codebase's data and constants, in a lineage that has
+`src/modules/landing/LandingPage.tsx` — exactly the path the pasted Shell
+imports. That lineage is a **third application tree**, after this repo and
+the fork.
+
+**Open question, not an assertion:** the paste's header says "session 31
+gave this state an actual page instead of going straight to the sign-in
+form". That did not happen in *this* repo — our signed-out branch still
+returns `<SignInPage />`. Either it happened only in the other lineage, or
+it happened here and was reverted. Worth knowing which before porting.
+
+**To bring the landing page in**, three things are needed and only the
+first is a file: the `LandingPage` component itself (not yet uploaded), a
+decision on its path, and a type-scale pass on both it and the Shell.
+
+A-082 | pasted `Shell.tsx` | not in the upload store | **RECONCILE** [read, guards run] | §9.1 |
+A-083 | landing-page screenshots ×2 | `78f12398`, `f8d06c8c` | **REFERENCE** [viewed] | §9.2 — the component itself is still missing |
+
+### 9.3 The 18 cover pages
+
+**11 distinct of 18.** Seven are redundant, including three identical
+copies of `Legal-Compliance_-_Front` and three of
+`Research-WhitePaper_-_Back`.
+
+| family | front | back |
+|---|---|---|
+| Financial-Analysis | `211312f7` | `de3bcfea` |
+| Legal-Compliance | `e9c35481` ×3 | `f773a476` ×2 |
+| Product-TechPlan | `ce60c7d3` ×2 | `9c24b9a8` |
+| Research-WhitePaper | `4591a57d` | `f3eceabb` ×3 |
+| SOP-Contract | `7e2acc11` ×2 | `19a3732f` |
+| Strategy-Plan | — not uploaded — | `d7a0d26b` |
+
+**Strategy-Plan has a back cover and no front.** Every other family has
+both. Flagged rather than assumed to be an oversight.
+
+These are document furniture, and they land on the branding question
+settled on 16 October: corporate `#13244A` / `#C9A227`, EC OS product
+tokens `#1A2246` / `#B7913F`, and a third set that was drift. The HTML
+briefing (A-049) introduced a fourth. **Not yet opened** — worth checking
+which palette these covers carry before any of them is used.
 
 ---
 
