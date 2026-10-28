@@ -27,8 +27,23 @@
  * vintage wording.
  */
 
-/** The registered domain the application is served from. */
-export const APP_DOMAIN = 'electioscos.co.za';
+/**
+ * The domain the application is served from.
+ *
+ * CHANGED 28 Oct 2026, by decision: `app.electioncos.co.za`, to isolate
+ * the static landing page on the apex from the PWA dashboard on the
+ * subdomain. `electioscos.co.za` — the previous value — joins
+ * `SUPERSEDED_DOMAINS` below rather than being deleted, because a name
+ * that has been in config is a name that can come back.
+ *
+ * Note what this does NOT settle. `HOSTING_ORIGIN` and `.firebaserc`
+ * still name `election2026-campaignms7-0`, and a second project,
+ * `electioncos1-0`, is under consideration. A custom domain attaches to
+ * whichever project serves it, so this constant is independent of that
+ * question and is changed now; the project is not, until its Firestore
+ * location is known. See docs/asset-control-sheet.md §27.
+ */
+export const APP_DOMAIN = 'app.electioncos.co.za';
 
 /** The application's canonical origin. No trailing slash. */
 export const APP_ORIGIN = `https://${APP_DOMAIN}` as const;
@@ -47,14 +62,21 @@ export const APP_ORIGIN = `https://${APP_DOMAIN}` as const;
 export const HOSTING_ORIGIN = 'https://election2026-campaignms7-0.web.app' as const;
 
 /**
- * Names planned but never registered. If one of these turns up as a live
- * target again, the guard test fails.
+ * Names that must never be a live target again. If one turns up as one,
+ * the guard test fails.
+ *
+ * The first four were the phase-0 plan and were never registered.
+ * `electioscos.co.za` is different: it was `APP_DOMAIN` until 28 Oct 2026
+ * and is listed here for exactly that reason — a superseded name that
+ * once worked is more dangerous than one that never did, because it is
+ * the one somebody remembers.
  */
 export const SUPERSEDED_DOMAINS = [
   'electioncampaignos.co.za',
   'app.electioncampaignos.co.za',
   'www.electioncampaignos.co.za',
   'api.electioncampaignos.co.za',
+  'electioscos.co.za',
 ] as const;
 
 /**

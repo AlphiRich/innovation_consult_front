@@ -76,10 +76,16 @@ describe('the application domain', () => {
     expect((code.match(/var\s+FALLBACK_URL\s*=/g) ?? []).length).toBe(1);
   });
 
-  it('does not reuse a superseded phase-0 name', () => {
+  it('does not reuse a superseded name', () => {
     const code = withoutComments(landingPage());
     for (const dead of SUPERSEDED_DOMAINS) {
-      expect(code, `${dead} was planned and never registered`).not.toContain(dead);
+      // Two kinds of entry live in this list and the message must not
+      // claim the wrong one: the phase-0 names were planned and never
+      // registered, while `electioscos.co.za` was the live APP_DOMAIN
+      // until 28 Oct 2026. Both are dead; only one was ever imaginary.
+      expect(code, `${dead} is a superseded domain and must not be a live target`).not.toContain(
+        dead,
+      );
       expect(APP_DOMAIN).not.toBe(dead);
     }
   });

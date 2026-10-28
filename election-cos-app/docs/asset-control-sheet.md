@@ -2759,5 +2759,78 @@ in this repository.
 
 ---
 
+## 27. The domain decision, and why "disable App Engine" would not have worked
+
+### 27.1 `APP_DOMAIN` is now `app.electioncos.co.za`
+
+Decided 28 Oct: the apex serves the static landing page, the PWA lives on
+the subdomain. Changed in `publicDomain.ts` and in the root `index.html`
+together, because the guard test holds them to each other.
+
+**`electioscos.co.za` was added to `SUPERSEDED_DOMAINS` rather than
+deleted.** The other four entries there were planned in phase 0 and never
+registered; this one was the live `APP_DOMAIN` until today, which makes
+it the more dangerous kind — a superseded name that once worked is the
+one somebody remembers. The guard's failure message said *"was planned
+and never registered"*, which is now untrue of one entry, so it was
+rewritten.
+
+**Proved by injection.** Putting `electioscos.co.za` back into
+`index.html` fails two tests — the origin match and the supersession
+tripwire — then reverted clean.
+
+**Deliberately not changed:** `HOSTING_ORIGIN` and `.firebaserc` still
+name `election2026-campaignms7-0`. A custom domain attaches to whichever
+project serves it, so the domain is independent of the project question
+— and the project question is not settled while §27.2 is open.
+
+### 27.2 Disabling App Engine would not free the location — checked against Google's docs
+
+The suggestion was: *"Disabling App Engine in `electioncos1-0` will
+ensure Firestore region pinning doesn't lock your location
+constraints."* **It would do the opposite of that — it would leave the
+pin in place while looking like it had been removed.** Both halves,
+from Google's own documentation:
+
+| | Google's wording |
+|---|---|
+| App Engine region | *"You cannot change an app's region after you set it."* |
+| Disabling an app | *"No data loss will occur when you disable your app, **nor will any configuration settings change**."* Serving stops; the app, and its location, remain. There is no delete-the-application-only operation — only shutting down the whole project releases its resources. |
+| Firestore location | *"once you provision a database instance, you cannot change its location setting."* |
+| The link between them | The **default** database's location follows the *"location for default Google Cloud resources"*, which covers resources *"associated with Google App Engine."* |
+
+So disabling changes nothing about location. If a pin exists it survives;
+if no pin exists there was nothing to disable.
+
+**But the same page gives a real escape hatch, and it is better than the
+proposed one:** *"any non-default Cloud Firestore database instances in
+your project do not share this location dependency."* A **named**
+(non-default) Firestore database can be created in `africa-south1` even
+where the default resource location is wrong. That is not free — the
+Firebase SDKs talk to `(default)` unless given a database id, so it is a
+code change in this repo — but it is a genuine way out that does not
+require a new project.
+
+### 27.3 The three outcomes, and what each means
+
+Everything turns on two facts nobody has read yet: whether an **App
+Engine application** exists in `electioncos1-0`, and whether a
+**Firestore database** exists and where.
+
+| console shows | meaning | action |
+|---|---|---|
+| **No Firestore, no App Engine app** | nothing is pinned — the clean case | choose `africa-south1` when Firestore is first created, and do not initialise App Engine |
+| **Default resource location is `africa-south1`** | already correct | proceed; `.firebaserc` and `HOSTING_ORIGIN` move to `electioncos1-0` |
+| **Default resource location is anything else** | permanent, and not fixable by disabling anything | either a **named** Firestore database in `africa-south1` (code change, §27.2), or **a different project** |
+
+A-138 §1 is the likely reason the App Engine Admin API is on at all: it
+puts the `electioncos.co.za` landing page on *"GCP Cloud Storage / App
+Engine static site hosting"*. Note that an **enabled API is not an
+initialised application** — the API is on by default in many projects and
+Firebase enables it routinely — so this may be nothing. The console
+answers it in one glance.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*

@@ -303,7 +303,8 @@
          on its own — this page does not need redeploying, and nobody
          has to remember to come back and change it.
 
-         The registered domain is electioscos.co.za. Firebase Hosting's
+         The application domain is app.electioncos.co.za (the apex serves the
+         static landing page; the PWA lives on the subdomain). Firebase Hosting's
          own election2026-campaignms7-0.web.app is kept as a FALLBACK,
          tried second, so the link goes live the moment either answers
          rather than waiting on .co.za DNS propagation.
@@ -352,7 +353,7 @@
                 <p class="launch-note">
                     This launch button checks that the application is reachable before offering a link, which
                     needs JavaScript. The application itself is at
-                    <strong>electioscos.co.za</strong> once it has been deployed.
+                    <strong>app.electioncos.co.za</strong> once it has been deployed.
                 </p>
             </noscript>
         </div>
@@ -434,7 +435,7 @@
             // Kept in step with election-cos-app/src/config/publicDomain.ts
             // by a guard test (publicDomain.test.ts), which fails if the
             // two disagree.
-            var APP_URL = "https://electioscos.co.za";
+            var APP_URL = "https://app.electioncos.co.za";
 
             // Firebase Hosting's own address, which keeps working after a
             // custom domain is attached.
