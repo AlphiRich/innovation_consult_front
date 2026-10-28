@@ -1437,7 +1437,6 @@
       "registeredVoters": 3052,
       "vdCodes": [
         "86820419",
-        "86820419",
         "86821151",
         "86821195",
         "86820420",
@@ -1451,15 +1450,7 @@
         "vdCode": "86820419",
         "wardCode": "NW405-W32",
         "name": "BOIKHUTSO COMMUNITY HALL",
-        "registeredVoters": 625,
-        "_split": true
-      },
-      {
-        "id": "NW405-W32::86820419",
-        "vdCode": "86820419",
-        "wardCode": "NW405-W32",
-        "name": "BOIKHUTSO COMMUNITY HALL",
-        "registeredVoters": 350,
+        "registeredVoters": 975,
         "_split": true
       },
       {

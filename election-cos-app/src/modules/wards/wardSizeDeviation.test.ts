@@ -198,12 +198,53 @@ describe('the split-station figures quoted around the build', () => {
     const across = Math.max(...perCode.values());
 
     expect(perCode.size).toBe(108);
-    expect(split).toBe(26);
+    // 25, not the 26 this asserted until session 36. One of the 26 was
+    // never a split: the gazette printed BOIKHUTSO COMMUNITY HALL twice
+    // inside ward 32, and counting rows rather than wards read that as a
+    // station straddling a boundary. See the id test below.
+    expect(split).toBe(25);
     expect(across).toBe(3);
 
     const basis = readFileSync(path.join(REPO_ROOT, 'src/modules/settings/staffProvisioning.ts'), 'utf8');
     expect(basis).toContain(`${split} of the ${perCode.size}`);
     const rules = readFileSync(path.join(REPO_ROOT, 'firestore.rules'), 'utf8');
     expect(rules).toContain(`${split} of NW405's ${perCode.size} station codes`);
+  });
+
+  /**
+   * Session 36. The seed carried two rows for BOIKHUTSO COMMUNITY HALL in
+   * ward 32 — 625 and 350 — both with the id `NW405-W32::86820419`. The
+   * loader writes a voting district by its id, so the second overwrote the
+   * first: ward 32's document read 3,052 registered voters while its own
+   * voting-district documents summed to 2,427, and nothing anywhere said
+   * so. 625 people were missing from every VD-level figure in the tenant.
+   *
+   * The generator's existing sanity check could not catch it, because it
+   * sums rows and both rows were there. Only the ids collide. So this
+   * counts ids, and `parse-nw405-demarcation.mjs` now refuses to emit a
+   * repeat in the first place.
+   */
+  it('gives every voting district an id no other row shares', () => {
+    const seed = JSON.parse(
+      readFileSync(path.join(REPO_ROOT, 'seed-data', 'jb-marks-nw405-wards-vds.json'), 'utf-8'),
+    ) as { ward: { wardCode: string; registeredVoters: number; vdCodes: string[] } ; votingDistricts: { id: string; registeredVoters: number }[] }[];
+
+    const rows = seed.flatMap((entry) => entry.votingDistricts);
+    const perId = new Map<string, number>();
+    for (const vd of rows) perId.set(vd.id, (perId.get(vd.id) ?? 0) + 1);
+    const repeated = [...perId.entries()].filter(([, n]) => n > 1);
+
+    expect(repeated).toEqual([]);
+    expect(perId.size).toBe(rows.length);
+
+    // What the overwrite actually cost, stated as the invariant it broke:
+    // after storing by id, each ward's districts must still add up to the
+    // ward. A repeated id breaks this and only this.
+    for (const entry of seed) {
+      const stored = new Map(entry.votingDistricts.map((vd) => [vd.id, vd.registeredVoters]));
+      const sum = [...stored.values()].reduce((a, b) => a + b, 0);
+      expect(sum).toBe(entry.ward.registeredVoters);
+      expect(entry.ward.vdCodes).toHaveLength(entry.votingDistricts.length);
+    }
   });
 });

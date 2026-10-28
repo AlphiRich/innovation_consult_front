@@ -6,8 +6,8 @@ arrived under different names with identical content, and two arrived
 under the same name with different content.
 
 **Opened 28 October 2026 · T−7** (election day 4 November).
-**171 files received · 120 distinct · 51 redundant copies (30%)**, across
-twelve batches. Running totals are in §7.3.
+**175 files received · 123 distinct · 52 redundant copies (30%)**, across
+thirteen batches. Running totals are in §7.3.
 
 Rows marked **[read]** have had their contents reviewed. Rows marked
 **[hash only]** are registered and deduplicated but not yet read — stated
@@ -218,23 +218,32 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
 
 ## 5. Reconciliation queue, in priority order
 
-0. **How many registered voters are there in NW405?** — the hard gate.
-   Five figures are in circulation, none of them reconciled:
+0. **Which registered-voter figure is the denominator?** — largely
+   resolved by batch 13; one anomaly left. Five figures were in
+   circulation. Dated, four of them are one time series:
 
-   | figure | source |
-   |---:|---|
-   | 122,059 | MDB gazette, 2026 baseline (§1, §7) — what we build on |
-   | 132,133 | IEC registration statistics (A-087) |
-   | 131,963 | the certified roll's own verified count (A-087) |
-   | 119,099 | IEC ward table, summed (A-087) |
-   | 113,218 | 2021 LGE registered voters (A-092) |
+   | figure | as at | source |
+   |---:|---|---|
+   | 113,218 | Nov 2021 | 2021 LGE registered voters (A-092) |
+   | 122,059 | 27 Feb 2025 | IEC Circular 1 of 2025, Annexure A — `src/data/iec/circular-1-2025-annexure-a.json`; the ward-norm baseline this build computes against |
+   | 131,963 | 7 Aug 2026 | certified roll, verified entries (A-099, counted) |
+   | 132,133 | 14 Aug 2026 | IEC registration statistics page (A-087) |
+   | 119,099 | 14 Aug 2026 | **the same page's own ward table, summed** |
 
-   Different vintages and a redelimited area explain *some* of the
-   spread, and nobody has shown which. **Until one is established as the
-   denominator, no turnout, coverage or penetration figure may leave this
-   system.** A percentage is a claim about a denominator, and we do not
-   currently have one. This sits above the fork port because it blocks
-   output, not just work.
+   113,218 → 122,059 → 131,963 over five years is ordinary growth, and
+   the roll and the stats page agree to **0.13%** a week apart. So there
+   is no five-way conflict; there is **one anomaly**: a page that states
+   132,133 and prints a ward table summing to 119,099. 13,034 voters,
+   same document, same date.
+
+   **The rule that follows is narrower than before but still binding:**
+   a turnout or coverage percentage must name which figure and which date
+   it divides by. The two legitimate denominators are 122,059 (Feb 2025,
+   for anything compared against the delimitation norms) and 131,963
+   (Aug 2026, for anything about the roll as it stands). **The stats
+   page's ward table may not be used at all** until the IEC explains it —
+   and per A-087's own open item 2, ward-level seeds should come from the
+   roll, not that page.
 
 1. **A-031 / A-032 — the fork and its build bundle.** After 4 November.
    Port forward from the fork; never merge backward. Start with
@@ -385,7 +394,8 @@ A-078 | repeats of A-033/035/036/037/039 and the research skill | — | **DUP** 
 | 10 (28 Oct) | 20 | 13 |
 | 11 — voters' roll (28 Oct) | 31 | 31 |
 | 12 (28 Oct) | 14 | 10 |
-| **total** | **171** | **120** |
+| 13 (28 Oct) | 4 | 3 |
+| **total** | **175** | **123** |
 
 The 31 roll PDFs are 31 distinct hashes — no duplicates in that batch,
 which is what you would expect from a machine-generated per-VD export
@@ -867,6 +877,13 @@ derived from it reaches a campaign.
   composite that exists because 26 of 108 NW405 stations split across
   wards is **not exercised** by this sample, so it remains unverified
   against real data.
+
+  > **Settled by batch 13, and not the way this expected.** It is not a
+  > sampling artefact: the complete roll places **all 106** VDs in exactly
+  > one ward. The roll and the gazette schedule describe different things,
+  > the composite key stays, and the roll **cannot populate it** for the
+  > 23 split stations it still carries. §13.4 — it is now a decision for
+  > the user, not a verification gap.
 - **Not loadable yet.** Beyond the POPIA question, the per-ward
   registered-voter figures that remain item 0 in §5 are still missing —
   the roll gives per-VD counts, and rolling those to wards needs the
@@ -1036,6 +1053,203 @@ run it.
 more urgent, not less.** A second municipality means a second tenant, and
 every unresolved ambiguity in the register gets multiplied by the number
 of tenants before it gets resolved.
+
+---
+
+## 13. Batch 13 (28 Oct, 4 files) — the roll dataset itself, and what it cost us
+
+§11.5 said: *the full dataset exists elsewhere; ask for it, do not rebuild
+it.* It arrived.
+
+ID | Asset | Hash | Kind | Disposition | Note
+---|---|---|---|---|---
+A-098 | `CLAUDE_CODE_BRIEF.md` | `de2d5bae` | — | **DUP of A-087** | also present as the bundle's `README.md`, byte-identical — a third copy |
+A-099 | `IC-ECOS-DATA-2026-02_NW405_VotersRoll.zip` | `c2874d20` | 4.2 MB → 36.7 MB, 10 entries | **KEEP — POPIA-GATED, NOT IN THIS REPO** | §13.1 |
+A-100 | `load_voters_roll.sql` | `e8eb3c68` | 231 lines, PostgreSQL | **REFERENCE — wrong stack, see §13.5** | byte-identical to the bundle's copy |
+A-101 | `parse_iec_voters_roll.py` | `86cf5be9` | 362 lines, pdfplumber | **KEEP as technique** | byte-identical to the bundle's copy |
+
+### 13.1 Handling — where it is and where it is not
+
+The bundle holds `verified_voters.csv` (25.8 MB, **131,963 named people
+with masked IDs and home addresses**) and `rejected_voters.csv` (8.7 MB).
+It was extracted to a session scratch directory, **not** into this
+repository, and is not committed anywhere. **No voter row was read.**
+
+Everything below was established from the non-personal files —
+`vd_summary.csv`, `parse_log.jsonl` — plus row *counts* and column
+*headers*. That is the same discipline §11.1 set when the roll arrived as
+PDFs, and the reason it holds here is unchanged: nothing in reconciling a
+dataset requires looking at the people in it.
+
+### 13.2 Every claim in A-087 verifies
+
+| claim | checked | result |
+|---|---|---|
+| 131,963 verified | `wc -l` − header | **131,963** |
+| 52,176 rejected | `wc -l` − header | **52,176** |
+| 184,139 entries | sum | **184,139** |
+| 106 VDs, all PASS | `vd_summary.csv` | **106 rows, 106 PASS**, all three match-flags True on every row |
+| declared = parsed | summed both | **131,963 / 52,176 / 184,139 on both sides** |
+| 34 wards `64005001`–`64005034` | distinct | **34, contiguous 1–34** |
+| 347 PDFs, 1 junk file skipped | `parse_log.jsonl` | **347 file records, 0 errors, 14,871 pages, 1 `SKIPPED_NON_PDF`** |
+| 10,832 with no address | anomaly count | **10,832** |
+
+Two things the brief does not mention, both benign and both worth knowing:
+**230,155 rows were parsed and 184,139 kept** — 46,016 dropped as repeats,
+which is the rejected list reprinted across Control and part files exactly
+as §3 of the brief describes. And **zero `DUPLICATE_KEY_CONTENT_MISMATCH`
+anomalies**, which is the load-bearing one: had any VD's roll been split
+across two ward folders with restarting sequence numbers, the de-duplicator
+would have silently dropped one ward's voters and logged a content
+mismatch. None were logged. The 106 VDs are 106 VDs.
+
+### 13.3 It explains the 108-vs-106 voting districts completely
+
+Our seed has 108 station codes; the roll has 106. Compared code by code:
+
+```
+shared                                                105
+in the seed only   86821151  TENT AT APPELDRAAI        193 voters (2 ward portions)
+                   86910138  PUDULOGO PRIMARY SCHOOL  1394 voters (2 ward portions)
+                   86940041  TENT AT NDLEBE           1584 voters
+in the roll only   86821285  REGOROGILE EARLY LEARNING CENTRE, ward 27, 852 verified
+```
+
+Two of the three that vanished are **tents** — temporary stations. Between
+a November 2025 delimitation schedule and an August 2026 certified roll,
+three stations closing and one opening is ordinary churn, not a conflict.
+**Nothing to reconcile. Both are right for their date.**
+
+### 13.4 The split-station question — and why the roll cannot answer it
+
+**The roll places all 106 VDs in exactly one ward each.** Our build says
+25 of 108 station codes straddle a ward boundary. That looks like a flat
+contradiction and is not one.
+
+For the split codes, the roll's single-ward total tracks the seed's **sum
+across all portions**, never one portion:
+
+| VD | seed portions (ward:voters) | seed total | roll ward | roll verified |
+|---|---|---:|---:|---:|
+| 86910026 | 4:200 · 5:3,391 | 3,591 | 5 | **3,592** |
+| 86820464 | 2:1,463 · 5:300 | 1,763 | 2 | **1,756** |
+| 86820420 | 32:30 · 33:647 | 677 | 33 | **625** |
+| 86820992 | 2:140 · 18:1,788 · 27:760 | 2,688 | 18 | **2,401** |
+
+Across all 25: seed 41,408 against roll 43,382 for the 23 still open — the
+same ~5% growth the municipality shows overall. **The two documents are
+describing different things.** The gazette schedule apportions a station's
+registered voters across every ward its catchment crosses. The certified
+roll publishes one roll per station and files it under a single ward. Both
+are accurate; neither is the other.
+
+**The consequence is a hard blocker on ingestion, and it is the opposite
+of the one we were guarding against.** `VotingDistrict.id` is
+`wardCode::vdCode` and `inScope()` narrows on both precisely so a canvasser
+working one ward's portion of a split station is not shown the other
+wards' voters. If the roll's addresses are attached using the roll's single
+ward, then for 23 split stations **the entire station's voters land on one
+ward portion** — and ward 18 is handed people the schedule places in wards
+2 and 27. That is the leak `SPLIT_VD_BASIS` exists to prevent, re-opened
+from the other end.
+
+**[U]** Nothing in the roll says how to apportion a station across wards,
+so this cannot be solved by parsing harder. Either the IEC can supply the
+per-ward split, or split stations are canvassed as whole stations with the
+ward scope relaxed for them and that stated plainly to the user. **This is
+a decision, not a defect.**
+
+### 13.5 Reviewing the two scripts — seven findings
+
+The parser is good work: word-level bounding boxes rather than `-layout`
+text, a footer cut at its detected y-position, cross-file de-duplication,
+and a pre-load and post-load gate either side of the database. The
+reconciliation it claims is real, and I reproduced it. What follows is
+what I would fix before a second municipality runs through it.
+
+1. **`electoral_roll.address` has no RLS at all.** `roll_entry` gets a
+   policy (`load_voters_roll.sql:216–224`); the address table gets a GIST
+   index and nothing else. The brief's §6 says the PWA syncs "the user's
+   RLS-scoped `electoral_roll.address` rows" — there is no such scoping.
+   **The map layer, which is the thing canvassers actually consume, is the
+   unprotected one.** Highest-severity item here.
+2. **`ENABLE ROW LEVEL SECURITY` without `FORCE`.** The table owner
+   bypasses RLS regardless of policy. The brief's test was "as a
+   non-superuser", which is a different exemption. If the app connects as
+   the schema owner — the common case after a `psql -f` load — every
+   policy above is inert.
+3. **A second roll edition cannot be loaded.** Open item 4 says a
+   supplementary roll "should load as a new edition". But the two INSERTs
+   never set `roll_edition` (so it always takes the default), and the
+   post-load gate counts `roll_entry` **without filtering on edition** —
+   so loading a second edition compares two editions' rows against one
+   edition's declared totals and always rolls back. The plan and the file
+   disagree.
+4. **`footer_top()` can be fooled by a surname.** It takes any word with
+   `top > 450` whose text is exactly `Sequence` or `Page`, with no
+   x-position constraint. *Page* is a real surname. One voter named Page
+   low on a page truncates every record below them. The accuracy gate
+   turns that into a FAIL rather than silent loss — so it is a false-alarm
+   risk, not a corruption risk — but the fix is one `x0` bound.
+5. **A documentation claim that the code does not support.** The brief
+   §3.3 says differing duplicate rows are "logged rather than one silently
+   winning". The code logs the anomaly *and* keeps the first copy
+   (`parse_iec_voters_roll.py:276–286`), and since results are sorted by
+   filename, `_1of4` sorts before `_Control` — so totals come from the
+   Control file while content comes from a part. **Zero occurrences in
+   this run**, so no data is affected. The sentence is what is wrong.
+6. **Nothing enforces the ID mask.** `id_number_masked VARCHAR(20)` is
+   commented "never a full ID" and the brief verified all 184,139 match
+   the mask — once, by hand. A `CHECK` would hold it for the next edition.
+   This is the one field where a parser regression is a POPIA incident.
+7. **`ward.registered_voters_count` is overwritten with the roll's
+   verified count** (lines 103–108). For us that writes the Aug-2026
+   figure into a column whose other consumers — the ward-norm deviation
+   work — are computed against the Feb-2025 circular. See §5 item 0: the
+   figure is fine, the silent change of vintage is not.
+
+### 13.6 What the roll found in our own build — fixed this session
+
+Reconciling the roll against `seed-data/jb-marks-nw405-wards-vds.json`
+turned up a defect of ours, not theirs.
+
+The NW405 gazette prints **BOIKHUTSO COMMUNITY HALL (86820419) twice
+inside ward 32** — 625 and 350 — and both count towards the ward's printed
+3,052. `parse-nw405-demarcation.mjs` transcribed both faithfully, so the
+seed held two rows with the identical id `NW405-W32::86820419`.
+`tools/dev/seed-emulator.mjs` writes a voting district **by its id**:
+
+```
+seed rows 136 · distinct ids 135 · last write wins
+ward 32  ward doc 3,052   its VD docs 2,427   short by 625
+tenant   ward docs 122,059   VD docs 121,434
+```
+
+**625 registered voters disappeared between the gazette and the database,
+and nothing reported it.** The generator's own sanity check could not see
+it: it sums rows, and both rows were present — only the ids collide.
+
+Fixed, in the order that keeps it fixed:
+
+- `parse-nw405-demarcation.mjs` now coalesces repeats of one station
+  within one ward, **logging each one to stderr**, and then asserts id
+  uniqueness and refuses to emit output that would lose a row. This
+  adjusts no total — 975 and 3,052 are both what the gazette prints.
+- The committed seed carries the merged row: **135 rows, 135 ids, ward
+  totals and the 122,059 municipal total unchanged.**
+- `wardSizeDeviation.test.ts` gains a guard that counts ids, not rows, and
+  holds every ward's districts to its ward total. **Proved by reinjecting
+  the duplicate pair**: it fails naming `NW405-W32::86820419 ×2`, then
+  reverted clean.
+- The quoted split count was wrong everywhere as a result. One of the
+  "26" was never a split. Corrected to **25** in `staffProvisioning.ts`
+  (which also said 24 in its own header, three numbers in one file),
+  `firestore.rules`, and `wardSeedingSop.ts`.
+
+The corroboration that the merge is right rather than merely tidy: the
+certified roll publishes 86820419 as **one** voting district in ward
+64005032 with 1,201 verified — consistent with 975 plus eighteen months,
+and nothing like 625 or 350 alone.
 
 ---
 

@@ -8,7 +8,7 @@
  * been reachable. This is the emulator equivalent: plain REST against the
  * Firestore emulator, no credentials, no admin SDK.
  *
- * It loads the real delimitation — 34 wards and 136 ward-scoped voting
+ * It loads the real delimitation — 34 wards and 135 ward-scoped voting
  * district records parsed from the North West provincial delimitation
  * notice, summing to 122,059 registered voters — plus the municipality
  * profile taken from the proclaimed baseline. Those specific figures
@@ -104,7 +104,10 @@ try {
 
     for (const vd of entry.votingDistricts) {
       // `${wardCode}::${vdCode}` — a split station appears once per ward
-      // it falls in, which is why 108 stations produce 136 records.
+      // it falls in, which is why 108 stations produce 135 records.
+      // 135 records, 135 ids: a repeated id would be written twice here
+      // and only the last would survive, which is what used to happen.
+      // `wardSizeDeviation.test.ts` holds that, since this loop cannot.
       await write(`tenants/${TENANT}/votingDistricts/${vd.id.replace(/\//g, '_')}`, {
         id: vd.id,
         tenantId: TENANT,

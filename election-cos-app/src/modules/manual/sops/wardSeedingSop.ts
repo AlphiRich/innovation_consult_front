@@ -85,7 +85,7 @@ export const WARD_SEEDING_SOP: Sop = {
     {
       heading: 'The voting district that belongs to two wards',
       body: [
-        'A voting station’s roll can be split across a ward boundary: the same station code appears in two wards’ schedules, each with only its own portion of the registered voters. This is ordinary, not an error, and it is common — in the one municipality this build holds real gazette data for, 26 of 108 station codes are split, which is a quarter of them.',
+        'A voting station’s roll can be split across a ward boundary: the same station code appears in two wards’ schedules, each with only its own portion of the registered voters. This is ordinary, not an error, and it is common — in the one municipality this build holds real gazette data for, 25 of 108 station codes are split, which is close to a quarter of them.',
         'The platform is built for it. A voting district is identified by the ward and the code together, not by the code alone, so the second ward’s entry does not overwrite the first. When you enter a code that already exists elsewhere, the form tells you which other wards have it, and lets you continue.',
       ],
       warnings: [
