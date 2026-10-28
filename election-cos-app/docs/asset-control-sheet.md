@@ -6,8 +6,8 @@ arrived under different names with identical content, and two arrived
 under the same name with different content.
 
 **Opened 28 October 2026 · T−7** (election day 4 November).
-**180 files received · 125 distinct · 55 redundant copies (31%)**, across
-fifteen batches. Running totals are in §7.3.
+**182 files received · 126 distinct · 56 redundant copies (31%)**, across
+sixteen batches. Running totals are in §7.3.
 
 Rows marked **[read]** have had their contents reviewed. Rows marked
 **[hash only]** are registered and deduplicated but not yet read — stated
@@ -402,7 +402,8 @@ A-078 | repeats of A-033/035/036/037/039 and the research skill | — | **DUP** 
 | 13 (28 Oct) | 4 | 3 |
 | 14 (28 Oct) | 1 | 1 |
 | 15 (28 Oct) | 4 | 1 |
-| **total** | **180** | **125** |
+| 16 (28 Oct) | 2 | 1 |
+| **total** | **182** | **126** |
 
 The 31 roll PDFs are 31 distinct hashes — no duplicates in that batch,
 which is what you would expect from a machine-generated per-VD export
@@ -1531,6 +1532,72 @@ someone and does not is worse than one that plainly does not limit them."*
   bounded to static hosting; this says Firestore now, Postgres later.
   **Three framings, three documents, same week.** §14.1 stands: only the
   user can settle it.
+
+---
+
+## 16. Batch 16 (28 Oct, 2 files) — a screenshot I cannot read
+
+ID | Asset | Hash | Kind | Disposition | Note
+---|---|---|---|---|---
+A-107 | `ElectionCOS-ingestion-voters-roll.zip` | `3794165c` | — | **DUP of A-103** (third copy) | identical |
+A-108 | screenshot, `image.webp` | `eb74af2f` | **67 × 5,110 px** chat transcript | **REFERENCE — content not recoverable** | §16.1 |
+
+### 16.1 What the screenshot is, and what it is not
+
+**It is 67 pixels wide.** At that width the body text is not a rendering
+problem, it is absent — there are roughly two pixels per character. I
+upscaled and sharpened four slices; headings come back, body text does
+not, and no amount of processing recovers what was not captured.
+
+**So I am not going to summarise its contents**, because any summary
+would be me inventing plausible sentences around a few legible headings.
+What follows is only what is actually readable.
+
+It is a **chat transcript**, not one document, and it contains two
+distinct pieces of work:
+
+**1. "Election Campaign OS 1.0 — Agent Development Blueprint."** Title
+legible. Structured as numbered layers with a subsection per agent.
+Recoverable headings include `Agent 1.2 — Media Compression Agent`,
+`1.3 — Field Context Guard`, `1.4 — Offline Consent Validator`,
+`2. API Gateway & Backend Service Agents`, `2.1 — Tenant Context Agent`,
+`2.2 — POPIA Masking Agent`, `2.3 — Soft Delete`, `2.4 — LWW`,
+`4.4 — Incident Dispatch Agent`, `4.5 — Audit Log`,
+`5. Orchestration Layer`, `5.1 — Campaign Director (Meta-Agent)`,
+`5.2 — Compliance War Room Agent`, then an *Inter-Agent Communication
+Contracts* table and a deployment table.
+
+**That is A-102 §3 agent-for-agent**, layers 1–5 in the same order with
+the same names. One difference is visible and worth recording: **no sixth
+layer appears here.** A-102 §3.6 is the simulator subsystem, and A-102
+tags the earlier layers `[SIM]`. So this blueprint is the **earlier**
+document and A-102 extends it — which also means §14's finding stands
+unchanged: this is the fork's agent architecture, on the stack §14.1
+could not settle.
+
+**2. An analysis of the Cloudflare edge Worker.** Heading legible as
+*"…Cloudflare Edge Worker for Election Campaign OS 1.0 V2"*, with
+sections reading approximately *What it verifies / does*, *Strengths of
+the Worker script* (a table), and **"Critical Findings & Required
+Fixes"** — a numbered list with red and orange severity markers and
+green-on-dark code blocks, of which 3.1, 3.2 and 3.3 are discernible as
+headings only.
+
+**That is a review of A-088** (`Election.docx`, §12.4). It is the one
+thing in this batch I actively want, because §12.4 recorded A-088 as
+good technique with the wrong origin constant, and somebody has since
+gone through it properly and found things I did not look for. **None of
+those findings are readable.**
+
+### 16.2 The ask
+
+The blueprint adds nothing over A-102 §3, which is already registered —
+no action needed there unless the full text differs.
+
+**The Worker analysis is worth having as text.** Send the document, or
+paste the "Critical Findings & Required Fixes" section, and it gets
+reviewed against A-088 and `publicDomain.ts` the same way everything
+else has been. A 67-pixel-wide picture of findings is not findings.
 
 ---
 
