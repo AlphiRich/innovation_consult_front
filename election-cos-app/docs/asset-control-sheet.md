@@ -6,8 +6,8 @@ arrived under different names with identical content, and two arrived
 under the same name with different content.
 
 **Opened 28 October 2026 · T−7** (election day 4 November).
-**182 files received · 126 distinct · 56 redundant copies (31%)**, across
-sixteen batches. Running totals are in §7.3.
+**184 files received · 128 distinct · 56 redundant copies (30%)**, across
+seventeen batches. Running totals are in §7.3.
 
 Rows marked **[read]** have had their contents reviewed. Rows marked
 **[hash only]** are registered and deduplicated but not yet read — stated
@@ -403,7 +403,8 @@ A-078 | repeats of A-033/035/036/037/039 and the research skill | — | **DUP** 
 | 14 (28 Oct) | 1 | 1 |
 | 15 (28 Oct) | 4 | 1 |
 | 16 (28 Oct) | 2 | 1 |
-| **total** | **182** | **126** |
+| 17 (28 Oct) | 2 | 2 |
+| **total** | **184** | **128** |
 
 The 31 roll PDFs are 31 distinct hashes — no duplicates in that batch,
 which is what you would expect from a machine-generated per-VD export
@@ -1598,6 +1599,140 @@ no action needed there unless the full text differs.
 paste the "Critical Findings & Required Fixes" section, and it gets
 reviewed against A-088 and `publicDomain.ts` the same way everything
 else has been. A 67-pixel-wide picture of findings is not findings.
+
+---
+
+## 17. Batch 17 (28 Oct, 2 files) — the provenance / report / routing slice
+
+ID | Asset | Hash | Kind | Disposition | Note
+---|---|---|---|---|---
+A-109 | `deep-researcher.md` | `4f9927ac` | Claude agent definition | **REFERENCE — tooling, not EC OS** | §17.5 |
+A-110 | `Ds_conversation.docx` | `d4ab4e1c` | 778 lines: 3 interlocking artifacts | **RECONCILE — reviewed below** | §17.1 |
+
+**This is not the Cloudflare Worker analysis §16.2 asked for.** That one is
+still outstanding. A-110 is a different and more substantial document:
+provenance enforcement in PL/pgSQL, the Scenario Report Agent's rendering
+contract, and the Campaign Director's routing table — the vertical slice
+under A-102 §3.6 and §5.
+
+PostgreSQL and PL/pgSQL throughout, so **§14.1 is unchanged**: this is the
+fork's stack and nothing here ports to Firestore as written. Reviewed
+anyway, because the design is good and the defects are the interesting
+part.
+
+### 17.1 What it gets right
+
+- **Nothing is dropped silently.** Every Campaign Director rejection —
+  `CAPABILITY_DENIED`, `TARGET_UNHEALTHY`, `PREREQUISITE_MISSING`,
+  `NO_ROUTING_RULE`, `SCENARIO_POLICY_VIOLATION` — escalates to the
+  Compliance War Room. The document names why, and it is the right why.
+- **`NO_HEARTBEAT` is treated as critical**, on the stated grounds that a
+  silent ingestion agent is indistinguishable from a corrupted one.
+- **Invariant 3** — no party result without a `quota_calculation_id` — is
+  the machine-checkable form of A-102's "no naive Hare calculator",
+  which until now was a promise in prose.
+- **Separate `cos_ingestion` credentials** from the app role, with
+  `REVOKE INSERT, UPDATE, DELETE … FROM cos_app`. That is the real
+  control in Artifact 1, and it works.
+- **It carries no PPFA figures at all.** The routing table has
+  `ppfa.limit.warning` and `ppfa.limit.blocked` and no thresholds, so
+  **A-102 §3.4's repealed R80k/R100k/R15M does not propagate here.**
+
+### 17.2 Three findings in Artifact 1 (provenance)
+
+1. **The session guard is bypassable by one statement, and §1.6 counts it
+   as a control.** `fn_require_ingestion_capability()` rejects any write
+   to `dataset_provenance` unless `current_setting('app.agent_code')` is
+   `'DATASET_INGESTION_AGENT'`. That is a custom GUC, and **any session
+   may `SET` one — no privilege is required**. So the function stops
+   nothing the GRANT has not already stopped. §1.5 half-concedes this
+   ("the triggers are only as strong as the privileges underneath them"),
+   but §1.6's table then lists it as a separate guarantee: *"only
+   DATASET_INGESTION_AGENT session can write (enforced by function)."*
+   The GRANT is the control. The function is decoration presented as
+   enforcement — the same class as the dead `FINANCE_OFFICER` clause in
+   §15.3.
+
+2. **`SECURITY DEFINER` with a mutable `search_path`, and it is not
+   needed.** All three functions get it in §1.5, the stated reason being
+   *"so it can query `dataset_provenance` regardless of the caller's
+   privileges"* — but the lines immediately above grant `SELECT` on
+   `dataset_provenance` to both roles, so no caller lacks it.
+   Meanwhile the function bodies reference `dataset_provenance`
+   unqualified, and a `SECURITY DEFINER` function resolves unqualified
+   names through the **caller's** `search_path`. That is the standard
+   PostgreSQL escalation vector: a caller who can create a schema points
+   `search_path` at their own `dataset_provenance` holding a `VALID` row,
+   and the provenance check reads their table instead. **The control that
+   guarantees provenance can be redirected by the party it is checking.**
+   Either drop `SECURITY DEFINER`, or pin
+   `ALTER FUNCTION … SET search_path = pg_catalog, public`.
+
+3. **A provenance row with NULL coverage validates everything, and the
+   comment claims otherwise.** The code is
+   `IF v_prov_event_id IS NOT NULL AND v_prov_event_id <> NEW.electoral_event_id`.
+   The comment above it says NULL is allowed *"only if the row explicitly
+   claims multi-event coverage"*. **No such flag exists anywhere in the
+   artifact.** A `dataset_provenance` row with both `covers_event_id` and
+   `covers_municipality` NULL passes every result row, for every event, in
+   every municipality. Given what §6 records about fabricated ward figures,
+   that is the one hole in Artifact 1 that matters. Fix is either NOT NULL
+   columns or a real `covers_all_events` boolean that the trigger tests.
+
+### 17.3 Two findings in Artifact 2 (the report)
+
+4. **The rendering template hard-codes JB Marks's swing wards.** §2.4's
+   section 3 reads, as literal template prose: *"The four swing wards
+   identified in the baseline (Wards 2, 5, 21, 28 — all decided by under
+   400 votes in 2021)."*
+
+   Those four are **correct** — §14.2 verified them against the primary
+   2021 IEC results at 62, 165, 201 and 233, all under 400. That is not
+   the problem. The problem is that they sit in a *generic* template in
+   which every other figure is interpolated and carries a `[R:…]`
+   citation tag. Run it for **Mahikeng NW383 (A-094)** — the register's
+   first non-NW405 municipality — and the report states JB Marks's swing
+   wards as that municipality's, in prose, as the only numeric claim in
+   the whole template with no citation tag. The document's own thesis is
+   that every figure traces to a register row; this one cannot.
+
+   **Checked the same pattern here and this repo is clean.** The only
+   live NW405 constant outside seed data, tests and comments is
+   `NW405_MAP_CENTER` in `src/lib/googleMapsConfig.ts`, and it is named
+   for the municipality, used only as a pre-load map framing default, and
+   already carries a comment forbidding exactly this
+   mistake — *"if per-ward map framing is ever needed, derive it from that
+   seed file's real ward list, not from a value invented here."*
+
+5. **The invariants check the citations that exist, not that every figure
+   has one.** §2.6's guarantee table opens with *"No figure appears
+   without a register row."* Invariant 6 checks that every cited id
+   resolves to a supplied row. **Nothing checks the converse.** A report
+   containing an uncited figure passes all seven checks and still renders
+   the static *"✅ All cited register rows validated"* block, which is
+   fixed markdown rather than derived from the check results. The checks
+   are sound; the guarantee claimed over them is wider than they prove —
+   and finding 4 is an instance of precisely the gap.
+
+### 17.4 One question, not a finding
+
+**[U] Two different "hung council" numbers.** Invariant 7 requires
+`coalition_frequencies` to sum to 1.0 ± 0.02, and A-102 §5.6's worked
+sample puts a `Hung: 0.22` bucket inside that set while separately
+reporting `hung_council_frequency: 0.34`. Either they measure different
+things — in which case a client-facing report must say which is which —
+or one is wrong. No invariant cross-checks them, and nothing in either
+document defines the relationship.
+
+### 17.5 A-109 is unrelated to any of this
+
+`deep-researcher.md` is a Claude agent definition — `claude-opus-5-5`,
+low effort, auto permission policy — instructing a research agent to
+decompose a question, prefer primary sources over aggregators, and close
+with a confidence-and-gaps section. Sound instructions, and the same
+discipline this sheet runs on, but it is **tooling, not an EC OS
+artifact**. Registered so it is not mistaken for one of the ~30 agents in
+A-102 §3; it belongs to none of those layers.
 
 ---
 
