@@ -6,8 +6,8 @@ arrived under different names with identical content, and two arrived
 under the same name with different content.
 
 **Opened 28 October 2026 · T−7** (election day 4 November).
-**175 files received · 123 distinct · 52 redundant copies (30%)**, across
-thirteen batches. Running totals are in §7.3.
+**176 files received · 124 distinct · 52 redundant copies (30%)**, across
+fourteen batches. Running totals are in §7.3.
 
 Rows marked **[read]** have had their contents reviewed. Rows marked
 **[hash only]** are registered and deduplicated but not yet read — stated
@@ -229,6 +229,7 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
    | 131,963 | 7 Aug 2026 | certified roll, verified entries (A-099, counted) |
    | 132,133 | 14 Aug 2026 | IEC registration statistics page (A-087) |
    | 119,099 | 14 Aug 2026 | **the same page's own ward table, summed** |
+   | 132,140 | "August 2026" | A-102 §5.1 — seven from the stats page's figure, no source given; transcription noise, not a sixth candidate |
 
    113,218 → 122,059 → 131,963 over five years is ordinary growth, and
    the roll and the stats page agree to **0.13%** a week apart. So there
@@ -282,6 +283,10 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
 - **PPFA R80k/R100k/R15M** (A-041, A-042 §2.1). Superseded.
 - **A disclosure threshold of R100,000** (A-090's default input value).
   Same superseded figure, third artefact. Current law is R200,000.
+- **PPFA "R80k Yellow / R100k Critical / R15M hard block"** (A-102 §3.4).
+  Fourth artefact, and this one is inside a document claiming to be the
+  build baseline. `ppfaDefaults.ts` is correct; do not let A-102 overwrite
+  it.
 - **`electioncampaignos.co.za` and `electioncos.co.za`** as the product's
   address (A-084, A-090). The first is in `SUPERSEDED_DOMAINS`; the
   second was never ours.
@@ -395,7 +400,8 @@ A-078 | repeats of A-033/035/036/037/039 and the research skill | — | **DUP** 
 | 11 — voters' roll (28 Oct) | 31 | 31 |
 | 12 (28 Oct) | 14 | 10 |
 | 13 (28 Oct) | 4 | 3 |
-| **total** | **175** | **123** |
+| 14 (28 Oct) | 1 | 1 |
+| **total** | **176** | **124** |
 
 The 31 roll PDFs are 31 distinct hashes — no duplicates in that batch,
 which is what you would expect from a machine-generated per-VD export
@@ -1250,6 +1256,146 @@ The corroboration that the merge is right rather than merely tidy: the
 certified roll publishes 86820419 as **one** voting district in ward
 64005032 with 1,201 verified — consistent with 975 plus eighteen months,
 and nothing like 625 or 350 alone.
+
+---
+
+## 14. Batch 14 (28 Oct, 1 paste) — the architecture white paper
+
+ID | Asset | Hash | Kind | Disposition | Note
+---|---|---|---|---|---
+A-102 | pasted *Technology Architecture White Paper — Election COS v1.0* | not in the upload store | 11 sections, ~30 named agents, 6 layers | **RECONCILE — the sharpest fork conflict in the register** | §14.1 |
+
+It presents itself as the **"architecture baseline for build"** and says it
+**supersedes** prior drafts. Taken at its word it would invalidate the
+application that exists, seven days before the election. It should not be
+taken at its word, but it should not be dismissed either — much of it is
+verifiably right, and one part of it is verifiably wrong in a way that is
+already on the §6 do-not-carry list.
+
+### 14.1 It describes the fork, not this build
+
+| | A-102 says | this repository is |
+|---|---|---|
+| API | Node.js / Express / Prisma, ECS Fargate | Cloud Functions, pinned `africa-south1` |
+| Database | PostgreSQL 15+ on RDS, RLS, PL/pgSQL triggers | Firestore, `firestore.rules` |
+| Queue | Redis + BullMQ on ElastiCache | — none — |
+| Object store | S3 | Firebase Storage |
+| Region | AWS `af-south-1` | Google `africa-south1` |
+| Firebase | *"static hosting only… cannot serve as the tenant-context authority"* | **is the backend** |
+| Agent tree | ~30 files under `agents/` | `src/agents` does not exist |
+
+`package.json` carries no `express`, no `@prisma/client`, no `pg`.
+`functions/src/region.ts` pins `africa-south1` under "IC-ECOS-BUILD-2026-V2
+§0 rule 1: every Cloud Function, africa-south1, no exceptions."
+
+**This is not a new conflict; it is A-023 and A-031/A-032 restated at full
+length.** A-024, the technical infrastructure whitepaper, is the register's
+authoritative architecture log, and its 2026-08 entry records the decision
+the other way: Postgres/RLS **→** Firebase/Firestore `africa-south1`. A-102
+argues the reverse and does not mention that entry.
+
+**[U]** A document cannot supersede a decision by declaring that it does.
+Either A-024's August entry stands and A-102 describes the fork, or A-102
+is a later decision that reverses it — and if so it reverses it into a
+stack with no running code. **Only the user can say which.** Nothing in
+this repository changes on A-102 before 4 November either way.
+
+### 14.2 What it gets right, checked against primary data
+
+The simulator section is not hand-waving. Its swing wards were tested
+against the primary 2021 IEC ward results (A-035):
+
+```
+A-102 names wards 2, 5, 21, 28 with margins 62, 201, 233, 165
+A-035  ward  2  FF+ > DA   margin  62
+       ward 28  ANC > DA   margin 165
+       ward  5  DA  > FF+  margin 201
+       ward 21  ANC > PA   margin 233
+```
+
+**Exact, all four**, and they are in fact the four tightest wards in the
+municipality — the next closest is ward 32 at 325. Also verified: 2021
+turnout 45.81% and FF+ 13.58% (both match A-092), gazette **8929** (matches
+`parse-nw405-demarcation.mjs`'s own source header), 34 wards / 67 seats.
+
+Two of its architectural positions are already how this build works, which
+is worth saying because they are the two it argues hardest for:
+
+- **"No simplified seat calculator in any UI."** Agreed and already true.
+  `seatCalculator.ts` is the statutory engine, it is the only one, and
+  A-090's demo page is exactly the "teaching model" A-102 refuses.
+- **"Item 16 overhang fixture."** Already built and tested —
+  `allocateSeats` carries `overhangSeats` and `councilSizeFinal`, with a
+  regression test for a party winning more ward seats than its quota
+  entitlement.
+
+### 14.3 Two claims that are false against this repository
+
+1. **PPFA at "R80k Yellow, R100k Critical, R15M hard block"** (§3.4).
+   These are the superseded thresholds already named in §6 as
+   must-not-carry-forward, and already found in A-042 and A-090. Current
+   law is **R200,000 / R30,000,000**, Gazette No. 53182 of 18 Aug 2025.
+   This build has it right, and says so in the file:
+
+   ```
+   src/modules/finance/ppfaDefaults.ts
+     disclosureThresholdZAR: 200_000_00
+     annualDonorCapZAR:   30_000_000_00
+     warningPercentage: 0.8   // 80% of R200,000 = R160,000 — never R80,000 (superseded)
+   ```
+
+   **A document claiming to be the build baseline must not carry a
+   repealed threshold into a compliance subsystem.** Fourth artefact now.
+
+2. **"FINANCE_OFFICER gap… the schema currently omits it"** (§2, §10).
+   Not here. `src/auth/seedRoles.ts` seeds seven roles and Finance Officer
+   is one of them: Party HQ Admin, Municipal Team Lead, Ward Lead, VD
+   Captain, Canvasser, Compliance Officer, **Finance Officer**. The gap is
+   real in the Postgres schema A-102 describes; it is presented as a
+   general defect and is not one. The open question it raises — whether
+   Finance Officer should hold `cap-household-read` — is a live product
+   question and goes to §5 item 3.
+
+### 14.4 A sixth registered-voter figure, and two figures A-092 says cannot exist
+
+**132,140 registered as at August 2026** (§5.1). That is a sixth number,
+seven voters from the IEC stats page's 132,133 and 177 from the certified
+roll's 131,963. Seven apart is not a vintage difference; it is a
+transcription difference. Added to §5 item 0 as noise around an already
+identified figure, not as a new candidate denominator.
+
+**[U] MK at 1.82% and FF+ at 6.28% on the 2024 JB Marks ballot** (§5.2).
+A-092 states plainly that *"the JB Marks municipal-level aggregate of the
+2024 national/provincial election could not be retrieved from public
+interfaces."* A-102 quotes both to two decimals without a source. They may
+come from an extraction A-092 did not have — its own §10 open item asks for
+exactly that pass. **Until a register row exists for them they fall under
+A-102's own rule: an input with register status GAP is not used.** The
+irony is the finding: the document's §5.4 invariant forbids the figures in
+its own §5.2.
+
+The same applies to the ward turnout range **29.26%–71.49%**, which cannot
+be checked against anything in this register — A-035 carries ward votes
+cast, not ward registration.
+
+### 14.5 What is worth taking from it regardless of the stack question
+
+Three things are good and are stack-independent:
+
+- **The `anc_trajectory_baseline` parameter.** Making −8.14pp and −3.93pp
+  two legitimate named inputs rather than a conflict to be settled is the
+  right move, and it is the same discipline as recording both the
+  three-term and four-term quota divisors in §7.1.
+- **"Never produce a single point estimate as the forecast."** A campaign
+  platform that emits one number is a liability.
+- **Mandatory recorded seed.** A scenario that cannot be re-run is not
+  evidence of anything.
+
+**[U] What is not established** is the claim that the simulator is "the
+only product in its class in South Africa" and that "no competitor can
+ship it in a cycle" (§5.7). That is a market assertion with no source,
+sitting in a document otherwise careful about provenance, and it should
+not reach a pitch deck unchecked.
 
 ---
 
