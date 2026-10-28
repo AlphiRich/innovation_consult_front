@@ -3211,5 +3211,127 @@ that are not here.
 
 ---
 
+## 32. The second "all phases complete" document
+
+A-141 | pasted Phases 5–8 + programme close-out | **MIXED — one design genuinely improved, one gate falsely ticked, the wrong quota now under test**
+
+Read against §31, which covered the first of this pair.
+
+### 32.1 A gate is ticked against a test that does not exist
+
+The G5 block carries:
+
+```
+[x] Aggregation fixture suite functions/src/ppfa/aggregate.test.ts:
+    FY-boundary donations … threshold flag → alerts match hand-computed expectations
+```
+
+and the close-out says **"G5 ✅ fixture-suite green in CI."**
+
+`functions/src/ppfa/aggregate.test.ts` **does not exist**, and no CI job
+runs it. Thirteen other named deliverables are likewise absent —
+`counters/maintain.ts`, `analytics/mmp.ts`, `ppfa/iecExport.ts`,
+`reports/scheduler.ts`, `billing/weeklyMeter.ts`, `pdf/engine.ts`, the
+Postgres adapter, the parity harness, `PHASE-8-RUNBOOK.md`,
+`ecos-landing/`, `ic-corporate`.
+
+§31 reported the same absence against a *description* of completion. This
+is a **gate**: a tick that says an independent check was performed and
+passed. That is the A-112 §1 pattern — work attributed to an artefact
+that does not contain it — in the one place it does the most damage,
+because a gate is what somebody relies on instead of looking.
+
+### 32.2 The wrong quota now has a test asserting it
+
+```typescript
+const quota = Math.floor(totalVotes / (councilSize + 1)) + 1;   // Droop
+// Tests: quota = floor(V/(S+1))+1; …
+```
+
+§31.3 established this is not Item 12 — **1,492 against the published
+1,515** on the certified NW405 data, with no `− C` term despite its own
+independent-with-a-ward-seat fixture. What is new is that the test suite
+is specified to **assert the wrong formula**.
+
+A test that codifies an error does not merely fail to catch it; it
+certifies it. Anyone later checking "is the seat maths tested?" gets yes.
+
+**It would also land beside ours.** `src/modules/analytics/mmp.ts` sits in
+the same directory as `seatCalculator.ts`, and the routes it registers —
+`/analytics/seat-calculator` and `/analytics/thresholds` — are **already
+served** by `SeatCalculatorPage.tsx` and `ThresholdAnalyzerPage.tsx`
+(`routes.tsx:59–60`). Same for `war-room`, `finance` and
+`ppfa-thresholds`. Two calculators, one route each, one of them wrong.
+
+### 32.3 Credit: the counters design is materially better
+
+This is a real improvement on §31.4 and worth saying so. Counters are now
+keyed by **scope** — `tenant`, `ward-{code}`, `vd-{code}` — as single
+documents, so `counters.get(ctx, 'tenant')` genuinely is one read. The
+§31 version promised O(1) and scanned the collection; this one delivers
+what that comment claimed.
+
+It also moves to `onDocumentWritten` with a before/after **delta**, so
+edits and soft-deletes decrement correctly rather than only creates
+incrementing, and wraps each scope in `runTransaction`.
+
+**Still not idempotent.** Firestore triggers are at-least-once; a retried
+event recomputes the same delta from the same before/after and applies it
+again. The transaction makes each write atomic, not exactly-once. A
+`lastEventId` on the counter document, checked inside the transaction,
+would close it.
+
+### 32.4 The signature PIN is not a second factor as designed
+
+```typescript
+if (hashPin(signaturePin, staff.pinSalt) !== staff.digitalSignaturePinHash)
+  throw new HttpsError('failed-precondition', 'Digital signature PIN incorrect');
+```
+
+Two problems compound:
+
+1. **A PIN is low-entropy and SHA-256 is fast.** Four to six digits is
+   10⁴–10⁶ candidates; a salted SHA-256 is exhaustible in microseconds
+   once the hash and salt are in hand. The salt stops a rainbow table
+   and nothing else. This wants a deliberately slow KDF — scrypt, argon2
+   or bcrypt — which is the same correction §18.2 required for hashed ID
+   numbers. Second time in this register that a fast hash is used where
+   a slow one is the whole point.
+2. **The hash and salt would sit where colleagues can read them.**
+   `firestore.rules:68` grants read on any `staff/{uid}` document to a
+   caller with `team.manage`. So the person who administers the team can
+   read another officer's `digitalSignaturePinHash` and `pinSalt` and
+   recover the PIN offline — **the second factor on IEC export is
+   defeated by the role that provisions it.**
+
+If a PIN gate is wanted, the material belongs somewhere no client can
+read, verified server-side, with a slow KDF and attempt throttling.
+
+### 32.5 What is sound
+
+- **The residency wording is quoted verbatim and correctly**, again.
+- **Phase 8 is "ARMED", gated on the first paying customer** — which is
+  exactly what A-111 §4 says: *"Phase 8 is conditional, not scheduled."*
+  Correctly respected, and the parity-harness idea (*"if it passes, the
+  migration is done"*) is the right shape for a DAL swap.
+- **The SPIKE · G5 guard** — sentiment renders observed counts only, "no
+  NLP scores, no predictive language … never claimable in marketing."
+- Landing and corporate split into isolated deploy targets, which matches
+  A-111 §4's insistence that Phase 7 is a separate project.
+
+### 32.6 Disposition
+
+**Take:** the scope-keyed counter design (§32.3), with an idempotency key
+added; the Phase 8 parity-harness idea; the SPIKE guard wording.
+
+**Do not take:** `mmp.ts` and its test. **Do not take** the PIN scheme as
+written.
+
+**Do not rely on the close-out.** "ALL PHASES COMPLETE" and "G5 ✅" refer
+to files that are not in this repository, and the routes it would add are
+already live.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
