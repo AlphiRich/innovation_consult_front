@@ -299,6 +299,10 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
   13 and 16; implements `A/B` with no `+1`, no `−C`, no surplus
   allocation and no overhang handling. On the certified NW405 2021 data
   it allocates **65 of 67 seats** and gets ANC and PA wrong (§26.1).
+- **`src/lib/mmp.ts`** (A-140). Billed as "Municipal Structures Act MMP
+  allocation"; implements the **Droop** quota `⌊A/(B+1)⌋+1` with no `−C`
+  term. Gives **1,492 against the published 1,515** (§31.3). Third
+  distinct wrong quota in the register.
 - **`electioncampaignos.co.za` and `electioncos.co.za`** as the product's
   address (A-084, A-090, A-129). The first is in `SUPERSEDED_DOMAINS` and
   has no DNS record. The second **is a live registration** — §23.4
@@ -3078,6 +3082,132 @@ Then `npm run deploy:hosting`, which runs the build, the preflight and
 `--only hosting:app` in order, and replaces the placeholder on
 `app.electioncos.co.za` with the PWA **and its six header blocks** —
 which is what §29.5 was about.
+
+---
+
+## 31. The "Phases 5–7 complete" build document
+
+A-140 | pasted Phase 5/6/7 completion + final register | **MIXED — valuable prose, a parallel codebase, and a third wrong quota**
+
+### 31.1 What is worth keeping
+
+More of this document is right than any architecture paste in the
+register since A-111, and the compliance thinking is good:
+
+- **PPFA figures are correct.** R200,000 / R30,000,000, cited to Gazette
+  53182, with `?? 2e5` / `?? 3e7` fallbacks in the UI. The first
+  architecture-style document since §12 not to carry a repealed figure.
+- **The residency wording is the mandated one**, near-verbatim from
+  A-111 §3.1 — voter and financial PII in `africa-south1`, Firebase Auth
+  identifiers processed in the US, disclosed under POPIA s72.
+- **"Document Integrity Hash (SHA-256)"** — the exact rename A-111 §3.3
+  requires over "Blockchain Verified Hash", used without being asked.
+- **Sentiment is labelled** *"SPIKE · G5 — unvalidated model,
+  configuration only"* rather than sold as analysis.
+- **PPFA is online-only** (Δ11) and `ppfaConfigs` is append-only and
+  effective-dated via `appendAmendment` (F-07).
+- The legal drafts carry **"DRAFT — pending attorney review (LG2/LG3)"**
+  and get the operator / responsible-party split right under POPIA, with
+  crypto-shredding erasure and a statutory-retention override.
+
+The **runbook and pre-launch audit are the most useful artefacts** — a
+go/no-go script that emits BLOCKER vs NOTE, and an exit-criteria list
+with numbers in it. Those have no equivalent here and are worth adapting.
+
+### 31.2 "Build is DONE" is not true of this repository
+
+Every one of the fourteen files it presents as delivered is **absent**:
+
+```
+src/dal/ports/counters.ts · functions/src/counters/bump.ts
+src/modules/warroom/WarRoomView.tsx · src/lib/mmp.ts
+src/modules/analytics/SeatCalculatorView.tsx · src/lib/pdf/engine.ts
+src/dal/ports/reports.ts · functions/src/reports/runner.ts
+functions/src/mail/send.ts · src/modules/finance/FinanceView.tsx
+src/lib/pricing.ts · src/modules/landing/LandingView.tsx
+src/modules/legal/LegalPages.tsx · scripts/prelaunch-audit.ts
+```
+
+**But the capabilities are mostly built already, under other names** —
+`SeatCalculatorPage.tsx`, `ThresholdAnalyzerPage.tsx`,
+`ScheduledReportsPage.tsx`, `DisclosureRegisterPanel.tsx`,
+`DonationForm.tsx`, `DonorDetail.tsx`, `DonorForm.tsx`,
+`FinancePage.tsx`, and `seatCalculator.ts` with its NW405 regression
+test.
+
+So this is not undone work. It is a **second implementation of work that
+exists**, declared complete. Adopting it wholesale would give the product
+two seat calculators and two finance modules — and §25.1 already showed a
+client snippet importing `@/modules/voice`, which likewise does not
+exist. The register entry that matters is: **nothing here is a gap in the
+build; it is an alternative to it.**
+
+### 31.3 The quota is wrong — the third distinct wrong formula
+
+```typescript
+const quota = Math.floor(totalVotes / (councilSize + 1)) + 1;
+```
+
+That is the **Droop** quota, and the file says so: *"Municipal Structures
+Act MMP allocation (Droop quota)."* Item 12 is `Q = (A / (B − C)) + 1`.
+
+Against the certified NW405 2021 data we fetched from the IEC:
+
+```
+document   ⌊101,439 / (67+1)⌋ + 1 = 1,492
+Item 12    ⌊101,439 / 67⌋     + 1 = 1,515   ← published
+```
+
+**And there is no `C` term at all.** Its own `DEFAULTS` include
+`Independent W6` holding a ward seat with `prEligible: false` — exactly
+the case Item 12's `− C` exists for — and the code never deducts it. On
+its own example: 228 where Item 12 gives 234.
+
+Running tally of quota implementations in this register:
+
+| source | formula | NW405 result |
+|---|---|---|
+| A-138 §4.1 | `A / B`, no `+1`, no `−C` | 65 of 67 seats allocated |
+| A-137 S1–S3 | Item 12, correct | exact |
+| A-137 S4 | unenacted IEC amendment, labelled Item 16 | §25.3 |
+| **A-140** | **Droop, `⌊A/(B+1)⌋+1`, no `−C`** | **1,492 vs 1,515** |
+| `seatCalculator.ts` | Item 12 with `− C − D` | **1,515 and all nine party totals** |
+
+### 31.4 Three more that would stop it at the gate
+
+1. **`check:hex` fails on the first run.** Five components carry an `HX`
+   constant of raw hex literals; the guard permits hex only in
+   `tokens.ts`. Six of the eleven are not our tokens at all — it uses
+   `#0C2430` as ink against our `#1A2246`. **A seventh palette.**
+2. **It mails from a dead superseded domain.**
+   `smtp.ecos.electioncampaignos.co.za`, from
+   `reports@ecos.electioncampaignos.co.za`. `electioncampaignos.co.za` is
+   in `SUPERSEDED_DOMAINS`, and `ecos.electioncampaignos.co.za` resolves
+   to **no DNS record** — while the comment claims "SPF/DKIM/DMARC
+   aligned".
+3. **The War Room's stated rationale contradicts its own code.** The
+   comment promises counters that keep reads *"O(1) on the free tier"*
+   with *"nothing scanned per render"*. `tenantTotals` then does
+   `.collection(counters).orderBy('day').get()` — the whole collection —
+   and filters in JavaScript; `range` fetches every day ever recorded for
+   a ward and filters in JavaScript. On a free-tier read quota that is a
+   problem precisely where it claims to have solved one.
+
+Also worth noting, smaller: `FieldValue.increment(1)` in an at-least-once
+Firestore trigger with no idempotency key **double-counts on retry**, and
+these counters are presented as the authoritative command-view figures.
+
+### 31.5 Disposition
+
+**Take:** the runbook, the pre-launch audit script's shape, the legal
+draft text as a starting point for the attorney, and the PPFA/residency
+wording as confirmation that ours is right.
+
+**Do not take:** `src/lib/mmp.ts`, under any circumstances. The engine
+that reproduces the certified result is already in this repository.
+
+**Do not believe:** the final register. Seven green ticks describe files
+that are not here.
 
 ---
 
