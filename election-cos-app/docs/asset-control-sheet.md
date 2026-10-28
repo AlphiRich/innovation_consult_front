@@ -6,8 +6,8 @@ arrived under different names with identical content, and two arrived
 under the same name with different content.
 
 **Opened 28 October 2026 · T−7** (election day 4 November).
-**176 files received · 124 distinct · 52 redundant copies (30%)**, across
-fourteen batches. Running totals are in §7.3.
+**180 files received · 125 distinct · 55 redundant copies (31%)**, across
+fifteen batches. Running totals are in §7.3.
 
 Rows marked **[read]** have had their contents reviewed. Rows marked
 **[hash only]** are registered and deduplicated but not yet read — stated
@@ -401,7 +401,8 @@ A-078 | repeats of A-033/035/036/037/039 and the research skill | — | **DUP** 
 | 12 (28 Oct) | 14 | 10 |
 | 13 (28 Oct) | 4 | 3 |
 | 14 (28 Oct) | 1 | 1 |
-| **total** | **176** | **124** |
+| 15 (28 Oct) | 4 | 1 |
+| **total** | **180** | **125** |
 
 The 31 roll PDFs are 31 distinct hashes — no duplicates in that batch,
 which is what you would expect from a machine-generated per-VD export
@@ -1396,6 +1397,140 @@ only product in its class in South Africa" and that "no competitor can
 ship it in a cycle" (§5.7). That is a market assertion with no source,
 sitting in a document otherwise careful about provenance, and it should
 not reach a pitch deck unchecked.
+
+---
+
+## 15. Batch 15 (28 Oct, 4 files) — the Firestore ingestion package
+
+ID | Asset | Hash | Kind | Disposition | Note
+---|---|---|---|---|---
+A-103 | `ElectionCOS-ingestion-voters-roll.zip` | `3794165c` | 34 files: Firestore ingest, rules, Dexie sync, 41 tests | **KEEP — the first uploaded asset that ships its own verification and passes it here** | §15.1 |
+A-104 | `ElectionCOS-ingestion-voters-roll.zip` (2nd) | `3794165c` | — | **DUP** | identical, same message |
+A-105 | `IC-ECOS-DATA-2026-02_NW405_VotersRoll.zip` | `c2874d20` | — | **DUP of A-099** | identical |
+A-106 | `CLAUDE_CODE_BRIEF.md` | `de2d5bae` | — | **DUP of A-087** (fourth copy) | identical |
+
+**No roll data is in the package** — no CSV, no JSONL, no PDF. Its
+`parse_iec_voters_roll.py` and `load_voters_roll.sql` are byte-identical to
+A-101 and A-100.
+
+### 15.1 It is the Firestore answer to §13, and it works
+
+§13.5 reviewed a PostgreSQL loader on a stack this repo does not run. This
+is the same ingestion for the stack it does: `firestore/src/` (build,
+ingest-core, sink, model, cli), `firestore.rules`, `firestore.indexes.json`,
+`client/src/syncRoll.ts` + `rollDb.ts` for scoped Dexie sync, and a test
+directory.
+
+**I ran it.** `npm ci --ignore-scripts`, then:
+
+```
+tsc --noEmit                                     clean
+vitest run                   29 passed, 12 skipped (rules need the emulator)
+firebase emulators:exec --only firestore \
+  "vitest run test/rules.test.ts"                10 passed  ← real emulator
+                                                 41 of 41 passing
+```
+
+The ten rules tests include the denials — pins outside the caller's VD,
+pins that touch roll fields, pins that impersonate another uid, pins
+outside the South African bounding box, and address create/delete. The
+`PERMISSION_DENIED` lines in the emulator log are the tests working.
+
+**It fixes two of §13.5's seven findings, on this side:**
+
+- **#1, the unprotected map layer.** In the SQL loader
+  `electoral_roll.address` had no RLS at all. Here `roll_addresses` is
+  behind the same `canReadRoll()` as the entries, and the only client
+  write permitted is a field GPS pin — constrained to seven named keys,
+  `geocodeSource == 'FIELD_GPS'`, `geocodedBy == request.auth.uid`,
+  `geocodedAt == request.time`, accuracy ≤ 50 m, and a latitude/longitude
+  box that rejects `(0,0)` and swapped coordinates.
+- **#3, editions.** The SQL post-load gate counted rows without filtering
+  on `roll_edition`, so a second edition could never load. Here gate 2
+  filters on `rollEdition`, and there is a full lifecycle —
+  `LOADING → ACTIVE → SUPERSEDED → PURGED` — with an atomic active-pointer
+  flip and a `runPurge` that refuses to purge the ACTIVE edition without
+  an explicit flag.
+
+Two more things it gets right that are worth copying regardless of what
+happens to the roll:
+
+- Addresses are written with `merge: true` and the location fields are
+  documented as owned by the field app, so **re-running ingest cannot
+  erase a canvasser's GPS pin**.
+- `resolveScope()` refuses to sync the municipality to a device *even for
+  HQ_ADMIN* — a command role must name a ward or VD first. That is the
+  right default and we do not have its equivalent.
+
+### 15.2 Three integration conflicts — none of them defects in the package
+
+The rules file says to "merge these match blocks into the app's main
+`firestore.rules`". Do not do that unchanged.
+
+1. **Root collections against a multi-tenant tree.** Every one of our
+   match blocks is `/tenants/{tid}/…` guarded by
+   `tenantOK(tid)` (`request.auth.token.tenantId == tid`). The package's
+   are root-level — `/roll_entries/{id}`, `/roll_addresses/{id}` — with no
+   tenant concept at all, because its model assumes **one Firebase project
+   per party**. Merged as-is, 131,963 personal-information documents sit
+   outside the tenant tree, and a Firestore root catch-all deny would not
+   save them: in Firestore any matching `allow` grants.
+2. **A claim we do not mint.** The rules read `request.auth.token.role`,
+   `.wardCode`, `.vdCode`. Our tokens carry `tenantId`, `caps` (26
+   capabilities), `geoScope`, `wardScope`, `vdScope` — **there is no
+   `role` claim**. So merged today the blocks are inert and everything is
+   denied, which is the good news. **The exposure is latent, not
+   current**: the moment anything mints a `role` claim, finding 1 goes
+   live. A rule that is safe only because a claim is missing is not safe.
+3. **VD scope without its ward.** `inVd(d)` compares `vdCode` alone. Our
+   `inScope()` requires both, and `staffProvisioning.ts` refuses a VD role
+   that has no ward, for the reason §13.4 re-examined: narrowing on the
+   district alone shows a canvasser the other wards' portion of a split
+   station. Less dangerous here because the roll files each VD under one
+   ward — but the two rule-sets state different contracts, and merging
+   them would leave the weaker one in force for roll data.
+
+### 15.3 A sixth role list, and one guard that does nothing
+
+`model.ts` declares six roles: `HQ_ADMIN`, `LOCAL_HEAD`,
+`FINANCE_OFFICER`, `WARD_LEAD`, `VD_CAPTAIN`, `VOLUNTEER`. Ours are seven:
+Party HQ Admin, Municipal Team Lead, Ward Lead, VD Captain, Canvasser,
+**Compliance Officer**, Finance Officer.
+
+**There is no Compliance Officer in the package's model**, and
+`canReadRoll()` grants only to `isCommand()` (HQ/Local Head) or
+`isFieldRole()` (Ward Lead/VD Captain/Volunteer). So under these rules
+**our Compliance Officer cannot read the roll at all** — which, for the
+role whose job is auditing how personal information is handled, is a
+decision somebody should make deliberately rather than inherit. Goes to
+§5 item 3; this is now the sixth document to propose a role list.
+
+**A dead guard.** The address-update rule carries
+`&& role() != 'FINANCE_OFFICER'`. `FINANCE_OFFICER` is in neither
+`isCommand()` nor `isFieldRole()`, so `canReadRoll()` has already failed
+for that role one line above. The clause can never change an outcome. It
+is harmless but it reads as protection, which is the exact thing
+`staffProvisioning.ts` refuses: *"a staff record that appears to limit
+someone and does not is worse than one that plainly does not limit them."*
+
+### 15.4 What it still does not decide
+
+- **The POPIA lawful basis.** The package *implements* loading 131,963
+  name + masked-ID + address records into Firestore; it does not
+  authorise it. Its own `CLAUDE.md` and A-087's open item 3 both say
+  counsel must sign off first. **§11.1 is unchanged and remains the
+  gate.** Nothing here is loaded anywhere.
+- **The split stations.** §13.4's question — the roll gives one ward per
+  VD, our seed has 25 codes across 2–3 wards — is untouched. The package
+  inherits the roll's one-ward-per-VD shape, so adopting it adopts that
+  answer by default rather than by decision.
+- **The stack.** The package's `CLAUDE.md` frames it a **third** way:
+  *"Firebase/Firestore (GCP `africa-south1`) for rollout; PostgreSQL 16 +
+  PostGIS with RLS (Prisma) as the target."* A-024 records Firestore as
+  the decision; A-102 records Postgres as the baseline with Firebase
+  bounded to static hosting; this says Firestore now, Postgres later.
+  **Three framings, three documents, same week.** §14.1 stands: only the
+  user can settle it.
 
 ---
 
