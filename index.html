@@ -305,7 +305,7 @@
 
          The application domain is app.electioncos.co.za (the apex serves the
          static landing page; the PWA lives on the subdomain). Firebase Hosting's
-         own election2026-campaignms7-0.web.app is kept as a FALLBACK,
+         own electioncos1-0.web.app is kept as a FALLBACK,
          tried second, so the link goes live the moment either answers
          rather than waiting on .co.za DNS propagation.
 
@@ -446,7 +446,7 @@
             // read "Launching soon" on the public page for however long
             // .co.za DNS takes to propagate, which is a worse outcome
             // than the dead link the probe exists to prevent.
-            var FALLBACK_URL = "https://election2026-campaignms7-0.web.app";
+            var FALLBACK_URL = "https://electioncos1-0.web.app";
 
             // A file from the app's own build, not a generic path, so a
             // parked domain or a placeholder page cannot pass.

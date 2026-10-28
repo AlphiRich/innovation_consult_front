@@ -22,14 +22,29 @@
  * network, and exits non-zero with a sentence an operator can act on. It
  * never deploys anything itself and it never says a deploy happened.
  *
- * WHAT IT CANNOT CHECK
+ * THE REGION CHECK (changed 28 Oct 2026)
  *
- * Whether Firestore and Storage were actually created in africa-south1.
- * That is set at resource-creation time, is not expressible in
- * `firebase.json`, and cannot be read without authenticating. It is the
- * one item this script can only remind a person to verify in the console
- * — and it is irreversible once data exists, which is why the reminder is
- * loud rather than a comment.
+ * This used to be the one thing the script could only nag about:
+ * Firestore's location is set at creation, is not expressible in
+ * `firebase.json`, and cannot be read without authenticating. It was
+ * verified by hand in an authenticated shell —
+ *
+ *   gcloud firestore databases list --project=electioncos1-0
+ *     (default)  africa-south1  FIRESTORE_NATIVE
+ *   gcloud app describe --project=electioncos1-0
+ *     ERROR: ... does not contain an App Engine application
+ *
+ * — which matters because the default database's location follows the
+ * "location for default Google Cloud resources", and that covers
+ * resources associated with App Engine. No App Engine application means
+ * nothing pinned it anywhere else.
+ *
+ * So the check is now run rather than deferred, whenever `gcloud` is on
+ * PATH and authenticated. Where it is not — a clean CI box, or this
+ * build's own container — it reports SKIP with the recorded value and
+ * the command, instead of claiming either a pass or a failure it has not
+ * established. It is still irreversible once data exists, so a FAIL here
+ * is fatal rather than advisory.
  *
  * USAGE
  *
@@ -240,6 +255,59 @@ try {
   add('function region', 'FAIL', `could not check: ${error.message}`);
 }
 
+// -------------------------------------------------------- firestore region
+
+// The one check this script used to be unable to make. Firestore's
+// location is fixed at creation and cannot be changed afterwards — the
+// documented wording is "once you provision a database instance, you
+// cannot change its location setting" — so a wrong answer here is not a
+// setting to correct, it is a project to abandon.
+//
+// Verified by hand on 28 Oct 2026: (default) is FIRESTORE_NATIVE in
+// africa-south1, and the project contains no App Engine application
+// (which matters, because the default database's location follows the
+// location for default Google Cloud resources, and that covers App
+// Engine).
+//
+// SKIP, not PASS, when gcloud is absent or unauthenticated. A check that
+// reports success because it could not run is worse than one that says
+// nothing — see the ETL script in the acquisition skill that printed
+// "complete" with every network call commented out.
+try {
+  const { execFileSync } = await import('node:child_process');
+  const projectId = JSON.parse(read('.firebaserc'))?.projects?.default;
+  const run = (args) =>
+    execFileSync('gcloud', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 30_000 }).trim();
+
+  const locations = run([
+    'firestore', 'databases', 'list', `--project=${projectId}`, '--format=value(name,locationId)',
+  ]);
+
+  if (locations === '') {
+    add('firestore region', 'WARN', `no database yet in ${projectId}`,
+      `Create it in ${REQUIRED_REGION}. The location cannot be changed afterwards.`);
+  } else {
+    const wrong = locations
+      .split('\n')
+      .map((line) => line.trim().split(/\s+/))
+      .filter(([, loc]) => loc !== REQUIRED_REGION);
+    if (wrong.length > 0) {
+      add('firestore region', 'FAIL',
+        wrong.map(([name, loc]) => `${name.split('/').pop()} is in ${loc}`).join(', '),
+        `Rule 1 of §0 fixes every resource at ${REQUIRED_REGION}, and a database's location cannot be changed. A non-default database can be created in the right region, or the project replaced.`);
+    } else {
+      const count = locations.split('\n').length;
+      add('firestore region', 'PASS', `${count} database(s), all ${REQUIRED_REGION}`);
+    }
+  }
+} catch (error) {
+  // gcloud missing, unauthenticated, or the API disabled — all of which
+  // mean "not established here", never "fine".
+  const why = /not found|ENOENT/i.test(String(error.message)) ? 'gcloud not on PATH' : 'gcloud not authenticated here';
+  add('firestore region', 'SKIP', `${why} — recorded value is ${REQUIRED_REGION}`,
+    'Verify in an authenticated shell: gcloud firestore databases list --project=<id> --format="value(name,locationId)"');
+}
+
 // --------------------------------------------------- functions readiness
 
 // Not every unfinished function is dangerous, and conflating the two
@@ -360,11 +428,22 @@ const failures = checks.filter((c) => c.status === 'FAIL');
 // goal — and it must not print as "FAIL" either, or the one thing the
 // reader needs to distinguish is the thing the output hides.
 const warnings = checks.filter((c) => c.status === 'WARN');
+// SKIP is a fourth state: the check is real and did not run. It must not
+// block a deploy, and it must not read as a pass — the whole point is
+// that nothing was established. It prints as "skip" and is counted
+// separately so the summary line cannot imply more was verified than was.
+const skipped = checks.filter((c) => c.status === 'SKIP');
 
 if (json) {
   console.log(
     JSON.stringify(
-      { ready: failures.length === 0, warnings: warnings.length, region: REQUIRED_REGION, checks },
+      {
+        ready: failures.length === 0,
+        warnings: warnings.length,
+        skipped: skipped.length,
+        region: REQUIRED_REGION,
+        checks,
+      },
       null,
       2,
     ),
@@ -372,7 +451,11 @@ if (json) {
 } else {
   console.log('\nElection Campaign OS — deploy preflight\n');
   for (const check of checks) {
-    const mark = check.status === 'PASS' ? 'ok  ' : check.status === 'WARN' ? 'warn' : 'FAIL';
+    const mark =
+      check.status === 'PASS' ? 'ok  '
+      : check.status === 'WARN' ? 'warn'
+      : check.status === 'SKIP' ? 'skip'
+      : 'FAIL';
     console.log(`  ${mark}  ${check.name.padEnd(22)} ${check.detail}`);
     if (check.remedy && check.status !== 'PASS') console.log(`        -> ${check.remedy}`);
   }
@@ -384,9 +467,16 @@ if (json) {
         ? '  All preflight checks pass. Nothing has been deployed — this script only checks.'
         : `  Preflight passes with ${warnings.length} warning${tail}. Nothing has been deployed — this script only checks.`,
     );
-    console.log(`\n  BEFORE THE FIRST DEPLOY, verify in the console that Firestore and Storage were created`);
-    console.log(`  in ${REQUIRED_REGION}. It is set at creation time, cannot be read from here, and cannot`);
-    console.log('  be changed once data exists.\n');
+    if (skipped.some((c) => c.name === 'firestore region')) {
+      console.log(`\n  The Firestore region was NOT checked on this run — see the skip above. It is`);
+      console.log(`  ${REQUIRED_REGION}, verified by hand on 28 Oct 2026, and cannot be changed once`);
+      console.log('  data exists. Re-verify from an authenticated shell if anything about the');
+      console.log('  project has changed.\n');
+    } else {
+      console.log(`\n  Storage's location is still unchecked here — Firestore's is not. Verify Storage`);
+      console.log(`  was created in ${REQUIRED_REGION} in the console; it is set at creation time and`);
+      console.log('  cannot be changed once data exists.\n');
+    }
   } else {
     console.log(`  ${failures.length} check(s) failed. Not ready to deploy.\n`);
   }

@@ -1,6 +1,6 @@
 {
-  "//": "Election-COS1.0 — real project, confirmed by the human session 10. Was previously only a guess (see docs/phase-0-infra-plan.md) between this ID and innovation-consult-ecos-dev/-prod; that ambiguity is now resolved in favour of this one. Region (africa-south1) must still be verified/set in the console — see this repo's BUILD-STATUS.md session 10 entry, this cannot be changed after Firestore/Storage data exists.",
+  "//": "Election-COS1.0 — project electioncos1-0 (project number 960903975002, display name 'Election-COS'). Changed from election2026-campaignms7-0 on 28 Oct 2026. The earlier value was recorded as 'confirmed by the human session 10' after a guess between it and innovation-consult-ecos-dev/-prod; this one is confirmed three ways — the console Project info card, the GCP dashboard analysis, and an authenticated Cloud Shell prompt reading (electioncos1-0). Region is no longer an open question: 'gcloud firestore databases list' returns the (default) database in africa-south1, FIRESTORE_NATIVE, and 'gcloud app describe' reports no App Engine application, so nothing pinned the location anywhere else. See docs/asset-control-sheet.md §28.",
   "projects": {
-    "default": "election2026-campaignms7-0"
+    "default": "electioncos1-0"
   }
 }

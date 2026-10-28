@@ -2832,5 +2832,93 @@ answers it in one glance.
 
 ---
 
+## 28. The project is settled, and the region is verified
+
+Read from an authenticated Cloud Shell on 28 Oct 2026:
+
+```
+$ gcloud firestore databases list --project=electioncos1-0
+NAME: projects/electioncos1-0/databases/(default)
+LOCATION_ID: africa-south1
+TYPE: FIRESTORE_NATIVE
+
+$ gcloud app describe --project=electioncos1-0
+ERROR: ... does not contain an App Engine application
+```
+
+**Both answers are the ones we wanted.** The default database is already
+in `africa-south1`, in Native mode, so rule 1 of §0 holds and the
+residency claim in A-111 §3.1 is true of the real project. And there is
+**no App Engine application**, so the enabled Admin API that §26.3
+flagged was nothing — nothing ever pinned the default-resource location
+anywhere else. §27.2's escape hatch is not needed.
+
+### 28.1 What changed
+
+| file | from | to |
+|---|---|---|
+| `.firebaserc` | `election2026-campaignms7-0` | `electioncos1-0` |
+| `publicDomain.ts` `HOSTING_ORIGIN` | `election2026-campaignms7-0.web.app` | `electioncos1-0.web.app` |
+| root `index.html` `FALLBACK_URL` | same | same |
+
+The project id is now confirmed four ways — the console Project info
+card (`Election-COS`, number 960903975002), the GCP dashboard analysis,
+the Cloud Shell prompt, and the deploy log. The `.firebaserc` comment
+records that, replacing the older note that said the previous id had been
+"confirmed by the human session 10" after a guess between three
+candidates.
+
+`https://electioncos1-0.web.app` was fetched independently from here:
+**HTTP 200, 1,219 bytes, `text/html`, `<title>Election-COS</title>`** —
+well-formed HTML, not the garbled JSON of the earlier attempt.
+
+### 28.2 The preflight now checks the region instead of nagging about it
+
+`deploy-preflight.mjs` opened with a section headed *"WHAT IT CANNOT
+CHECK"*, whose single entry was the Firestore region. That section is
+gone. The check runs `gcloud firestore databases list` and has four
+outcomes, **all four proved by stubbing `gcloud` on `PATH`**:
+
+```
+PASS  1 database(s), all africa-south1
+FAIL  (default) is in us-central1
+        -> … a database's location cannot be changed. A non-default
+           database can be created in the right region, or the project replaced.
+WARN  no database yet in electioncos1-0
+        -> Create it in africa-south1. The location cannot be changed afterwards.
+skip  gcloud not authenticated here — recorded value is africa-south1
+```
+
+**`SKIP` is a new fourth state and the important one.** A check that
+reports success because it could not run is worse than one that says
+nothing — the acquisition skill records an ETL script that printed
+`ETL Pipeline complete` with every network call commented out. So where
+`gcloud` is missing or unauthenticated, as in this build's own container,
+the check prints `skip`, does not count as a pass, does not block the
+deploy, and names the command that would settle it.
+
+**Storage's location is still unchecked** and the closing reminder now
+says so specifically, rather than lumping it together with Firestore.
+
+### 28.3 Still open
+
+- **Deploy credential.** Preflight still fails on it. A service-account
+  JSON as `GOOGLE_APPLICATION_CREDENTIALS` remains the better path than a
+  personal `firebase login` — scoped to the project, revocable, and the
+  only option that works from a cloud session.
+- **`.env` points at the emulator suite**, so a build published today
+  would be a development build.
+- **The placeholder's `firebase.json` is not ours.** `electioncos1-0.web.app`
+  currently returns HSTS and nothing else — no `X-Content-Type-Options`,
+  `X-Frame-Options`, `Referrer-Policy` or CSP — because that hand-made
+  config has no `headers` block. Harmless for a placeholder; it is the
+  observable shape of the regression if the PWA deploys against it rather
+  than against this repo's `firebase.json` and its six header blocks.
+- **A second Hosting site** for `app.electioncos.co.za` needs deploy
+  targets: one `firebase.json` cannot name two sites with a bare `site`
+  key.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*

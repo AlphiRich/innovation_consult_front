@@ -59,7 +59,7 @@ export const APP_ORIGIN = `https://${APP_DOMAIN}` as const;
  * propagate — which is a worse outcome than the one the probe exists to
  * prevent.
  */
-export const HOSTING_ORIGIN = 'https://election2026-campaignms7-0.web.app' as const;
+export const HOSTING_ORIGIN = 'https://electioncos1-0.web.app' as const;
 
 /**
  * Names that must never be a live target again. If one turns up as one,
