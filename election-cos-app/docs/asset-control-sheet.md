@@ -2254,5 +2254,96 @@ never from the path. After that, a compose file is a reasonable half-hour.
 
 ---
 
+## 22. Batch 22 (28 Oct, 2 files) — the compose file
+
+ID | Asset | Hash | Disposition | Note
+---|---|---|---|---
+A-126 | `gemini-code-…4744334.py` | `45909fc3` | **DUP of A-122's patch** | 12 lines: the sanitised `except` block |
+A-127 | `gemini-code-…4726484.yaml` | `b475e96a` | **RECONCILE — §22.1** | `docker-compose.yml`, three services |
+A-128 | the covering paste | not in the upload store | **DUP of A-120** | fourth verbatim copy of the relay |
+
+§21.3 recommended authentication before orchestration. The compose file
+came anyway, which is a fair call to make — so this reviews what arrived
+rather than restating the recommendation.
+
+### 22.1 Both `build:` contexts point at things that do not exist
+
+```yaml
+api-gateway:
+  build: { context: ./election-cos-app, dockerfile: Dockerfile }
+voice-relay:
+  build: { context: ., dockerfile: Dockerfile.voice }
+```
+
+**There is no Dockerfile anywhere in this repository** — `find` returns
+nothing. And `./election-cos-app` is not a Node API gateway: its
+dependencies are React, Dexie, Firebase, TanStack Query and React Router,
+it has no `express`, no `main` entry, and nothing listens on 3000. The
+service labelled *"Node.js API Gateway & V2 Metering Engine"* has its
+build context aimed at **our Vite single-page app**. Adding a Dockerfile
+would not fix that; it would containerise the wrong program.
+
+### 22.2 The database is missing, and it is the part that meters
+
+There is no Postgres service. `debit_tokens()` and `reverse_debit()` are
+PL/pgSQL functions in `020_metering_tokens_vouchers.sql` — **the
+component that actually implements "debit before action" is absent from
+the orchestration**, while `DATABASE_URL` is passed in from the host
+shell pointing at something undefined. Of three services composed, one is
+the wrong program, one has no image, and the one that does the metering
+is not there.
+
+### 22.3 Publishing the ports makes the §20.3 finding materially worse
+
+```yaml
+redis:      ports: ["6379:6379"]     command: redis-server --save 60 1 …
+voice-relay: ports: ["8000:8000"]
+```
+
+Redis is published to the host **with no `--requirepass`**, and the relay
+— which still derives `tenant_id` and `actor_id` from the URL path — is
+published beside it. On any host with a public interface that is an open
+Redis holding session state next to an unauthenticated endpoint that
+spends tenants' tokens. Neither needs host publishing: the services reach
+each other over `ecos-net` by service name, which the file already
+configures and uses (`redis://redis:6379`, `http://api-gateway:3000`).
+
+**Minimal changes that make the file not dangerous**, in order:
+
+1. Delete the `ports:` block from `redis` entirely.
+2. Bind the relay to loopback — `127.0.0.1:8000:8000` — until a bearer
+   token replaces the path parameters.
+3. Add `--requirepass` and a `REDIS_PASSWORD` secret regardless; a
+   container-network-only Redis with no password is one `docker run
+   --network ecos-net` away from open.
+
+### 22.4 Four smaller things
+
+- **`version: '3.8'` is obsolete.** Compose V2 ignores it and warns.
+- **`depends_on` is inconsistent.** `api-gateway` waits for
+  `condition: service_healthy`; `voice-relay` uses the short form, so it
+  starts before the gateway is ready — and its first action is a debit
+  against that gateway, which §20.3 #3 reports to the user as
+  "Insufficient CampaignTokens".
+- **`GEMINI_API_KEY` is passed to `api-gateway`**, which does not talk to
+  Gemini. Only the relay does.
+- **`restart: unless-stopped` with no healthcheck** on either app service
+  will loop a crashing container silently.
+
+One more, from the Redis volume: `--save 60 1` with `redis_data`
+persisted means `prepaid_bytes` survives a restart, so a resumed session
+can carry allowance it already consumed.
+
+### 22.5 Where this belongs
+
+**Not in this repository.** §18.1 established that the Node gateway and
+the Postgres schema exist in no repository, and this build is Firebase
+with Cloud Functions pinned `africa-south1` — it has no containers and
+needs none. A compose file for FastAPI + Redis + Postgres belongs with
+the stack it orchestrates, whenever that stack acquires a repository.
+Registered here; **not added to the tree.**
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
