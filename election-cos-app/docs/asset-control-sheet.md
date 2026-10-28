@@ -6,8 +6,8 @@ arrived under different names with identical content, and two arrived
 under the same name with different content.
 
 **Opened 28 October 2026 · T−7** (election day 4 November).
-**126 files received · 79 distinct · 47 redundant copies (37%)**, across
-ten batches. Running totals are in §7.3.
+**171 files received · 120 distinct · 51 redundant copies (30%)**, across
+twelve batches. Running totals are in §7.3.
 
 Rows marked **[read]** have had their contents reviewed. Rows marked
 **[hash only]** are registered and deduplicated but not yet read — stated
@@ -218,6 +218,24 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
 
 ## 5. Reconciliation queue, in priority order
 
+0. **How many registered voters are there in NW405?** — the hard gate.
+   Five figures are in circulation, none of them reconciled:
+
+   | figure | source |
+   |---:|---|
+   | 122,059 | MDB gazette, 2026 baseline (§1, §7) — what we build on |
+   | 132,133 | IEC registration statistics (A-087) |
+   | 131,963 | the certified roll's own verified count (A-087) |
+   | 119,099 | IEC ward table, summed (A-087) |
+   | 113,218 | 2021 LGE registered voters (A-092) |
+
+   Different vintages and a redelimited area explain *some* of the
+   spread, and nobody has shown which. **Until one is established as the
+   denominator, no turnout, coverage or penetration figure may leave this
+   system.** A percentage is a claim about a denominator, and we do not
+   currently have one. This sits above the fork port because it blocks
+   output, not just work.
+
 1. **A-031 / A-032 — the fork and its build bundle.** After 4 November.
    Port forward from the fork; never merge backward. Start with
    `src/MemberCapture.tsx`, `src/services/**`, `src/hooks/**`.
@@ -237,15 +255,27 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
 7. **PPFA citation (A-043).** "6 Aug 2025 proclamation" against our
    verified *Gazette No. 53182, 18 Aug 2025*. Figures agree; provenance
    does not.
-8. **Palettes.** A-049 introduces a fourth (`#040c30` / `#795907`).
-   Canonical remains corporate `#13244A`/`#C9A227` and EC OS product
-   tokens `#1A2246`/`#B7913F`.
+8. **Palettes — now five.** A-049 introduced a fourth
+   (`#040c30` / `#795907`); A-085 adds a fifth
+   (`#1A253A` / `#722226` / `#C0A062`). Canonical remains corporate
+   `#13244A`/`#C9A227` and EC OS product tokens `#1A2246`/`#B7913F` —
+   but five is past the point where a default holds. **Needs a decision,
+   not a reconciliation** (§12.3).
+9. **The public-facing domain, in three spellings.** `electioscos.co.za`
+   is registered and is what `publicDomain.ts` guards. A-084's footer
+   and A-090 each use a different one (§12.3). The corporate site is
+   outside this repo, so no guard can catch it.
 
 ## 6. What must not be carried forward
 
 - **The NW405 32-ward "correction"** (§1). Wrong provenance; fails the
   statutory ward-seat test; now contradicted by MDB Gazette 8929.
 - **PPFA R80k/R100k/R15M** (A-041, A-042 §2.1). Superseded.
+- **A disclosure threshold of R100,000** (A-090's default input value).
+  Same superseded figure, third artefact. Current law is R200,000.
+- **`electioncampaignos.co.za` and `electioncos.co.za`** as the product's
+  address (A-084, A-090). The first is in `SUPERSEDED_DOMAINS`; the
+  second was never ours.
 - **PSP figures of R7,515 / "under 1%"** (A-020, A-021).
 - **"Cumulative cash dips negative in December"** (A-021).
 - **The fork as a merge source** (§3). Donor tree only.
@@ -353,9 +383,16 @@ A-078 | repeats of A-033/035/036/037/039 and the research skill | — | **DUP** 
 | 8 (28 Oct) | 2 | 2 |
 | 9 (28 Oct) | 10 | **0** |
 | 10 (28 Oct) | 20 | 13 |
-| **total** | **126** | **79** |
+| 11 — voters' roll (28 Oct) | 31 | 31 |
+| 12 (28 Oct) | 14 | 10 |
+| **total** | **171** | **120** |
 
-Redundancy is running at **38%**. The pattern is consistent: the same
+The 31 roll PDFs are 31 distinct hashes — no duplicates in that batch,
+which is what you would expect from a machine-generated per-VD export
+rather than a human re-sending a folder.
+
+Redundancy is running at **30%**, down from 38% — the roll batch, being
+all-new, moved the ratio on its own. The underlying pattern is unchanged. The pattern is consistent: the same
 corpus re-exported from several conversations. Hash-keying is doing real
 work — four copies of one HTML file, three each of the base report, the RD
 report, the Ventersdorp CSV, the research skill, the settings-modules zip,
@@ -752,6 +789,14 @@ one is in `1..34`, matching the proclaimed count.
 **The join key for any roll ingestion is this ward ID**, not a bare ward
 number and not the candidate file's ward-row column.
 
+> **A fourth confirmation, and it closes in both directions.** A-087
+> reaches the identical rule from the other end — "`NW405-W31` comes from
+> the last 3 digits of IEC ward ID `64005031`" — and files it as *derived,
+> pending MDB confirmation*. The proclaimed-delimitation work in §10 and
+> the gazette citation in §7 are that confirmation. Two conversations
+> derived the same mapping independently and each held the other's missing
+> half; the open item can be closed on both sides.
+
 ### 11.3 The segments reconcile — where they are complete
 
 Multi-part files each carry their own header, which makes the control
@@ -791,19 +836,206 @@ verification status with no bearing on eligibility, or something
 operationally significant. Confirm with the IEC before any figure
 derived from it reaches a campaign.
 
+> **Partial answer arrived in batch 12, from a second conversation —
+> corroboration, not confirmation.** `CLAUDE_CODE_BRIEF.md` (A-087, §12.1)
+> reports a complete parse of the same roll in which **50,400 of 52,176
+> rejections carry the reason "Deceased"** — 96.6% of them. That would
+> make the category overwhelmingly a roll-hygiene status, not an
+> eligibility judgement, and it would explain a township/suburb spread as
+> an age-profile artefact rather than anything operational.
+>
+> It does **not** close the item. It is a figure parsed from the same PDFs
+> by another run of the same kind of process I ran, not a statement from
+> the IEC, and two independent parses agreeing proves the parser, not the
+> meaning. The question put to the IEC is unchanged; this only narrows
+> what the likely answer is.
+
 ### 11.5 What this upload is not
 
 - **Partial.** 21 VDs of NW405's roughly 108, and only 7 of those 21
   have a control sheet.
+
+  > **Amended by batch 12.** A-087 describes a complete parse of **347
+  > PDFs → 106 VDs, 184,139 roll entries, 34 wards `64005001`–`64005034`,
+  > all 106 reconciling**. So the full dataset exists, in another
+  > conversation's working tree. **Ask for it; do not rebuild it** —
+  > re-deriving it here would mean handling the whole certified roll a
+  > second time for no gain, which is the opposite of what §11.1 says to
+  > do with personal information at this scale.
 - **Not a test of the composite key.** Every VD here maps to exactly one
   ward, and no voting station spans two. The `wardCode::vdCode`
   composite that exists because 26 of 108 NW405 stations split across
   wards is **not exercised** by this sample, so it remains unverified
   against real data.
 - **Not loadable yet.** Beyond the POPIA question, the per-ward
-  registered-voter figures that remain item 3 in §5 are still missing —
+  registered-voter figures that remain item 0 in §5 are still missing —
   the roll gives per-VD counts, and rolling those to wards needs the
   complete VD set, not 21 of 108.
+
+---
+
+## 12. Batch 12 (28 Oct, 14 files) — the corporate site, and a complete roll parse
+
+ID | Asset | Hash | Kind | Disposition | Note
+---|---|---|---|---|---
+A-084 | `Innovation_Consult_Site_Preview.md` | `64b24b06` | rendered corporate home page | **KEEP — but see §12.3** | **DEFECT:** footer links `electioncampaignos.co.za`, which `SUPERSEDED_DOMAINS` exists to catch |
+A-085 | `Corporate_Website_Technical_and_Design_Architecture_White_Paper.md` | `29734624` | architecture white paper, ADR-01…ADR-10 | **RECONCILE** | Astro + Cloudflare, `innovationconsult.co.za`. A **fifth** palette — §12.3 |
+A-086 | `Corporate_Website_…_White_Paper.docx` | `2f26aea6` | same paper, Word | **DUP of A-085** (format variant) | not separately read |
+A-087 | `CLAUDE_CODE_BRIEF.md` (IC-ECOS-DATA-2026-02) | `de2d5bae` | voters'-roll parse brief | **KEEP — highest value in the batch** | §12.1 |
+A-088 | `Election.docx` | `51ab0aca` | Cloudflare Worker, edge proxy for Firebase Hosting | **RECONCILE** | §12.4 |
+A-089 | `Firebase.docx` | `70e38696` | Remote Config fetch-discipline skill | **RECONCILE** | §12.4 |
+A-090 | `Election-COS_Demo.html` | `5f8d55dc` | single-file product demo | **REFERENCE — do not ship** | **two DEFECTS:** domain `electioncos.co.za`; PPFA threshold defaults to **R100,000**. §12.2 |
+A-091 | `Election-COS_Demo.md` | `8c7df7db` | the demo's script | **REFERENCE** | same `electioncos.co.za`; figures R14,000 / R45,000 are illustrative |
+A-092 | `JB_Marks_…_2016-2026_…_Forecasting_Base_Report.md` | `6729ceff` | 175-line base report | **SUPERSEDED by A-033** | **not** the fabricated draft; an earlier *honest* one. §12.5 |
+A-093 | `Sourcing_Ward-Level_Data_…_NW405.md` | `029b87cc` | data-sourcing method report | **KEEP** | records *how* the ward data was finally obtained — the provenance trail behind A-033 |
+A-094 | `Mahikeng_Local_Municipality_NW383_…_2026_LGE_Outlook.md` | `fb2e7ad7` | second-municipality report | **KEEP — first non-NW405 asset** | §12.6 |
+A-095 | `api-contract.md` | `948ec0db` | — | **DUP of A-056** (fourth copy) | identical |
+A-096 | `municipal-electoral-research.skill` | `e6348492` | — | **DUP of A-048** | identical |
+A-097 | `ecos-settings-modules.zip` | `64094709` | — | **DUP of A-053** (fourth copy) | identical; 12 files in 3 modules |
+
+Four of fourteen are exact re-uploads. Nothing in this batch needed a new
+hash family — the register is doing its job.
+
+### 12.1 A-087 is the most consequential document received so far
+
+It documents a **complete** parse of the certified roll §11 only sampled:
+
+```
+347 PDFs → 106 VDs → 184,139 roll entries → 34 wards, 64005001–64005034
+131,963 verified · 52,176 rejected · 82,607 distinct address points
+All 106 VDs = PASS
+```
+
+Three things follow, and they are recorded against §11 above rather than
+restated here:
+
+1. **It confirms the ward-ID rule a fourth time**, independently, and
+   flags it as needing exactly the MDB confirmation our §7/§10 work
+   already supplies. Both halves now exist. (§11.2)
+2. **It narrows the rejection question** — 50,400 of 52,176 rejections
+   read "Deceased". Corroboration from a second parse, not an IEC
+   statement. (§11.4)
+3. **The full dataset exists; ask for it rather than rebuild it.** (§11.5)
+
+**Its own POPIA rule is ours, arrived at separately.** The brief states
+plainly: do not write the roll into `voter` or `household`, because
+`trg_popia_consent_check` blocks unconsented rows and *"setting the flag
+to TRUE to get past the trigger would falsify the consent record the whole
+compliance design rests on."* That is the same reasoning §11.1 gives for
+reading page 1 only. **[U]** Two conversations reaching it independently
+is encouraging but is not a lawful basis; §11.1's open question stands.
+
+**It targets the fork's stack, not ours** — PostgreSQL 16.15 + PostGIS
+3.4 and `rls-tenancy-migrations.sql`. The *finding* ports; the migration
+does not.
+
+**It flags its own reconciliation failure, which is the right instinct.**
+IEC registration statistics for NW405 do not agree internally: **132,133
+vs 131,963 vs a ward table summing to 119,099**. None of the three is the
+gazetted 122,059 baseline. Four numbers now claim to be "registered voters
+in NW405", and **no campaign-facing figure may be derived from any of them
+until that is resolved.** This goes to §5 as a blocker, not a note.
+
+### 12.2 A-090 would publish two wrong numbers if it shipped
+
+The demo is a self-contained HTML page and is good at what it is for. It
+also carries two values that contradict verified law and verified
+registration:
+
+| field | demo | verified |
+|---|---|---|
+| disclosure threshold | `value="100000"` | **R200,000** — Gazette No. 53182, 18 Aug 2025 |
+| product domain | `electioncos.co.za` ×3 | **`electioscos.co.za`** — `src/config/publicDomain.ts` |
+
+The threshold is a user-editable input labelled "set to the current
+regulation", so a demo audience would reasonably read the default *as*
+the current regulation. It is the same superseded-PPFA-figure defect
+already recorded against A-042, in a third artefact.
+
+Credit where due: its seat calculator is labelled *"Illustrative model,
+not an official IEC seat calculation"* — which is exactly the disclosure
+discipline the build rules require, and it is the only uploaded demo
+artefact that carries one.
+
+### 12.3 Three domains and five palettes
+
+`publicDomain.ts` draws one line: the product is served from
+`electioscos.co.za`, the company publishes from `innovationconsult.co.za`,
+and `electioncampaignos.co.za` was planned, never registered, and is
+guarded against. This batch crosses that line twice:
+
+- **A-084's footer** links `electioncampaignos.co.za` — a name our own
+  guard test fails the build over. The corporate site preview is outside
+  the repo, so the guard cannot see it. **It is still wrong, and it is
+  the one place a prospect would click.**
+- **A-090** uses a third spelling that belongs to nobody we know.
+
+**A-085 adds a fifth palette.** `#1A253A` / `#722226` / `#C0A062` matches
+neither the EC OS tokens nor `docs/innovation-consult-brand.md` nor the
+A-049 briefing page. **[U]** Five palettes across four artefacts is not a
+design decision anyone made; it is four conversations each picking one.
+Somebody has to say which is the brand — that is a call for the user, not
+a reconciliation I can perform.
+
+### 12.4 A-088 / A-089 — good engineering, wrong origin
+
+Both are competent and both are worth keeping as technique:
+
+- **A-089 (Remote Config):** `activate()` from cache on boot (0 ms),
+  `fetch()` in the background on a 24-hour interval, realtime listeners
+  only in emergency-banner components with explicit teardown. For
+  canvassers on poor signal this is the right shape, and the cost
+  argument behind it is sound.
+- **A-088 (Cloudflare Worker):** edge proxy with HSTS, CSP, frame-deny
+  and a `Permissions-Policy` that closes camera and microphone while
+  leaving `geolocation=(self)` — correct for a canvassing app.
+
+**What does not port:** the Worker hard-codes
+`election-campaign-os-1-v2.web.app` as origin; ours is
+`election2026-campaignms7-0.web.app` (`HOSTING_ORIGIN`). And it puts
+Cloudflare in front of Firebase Hosting, which is an architecture
+decision nobody in this repo has taken — our Functions are pinned
+`africa-south1` for data-residency reasons that an edge proxy interacts
+with. **[U]** Adopt the two techniques; do not adopt the topology without
+deciding it.
+
+### 12.5 A-092 is superseded, and the way it is superseded matters
+
+It is **not** one of the fabricated drafts A-033 corrects — it invents
+nothing and says so where it cannot verify: *"verified IEC ward-by-ward
+vote counts for all 34 wards … could not be retrieved."* A-033 is the
+same work after that gap closed, with primary station-level IEC data.
+
+The two agree everywhere they overlap — 67 seats, 34 wards, ANC 34→33,
+DA 22→17, FF+ 4→9 — so this is confirmation, not conflict. Two figures
+it carries that A-033 does not foreground, and that are worth keeping:
+**registered voters 116,321 (2016) → 113,218 (2021)**, and **turnout
+57.58% → 45.81% on the PR ballot**.
+
+That trajectory is the fourth number problem from §12.1 seen from
+another angle: 116,321 → 113,218 → a gazetted 2026 baseline of 122,059.
+A rise of ~8,800 after a fall of ~3,100. Not impossible — the baseline is
+a different vintage and a redelimited area — but **it is a reconciliation
+nobody has done**, and it belongs beside the 132,133 / 131,963 / 119,099
+spread rather than being treated separately.
+
+One date to reconcile: A-092 cites the MDB gazette as **18 November
+2025**; §7 records the delimitation we build on. Same board, possibly
+different instruments. Check before either date is printed.
+
+### 12.6 A-094 is the first evidence the work generalises
+
+Every electoral asset in this register until now has been NW405. This is
+NW383 Mahikeng, built to the same structure. That matters commercially
+more than it matters technically: it is the first demonstration that the
+research method is a repeatable product rather than one municipality's
+case study, and A-093 is the method write-up that would let someone else
+run it.
+
+**It also makes the six-vs-seven roles and the two build-spec versions
+more urgent, not less.** A second municipality means a second tenant, and
+every unresolved ambiguity in the register gets multiplied by the number
+of tenants before it gets resolved.
 
 ---
 
