@@ -294,8 +294,11 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
   build baseline. `ppfaDefaults.ts` is correct; do not let A-102 overwrite
   it.
 - **`electioncampaignos.co.za` and `electioncos.co.za`** as the product's
-  address (A-084, A-090). The first is in `SUPERSEDED_DOMAINS`; the
-  second was never ours.
+  address (A-084, A-090, A-129). The first is in `SUPERSEDED_DOMAINS` and
+  has no DNS record. The second **is a live registration** — §23.4
+  withdraws the earlier "never ours", which was not established — but it
+  is not `APP_DOMAIN`, and three spellings in circulation is the defect
+  whoever owns them.
 - **`Election_Campaign_OS_Business_Plan_v2.docx`** (A-114, §19.4). Its
   "v2.0" is its own version number, dated 20 July — nineteen days before
   the V2 artefact set — so it is **not** artefact 02-V2. It carries
@@ -2342,6 +2345,182 @@ with Cloud Functions pinned `africa-south1` — it has no containers and
 needs none. A compose file for FastAPI + Redis + Postgres belongs with
 the stack it orchestrates, whenever that stack acquires a repository.
 Registered here; **not added to the tree.**
+
+---
+
+## 23. Batch 23 (28 Oct, 1 paste) — the nginx front end
+
+A-129 | pasted `nginx.conf` server block | not in the upload store | **RECONCILE — do not deploy as written**
+
+This is the step §20.3 and §22.3 were about. The relay's missing
+authentication stopped being theoretical when a compose file published
+its port; this terminates TLS in front of it and puts it on the public
+internet.
+
+### 23.1 `/api/` publishes the debit endpoint to the world
+
+```nginx
+location /api/ { proxy_pass http://api-gateway:3000; }
+```
+
+That is the Node gateway, and the gateway is where
+`/api/v2/metering/debit` lives — the endpoint the relay posts to with a
+caller-supplied `tenantId`, `actorId` and `actorName`. Proxied like this,
+**anyone on the internet can POST debits naming any tenant**, in a loop,
+and the metering audit trail will record whichever `actorName` they
+chose. A party's token wallet is drained by a stranger and the log blames
+a named member of their own staff.
+
+`/ws/` has the same defect one step removed: the relay still takes
+`tenant_id` and `actor_id` from the URL path, so the WebSocket is a
+token-spending endpoint with no caller identity.
+
+There is no `auth_request`, no JWT verification, no `limit_req` and no
+`limit_conn` anywhere in the block. With `proxy_read_timeout 3600s` and
+no connection limit, one client can also hold unbounded hour-long
+streams.
+
+**Nothing else in this file matters until an `auth_request` sits in front
+of both locations** — or, better, until the relay and gateway derive
+identity from a bearer token and stop trusting the path and the body.
+
+### 23.2 It cannot obtain or present a valid certificate
+
+Three separate problems, all checkable:
+
+| | |
+|---|---|
+| `server_name api.electioncos.co.za` | **no DNS record** — resolved today, nothing returned |
+| `ssl_certificate …/live/electioncos.co.za/fullchain.pem` | the **apex**, against a subdomain `server_name` |
+| no `listen 80` block | no HTTP→HTTPS redirect and **no ACME `http-01` location** |
+
+A certificate issued by a plain `certbot certonly -d electioncos.co.za`
+does **not** cover `api.electioncos.co.za`, so every client would get a
+name mismatch even if the host resolved. It needs both names on one
+certificate (or a wildcard), an A record for `api.`, and a port-80 server
+block for webroot renewal — or a DNS-01 challenge instead.
+
+### 23.3 TLS and nginx hygiene
+
+- **No `ssl_protocols`, `ssl_ciphers`, or `ssl_session_cache`**, so the
+  policy is whatever this nginx build defaults to. §12.4 credited A-088's
+  Cloudflare Worker for getting HSTS right; this drops it entirely, along
+  with the rest of the security headers that Worker set.
+- `listen 443 ssl;` with **no `http2`** and no IPv6 `listen [::]:443`.
+- `proxy_set_header Host $host` passes the client's Host through to a
+  Node app — fine if the upstream ignores it, a Host-injection surface if
+  it builds links or cache keys from it.
+- No `proxy_connect_timeout` on `/ws/`, no timeouts at all on `/api/`.
+- **nginx is a fourth service that §22's compose file does not define**,
+  yet it addresses `voice-relay` and `api-gateway` by their compose
+  service names, so it is expected to run on `ecos-net`.
+
+### 23.4 Correcting myself on `electioncos.co.za`
+
+§12.3 and §6 say this domain "was never ours". **I could not support
+that, and DNS partly contradicts it:**
+
+```
+electioncos.co.za         169.239.218.58     ← resolves, a live registration
+api.electioncos.co.za     no record
+electioscos.co.za         no record          ← APP_DOMAIN
+electioncampaignos.co.za  no record          ← SUPERSEDED_DOMAINS, consistent
+innovationconsult.co.za   172.67.193.15      ← resolves
+```
+
+The accurate statement is: `electioncos.co.za` **is a live registration
+and is not what `publicDomain.ts` names.** Whether it belongs to
+Innovation Consult is not established here and is a question for the
+user, not an inference from an A record. The do-not-carry entry stands on
+the narrower ground that it is **not `APP_DOMAIN`** — three spellings in
+circulation is the problem, regardless of who owns which.
+
+### 23.5 And a finding about this build, not theirs
+
+**`APP_DOMAIN` — `electioscos.co.za` — has no DNS record today**, and
+`HOSTING_ORIGIN` (`election2026-campaignms7-0.web.app`) returns **404**.
+So nothing is deployed and nothing is reachable at either address.
+
+That is not a defect: `publicDomain.ts` anticipated exactly this, which
+is why the launch card prefers `APP_ORIGIN` and falls back to the hosting
+origin — *"so the link goes live the moment either answers."* Neither
+answers yet. It belongs beside §5's deploy blockers as the current state
+of the world, and it means **the domain needs an A record before launch,
+not just a deploy**.
+
+---
+
+## 24. Batch 24 (28 Oct, 3 files) — the Dockerfile, and an image that cannot build
+
+ID | Asset | Hash | Disposition
+---|---|---|---
+A-130 | `docker-compose_yml.docx` | `4b4ab24d` | **RECONCILE** — §22's compose file plus two new artefacts |
+A-131 | `gemini-code-…4744334.py` | `45909fc3` | **DUP of A-126** — byte-identical |
+A-132 | `gemini-code-…4726484.yaml` | `b475e96a` | **DUP of A-127** — byte-identical |
+
+The compose YAML inside A-130 is the one reviewed in §22. New are a
+`Dockerfile.voice` and a `requirements.txt`.
+
+### 24.1 The image cannot be built
+
+```
+google-genai==0.1.1
+```
+
+**That version was never published.** PyPI's `google-genai` 0.x line runs
+`0.0.1, 0.1.0, 0.2.0, 0.2.1, 0.2.2, 0.3.0 …` — there is no `0.1.1`, and
+the current release is **2.33.0 (23 Oct 2026)**. So
+`pip install --no-cache-dir -r requirements.txt` fails with *no matching
+distribution*, and `docker build -f Dockerfile.voice` aborts on that
+layer.
+
+§22 reported that the compose file's `voice-relay` had no image. It has
+one now, and it still cannot be built — and even corrected to a real
+version, a 0.x pin is two major versions behind the library whose Live
+API (`aio.live.connect`, `LiveConnectConfig`, `PrebuiltVoiceConfig`) the
+relay calls.
+
+### 24.2 Four more in the Dockerfile
+
+- **It runs as root.** No `USER` directive, so uvicorn serves as root in
+  a container that §23's nginx publishes to the internet.
+- **`build-essential` is installed and never removed.** A compiler
+  toolchain stays in the production image; this wants a multi-stage build
+  with the wheels built in the first stage.
+- **`COPY main.py .`** copies one file. The relay has never been called
+  `main.py` anywhere in this corpus, and the moment it becomes two
+  modules the image silently ships a broken app.
+- **No `HEALTHCHECK`**, so §22's `restart: unless-stopped` has nothing to
+  test and will loop a crashing container.
+
+### 24.3 The matched pair: nginx sets headers uvicorn is told to ignore
+
+`uvicorn main:app --host 0.0.0.0 --port 8000` — **no `--proxy-headers`,
+no `--forwarded-allow-ips`.**
+
+§23's nginx block carefully sets `X-Real-IP`, `X-Forwarded-For` and
+`X-Forwarded-Proto`. This uvicorn discards all three, so every request
+logs with the proxy's address. For a per-tenant **metered** service whose
+identity is already caller-asserted from the URL path, that removes the
+last network-level attribution there was: a drained wallet would have no
+client IP in the record either.
+
+### 24.4 A fourth domain, and it is the corporate one
+
+A-130 closes by offering an nginx config to route `wss://` from
+**`api.innovationconsult.co.za`**. The config actually pasted (§23) uses
+**`api.electioncos.co.za`**. That is a fourth spelling, and this one is
+the **corporate** domain, which `publicDomain.ts` keeps deliberately
+apart:
+
+> *"The corporate domain, which is a different thing and stays where it
+> is. Innovation Consult publishes from `innovationconsult.co.za`; the
+> product is served from `APP_DOMAIN`."*
+
+Putting the product's WebSocket relay on the corporate host collapses a
+separation the build makes on purpose. **The offer is already answered:
+§23 reviewed an nginx config for this relay** — on a different host than
+the one proposed here, which is itself the point.
 
 ---
 
