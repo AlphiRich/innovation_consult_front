@@ -2920,5 +2920,91 @@ says so specifically, rather than lumping it together with Firestore.
 
 ---
 
+## 29. The DNS audit document — four corrections
+
+A-139 | `dns_architecture_deployment_audit.md` | **KEEP, after the corrections below**
+
+The zone table is accurate — it matches what was resolved independently
+(Cloudflare NS, proxied apex and `www`, grey-clouded `app` CNAME, no CAA,
+`v=spf1 -all`). The CAA omission policy is right and for the right
+reason. Four specifics are wrong, and three of them are the kind that
+only surface after someone acts on them.
+
+### 29.1 The HSTS value is wrong, and the risk it describes does not exist
+
+| | |
+|---|---|
+| document §2.2 | `max-age=63072000` (730 days) |
+| **actually served** | `max-age=15552000` (**180 days**) |
+
+The preload list requires **`max-age` ≥ 31536000** (one year). At 180
+days the apex carries the `preload` directive but **is not eligible for
+the preload list** — the directive is inert. So §2.2's "permanent
+constraint that requires long lead times to reverse" is not a commitment
+currently in force.
+
+That cuts both ways and the document should say which is intended:
+either raise `max-age` to a year and accept the commitment deliberately,
+or drop `preload` so the header stops advertising an intent the value
+cannot support. Carrying `preload` at 180 days is the one combination
+that means nothing.
+
+### 29.2 `public/index.html` does not exist in this repository
+
+The document cites it twice as "Repository Source". The landing page is
+at the **repository root** — `index.html`, 21,571 bytes, 563 lines. There
+is no `public/` directory here; `public/` is the Cloud Shell placeholder
+folder (`~/electioncos-firebase/public/`, one file).
+
+The byte comparison in §2.3 is right. The path is not, and it points at
+the directory holding the *other* page — which is how the wrong file gets
+shipped.
+
+### 29.3 `VITE_USE_EMULATOR` is not the flag
+
+The real one is **`VITE_FIREBASE_USE_EMULATORS`**, set `true` at
+`.env:11` and asserted in `dal/adapters/firestore/client.test.ts`.
+Setting the document's variable name leaves the real flag untouched and
+publishes a build pointed at the local emulator suite — exactly the
+failure `deploy-preflight.mjs` reports and the reason it fails today.
+
+### 29.4 `firebase deploy --only hosting:app` has no target to deploy to
+
+This repo's `firebase.json` hosting block declares **neither `site` nor
+`target`** — `public: dist` and nothing else — so it deploys to the
+project's default site and there is no target named `app`. The command
+fails until someone runs:
+
+```bash
+firebase target:apply hosting app electioncos1-0
+```
+
+and adds `"target": "app"` to the hosting block. That is the deploy-target
+work §28.3 already flagged for a second site; the document assumes it is
+done.
+
+### 29.5 Two smaller notes
+
+**§3.2 undersells its own point.** It describes the canonical
+`firebase.json` as the one "with single-page application rewrites to
+`index.html`". The SPA rewrite is the least important thing in it. The
+reasons to insist on ours are the **six header blocks** — kept in sync by
+`scripts/sync-hosting-headers.mjs` and enforced by `check:headers` in
+`check:all` — and the `/api/** → function api` rewrite. Naming the rewrite
+and not the headers invites someone to conclude any config with an SPA
+rewrite will do, which is how `app.electioncos.co.za` ends up serving
+HSTS and nothing else, as `electioncos1-0.web.app` does today.
+
+**§3.4's orange-cloud cutover is still the one step to think twice
+about.** Proxying `app` through Cloudflare puts a second CDN in front of
+Firebase and moves certificate renewal behind it. Full (Strict) works
+while the Firebase origin certificate is valid; the failure mode is a
+renewal that quietly does not happen months later, which presents as an
+outage with no recent change to blame. Grey is not a limitation to
+outgrow here — it is the configuration that lets Firebase keep its own
+certificate working.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
