@@ -108,6 +108,42 @@ describe('the uploaded DHA integration scheme', () => {
     // The check digit it should have carried.
     expect(saIdCheckDigit(sample.slice(0, 12))).toBe(8);
   });
+
+  /**
+   * Session 38. A second DHA artefact set arrived — an OpenAPI spec and a
+   * Python validator — carrying this *same* invalid sample, now in the
+   * spec's `example:` field as well as the code's docstring. The arithmetic
+   * in that validator is right (it agrees with a plain Luhn pass over
+   * 200 000 random payloads), but it resolves the century like this.
+   */
+  function schemeCenturyRule(yy: number, now: Date): number {
+    const currentYy = now.getFullYear() % 100;
+    return yy > currentYy ? 1900 + yy : 2000 + yy;
+  }
+
+  it('resolves the century against the current year, which moves a birth date a hundred years', () => {
+    // Born 1 January 1927. Read correctly in 2026, and then the calendar
+    // turns over and the same thirteen digits mean 2027: the record ages
+    // backwards by a century with no edit, no error and no migration.
+    expect(schemeCenturyRule(27, new Date('2026-06-01T00:00:00Z'))).toBe(1927);
+    expect(schemeCenturyRule(27, new Date('2027-06-01T00:00:00Z'))).toBe(2027);
+
+    // And it already reads a 1926-born pensioner as an infant.
+    expect(schemeCenturyRule(26, new Date('2026-06-01T00:00:00Z'))).toBe(2026);
+
+    // This module never pivots on today's date. It reports every reading
+    // that has actually happened and makes the caller choose, so the same
+    // number means the same thing in 2026 and 2027.
+    const body = '270101' + '5009' + '0' + '8';
+    const id = body + saIdCheckDigit(body);
+    const inThisYear = parsed(id, new Date('2026-06-01T00:00:00Z')).possibleBirthDates;
+    const inNextYear = parsed(id, new Date('2027-06-01T00:00:00Z')).possibleBirthDates;
+    expect(inThisYear).toEqual(['1927-01-01']);
+    expect(inNextYear).toEqual(['2027-01-01', '1927-01-01']);
+    // The 1927 reading is never withdrawn — the later year only adds a
+    // second possibility, it does not replace the first.
+    expect(inNextYear).toContain(inThisYear[0]);
+  });
 });
 
 describe('what the number encodes', () => {

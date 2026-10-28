@@ -3333,5 +3333,178 @@ already live.
 
 ---
 
+## §33 — DHA Identity Verification API artefact set, and the counter defect it led to
+
+Session 38. Three artefacts pasted in: `06-OPENAPI-DHA-VERIFICATION.yaml`,
+`07-CODE-LUHN-VALIDATION.py`, and an updated `05-ARTEFACT-INDEX.md`.
+
+### 33.1 This is the session-27 scheme again
+
+`docs/dha-idvs-and-provincial-scale-review.md` already audited *API and
+Integration Scheme for DoHA IDVS* and recorded the disposition: the local
+structural validator was taken (`src/lib/saIdNumber.ts`), and DHA/SITA
+integration, the biometric endpoint, KYC-aggregator fallback, Redis
+caching of verification results and "purge after the transaction" were all
+refused, each for a reason that has not changed.
+
+The new set does not reopen any of those. It wraps the same scheme in an
+OpenAPI document. **That disposition stands and is not re-litigated here.**
+
+The tell is the sample ID. `9001015800086` appears in the OpenAPI spec's
+`example:` field and in the Python docstring — the same invalid number
+that appeared in three example payloads of the session-27 document, and
+that `saIdNumber.test.ts:102` has pinned ever since. Run against the
+artefact's own validator:
+
+```
+validate_sa_id_local('9001015800086')
+  -> {'is_valid': False, 'error': 'Failed Luhn check digit validation.'}
+```
+
+Its check digit should be `8`. **A verification artefact whose own worked
+example fails its own first check, twice, across two independently
+generated document sets.**
+
+### 33.2 The arithmetic is right, and that is worth saying
+
+The check digit code is correct. Verified, not assumed: three formulations
+were run against 200 000 random twelve-digit payloads —
+
+| Formulation | Mismatches vs textbook Luhn |
+|---|---|
+| Textbook Luhn (double every second digit from the right, cast out nines) | — |
+| Ours (`saIdCheckDigit`: even positions concatenated, then doubled) | **0** |
+| The artefact's (each even-position digit doubled separately) | **0** |
+
+All three are the same function. This is an independent third derivation
+of the digit our module computes, which is a genuine corroboration.
+
+### 33.3 Three defects in the validator, each executed
+
+**The century pivots on today's date.** The rule is
+`full_year = 1900 + yy if yy > current_yy else 2000 + yy`. Run:
+
+```
+2701015800080  parsed in 2026 -> 1927-01-01
+2701015800080  parsed in 2027 -> 2027-01-01
+```
+
+The same thirteen digits mean a different century after New Year. A stored
+record ages backwards by a hundred years with no edit, no error and no
+migration. It also reads a person born in March 1926 as born in March
+2026, and accepts `261231…` as a birth date that has not happened yet.
+`saIdNumber.ts` never pivots: it returns `possibleBirthDates`, drops
+future dates, and refuses to choose. Guarded at `saIdNumber.test.ts` —
+"resolves the century against the current year, which moves a birth date a
+hundred years".
+
+**The citizenship digit is not validated.** `citizenship_code == '0'` →
+citizen, *anything else* → "Permanent Resident". Executed across all ten
+digits: `2` through `9` all return "Permanent Resident" on a
+check-digit-valid number. Only `0` and `1` are defined. Ours rejects the
+rest with `UNKNOWN_CITIZENSHIP`.
+
+**Digits 7–10 are labelled `gender`,** and the OpenAPI schema types it
+`gender: {enum: [Male, Female]}`. That field records the sex marker on the
+document. `saIdNumber.ts` names it `sexMarker`, gives it a type that does
+not assign to `CandidateGender`, and a test asserts it never becomes a
+candidate's declared gender. Not a bug in arithmetic; a bug in what the
+number is said to mean.
+
+### 33.4 What conflicts with settled decisions
+
+| In the artefact | Settled position |
+|---|---|
+| `servers: https://api.yourdomain.com/v1` | §30: the API is same-origin at `/api/**` behind a Hosting rewrite, which is what lets `connect-src` stay `'self'` |
+| "SITA vs. Cloud (AWS/Azure) hosting", "SITA-compliant Kubernetes cluster" | §28: Firebase, `electioncos1-0`, `africa-south1`, settled four ways |
+| "implement a middleware (e.g. in Redis)" | Already refused in the session-27 review: wrong stack, and it would cache special personal information |
+| Full unmasked 13-digit IDs in request and response bodies | §11.1/§13.1 hold the line that no unmasked ID leaves the record; `maskSaIdNumber` reveals four digits; `unmaskCandidateIdNumber` is `@deployable fails-closed` pending a KMS key |
+
+None of these are taken. The POPIA posture is the material one: this
+product does not today transmit an unmasked ID number anywhere, and an
+integration that does is the decision recorded as still open at the end of
+the session-27 review — *"whether this product should hold verified
+identity data at all"* — needing a DPIA, an accreditation route and a
+rewrite of LEG-01 and LEG-02. That is a decision for the client, not a
+build item, and nothing here presumes it.
+
+### 33.5 What was taken: the quota endpoint, pointed at a real defect
+
+The one genuinely new idea is `/quota/usage` and the note that a counter
+has to be maintained per scope per week. It does not apply to DHA queries
+— there are none — but it sent me to the counters this build *does* keep,
+and there was a defect there.
+
+**`functions/src/warRoomCounters.ts` double-counted on redelivery.**
+Firestore triggers are at-least-once; `FieldValue.increment` is not
+idempotent. A redelivered event added its delta a second time —
+permanently, because nothing in this product recomputes these counters
+from the collections, and invisibly, because a wrong voter total looks
+exactly like a right one. This is a `@deployable yes` function.
+
+Fixed: each event now writes a marker document and the increment inside
+one transaction, so a redelivery is a no-op. The transaction's *read set*
+is the marker alone, which is unique to one event, so two concurrent
+events never contend; the counter is write-only in the transaction, still
+as commutative increments. That preserves the no-lost-update property the
+original design was built around rather than trading it away.
+
+Three guards, each proved by injection and reverted clean:
+
+| Injected defect | Test that failed |
+|---|---|
+| `markerExists` short-circuit removed | *applies a redelivered event once, not twice* |
+| hash dropped from the marker document id | *is a legal Firestore document id…*, *separates two event ids that sanitise to the same string* |
+| tenant dropped from the marker path | *keeps one tenant from suppressing another tenant* |
+
+The document id matters in the dangerous direction: a CloudEvent id may
+contain `/`, which Firestore forbids, and sanitising alone collides, which
+does not double-count — it silently *drops* a real event and leaves the
+counter low. So the id is a readable prefix plus a hash of the untouched
+event id.
+
+**Two operational notes, because neither can be checked from here:**
+
+- Markers carry `expireAt` for a **Firestore TTL policy on
+  `tenants/{tenantId}/counterEvents`**, which must be configured on the
+  project. It is not expressible in `firebase.json` and the preflight
+  cannot see it. Without it the collection grows forever — never wrong,
+  only expensive. 30 days, against Firestore's 7-day retry window.
+- `firestore.rules` now denies that collection explicitly. The
+  `/tenants/{tid}/{document=**}` default-deny already covered it; it is
+  written out so a reviewer does not have to derive it.
+
+### 33.6 A gate that was not running
+
+Found while adding the tests above: **`npm run check:all` never ran the
+Cloud Functions test suite.** The root vitest config excludes
+`functions/**`, the functions package has its own vitest, and nothing
+invoked it. The "1 010 tests green" figure quoted in §28–§32 did not
+include a single one of `warRoomCounters.test.ts`'s assertions — the tests
+guarding the only `@deployable yes` triggers in the build.
+
+`check:all` now ends `&& npm run test:functions`. The CI workflow already
+runs `npm ci --prefix functions` before `check:all`, so this needed no
+workflow change — it was one missing word in a script.
+
+Rule 5 again: present is not correct. A test file existed, passed, and
+guarded nothing, because nothing ran it.
+
+### 33.7 Disposition
+
+**Take:** the check-digit corroboration (recorded, no code change); the
+quota-counter idea, which became the idempotency fix.
+
+**Do not take:** the OpenAPI spec, the Python validator, the sample ID,
+the SITA/AWS hosting question, the Redis middleware, the `api.yourdomain.com`
+origin, the `gender` field name.
+
+**Do not act on:** `08-POPIA-DPIA-DHA-Integration.pdf` listed as *Pending*.
+A DPIA is not a build artefact and is not drafted here (rule 3). The brief
+of what it must cover is in
+`docs/dha-idvs-and-provincial-scale-review.md` §1.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*

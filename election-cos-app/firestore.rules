@@ -284,6 +284,17 @@ service cloud.firestore {
       allow write: if false; // Cloud Functions (admin SDK) only
     }
 
+    // One marker per counter trigger event, so an at-least-once redelivery
+    // cannot increment a counter twice (functions/src/warRoomCounters.ts).
+    // The default-deny above already covered this; it is written out so a
+    // reviewer does not have to derive it, and so that nobody "fixes" the
+    // read by granting one. Nothing on the client reads these, ever: a
+    // client that could read them could also infer write activity in wards
+    // it has no scope for. They expire by TTL policy on `expireAt`.
+    match /tenants/{tid}/counterEvents/{eventDocId} {
+      allow read, write: if false; // Cloud Functions (admin SDK) only
+    }
+
     // ---- audit log — append-only, written by Cloud Functions --------------
 
     match /tenants/{tid}/auditLog/{eventId} {
