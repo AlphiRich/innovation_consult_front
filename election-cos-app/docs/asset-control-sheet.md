@@ -3649,5 +3649,176 @@ on the screen rather than approximated.
 
 ---
 
+## §35 — WhatsApp OTP membership verification service
+
+Session 38. A Cloud Run boilerplate pasted in: `main.py` (Flask + psycopg2
++ Meta Graph API), a `Dockerfile`, `requirements.txt`, and four
+integration notes. It closes by offering either the `GET` handler for
+Meta's webhook verification or the SQL migration for
+`membership_capture_log`.
+
+**Neither is the next thing to write.** Both would help deploy a service
+that, as written, lets a stranger mark any member VERIFIED. Everything
+below was executed, not read.
+
+### 35.1 The webhook authenticates nobody
+
+The handler's first line is `data = request.get_json()`. There is no
+signature check anywhere in the file. Meta signs every delivery with an
+HMAC-SHA256 of the raw body under the app secret, in
+`X-Hub-Signature-256`, and this endpoint never reads the header.
+
+A Cloud Run URL is not a secret — it is in TLS certificate transparency
+logs the moment it is provisioned. So anyone who finds it can POST a reply
+as any phone number. **This is an authentication bypass on an identity
+verification system**, and it is the finding that makes the other eleven
+secondary.
+
+### 35.2 The OTP hash is the §18.2 and §32.4 mistake, a third time
+
+```python
+input_hash = hashlib.sha256(f"{body}:salt_from_db".encode()).hexdigest()
+```
+
+`salt_from_db` is a **literal**, not a variable — despite the name. Every
+OTP in the system is hashed under the same five-word constant.
+
+Run against a 6-digit code: **the OTP was recovered in 0.67 s** by
+exhausting 482 916 candidates on one core; the whole keyspace takes about
+1.4 s. The salt stops a rainbow table and nothing else.
+
+Third time in this register that a fast hash is used where a slow KDF is
+the entire point — hashed ID numbers (§18.2), the IEC-export PIN (§32.4),
+and now this. The remedy is the same each time: scrypt, argon2 or bcrypt,
+plus attempt throttling, which this service also does not have — it
+*logs* failures and never *counts* them.
+
+### 35.3 One typo locks the member out for good
+
+The worst defect, and invisible on a read-through. The SELECT is:
+
+```sql
+JOIN ecos.membership_otp_audit moa ON mcl.capture_id = moa.capture_id
+ORDER BY moa.created_at DESC LIMIT 1
+```
+
+`membership_otp_audit` holds **both** the OTP challenge *and* the attempt
+log. Every failed attempt inserts a row with no `otp_hash`. That row is
+then the most recent for the capture, so the next lookup reads
+`otp_hash = NULL` — and the correct code can never match again.
+
+Simulated in sqlite with the boilerplate's own statements:
+
+```
+attempt 1 — wrong          -> stored_hash=f3d506385010…  match=False
+attempt 2 — CORRECT code   -> stored_hash=NULL           match=False
+attempt 3 — CORRECT code   -> stored_hash=NULL           match=False
+final status: PENDING_OTP
+```
+
+Note 4 of the upload presents this very `ORDER BY … LIMIT 1` as the
+idempotency guarantee. It is the opposite: it is the bug.
+
+### 35.4 The expiry branch cannot run
+
+```python
+if expires_at < time.time():
+```
+
+psycopg2 returns a PostgreSQL `timestamp` as `datetime.datetime`.
+Executed: `TypeError: '<' not supported between instances of
+'datetime.datetime' and 'float'`. That is caught by the bare
+`except Exception` and returned as a 500, so **no OTP ever expires** —
+it crashes instead. The source comment, *"Assuming epoch storage or
+convert DB timestamp"*, records that the author did not know which.
+
+### 35.5 Every status callback is a 500, and Meta retries them
+
+The parser assumes `value['messages'][0]['text']['body']`. Run against
+the payload shapes Meta actually delivers:
+
+| Delivery | Result |
+|---|---|
+| a text reply | 200 |
+| a **DELIVERED** status callback | **500** `KeyError: 'messages'` |
+| a **READ** status callback | **500** `KeyError: 'messages'` |
+| member replies with a voice note | **500** `KeyError: 'text'` |
+| member taps a quick-reply button | **500** `KeyError: 'text'` |
+
+Status callbacks arrive for *every message the service sends*. So each OTP
+produces at least two 500s, each of which Meta retries with backoff. This
+is not an edge case; it is the steady state from the first message
+onward. The 500 also echoes `str(e)` back to the caller, which is an
+internals leak on a public endpoint.
+
+### 35.6 Six smaller ones
+
+1. `input_hash == stored_otp_hash` is not constant-time. `hmac.compare_digest`.
+2. `requests.post` has **no timeout**. With `--workers 1 --threads 8`,
+   eight hung calls are an outage.
+3. `get_secret()` runs at **import time**, so a Secret Manager blip is a
+   crash loop rather than an unhealthy container — and `/health` can never
+   report it, because the process never starts.
+4. `python:3.9-slim`. Python 3.9 reached **end of life on 2025-10-31**
+   (endoflife.date) — unsupported for a year, receiving no security fixes.
+5. Every pin is from mid-2023. Checked against PyPI today:
+
+   | pinned | released | latest |
+   |---|---|---|
+   | `flask==2.3.2` | 2023-05-01 | 3.1.3 |
+   | `requests==2.31.0` | 2023-05-22 | 2.34.2 |
+   | `gunicorn==21.2.0` | 2023-07-19 | 26.2.0 |
+   | `psycopg2-binary==2.9.7` | 2023-08-05 | 2.9.13 |
+   | `google-cloud-secret-manager==2.16.2` | 2023-07-05 | 2.31.0 |
+
+6. `COPY . /app` **before** `pip install` busts the layer cache on every
+   code change, and copies whatever is in the build context — including a
+   stray `.env` — into the image.
+
+### 35.7 What is sound
+
+- **The SQL is parameterised.** `%s` with a tuple throughout, on a value
+  that comes straight off an unauthenticated webhook. No injection.
+- **Secrets come from Secret Manager at runtime, not from the image.**
+  Note 3 is right and matches §10.
+- **Note 1 is right**: the `GET` / `hub.challenge` handler is genuinely
+  missing and Meta will not activate the webhook without it.
+- **Note 2 is right**: E.164 normalisation belongs upstream of storage.
+  `src/lib/phone.ts` already does this for ZA numbers.
+
+### 35.8 Architecture, and the question that has not been asked
+
+Flask on Cloud Run, PostgreSQL on Cloud SQL, a `ecos.` schema. This build
+settled on Firebase — Firestore, Cloud Functions, `africa-south1` — in
+§28, and `src/dal/adapters/postgres/` is a README and nothing else. An
+OTP flow here is a callable Cloud Function and a Firestore collection, in
+the region already pinned, under `firestore.rules` and the capability
+model that exists.
+
+The larger point is not the stack. **`extracted_phone` and a capture log
+imply OCR of membership cards**, which is a new class of personal
+information about people who are not users of this product. That is the
+same decision left open at the end of
+`docs/dha-idvs-and-provincial-scale-review.md` — whether this product
+should hold verified identity data at all — and it needs a DPIA, a
+lawful-basis determination and a rewrite of LEG-01, not a boilerplate.
+
+### 35.9 Disposition
+
+**Take:** nothing as code. Recorded: the Meta signature requirement, the
+`hub.challenge` handshake, and E.164 normalisation, for whenever an OTP
+flow is actually specified.
+
+**Do not take:** the service, the schema, the Dockerfile, the pins.
+
+**Do not write next:** the `GET` handler or the SQL migration. The first
+makes the webhook live; the second commits a schema whose audit table
+design is the lock-out bug in §35.3. The order that makes sense is
+signature verification, then a slow KDF with throttling, then separating
+the challenge row from the attempt log — and before any of those, a
+decision about whether this product holds membership identity data.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
