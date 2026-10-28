@@ -6,8 +6,8 @@ arrived under different names with identical content, and two arrived
 under the same name with different content.
 
 **Opened 28 October 2026 · T−7** (election day 4 November).
-**94 files received · 65 distinct · 29 redundant copies**, across seven
-batches. Running totals are in §7.
+**106 files received · 66 distinct · 40 redundant copies (38%)**, across
+nine batches. Running totals are in §7.3.
 
 Rows marked **[read]** have had their contents reviewed. Rows marked
 **[hash only]** are registered and deduplicated but not yet read — stated
@@ -350,12 +350,33 @@ A-078 | repeats of A-033/035/036/037/039 and the research skill | — | **DUP** 
 | 5 (28 Oct) | 20 | 8 |
 | 6 (28 Oct) | 20 | 16 |
 | 7 (28 Oct) | 7 | 3 |
-| **total** | **94** | **65** |
+| 8 (28 Oct) | 2 | 2 |
+| 9 (28 Oct) | 10 | **0** |
+| **total** | **106** | **66** |
 
-Redundancy is running at **31%**. The pattern is consistent: the same
-research corpus re-exported from several conversations. Hash-keying is
-doing real work — four copies of one HTML file, three each of the base
-report, the RD report, the Ventersdorp CSV and the research skill.
+Redundancy is running at **38%**. The pattern is consistent: the same
+corpus re-exported from several conversations. Hash-keying is doing real
+work — four copies of one HTML file, three each of the base report, the RD
+report, the Ventersdorp CSV, the research skill, the settings-modules zip,
+and now three each of the payments, policies and positioning documents.
+
+**Batch 9 (10 files) added nothing.** Every one is byte-identical to a
+document registered in batch 3:
+
+| file | matches | now |
+|---|---|---|
+| `ecos-two-version-build-plan-2026.docx` | A-023 | ×2 |
+| `ecos-compressed-golive-plan-2026.docx` | A-022 | ×2 |
+| `ecos-membership-capture-2026.docx` | A-027 | ×2 |
+| `ecos-technical-infrastructure-whitepaper-2026.docx` | A-024 | ×2 |
+| `ecos-financial-subscription-policies-2026.docx` ×2 | A-026 | ×3 |
+| `ecos-payments-accounts-architecture-2026.docx` ×2 | A-025 | ×3 |
+| `ecos-financial-market-positioning-2026.docx` ×2 | A-021 | ×3 |
+
+Three of the ten were duplicates *within their own batch*. No disposition
+changes, and the three verified defects in A-021 (the PSP "under 1%"
+figure and the December cumulative-cash claim) and A-026's attorney gate
+all still stand against the same bytes.
 
 ### 7.4 What batches 5–7 add to the queue
 
