@@ -6,7 +6,12 @@ arrived under different names with identical content, and two arrived
 under the same name with different content.
 
 **Opened 28 October 2026 · T−7** (election day 4 November).
-47 files received · **36 distinct** · 11 redundant copies.
+**94 files received · 65 distinct · 29 redundant copies**, across seven
+batches. Running totals are in §7.
+
+Rows marked **[read]** have had their contents reviewed. Rows marked
+**[hash only]** are registered and deduplicated but not yet read — stated
+so that this sheet is never mistaken for a review.
 
 Disposition codes:
 
@@ -249,5 +254,125 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
 
 ---
 
-*Append new batches as §2-style tables. Identity by hash; filenames in
+## 7. Batches 5–7 (28 Oct, 47 further files, 27 new distinct)
+
+### 7.1 The finding — our seat calculator is confirmed against primary source
+
+`legislative-source-excerpts.md` quotes the Municipal Structures Act
+Schedule 1 from **Government Gazette No. 19614, 18 December 1998**, and
+carries the IEC's own seat-calculation detail sheet for **NW405, LOCAL
+GOVERNMENT ELECTION 2021** — complete, party by party.
+
+It also exposed a formula discrepancy worth being precise about:
+
+| source | Item 12 quota |
+|---|---|
+| The gazetted statute, as quoted | `Q = (A / (B − C)) + 1` |
+| `SKILL-3.md` (`ecos-demarcation-baseline-config`) | `Q = A/(B−C) + 1` — matches the statute |
+| `src/modules/analytics/seatCalculator.ts` | `Q = (A / (B − C − D)) + 1` |
+| The IEC's NW405 worked example | lists **`D (ward seats from parties with no PR list) = 0`** |
+
+So the statute has three terms and the IEC's operational report has four.
+They do not conflict: **D = 0 reduces the four-term divisor exactly to the
+statutory one**, and they diverge only where a party wins ward seats and
+files no PR list. The four-term version is the safer superset, and it is
+what this repo implements.
+
+Ran the published figures through `allocateSeats` as a new permanent test,
+`src/modules/analytics/seatCalculator.nw405-2021.test.ts`:
+
+```
+✓ the published party votes sum to the published total A   (101,439)
+✓ reproduces the published quota of 1,515
+✓ reproduces every published party seat total   ANC 33 · DA 17 · FF+ 9 · EFF 6 · PA 2 · four parties 0
+✓ allocates exactly the 67 seats the council has
+✓ with D = 0 the four-term divisor equals the statutory B − C
+```
+
+`npm run check:all` green afterwards — **64 files, 997 tests**.
+
+This is an independent arrival of the same published result through a
+different conversation and a different document, which is why it is kept
+as its own test rather than folded into the session-8 regression block. If
+the two ever disagree, that should surface as two failures.
+
+The excerpts also re-confirm the MDB gazette a third time: **34 wards,
+67 seats, 122,059 baseline, ±15% norm variance, March 2024 roll.**
+
+**One thing to check, not yet checked:** the excerpts state that the IEC's
+briefing deck proposes an Item 16 overhang resolution — recalculating the
+quota excluding the excessive-seats party — and warn it is a **proposal,
+not enacted law**, never to be the default. This repo implements Item 16;
+whether it implements the proposal needs verifying before that claim is
+made either way.
+
+### 7.2 Register
+
+ID | Asset | Hash | Disposition | Note
+---|---|---|---|---
+A-051 | `legislative-source-excerpts.md` ×2 | `713daa87` | **KEEP — highest-value asset in the batch** [read] | Item 12/13/16 verbatim; NW405 2021 fixture; the Item 16 proposal warning |
+A-052 | `municipal-electoral-quota-config.zip` | `baf965c4` | **KEEP** [read, 3 entries] | SKILL.md + the excerpts + 16.8 KB `schema.sql`. Parent of the settings modules |
+A-053 | `ecos-settings-modules.zip` ×2 | `64094709` | **RECONCILE** [read, 19 entries] | Three settings modules — `demarcation-baseline`, `pr-candidate-list`, `rbac` — each SKILL + api-contract + schema. Postgres. The `rbac/references/schema.sql` (21 KB) is the one to read against this repo's 7 roles / 26 capabilities |
+A-054 | `schema.sql` (PR candidate list) | `de869ffd` | **RECONCILE — good design** [read] | Item 11(1) 2× cap as a hard trigger; s14(4A) cross-list duplicate block; gender distribution as WARNING never BLOCKING; soft-remove with reason. Postgres/RLS |
+A-055 | `api-contract-1.md` (PR list export) | `b0595ee5` | **KEEP** [read] | Carries its own correction: the card's "Sec 17" subtitle is wrong — s14/s15 plus Sch.1 Item 11. Also "Generate submission documents", never "Submit to IEC" |
+A-056 | `api-contract-2/3/4.md` | `948ec0db` | **KEEP** [read] | Three identical copies. `prSeatsToBeFilled: 33` = 67 − 34 ✓ against our baseline |
+A-057 | `SKILL-3.md` (`ecos-demarcation-baseline-config`) | `ef5c0bb4` | **SUPERSEDED by the installed skill** [read] | Already installed in this session under the same name. Its `Q = A/(B−C)+1` is the statute; see §7.1 |
+A-058 | `migration.sql` ×2 | `321a6970` | **RECONCILE** [read] | Adds `municipal_category` A/B/C + a trigger forbidding Schedule 1 for Category C. Backfills NW405 = 'B' ✓ |
+A-059 | `tenant_isolation.sql` ×2 | `d48bf9a1` | **RECONCILE — self-documents four real fixes** [read] | Dropped the `::UUID` cast, restored `FINANCE_OFFICER`, moved to `ward_code` against cross-municipality collision, scoped VD_CAPTAIN/VOLUNTEER to voting district. Postgres RLS, so it governs the fork's stack, not this one |
+A-060 | `JB-Marks-Ward-Swing-2021-2024.csv` | `d1b1639b` | **KEEP — genuinely new** [read] | Per-ward 2021→2024 swing, 12 columns, all 34 wards. **Basis needs stating:** its 2021 percentages do not match the ward-ballot CSV (Ward 2 FF+ 43.3 here vs 43.74 computed from `JB-Marks-Ward-Results-2021.csv`), so it is a different ballot or denominator. Do not join the two until that is settled |
+A-061 | `00-MASTER-INDEX-work-partition-map-v2.md` | `0a786c0f` | **KEEP** [hash only] | The V2 document set's index — read this first in the reconciliation pass |
+A-062 | `01-claude-code-build-spec-v2.md` | `586db7e7` | **KEEP — governing spec, newer than A-001** [hash only] | 39,380 bytes against A-001's 30,772. **A-001 is not the same file** and batch 7 re-uploaded A-001's exact hash, so both versions are live in the store |
+A-063 | `02-commercial-rewrite-brief-v2.md` | `8f81527d` | **REFERENCE** [hash only] | |
+A-064 | `03-implementation-rollout-plan-v2.md` ×2 | `2ddccae3` | **REFERENCE** [hash only] | |
+A-065 | `04-legal-compliance-workstream-v2.md` | `4525d08b` | **KEEP — attorney gate** [hash only] | |
+A-066 | `04-legal-compliance-workstream.md` | `ab50db97` | **SUPERSEDED by A-065** [hash only] | |
+A-067 | `05-project-schedule-v2.xlsx` | `02697d14` | **KEEP** [hash only] | Compare against `municipal-gantt-planner-v2_1.xlsx` (A-003), the current freeze-window source |
+A-068 | `05-project-schedule.xlsx` | `ee75c9e3` | **SUPERSEDED by A-067** [hash only] | |
+A-069 | `06-reconciliation-record-v2.md` | `74c51dbd` | **KEEP — read early** [hash only] | A prior reconciliation record; may already resolve items in §5 |
+A-070 | `CLAUDE-HANDOFF.md` | `c13f6f16` | **KEEP — read early** [hash only] | |
+A-071 | `SKILL.md`, `SKILL-1.md`, `SKILL-2.md` | `557e60da`, `39b2f0d1`, `f8c7718e` | **RECONCILE** [hash only] | Three distinct skills, names not yet established. Several uploaded skills duplicate ones already installed in this session |
+A-072 | `api-contract.md`, `schema.sql`, `sentiment-monitoring-schema.sql` | `fee75c34`, `7385f136`, `61e5fd8f` | **RECONCILE** [hash only] | A fourth module — sentiment monitoring. Note the PAIR audit (A-041) rates this module's evidence of user need as its weakest finding, F4 |
+A-073 | `Election_Campaign_OS_Business_Plan_v2.docx` | `3a63dc94` | **KEEP — "B1"** [hash only] | The B1 every other document cross-references. Reading this should resolve several §5 queue items |
+A-074 | `Election_Campaign_OS_Business_Plan.docx` | `d145c194` | **SUPERSEDED by A-073** [hash only] | |
+A-075 | `IC_LGE_Regional_Roadmap_2026_INTERNAL.md` | `4a7c80ac` | **REFERENCE** [hash only] | Marked INTERNAL — treat as not for customer circulation |
+A-076 | `elections_in_south_africa_..._edition.html` ×4 | `d06477ad` | **DUP** | Four identical copies now, including A-049 |
+A-077 | `01-claude-code-build-spec.md` | `453a1c7b` | **DUP of A-001** | Confirms A-001 and the v2 spec are different documents |
+A-078 | repeats of A-033/035/036/037/039 and the research skill | — | **DUP** | base report ×3, RD report ×3, Ventersdorp ×3, research skill ×3, ward results ×2 each |
+
+### 7.3 Running totals
+
+| batch | files | new distinct |
+|---|---|---|
+| 1 (17 Oct) | 3 | 3 |
+| 2 (26 Oct) | 7 | 7 |
+| 3 (28 Oct) | 17 | 12 |
+| 4 (28 Oct) | 20 | 14 |
+| 5 (28 Oct) | 20 | 8 |
+| 6 (28 Oct) | 20 | 16 |
+| 7 (28 Oct) | 7 | 3 |
+| **total** | **94** | **65** |
+
+Redundancy is running at **31%**. The pattern is consistent: the same
+research corpus re-exported from several conversations. Hash-keying is
+doing real work — four copies of one HTML file, three each of the base
+report, the RD report, the Ventersdorp CSV and the research skill.
+
+### 7.4 What batches 5–7 add to the queue
+
+1. **Read A-061, A-069, A-070, A-073 first** — master index, prior
+   reconciliation record, handoff, and B1. Four documents that likely
+   close open queue items rather than add to them.
+2. **Two live versions of the governing spec** (A-001 and A-062). Which
+   governs is a decision, not a guess.
+3. **The settings-module trio** (A-053) against this repo's RBAC. The
+   uploaded RLS file names the canonical six; this repo has seven roles
+   and 26 capabilities. A-053's `rbac/references/schema.sql` is where
+   that gets settled.
+4. **State the swing CSV's basis** (A-060) before any join.
+5. **Verify the Item 16 implementation** does not default to the IEC's
+   unenacted proposal (§7.1).
+
+---
+
+*Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
