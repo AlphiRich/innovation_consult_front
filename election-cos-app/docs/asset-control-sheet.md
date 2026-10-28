@@ -2124,5 +2124,135 @@ what may be logged rather than denylist what may not.
 
 ---
 
+## 21. Batch 21 (28 Oct, 5 files) — the regex, tested; and a skill cited for the opposite of what it says
+
+ID | Asset | Hash | Disposition | Note
+---|---|---|---|---
+A-121 | `Https___api.elections.org.za_Help_develop_the_nece.docx` | `2e711076` | **DEFECT — §21.1** | the harvest service plus its justification |
+A-122 | `Regex_Definition__Sanitization_Function.docx` | `c8db6347` | **REJECT — §21.2** | the `[REDACTED]` regex §20.4 asked for |
+A-123 | `Yes_you_can_proceed_to_do_that.docx` | `cb42bb28` | **SUPERSEDED** | 3 MB; an earlier revision of the relay |
+A-124 | `yes.docx` | `b7bc5104` | **DUP of A-120** | same content as the §20 paste |
+A-125 | `yes.rtf` | `e91091e2` | **DUP of A-120** | same again; 337 KB is RTF markup, not content |
+
+### 21.1 The harvest service cites a skill that governs something else
+
+A-121 states: *"The integration must follow the `ecos-electoral-data-harvest`
+agent rules, which govern IEC roll ingestion, identity masking, and audit
+logging to remain compliant with POPIA."*
+
+That skill is real — it is in A-032's build bundle, with an OpenAPI spec
+and a migration. **I read it. It governs none of those things.**
+
+It is a manifest-driven harvest of **published reference data**:
+`harvest_source` → `harvest_run` → `ingested_row` (checksummed, with
+`source_url` and `sha256` provenance) → materialised into ten typed
+tables. Here is every table `030_electoral_data_harvest.sql` creates:
+
+```
+harvest_source · harvest_run · ingested_row · municipality · ward
+voting_district · electoral_ballot · electoral_result_vd
+ppfa_disclosure · derivation_provenance
+```
+
+**Not one of them holds a person.** Searched the skill and the spec:
+`voter_roll` 0 hits, `voter-roll` 0, `id_number` 0, `idNumber` 0,
+"identity mask" 0. The OpenAPI paths are `/sources`, `/runs`,
+`/municipalities`, `/wards`, `/voting-districts`, `/ballots` — **there is
+no `/voter-roll` endpoint in the spec either**, which is the same endpoint
+§18.2 established the IEC does not publish.
+
+The clincher is the skill's RLS posture: the harvested dataset is *"a
+**shared public reference dataset** — read access is permissive across all
+authenticated tenants (a party doesn't get a competitive edge by being the
+only one who can see IEC results)."* **A certified voters' roll could never
+be that**, and the skill is read-permissive precisely because it holds
+nothing personal.
+
+So the service does not merely call an endpoint that does not exist. **It
+attributes its design to a governing document that says the opposite.**
+That is the third instance of the pattern A-112 §1 names: A-102 asserted a
+FINANCE_OFFICER gap this build does not have, a prior session attributed
+five quotations to artefacts that did not contain them, and now this.
+A-121 also derives itself from *"the Election Campaign OS 2026 North West
+Business Plan"* — A-114, already on the §6 list.
+
+### 21.2 The regex, run against real inputs
+
+§20.4 declined to port a regex nobody had seen. A-122 supplies it, so it
+can be tested instead of argued about:
+
+```python
+PII_REDACTION_PATTERN = re.compile(
+    r'\b\d{13}\b|(?:\+27|0)\d{9}\b|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
+```
+
+| input | result |
+|---|---|
+| `8201015009087` (bare ID) | redacted ✓ |
+| `820101 5009 087` (spaced — the printed form) | **passes through** |
+| `820101-5009-087` | **passes through** |
+| `910906 **** 08*` — **the IEC mask in our own roll data** | **passes through** |
+| `0821234567` / `+27821234567` | redacted ✓ |
+| `082 123 4567` | **passes through** |
+| `27821234567` (no plus) | **passes through** |
+| `jane.doe@party.org.za` | redacted ✓ |
+| `surname='DLAMINI' full_names='THANDI P' address_raw='14 SOL PLAATJIE AVE, IKAGENG'` | **passes through, entirely** |
+| `requestId=sess-1793203471827` | **redacted — a timestamp, not PII** |
+| `gemini-code-1793197745836.ts` | **redacted — this batch's own filenames** |
+
+Two failures, in opposite directions.
+
+**It misses what it is for.** It does not match a spaced or hyphenated ID,
+and it does not match **the IEC's own mask format**, which is the literal
+shape of `id_number_masked` in the roll the whole subsystem exists to
+handle. It does not touch names or addresses at all — and the roll's
+payload is surname, full names and verbatim street address. A trace
+carrying a voter's name and house number passes through and is then
+written to Redis under a field that says it was sanitised. **That is the
+`POPIA_MASKED` failure of §18.2 in a second place**: a partial filter
+presented as a guarantee.
+
+**It destroys what it should keep.** A 13-digit epoch-millisecond
+timestamp is exactly 13 digits. The relay's own
+`requestId = f"{session_id}-{datetime.now().timestamp()}"` carries one —
+and `requestId` is the metering engine's idempotency key and the only
+handle for investigating a disputed debit. The note says the word
+boundaries were added *"to prevent partial matches on longer operational
+IDs (like timestamps…)"*; they do not, because `\b\d{13}\b` matches a
+13-digit timestamp exactly.
+
+Two smaller things: the patched block keeps `except RuntimeError` — still
+unreachable per §20.3 #2, so the fix preserves the bug it sits next to —
+and `str(e)` is the exception message, not a stack trace, despite the
+docstring saying otherwise.
+
+**The §20.4 recommendation is unchanged, and now demonstrated rather than
+asserted:** do not sanitise arbitrary exception text. Log an error class
+and a correlation id, and keep the detail where it already has protection.
+
+### 21.3 The question asked — a `docker-compose.yml` for the relay, Redis and the gateway?
+
+**Not yet — and not because orchestration is the wrong idea.** It is the
+right eventual artefact and the wrong next one, for four reasons already
+established:
+
+1. **The relay has no authentication** (§20.3 #1). `tenant_id` and
+   `actor_id` come from the URL path. Composing it puts an unauthenticated
+   token-spending endpoint on a shared network with Redis and the gateway.
+   **Orchestration does not fix that; it ships it.**
+2. **Two of the three services have no code.** §18.1 established that no
+   repository holds the Node gateway or the Postgres schema — they exist
+   as a migration bundle and a design. A compose file would orchestrate
+   one implemented service and two intentions.
+3. **The capability seed does not run** (§20.2) — eight columns against a
+   four-column table.
+4. **The soft-cap discount it depends on is not implemented** (§20.2).
+
+The next artefact is authentication on that WebSocket endpoint: verify a
+bearer token, derive `tenant_id` and `actor_id` **from the token**, and
+never from the path. After that, a compose file is a reasonable half-hour.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
