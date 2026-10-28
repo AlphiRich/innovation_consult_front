@@ -293,6 +293,12 @@ A-027 | `ecos-membership-capture-2026.docx` | `aba90c32` | **RECONCILE** | Postg
   Fourth artefact, and this one is inside a document claiming to be the
   build baseline. `ppfaDefaults.ts` is correct; do not let A-102 overwrite
   it.
+- **PPFA "R80k/R200k/R15M"** (A-138 §3, agent 18). Half-corrected, which
+  reads as current and is not: R80,000 and R15,000,000 are both repealed.
+- **`fn_calculate_schedule1_quotas`** (A-138 §4.1). Billed as Items 12,
+  13 and 16; implements `A/B` with no `+1`, no `−C`, no surplus
+  allocation and no overhang handling. On the certified NW405 2021 data
+  it allocates **65 of 67 seats** and gets ANC and PA wrong (§26.1).
 - **`electioncampaignos.co.za` and `electioncos.co.za`** as the product's
   address (A-084, A-090, A-129). The first is in `SUPERSEDED_DOMAINS` and
   has no DNS record. The second **is a live registration** — §23.4
@@ -2645,6 +2651,111 @@ revenue figure deliberately, and either wire the engine to
 `allocateSeats` or stop calling it one. The electoral baseline numbers
 are sound and the arithmetic is careful — which is exactly why the
 compliance footer over the top of it is the problem.
+
+---
+
+## 26. Batch 26 — `Tech_Architecture_Master_Code_Stack_3.md`
+
+A-138 | `Tech_Architecture_Master_Code_Stack_3.md` | `8435e02c` | **DEFECT — the statutory engine is wrong, and it is the only part presented as authoritative**
+
+### 26.1 Its quota function is not Schedule 1, and the real data proves it
+
+The document calls `fn_calculate_schedule1_quotas` the place where
+*"Schedule 1 (Items 12, 13, and 16) [is] calculated strictly at database
+level"*, and agent 16 `QUOTA_FORMULA_GUARDIAN` is said to *"enforce
+Schedule 1 (Items 12, 13, 16) statutory seat allocation formulas"*. The
+function is:
+
+```sql
+v_quota := v_total_valid_votes::NUMERIC / v_council_size::NUMERIC;
+```
+
+That is `A / B`. **Item 12 is `Q = (A / (B − C)) + 1`.** Both the `+ 1`
+and the `− C` independent-councillor deduction are missing — so this is
+the Hare quota the register has twice recorded as a teaching model
+(§12.2, A-102 §9.2), presented here as the statutory engine.
+
+Run against the NW405 2021 figures we fetched from the IEC ourselves
+(§18.4):
+
+```
+their quota   A / B          = 1514.0149
+Item 12       ⌊A/B⌋ + 1      = 1515          (published quota: 1515)
+
+party    votes   their seats   published
+ANC     48,911            32          33   ← wrong
+DA      25,837            17          17
+FF+     13,800             9           9
+EFF      9,200             6           6
+PA       2,389             1           2   ← wrong
+
+allocated 65 of 67 — two seats never assigned
+```
+
+**It gets the council size wrong, and it gets the governing party's seat
+count wrong, on the one election we have certified data for.**
+
+Two seats vanish because **Item 13 is absent**: the function computes a
+`remainder` column and then never uses it — `final_seats` is a verbatim
+copy of `quota_seats`, so no surplus allocation happens at all. **Item 16
+is absent entirely**; nothing in the function detects or handles a party
+whose ward wins exceed its entitlement.
+
+For contrast, `seatCalculator.ts:123` is
+`Math.floor(totalValidVotes / quotaDivisor) + 1`, with the divisor
+carrying `− C − D`, and it reproduces 1,515 and all five published seat
+totals exactly.
+
+### 26.2 PPFA thresholds are half-corrected, which is worse than stale
+
+Agent 18, `PPFA_AGGREGATOR`: *"aggregating political donations against
+statutory thresholds (**R80k/R200k/R15M**)."*
+
+R200,000 is current. **R80,000 and R15,000,000 are repealed** — the cap
+is R30,000,000. A document carrying all three superseded figures reads as
+out of date; one carrying the new disclosure threshold beside the old cap
+reads as *updated* and is not. Sixth artefact in the register to carry
+repealed PPFA figures; §6 already names the pattern.
+
+### 26.3 It may explain the App Engine flag — and that is today's problem
+
+§1 places the landing page on **"GCP Cloud Storage / App Engine static
+site hosting"** for `electioncos.co.za`.
+
+That bears directly on the open console question. A-111 §3.1 records the
+caveat verbatim: Firestore's `africa-south1` *"does not support App
+Engine"*, followed by *"We are not using App Engine, so this is
+immaterial."* The GCP dashboard analysis reports the **App Engine Admin
+API enabled** in `electioncos1-0`. **This document is a plausible reason
+why** — somebody followed it.
+
+If an App Engine *application* was ever initialised in that project, it
+cannot be in `africa-south1`, and in older projects the App Engine
+location is what pinned Firestore's. **Check before any data is written.**
+
+### 26.4 The rest
+
+- **The Worker cannot reach its backend.** It fetches
+  `https://api.election-cos.af-south-1.aws.internal` — a `.internal`
+  name is not publicly resolvable, and a Cloudflare Worker runs on the
+  public internet. Same constant as A-102 §6; it has never been able to
+  work.
+- **A third agent inventory.** 32 agents here against A-102 §3's ~30 and
+  the blueprint's five layers (§16.1). Same names, different counts.
+- **The topology contradicts §18.1.** AWS `af-south-1`, ECS Fargate, RDS,
+  "Firebase strictly bounded to static asset delivery" — no repository
+  holds any of it, and A-024 records the decision the other way.
+- **Credit where due:** the Dexie outbox enum carries `REJECTED` and
+  `DISCARDED`, which is exactly the fix A-102 §2 identified for silently
+  lost sync records, and the Cloudflare Free Tier bounds are at least
+  stated as constraints rather than ignored. **[U]** Those limits are
+  quoted without a source and should be checked against current
+  Cloudflare documentation before anything is budgeted on them.
+
+**Disposition:** do not implement §4.1 under any circumstances. If this
+document governs anything, the quota engine must be replaced wholesale —
+and the version that reproduces the certified NW405 result already exists
+in this repository.
 
 ---
 
