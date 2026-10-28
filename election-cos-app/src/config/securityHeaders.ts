@@ -74,6 +74,21 @@ const MAPS = ['https://maps.googleapis.com', 'https://maps.gstatic.com'];
 /** The Google sign-in popup and the Firebase auth helper iframe. */
 const AUTH_FRAME = ['https://accounts.google.com', 'https://apis.google.com'];
 
+/**
+ * The project's own `firebaseapp.com` host, which Firebase Auth loads in
+ * an iframe to complete a sign-in.
+ *
+ * This moves with the Firebase project, and it moved on 28 Oct 2026 —
+ * it named `election2026-campaignms7-0` until the build was pointed at
+ * `electioncos1-0`. A stale value here does not fail a build or a test
+ * that does not look for it: the app deploys, loads, and then sign-in
+ * silently fails because the iframe is blocked by our own CSP.
+ *
+ * `securityHeaders.test.ts` holds it to `.firebaserc`, so the two cannot
+ * drift apart again.
+ */
+export const AUTH_IFRAME_HOST = 'https://electioncos1-0.firebaseapp.com';
+
 export const CONTENT_SECURITY_POLICY = [
   `default-src 'self'`,
   // No 'unsafe-inline'. The build has no inline scripts.
@@ -84,7 +99,7 @@ export const CONTENT_SECURITY_POLICY = [
   `font-src 'self'`,
   `img-src 'self' data: blob: https://lh3.googleusercontent.com ${MAPS.join(' ')}`,
   `connect-src 'self' ${FIREBASE_API.join(' ')} ${MAPS[0]} https://*.firebaseio.com wss://*.firebaseio.com`,
-  `frame-src 'self' ${AUTH_FRAME.join(' ')} https://election2026-campaignms7-0.firebaseapp.com`,
+  `frame-src 'self' ${AUTH_FRAME.join(' ')} ${AUTH_IFRAME_HOST}`,
   // Nothing in this product is a plugin or an embedded object.
   `object-src 'none'`,
   // Stops an injected <base> redirecting every relative URL in the app.

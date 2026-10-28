@@ -13,7 +13,12 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { CACHE_RULES, CONTENT_SECURITY_POLICY, GLOBAL_HEADERS } from './securityHeaders';
+import {
+  AUTH_IFRAME_HOST,
+  CACHE_RULES,
+  CONTENT_SECURITY_POLICY,
+  GLOBAL_HEADERS,
+} from './securityHeaders';
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const firebaseJson = JSON.parse(readFileSync(path.join(ROOT, 'firebase.json'), 'utf8'));
@@ -119,6 +124,47 @@ describe('firebase.json', () => {
       expect(block, `no headers block for ${rule.source}`).toBeTruthy();
       expect(block.headers[0]).toEqual({ key: 'Cache-Control', value: rule.value });
     }
+  });
+
+  /**
+   * Session 37. The CSP's frame-src named
+   * `election2026-campaignms7-0.firebaseapp.com` for as long as that was
+   * the project. When `.firebaserc` moved to `electioncos1-0`, nothing
+   * failed — not a type, not a lint, not a test. The app would have
+   * deployed, loaded, and then silently refused to sign anyone in,
+   * because Firebase Auth's iframe was blocked by our own policy.
+   *
+   * So the auth host is held to the project id rather than to a memory
+   * of it. Proved by injection: putting the old project back into
+   * AUTH_IFRAME_HOST fails this test, then reverted clean.
+   */
+  it('frames the auth iframe for the project this repo actually deploys to', () => {
+    const rc = JSON.parse(readFileSync(path.join(ROOT, '.firebaserc'), 'utf-8'));
+    const project = rc.projects.default;
+
+    expect(AUTH_IFRAME_HOST).toBe(`https://${project}.firebaseapp.com`);
+    expect(CONTENT_SECURITY_POLICY).toContain(`frame-src 'self'`);
+    expect(CONTENT_SECURITY_POLICY).toContain(AUTH_IFRAME_HOST);
+
+    // And the generated header, not just the constant it came from.
+    const global = firebaseJson.hosting.headers.find((h: { source: string }) => h.source === '**');
+    const csp = global.headers.find(
+      (x: { key: string }) => x.key === 'Content-Security-Policy',
+    ).value;
+    expect(csp).toContain(`https://${project}.firebaseapp.com`);
+  });
+
+  it('deploys to a named hosting target rather than whatever the default site is', () => {
+    // `firebase deploy --only hosting:app` is meaningless without this,
+    // and a bare default-site deploy is how the wrong site gets written
+    // to once a second one exists.
+    const rc = JSON.parse(readFileSync(path.join(ROOT, '.firebaserc'), 'utf-8'));
+    const target = firebaseJson.hosting.target;
+
+    expect(target, 'firebase.json hosting needs a target').toBe('app');
+    const sites = rc.targets?.[rc.projects.default]?.hosting?.[target];
+    expect(sites, `.firebaserc must map hosting target ${target}`).toBeTruthy();
+    expect(sites).toContain(rc.projects.default);
   });
 
   it('still rewrites /api/** to the function, ahead of the SPA catch-all', () => {

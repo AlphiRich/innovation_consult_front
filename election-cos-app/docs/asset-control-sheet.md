@@ -3006,5 +3006,80 @@ certificate working.
 
 ---
 
+## 30. The deploy target — and a CSP that would have broken sign-in
+
+### 30.1 What was asked for
+
+`firebase.json` now declares `"target": "app"`, and `.firebaserc` maps it:
+
+```json
+"targets": { "electioncos1-0": { "hosting": { "app": ["electioncos1-0"] } } }
+```
+
+So `firebase deploy --only hosting:app` means something, which §29.4
+recorded it did not. The deploy scripts follow: `deploy:hosting` uses
+`--only hosting:app`, and the full `deploy` now names its components
+(`hosting:app,functions,firestore:rules,storage`) rather than deploying
+whatever is in the file.
+
+The target resolves to the project's **default site**, because there is
+only one — `electioncos1-0`, which serves both `electioncos1-0.web.app`
+and `app.electioncos.co.za`. The apex is deliberately not here: it is
+Cloudflare's, and §28 settled that keeping it there is the point.
+
+### 30.2 What the change exposed
+
+Pointing `app` at this repo's `firebase.json` meant reading it, and the
+CSP's `frame-src` still named the **old** project:
+
+```
+frame-src 'self' … https://election2026-campaignms7-0.firebaseapp.com
+```
+
+That is the host Firebase Auth loads in an iframe to finish a sign-in.
+When `.firebaserc` moved to `electioncos1-0` in §28, **nothing failed** —
+not a type, not a lint, not a test. The app would have built, deployed,
+loaded, and then silently refused to sign anyone in, blocked by our own
+policy. On a campaign platform a week before an election, that is a bad
+way to find out.
+
+It is generated from a single declaration, so the fix is one line in
+`src/config/securityHeaders.ts` plus `node scripts/sync-hosting-headers.mjs`.
+It is now a named export, `AUTH_IFRAME_HOST`, rather than a literal
+buried in a template string.
+
+### 30.3 Two guards, both proved by injection
+
+Added to `securityHeaders.test.ts`:
+
+| guard | injected defect | result |
+|---|---|---|
+| auth host matches `.firebaserc` | put `election2026-campaignms7-0` back | **2 tests fail**, naming the expected host |
+| hosting target is declared and mapped | deleted `hosting.target` | **fails**: *"firebase.json hosting needs a target"* |
+
+Both reverted clean; `check:all` green at **65 files, 1,010 tests**.
+
+The first guard checks the generated header as well as the constant it
+came from, because the thing that ships is `firebase.json`, not the
+TypeScript.
+
+### 30.4 Still open before `app.` can serve the PWA
+
+Unchanged from §28.3, and now the only things between here and a deploy:
+
+1. **Deploy credential** — `GOOGLE_APPLICATION_CREDENTIALS` (service
+   account) preferred over a personal `firebase login`.
+2. **`.env`** — `VITE_FIREBASE_USE_EMULATORS=true` at line 11. Note the
+   name: §29.3 records that the audit document had it as
+   `VITE_USE_EMULATOR`, which would leave the real flag set.
+3. **`npm run build`** — `dist` is older than `src`.
+
+Then `npm run deploy:hosting`, which runs the build, the preflight and
+`--only hosting:app` in order, and replaces the placeholder on
+`app.electioncos.co.za` with the PWA **and its six header blocks** —
+which is what §29.5 was about.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
