@@ -114,6 +114,24 @@ export function counterEventPath(tenantId: string, eventId: string): string {
   return `tenants/${tenantId}/counterEvents/${counterEventDocId(eventId)}`;
 }
 
+/**
+ * A counter document id within a tenant.
+ *
+ * `warRoom` is the tenant-wide aggregate the War Room has always read.
+ * `ward-{wardCode}` is the same shape, scoped to one ward — added so that
+ * a ward sentiment comparison reads real captured counts rather than an
+ * invented figure. Both are maintained by the same triggers, in the same
+ * transaction, from the same event.
+ */
+export const TENANT_SCOPE = 'warRoom';
+export const wardScope = (wardCode: string): string => `ward-${wardCode}`;
+
+/** A delta and the counter document it belongs on. */
+export interface ScopedDelta {
+  scope: string;
+  delta: Delta;
+}
+
 /** Exported for testing: the increments a delta turns into, zeroes dropped. */
 export function counterUpdateFor(delta: Delta): Record<string, number> {
   return Object.fromEntries(Object.entries(delta).filter(([, amount]) => amount !== 0));
@@ -146,11 +164,13 @@ export async function applyCounterEvent(
   tx: CounterTransaction,
   tenantId: string,
   eventId: string,
-  delta: Delta,
+  deltas: ScopedDelta[],
   nowMillis: number,
 ): Promise<void> {
-  const amounts = counterUpdateFor(delta);
-  if (Object.keys(amounts).length === 0) return;
+  const writes = deltas
+    .map((scoped) => ({ scope: scoped.scope, amounts: counterUpdateFor(scoped.delta) }))
+    .filter((w) => Object.keys(w.amounts).length > 0);
+  if (writes.length === 0) return;
 
   const markerPath = counterEventPath(tenantId, eventId);
   // The only read, and it is unique to this event — see the file header
@@ -158,11 +178,16 @@ export async function applyCounterEvent(
   if (await tx.markerExists(markerPath)) return;
 
   tx.writeMarker(markerPath, nowMillis + COUNTER_EVENT_TTL_DAYS * 24 * 60 * 60 * 1000);
-  tx.incrementCounter(`tenants/${tenantId}/counters/warRoom`, amounts);
+  // One marker covers every scope this event touches, because they are
+  // written in one transaction. A redelivery that updated the ward
+  // counter but not the tenant one would be worse than either.
+  for (const write of writes) {
+    tx.incrementCounter(`tenants/${tenantId}/counters/${write.scope}`, write.amounts);
+  }
 }
 
-async function applyDeltaOnce(tenantId: string, eventId: string, delta: Delta): Promise<void> {
-  if (Object.keys(counterUpdateFor(delta)).length === 0) return; // don't open a transaction for nothing
+async function applyDeltaOnce(tenantId: string, eventId: string, deltas: ScopedDelta[]): Promise<void> {
+  if (deltas.every((d) => Object.keys(counterUpdateFor(d.delta)).length === 0)) return; // don't open a transaction for nothing
 
   const db = getFirestore();
   await db.runTransaction(async (transaction) => {
@@ -182,7 +207,7 @@ async function applyDeltaOnce(tenantId: string, eventId: string, delta: Delta): 
         transaction.set(db.doc(path), update, { merge: true });
       },
     };
-    await applyCounterEvent(tx, tenantId, eventId, delta, Date.now());
+    await applyCounterEvent(tx, tenantId, eventId, deltas, Date.now());
   });
 }
 
@@ -196,13 +221,62 @@ async function applyDeltaOnce(tenantId: string, eventId: string, delta: Delta): 
  * number nobody can check. CloudEvents guarantees the id, so this is a
  * path that should never run; it exists so that if it ever does, it says so.
  */
-async function handle(eventId: string | undefined, tenantId: string, delta: Delta): Promise<void> {
+async function handle(eventId: string | undefined, tenantId: string, deltas: ScopedDelta[]): Promise<void> {
   if (!eventId) {
     throw new Error(
       `Counter event for tenant ${tenantId} arrived without an event id; refusing to apply a delta that cannot be deduplicated.`,
     );
   }
-  await applyDeltaOnce(tenantId, eventId, delta);
+  await applyDeltaOnce(tenantId, eventId, deltas);
+}
+
+/**
+ * Spreads a tenant-wide delta across the ward dimension as well.
+ *
+ * The ward counters reuse the very same delta functions rather than
+ * growing their own copy of the counting rules, which is what keeps the
+ * two scopes from disagreeing: a ward total that drifts away from the
+ * tenant total is a bug nobody can see from either screen alone.
+ *
+ * A record that *moves ward* is the case worth being careful about. It is
+ * not an update as far as the two ward counters are concerned — it is a
+ * departure from one and an arrival at the other — so it is expressed
+ * exactly that way, by calling the same delta function with the record
+ * leaving (`after` undefined) and then arriving (`before` undefined).
+ */
+function scoped<T extends { wardCode?: string }>(
+  before: T | undefined,
+  after: T | undefined,
+  delta: (b: T | undefined, a: T | undefined) => Delta,
+): ScopedDelta[] {
+  const deltas: ScopedDelta[] = [{ scope: TENANT_SCOPE, delta: delta(before, after) }];
+
+  const fromWard = before?.wardCode;
+  const toWard = after?.wardCode;
+
+  if (fromWard === toWard) {
+    if (toWard) deltas.push({ scope: wardScope(toWard), delta: delta(before, after) });
+    return deltas;
+  }
+  if (fromWard) deltas.push({ scope: wardScope(fromWard), delta: delta(before, undefined) });
+  if (toWard) deltas.push({ scope: wardScope(toWard), delta: delta(undefined, after) });
+  return deltas;
+}
+
+/** Exported for testing: the full scoped fan-out for a voter write. */
+export function voterScopedDeltas(
+  before: VoterSnapshot | undefined,
+  after: VoterSnapshot | undefined,
+): ScopedDelta[] {
+  return scoped(before, after, voterCounterDelta);
+}
+
+/** Exported for testing: the full scoped fan-out for a household write. */
+export function householdScopedDeltas(
+  before: HouseholdSnapshot | undefined,
+  after: HouseholdSnapshot | undefined,
+): ScopedDelta[] {
+  return scoped(before, after, householdCounterDelta);
 }
 
 // ---- voters ---------------------------------------------------------------
@@ -211,6 +285,8 @@ type Sentiment = 'STRONG_SUPPORT' | 'LEAN_SUPPORT' | 'UNDECIDED' | 'LEAN_OPPOSIT
 interface VoterSnapshot {
   sentiment: Sentiment;
   deletedAt: string | null;
+  /** Mirrors `Voter.wardCode` — what makes a per-ward sentiment count real. */
+  wardCode?: string;
 }
 
 /**
@@ -252,11 +328,11 @@ export function voterCounterDelta(before: VoterSnapshot | undefined, after: Vote
 export const maintainVoterCounters = onDocumentWritten(
   { document: 'tenants/{tenantId}/voters/{voterId}', region: REGION },
   async (event) => {
-    const delta = voterCounterDelta(
+    const deltas = voterScopedDeltas(
       event.data?.before?.data() as VoterSnapshot | undefined,
       event.data?.after?.data() as VoterSnapshot | undefined,
     );
-    await handle(event.id, (event.params as { tenantId: string }).tenantId, delta);
+    await handle(event.id, (event.params as { tenantId: string }).tenantId, deltas);
   },
 );
 
@@ -287,11 +363,14 @@ export function incidentCounterDelta(before: IncidentSnapshot | undefined, after
 export const maintainIncidentCounters = onDocumentWritten(
   { document: 'tenants/{tenantId}/incidents/{incidentId}', region: REGION },
   async (event) => {
+    // Tenant scope only. Incidents carry a ward, but nothing reads a
+    // per-ward incident count yet, and a counter nobody reads is storage
+    // and a migration with no reader to justify them.
     const delta = incidentCounterDelta(
       event.data?.before?.data() as IncidentSnapshot | undefined,
       event.data?.after?.data() as IncidentSnapshot | undefined,
     );
-    await handle(event.id, (event.params as { tenantId: string }).tenantId, delta);
+    await handle(event.id, (event.params as { tenantId: string }).tenantId, [{ scope: TENANT_SCOPE, delta }]);
   },
 );
 
@@ -333,6 +412,8 @@ type ContactStatus =
 interface HouseholdSnapshot {
   contactStatus?: ContactStatus;
   deletedAt: string | null;
+  /** Mirrors `Household.wardCode`. */
+  wardCode?: string;
 }
 
 /**
@@ -366,11 +447,11 @@ export function householdCounterDelta(
 export const maintainHouseholdCounters = onDocumentWritten(
   { document: 'tenants/{tenantId}/households/{householdId}', region: REGION },
   async (event) => {
-    const delta = householdCounterDelta(
+    const deltas = householdScopedDeltas(
       event.data?.before?.data() as HouseholdSnapshot | undefined,
       event.data?.after?.data() as HouseholdSnapshot | undefined,
     );
-    await handle(event.id, (event.params as { tenantId: string }).tenantId, delta);
+    await handle(event.id, (event.params as { tenantId: string }).tenantId, deltas);
   },
 );
 
@@ -381,6 +462,6 @@ export const maintainDiaryCounters = onDocumentWritten(
       event.data?.before?.data() as DiarySnapshot | undefined,
       event.data?.after?.data() as DiarySnapshot | undefined,
     );
-    await handle(event.id, (event.params as { tenantId: string }).tenantId, delta);
+    await handle(event.id, (event.params as { tenantId: string }).tenantId, [{ scope: TENANT_SCOPE, delta }]);
   },
 );

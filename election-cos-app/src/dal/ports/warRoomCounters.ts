@@ -48,4 +48,21 @@ export interface WarRoomCounters {
 
 export interface WarRoomCountersRepository {
   get(ctx: SessionContext): Promise<WarRoomCounters>;
+  /**
+   * The same shape, for one ward.
+   *
+   * Maintained by the same triggers in the same transaction as the
+   * tenant-wide document, so the ward documents are a partition of it
+   * rather than a second, separately-derived count that could disagree —
+   * see `functions/src/warRoomCounters.test.ts`, "keeps every ward summing
+   * to the tenant, and leaves no voter behind".
+   *
+   * Still one document read per ward, so §7.4 holds: no screen scans the
+   * voters collection, including the one that compares every ward.
+   *
+   * A ward nobody has canvassed returns the zeroed shape. That is a real
+   * answer — "nothing recorded here" — and the comparison screen prints it
+   * as such rather than as a zero that looks like a measurement.
+   */
+  getForWard(ctx: SessionContext, wardCode: string): Promise<WarRoomCounters>;
 }

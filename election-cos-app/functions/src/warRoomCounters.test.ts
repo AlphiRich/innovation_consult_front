@@ -7,6 +7,10 @@ import {
   householdCounterDelta,
   incidentCounterDelta,
   voterCounterDelta,
+  voterScopedDeltas,
+  householdScopedDeltas,
+  TENANT_SCOPE,
+  wardScope,
   type CounterTransaction,
 } from './warRoomCounters';
 
@@ -196,7 +200,7 @@ describe('applying a counter event exactly once', () => {
   }
 
   const NOW = Date.parse('2026-10-28T09:00:00.000Z');
-  const CREATE = voterCounterDelta(undefined, { sentiment: 'UNDECIDED', deletedAt: null });
+  const CREATE = [{ scope: TENANT_SCOPE, delta: voterCounterDelta(undefined, { sentiment: 'UNDECIDED', deletedAt: null }) }];
 
   it('applies a first delivery', async () => {
     const { tx, written } = ledger();
@@ -229,10 +233,15 @@ describe('applying a counter event exactly once', () => {
       tx,
       'jbmarks',
       'evt-2',
-      voterCounterDelta(
-        { sentiment: 'UNDECIDED', deletedAt: null },
-        { sentiment: 'STRONG_SUPPORT', deletedAt: null },
-      ),
+      [
+        {
+          scope: TENANT_SCOPE,
+          delta: voterCounterDelta(
+            { sentiment: 'UNDECIDED', deletedAt: null },
+            { sentiment: 'STRONG_SUPPORT', deletedAt: null },
+          ),
+        },
+      ],
       NOW,
     );
 
@@ -261,7 +270,12 @@ describe('applying a counter event exactly once', () => {
       tx,
       'jbmarks',
       'evt-noop',
-      voterCounterDelta({ sentiment: 'UNDECIDED', deletedAt: null }, { sentiment: 'UNDECIDED', deletedAt: null }),
+      [
+        {
+          scope: TENANT_SCOPE,
+          delta: voterCounterDelta({ sentiment: 'UNDECIDED', deletedAt: null }, { sentiment: 'UNDECIDED', deletedAt: null }),
+        },
+      ],
       NOW,
     );
 
@@ -317,9 +331,136 @@ describe('the marker document id', () => {
       };
     })();
 
-    const delta = voterCounterDelta(undefined, { sentiment: 'UNDECIDED', deletedAt: null });
+    const delta = [
+      { scope: TENANT_SCOPE, delta: voterCounterDelta(undefined, { sentiment: 'UNDECIDED', deletedAt: null }) },
+    ];
     await applyCounterEvent(tx, 'jbmarks', 'a/b', delta, 0);
     await applyCounterEvent(tx, 'jbmarks', 'a.b', delta, 0);
     expect(written.counters).toHaveLength(2);
+  });
+});
+
+/**
+ * The ward dimension.
+ *
+ * These counters are what makes a per-ward sentiment comparison show
+ * captured counts instead of an invented figure, so the property that
+ * matters is not that they exist — it is that they never disagree with
+ * the tenant total they are a partition of.
+ */
+describe('ward-scoped fan-out', () => {
+  const ward = (wardCode: string, sentiment: 'UNDECIDED' | 'STRONG_SUPPORT' = 'UNDECIDED') => ({
+    sentiment,
+    deletedAt: null,
+    wardCode,
+  });
+
+  it('counts a new voter in the tenant and in their ward', () => {
+    expect(voterScopedDeltas(undefined, ward('NW405-W2'))).toEqual([
+      { scope: TENANT_SCOPE, delta: { totalVoters: 1, 'sentimentBreakdown.UNDECIDED': 1 } },
+      { scope: wardScope('NW405-W2'), delta: { totalVoters: 1, 'sentimentBreakdown.UNDECIDED': 1 } },
+    ]);
+  });
+
+  it('moves a voter between wards as a departure and an arrival', () => {
+    // Not an update as far as the two ward counters are concerned. If this
+    // were expressed as one delta, the ward they left would keep counting
+    // them forever and the two wards would sum to more than the tenant.
+    const deltas = voterScopedDeltas(ward('NW405-W2'), ward('NW405-W5'));
+
+    expect(deltas).toEqual([
+      { scope: TENANT_SCOPE, delta: {} },
+      { scope: wardScope('NW405-W2'), delta: { totalVoters: -1, 'sentimentBreakdown.UNDECIDED': -1 } },
+      { scope: wardScope('NW405-W5'), delta: { totalVoters: 1, 'sentimentBreakdown.UNDECIDED': 1 } },
+    ]);
+  });
+
+  it('leaves the tenant total untouched when only the ward changes', () => {
+    const [tenant] = voterScopedDeltas(ward('NW405-W2'), ward('NW405-W5'));
+    expect(tenant.delta).toEqual({});
+  });
+
+  it('applies a sentiment change to both scopes, once each', () => {
+    const deltas = voterScopedDeltas(ward('NW405-W2'), ward('NW405-W2', 'STRONG_SUPPORT'));
+    const expected = { 'sentimentBreakdown.UNDECIDED': -1, 'sentimentBreakdown.STRONG_SUPPORT': 1 };
+    expect(deltas).toEqual([
+      { scope: TENANT_SCOPE, delta: expected },
+      { scope: wardScope('NW405-W2'), delta: expected },
+    ]);
+  });
+
+  it('keeps every ward summing to the tenant, and leaves no voter behind', () => {
+    // Two different guarantees, and the second is the one with teeth.
+    //
+    // Summing is weaker than it looks: mis-attributing a move to the wrong
+    // ward preserves the total while putting the voter in the wrong place,
+    // so the sum alone passes. Proved by injection — treating a ward move
+    // as a plain update leaves the sum intact and only the emptiness of
+    // the ward they left catches it.
+    const tenant: Record<string, number> = {};
+    const wards: Record<string, Record<string, number>> = {};
+    const apply = (deltas: ReturnType<typeof voterScopedDeltas>) => {
+      for (const { scope, delta } of deltas) {
+        const target = scope === TENANT_SCOPE ? tenant : (wards[scope] ??= {});
+        for (const [k, v] of Object.entries(delta)) target[k] = (target[k] ?? 0) + v;
+      }
+    };
+
+    apply(voterScopedDeltas(undefined, ward('NW405-W2')));
+    apply(voterScopedDeltas(undefined, ward('NW405-W5', 'STRONG_SUPPORT')));
+    apply(voterScopedDeltas(ward('NW405-W2'), ward('NW405-W5')));
+    apply(voterScopedDeltas(ward('NW405-W5'), ward('NW405-W5', 'STRONG_SUPPORT')));
+    apply(voterScopedDeltas(ward('NW405-W5', 'STRONG_SUPPORT'), { ...ward('NW405-W5', 'STRONG_SUPPORT'), deletedAt: 'x' }));
+
+    const summed: Record<string, number> = {};
+    for (const counters of Object.values(wards)) {
+      for (const [k, v] of Object.entries(counters)) summed[k] = (summed[k] ?? 0) + v;
+    }
+    const nonZero = (o: Record<string, number>) =>
+      Object.fromEntries(Object.entries(o).filter(([, v]) => v !== 0));
+
+    expect(nonZero(summed)).toEqual(nonZero(tenant));
+    expect(nonZero(tenant)).toEqual({ totalVoters: 1, 'sentimentBreakdown.STRONG_SUPPORT': 1 });
+
+    // The ward the voter left must hold nothing of them. This is the
+    // assertion the sum cannot make.
+    expect(nonZero(wards[wardScope('NW405-W2')] ?? {})).toEqual({});
+  });
+
+  it('falls back to the tenant scope alone for a record with no ward', () => {
+    // Nothing in the schema makes wardCode optional, but a document
+    // written before the field existed would have none. Counting it in the
+    // tenant total and nowhere else is right: it is a real voter, and
+    // guessing a ward for it would be worse than omitting it from one.
+    expect(voterScopedDeltas(undefined, { sentiment: 'UNDECIDED', deletedAt: null })).toEqual([
+      { scope: TENANT_SCOPE, delta: { totalVoters: 1, 'sentimentBreakdown.UNDECIDED': 1 } },
+    ]);
+  });
+
+  it('scopes households by ward on the same rules', () => {
+    expect(householdScopedDeltas(undefined, { contactStatus: 'CONTACTED', deletedAt: null, wardCode: 'NW405-W2' })).toEqual([
+      { scope: TENANT_SCOPE, delta: { 'householdsByContactStatus.CONTACTED': 1 } },
+      { scope: wardScope('NW405-W2'), delta: { 'householdsByContactStatus.CONTACTED': 1 } },
+    ]);
+  });
+
+  it('writes every scope under one marker, so a redelivery skips all of them', async () => {
+    const markers: string[] = [];
+    const counters: string[] = [];
+    const tx: CounterTransaction = {
+      markerExists: async (p) => markers.includes(p),
+      writeMarker: (p) => void markers.push(p),
+      incrementCounter: (p) => void counters.push(p),
+    };
+    const deltas = voterScopedDeltas(undefined, ward('NW405-W2'));
+
+    await applyCounterEvent(tx, 'jbmarks', 'evt-1', deltas, 0);
+    await applyCounterEvent(tx, 'jbmarks', 'evt-1', deltas, 0);
+
+    expect(counters).toEqual([
+      'tenants/jbmarks/counters/warRoom',
+      'tenants/jbmarks/counters/ward-NW405-W2',
+    ]);
+    expect(markers).toHaveLength(1);
   });
 });

@@ -15,6 +15,12 @@ const SUB_VIEWS = [
     description: 'Electoral 1% qualification threshold — not PPFA funding thresholds.',
   },
   {
+    to: '/analytics/ward-comparison',
+    label: 'Ward Comparison & Scenario',
+    description:
+      'Certified 2021 ward results, the swing each ward would need to turn, captured canvass sentiment, and a Schedule 1 projection under a swing you set.',
+  },
+  {
     to: '/analytics/scheduled-reports',
     label: 'Sentiment Summary Report',
     description: 'Tenant-wide sentiment breakdown, on demand, CSV export.',

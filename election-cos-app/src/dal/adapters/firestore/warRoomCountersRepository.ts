@@ -55,4 +55,13 @@ export const warRoomCountersRepository: WarRoomCountersRepository = {
     const doc = await getByIdGeneric(ctx, 'counters', 'warRoom', fromFirestore);
     return doc ?? ZERO_COUNTERS;
   },
+
+  async getForWard(ctx: SessionContext, wardCode: string): Promise<WarRoomCounters> {
+    // Document id built by the same rule the trigger writes under —
+    // `wardScope()` in functions/src/warRoomCounters.ts. The two packages
+    // do not share a workspace yet, so this is the hand-kept half of that
+    // pair; warRoomCountersRepository.test.ts pins the spelling.
+    const doc = await getByIdGeneric(ctx, 'counters', `ward-${wardCode}`, fromFirestore);
+    return doc ?? ZERO_COUNTERS;
+  },
 };
