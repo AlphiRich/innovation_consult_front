@@ -9,6 +9,13 @@
  * `volunteer_tasks_innovation_consult_edition` screen is the real screen;
  * this is the logic it needs.
  *
+ * That screen lives at `docs/stitch-screens/` on
+ * `claude/test-coverage-analysis-mdahdx`, not on this branch — the
+ * original of this file cited that path and it was briefly recorded here
+ * as a wrong reference. It is not wrong; it is on the other branch, with
+ * 47 other extracted screens. Porting that directory across is item 1 in
+ * §10 of docs/asset-control-sheet.md.
+ *
  * Unlike incidents (`incidentWorkflow.ts`), a task transition carries no
  * dedicated capability — `firestore.rules`' `/tenants/{tid}/tasks/{taskId}`
  * match gates on `tenantOK(tid) && inScope(tid, ...)` only, the same

@@ -637,5 +637,84 @@ which palette these covers carry before any of them is used.
 
 ---
 
+## 10. Branch `claude/test-coverage-analysis-mdahdx`
+
+A sibling branch of this repo, not an upload. Diverged at `bae32f56`:
+**11 commits theirs, 43 ours.** 59 files exist there and not here.
+
+### 10.1 It resolves the §1 blocking finding — and the blocker was ours
+
+Its `seed-data/lge2026-candidate-database.csv` is the **national** LGE2026
+candidate list: **136,723 rows, 257 municipalities**, where the file
+registered as A-019 covered North West only.
+
+Run against the proclaimed baseline, `ward_or_list_order` looked
+catastrophic — **178 of 213 municipalities disagreed**, in both
+directions, including Cape Town 118 vs 234 and Johannesburg 135 vs 189.
+
+It is not a disagreement. **The column is polymorphic.** On
+`PR List Candidate` rows it carries the IEC *ward ID*, whose last three
+digits are the ward number; on `Ward Candidate` rows it carries something
+else entirely. Reading it correctly:
+
+```
+last 3 digits of max PR value == proclaimed ward count : 211
+mismatch                                               :   2
+no comparable data                                     :  45
+
+the SAME column read off Ward Candidate rows               : 35 of 213
+```
+
+`64005034` for NW405 → 34 wards. `19100118` for Cape Town → 118.
+`79800135` for Johannesburg → 135. All exactly the proclaimed figures.
+
+**So the candidate data corroborates the proclamation at national scale,
+and the earlier conflict was a column misreading on our side** — mine,
+reading a per-party sequence number as a ward number. The NW405 "32
+wards" note in A-019 is an artefact of the same mistake and remains not
+to be actioned. §1's conclusion is unchanged; its framing as a
+*conflict between sources* was wrong and is withdrawn.
+
+Two genuine mismatches survive, worth a look but not blocking:
+**FS162 Kopanong** (baseline 7, ward-ID tail 9) and **GT484 Merafong
+City** (25 vs 28). And **FS164 "-New"** is in the baseline but absent
+from the database — a newly created municipality with no candidates yet.
+
+### 10.2 `docs/stitch-screens/` is real — correcting §9
+
+Last entry recorded that path as the one false claim in the pasted task
+file. **It is not false.** It exists on this branch with **48 files** —
+47 extracted screens plus a README — including
+`volunteer_tasks_innovation_consult_edition.html`, the exact screen that
+file cites. The paste was written against this branch, not against a
+missing directory. `src/modules/tasks/taskWorkflow.ts` now says so.
+
+### 10.3 Nothing to reconcile on the seat engine
+
+Their `seatCalculator.ts` differs from ours by 28 lines, and the diff is
+**entirely additive on our side**: the quota formula is identical, and
+ours adds `assertSchedule1Applies(municipalityCode)`, the
+`delimitationId` stamp, and the refusal to run Schedule 1 against a
+category C district. Ours supersedes; no merge needed.
+
+### 10.4 What is worth porting, in order
+
+1. **`docs/stitch-screens/`** (48 files) — the design source of truth, and
+   the thing the Stitch work order (A-045/A-047) is about.
+2. **The national candidate database** — `seed-data/` CSV (20 MB),
+   `docs/lge2026-candidate-database.md`, and `tools/seed-data/lge2026-candidates/`
+   (4 files). Read the PR-row ward ID, never the ward-row column.
+3. **The Ward-Sentiment budget guardrail** — `functions/src/sentimentBudget.ts`
+   + test, `src/dal/ports/sentimentBudget.ts`,
+   `src/dal/adapters/firestore/sentimentBudgetRepository.ts`. Directly
+   answers finding F4 in A-041, which rates sentiment the weakest module
+   on evidence of user need and has no cost ceiling.
+
+Ours carries 24 `src/modules` files, 19 fonts and 5 `src/config` files
+they lack, so this is a port-forward in the same direction as the fork
+(A-031): **this branch is the donor, ours stays authoritative.**
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
