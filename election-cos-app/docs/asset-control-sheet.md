@@ -716,5 +716,96 @@ they lack, so this is a port-forward in the same direction as the fork
 
 ---
 
+## 11. The voters' roll — 31 PDFs, NW405
+
+**IEC LGE 2026 Certified Voters' Roll, NW405 JB Marks, proclaimed
+7 August 2026.** 31 PDFs, **21 distinct voting districts**.
+
+### 11.1 Handling — what was and was not read
+
+**Page 1 of each file only.** That page carries the control header: VD
+code, ward, voting station, proclamation date, and the verified /
+rejected / total counts. **No voter record was read, extracted, copied or
+stored**, and none appears in this repository or in this document. The
+reference table below is non-personal: codes, station names and counts.
+
+A certified roll is personal information at scale under POPIA, and far
+more sensitive than the candidate lists already registered — candidate
+lists are published; a voters' roll is not. Two things follow, and
+neither is decided here:
+
+- **Whether the roll is loaded into EC OS at all** is a POPIA decision
+  with a lawful-basis question attached, not a technical one. The
+  accounting spec's own rule already bars it from the books.
+- **Where it would live.** Firestore in `africa-south1` is in-country,
+  which is the easy half. Retention, the §5 deletion jobs the PAIR audit
+  flags as unbuilt, and the DSR path are the hard half.
+
+### 11.2 It confirms the ward-key finding a third time
+
+Every ward field reads `64005` + a three-digit ward number — `64005013`
+is ward 13. That is the **same format** recovered from the national
+candidate database in §10, now independently confirmed by the IEC's own
+certified roll. Wards 2, 3, 4, 5, 6, 8, 9, 12, 13 and 14 appear; every
+one is in `1..34`, matching the proclaimed count.
+
+**The join key for any roll ingestion is this ward ID**, not a bare ward
+number and not the candidate file's ward-row column.
+
+### 11.3 The segments reconcile — where they are complete
+
+Multi-part files each carry their own header, which makes the control
+total checkable against the sum of its parts:
+
+```
+VD        ward      segs  sum verified  control   sum total  control  result
+86820486  64005002     2           877      877        1239     1239  MATCH
+86910015  64005004     1           503     2500         659     3282  partial — 1 of 5 segments uploaded
+```
+
+Where every segment is present the arithmetic is exact. Where it is not,
+the shortfall is detected rather than silently accepted — which is the
+check any ingestion must run before it trusts a VD.
+
+### 11.4 Reference table (7 VDs with a control sheet)
+
+| VD | ward id | w# | verified | rejected | total | rej% | station |
+|---|---|---:|---:|---:|---:|---:|---|
+| 86820486 | 64005002 | 2 | 877 | 362 | 1,239 | 29.2% | Roodekraal Kontant Winkel |
+| 86820521 | 64005003 | 3 | 875 | 532 | 1,407 | 37.8% | Fikadibeng Primary School |
+| 86910015 | 64005004 | 4 | 2,500 | 782 | 3,282 | 23.8% | Potchefstroom Primary School |
+| 86910026 | 64005005 | 5 | 3,592 | 1,473 | 5,065 | 29.1% | Laerskool ML Fick |
+| 86910161 | 64005006 | 6 | 1,922 | 1,462 | 3,384 | 43.2% | Uniting Reformed Church of SA (Ikageng) |
+| 86910284 | 64005013 | 13 | 1,165 | 290 | 1,455 | 19.9% | Methodist Church of SA Promosa |
+| 86910532 | 64005003 | 3 | 3,551 | 255 | 3,806 | 6.7% | Die Wilge High School |
+
+**Totals: 14,482 verified · 5,156 rejected · 19,638 records · 26.3%
+rejected.**
+
+**The rejection spread is the thing to ask about, not to interpret.**
+6.7% at Die Wilge against 43.2% at Ikageng is a sixfold difference
+between two VDs in the same municipality on the same certified roll.
+**[U]** What "rejected" denotes on a certified roll is not established
+here, and I am not going to guess at it — it could be an address or
+verification status with no bearing on eligibility, or something
+operationally significant. Confirm with the IEC before any figure
+derived from it reaches a campaign.
+
+### 11.5 What this upload is not
+
+- **Partial.** 21 VDs of NW405's roughly 108, and only 7 of those 21
+  have a control sheet.
+- **Not a test of the composite key.** Every VD here maps to exactly one
+  ward, and no voting station spans two. The `wardCode::vdCode`
+  composite that exists because 26 of 108 NW405 stations split across
+  wards is **not exercised** by this sample, so it remains unverified
+  against real data.
+- **Not loadable yet.** Beyond the POPIA question, the per-ward
+  registered-voter figures that remain item 3 in §5 are still missing —
+  the roll gives per-VD counts, and rolling those to wards needs the
+  complete VD set, not 21 of 108.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
