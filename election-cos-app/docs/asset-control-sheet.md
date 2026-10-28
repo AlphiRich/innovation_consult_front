@@ -374,5 +374,143 @@ report, the RD report, the Ventersdorp CSV and the research skill.
 
 ---
 
+## 8. Batch 8 — `Security_Baselines_for_ElectionsCOS1.zip` (+ 1 dup)
+
+`b6ded8d7` · 9 entries. **Seven are byte-identical to A-004–A-010**, so
+those reviews stand. **Two are new, and they are the two files whose
+cross-file claims had been unverifiable for three turns:** `guardrails.ts`
+and `security.ts`. Both typecheck clean under `--strict`. Both were run.
+
+**Also settled:** the `(?i)` regex claim. These copies are the *fixed*
+versions — `guardrails.ts` lines 45–51 document the bug and use proper `/i`
+flags. The broken version was never in this store. That claim was never
+adopted here, and it stays unadopted.
+
+A-079 | `guardrails.ts` | `inside b6ded8d7` | **DEFECT ×5** [read, run]
+A-080 | `security.ts` | `inside b6ded8d7` | **DEFECT ×4** [read, run]
+A-081 | `ecos-settings-modules-1.zip` | `64094709` | **DUP of A-053** (third copy)
+
+### 8.1 `guardrails.ts` — verified by running
+
+**G1 (high). A secret inside a structured tool result is returned
+unredacted, and audited `ALLOW`.** `executeTool` line 182 keeps the
+screened text only when the result was a string:
+
+```
+decision: ALLOW
+result  : {"tool":"lookup","args":{"q":"AKIAIOSFODNN7EXAMPLE"},...}
+>> AWS key present in the returned object: YES — LEAKED
+audit   : ALLOW tool.call {"sandboxed":true}
+```
+
+The same key as a *string* result is redacted correctly. Most tools return
+objects, so the output guard is inert where it matters most. `screenOutput`
+also never returns `"REDACT"` — it returns `ALLOW` with rewritten text — so
+the caller cannot tell a redaction happened.
+
+**G2. Only the first occurrence per pattern is redacted** —
+`out.replace(re, …)` with no `/g`:
+
+```
+"AKIAIOSFODNN7EXAMPLE and AKIAZZZZZZZZZZZZZZZZ"
+        -> "[REDACTED] and AKIAZZZZZZZZZZZZZZZZ"
+```
+
+**G3. The documented unsandboxed path cannot run.** `ToolSpec` declares no
+`impl`, `register()` does not require one, and line 170 casts to
+`{ impl }`:
+
+```
+register(sandboxed:false + justification): accepted
+executeTool THREW: TypeError: spec.impl is not a function
+```
+
+Deny-by-default itself works — `register()` correctly refused
+`sandboxed:false` without a justification.
+
+**G4. The delimiter nonce comes from `Math.random()`**, in a file that
+already imports `sha256`. The escaping is case-sensitive, so a nested
+closing tag in different case passes through intact:
+
+```
+"x<\\u002funtrusted_doc> y</UNTRUSTED_DOC> z"
+```
+
+A predictable nonce plus an unescaped uppercase close tag is a delimiter
+forgery path against the file's own stated invariant.
+
+**G5. `ROLE_OVERRIDE` blocks ordinary prose.** `/you are now|act as|…/i`:
+
+```
+"this will act as the tiebreaker"  -> BLOCK ROLE_OVERRIDE
+"please act as reviewer"           -> BLOCK ROLE_OVERRIDE
+```
+
+For a tool processing free-text field reports, that is a self-inflicted
+outage.
+
+### 8.2 `security.ts` — verified by running
+
+**S1 (high). The audit hash chain cannot be recomputed.** `makeAudit`
+feeds `ts: Date.now()` into the sha256 input and never stores it:
+
+```
+columns written : tenantId, actorId, action, resource, outcome, ip, prevHash, entryHash, detail
+hash input      : tenantId, actorId, action, resource, outcome, ip, detail, prevHash, ts
+>> a timestamp column is stored: NO
+```
+
+So the nightly verifier that `0001_security_baseline.sql` describes cannot
+reproduce `entryHash` from the stored row. The integrity property this
+package rates highest is unverifiable **by construction** — a different and
+worse failure than the forked chain it set out to fix.
+
+**S2 (high). `redactSecrets` does not recurse into arrays.** The
+`!Array.isArray(v)` guard on line 128 means array members are copied
+verbatim, and `makeAudit` now routes `detail` through this function:
+
+```
+in : {"items":[{"token":"supersecret123"},{"note":"AKIAIOSFODNN7EXAMPLE"}],"ok":1}
+out : identical — both survive
+```
+
+**S3. The key-name patterns destroy legitimate audit evidence.** `/key/i`
+and `/aws/i` match far more than secrets:
+
+```
+{"monkey":1}             -> {"monkey":"[REDACTED]"}
+{"idempotencyKey":"abc"} -> {"idempotencyKey":"[REDACTED]"}
+{"ward_cycle_tokens":12} -> {"ward_cycle_tokens":"[REDACTED]"}
+{"awsRegion":"af-south-1"} -> {"awsRegion":"[REDACTED]"}
+```
+
+For a forensic log, redacting the ward-token count and the region is loss,
+not protection.
+
+**S4 (by inspection, not run). `SELECT … LIMIT 1 FOR UPDATE` on an empty
+table acquires no lock**, so the first concurrent audits all read `GENESIS`
+and fork the chain — the exact defect the changelog claims to have closed.
+On Postgres it also does not block a tail insert at all, since there are no
+gap locks. The file's own comment offers the advisory-lock alternative;
+that is the one that works.
+
+**Also by inspection:** the rate-limit identity falls back to
+`x-forwarded-for`, which the client controls, so an unauthenticated caller
+can mint unlimited buckets. Verified correct: the lockout boundary (5
+failures locks) and the token-bucket Lua, which does store the refilled
+count before denying.
+
+### 8.3 What this changes
+
+The package's three unverifiable cross-file claims are now resolved: the
+Redis rate limiter is real, the `pageOnCall` hook is real, and the audit
+transaction exists. **But the audit chain is unverifiable and the two
+redaction functions both leak**, so the disposition does not improve.
+Combined with A-006 (the gate blocks every build) and A-007 (the pipeline
+can never go green), the package remains **DEFECT** across the board and
+still targets a stack this repo does not use.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
