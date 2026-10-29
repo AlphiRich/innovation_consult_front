@@ -22,11 +22,16 @@ export default {
         teal: '#33427E',
         green: '#2F7E4A',
         slate: '#6A6E7E',
+        // Public-site border/rule. Borders only, never text — 1.5:1 on
+        // paper. See src/design/tokens.ts for why the site needs its own.
+        line: '#DCD6C8',
       },
       fontFamily: {
         display: ['"Archivo Narrow"', 'sans-serif'],
         body: ['"Public Sans"', 'sans-serif'],
         mono: ['"IBM Plex Mono"', 'monospace'],
+        // The public site's display face: Archivo, not Archivo Narrow.
+        'site-display': ['Archivo', 'sans-serif'],
       },
       // Typographic role scale, sourced from the Stitch suite's civic_authority/
       // DESIGN.md "Brand & Style" section — that file's YAML colour palette
@@ -42,6 +47,26 @@ export default {
         'body-md': ['16px', { lineHeight: '24px', fontWeight: '400' }],
         'label-caps': ['12px', { lineHeight: '16px', letterSpacing: '0.1em', fontWeight: '700' }],
         'data-mono': ['14px', { lineHeight: '20px', letterSpacing: '-0.01em', fontWeight: '500' }],
+
+        // ---- public site (electioncos.co.za) ------------------------
+        // Named because check-type-scale.mjs refuses `text-xl` and
+        // `text-[17px]` equally. Phone sizes come from picking a smaller
+        // role by default and stepping up at `md:`.
+        'site-hero': ['56px', { lineHeight: '1.05', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'site-display': ['52px', { lineHeight: '1.08', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'site-h1': ['48px', { lineHeight: '1.08', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'site-h2': ['40px', { lineHeight: '1.15', fontWeight: '700' }],
+        'site-h3': ['34px', { lineHeight: '1.2', fontWeight: '700' }],
+        'site-h4': ['28px', { lineHeight: '1.2', fontWeight: '700' }],
+        'site-h5': ['22px', { lineHeight: '1.3', fontWeight: '700' }],
+        'site-h6': ['19px', { lineHeight: '1.3', fontWeight: '700' }],
+        'site-lead': ['20px', { lineHeight: '1.55', fontWeight: '400' }],
+        'site-body': ['17px', { lineHeight: '1.65', fontWeight: '400' }],
+        'site-base': ['16px', { lineHeight: '1.6', fontWeight: '400' }],
+        'site-sm': ['15px', { lineHeight: '1.55', fontWeight: '400' }],
+        'site-caption': ['14px', { lineHeight: '1.45', fontWeight: '400' }],
+        'site-micro': ['13px', { lineHeight: '1.4', fontWeight: '400' }],
+        'site-nano': ['12px', { lineHeight: '1.35', fontWeight: '400' }],
       },
     },
   },

@@ -1,0 +1,103 @@
+/**
+ * Election Campaign OS — public site stylesheet
+ *
+ * Only what cannot be a utility: the font faces the site needs that the
+ * application does not, and the three button shapes that repeat on
+ * every page.
+ *
+ * No hex literals. `check-no-hex.mjs` scans .css as well as .tsx, and
+ * `@apply` with a token class is the right answer anyway — a hex here
+ * would be a second source of truth for a colour that already has one.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Archivo, for the site's display face.
+ *
+ * The application self-hosts its woff2 and carries a guard that none of
+ * the three brand faces has silently stopped loading. The site adds
+ * Archivo (not Narrow), which the application does not use.
+ *
+ * It is loaded by `site.html` with a preconnect rather than imported
+ * here: an @import in CSS blocks rendering until the font file resolves,
+ * and the canvas's own requirement is that the home page reads fully at
+ * 360px on 3G. A `<link>` in the head starts the fetch earlier and
+ * `display=swap` means the text is readable before it lands.
+ */
+
+@layer base {
+  html {
+    /* The canvas sets the body background on <body>; doing it on html as
+       well stops a white band under a short page on iOS. */
+    @apply bg-paper;
+  }
+
+  body {
+    @apply m-0 bg-paper font-body text-ink;
+  }
+
+  /* Links are blue and go ink on hover, per the canvas. */
+  a {
+    @apply text-teal;
+  }
+
+  a:hover {
+    @apply text-ink;
+  }
+
+  /* One visible focus ring everywhere, amber, offset so it clears the
+     control. Rule 13 and WCAG 2.2 both want this visible, and the
+     canvas specifies exactly this treatment. */
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    @apply outline outline-[3px] outline-offset-2 outline-gold;
+  }
+}
+
+@layer components {
+  /**
+   * The three button shapes.
+   *
+   * `min-height: 48px` is not decoration: the canvas requires 44px
+   * touch targets and these are the controls a councillor taps on a
+   * phone at a gate. The header's slightly smaller variant still
+   * clears 44.
+   */
+  .site-btn-primary {
+    @apply inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-md
+           bg-gold px-[22px] font-semibold text-ink no-underline;
+  }
+
+  .site-btn-outline-ink {
+    @apply inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-md
+           border-[1.5px] border-teal px-[22px] font-semibold text-teal no-underline;
+  }
+
+  .site-btn-outline-paper {
+    @apply inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-md
+           border-[1.5px] border-paper px-[22px] font-semibold text-paper no-underline;
+  }
+
+  /* The header's Talk to us sits in a 44px bar rather than a 48px one. */
+  .site-btn-primary.text-site-sm {
+    @apply min-h-[44px] px-[18px];
+  }
+
+  /**
+   * Form controls. One shape, so a field cannot drift between pages.
+   */
+  .site-field {
+    @apply min-h-[48px] w-full rounded-md border border-line bg-white px-3.5
+           font-body text-site-base text-ink;
+  }
+
+  textarea.site-field {
+    @apply py-3;
+  }
+}
