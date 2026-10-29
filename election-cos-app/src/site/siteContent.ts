@@ -79,7 +79,7 @@ export const SITE_NAV: NavItem[] = [
   { label: 'Platform', href: '/#pillars' },
   { label: 'Compliance', href: '/compliance' },
   { label: 'Packages', href: '/packages' },
-  { label: 'Explainers', href: '/#pillars' },
+  { label: 'Explainers', href: '/explainers' },
   { label: 'About', href: '/#pledge' },
 ];
 

@@ -37,6 +37,7 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { SITE, SITE_NAV, whatsAppHref } from './siteContent';
+import { AdConsentWithdrawLink } from './ads/ConsentBanner';
 
 /* ------------------------------------------------------------- mark */
 
@@ -118,7 +119,7 @@ export function SiteHeader({ enquirySubject }: { enquirySubject: string }) {
 
 /* ----------------------------------------------------------- footer */
 
-export function SiteFooter() {
+export function SiteFooter({ onWithdrawAdConsent }: { onWithdrawAdConsent: () => void }) {
   return (
     <footer className="bg-ink text-line text-site-sm">
       <div className="mx-auto grid max-w-[1200px] grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-8 px-6 pb-8 pt-14">
@@ -158,6 +159,13 @@ export function SiteFooter() {
           <Link to="/#pledge" className="text-line">
             Neutrality pledge
           </Link>
+          {/*
+           * In the footer, on every page — including the ones where no
+           * advert ever appears. Consent that is harder to withdraw than
+           * it was to give is not consent, and somebody who said yes on
+           * an explainer should not have to find that explainer again.
+           */}
+          <AdConsentWithdrawLink onWithdraw={onWithdrawAdConsent} />
         </div>
 
         <div className="flex flex-col gap-1.5">
@@ -182,15 +190,17 @@ export function SiteFooter() {
 export function SiteShell({
   children,
   enquirySubject,
+  onWithdrawAdConsent,
 }: {
   children: ReactNode;
   enquirySubject: string;
+  onWithdrawAdConsent: () => void;
 }) {
   return (
     <div className="min-h-screen bg-paper font-body text-site-body text-ink">
       <SiteHeader enquirySubject={enquirySubject} />
       <main>{children}</main>
-      <SiteFooter />
+      <SiteFooter onWithdrawAdConsent={onWithdrawAdConsent} />
     </div>
   );
 }
