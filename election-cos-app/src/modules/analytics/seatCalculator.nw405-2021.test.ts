@@ -115,3 +115,47 @@ describe('NW405 2021 — IEC published seat calculation', () => {
     expect(statutory.quota).toBe(result.quota);
   });
 });
+
+/**
+ * Session 38 — what the D term is worth when it is NOT zero.
+ *
+ * A supplied Python implementation of Schedule 1 refuses the term
+ * outright — *"Item 12 has no D term"* — and carries a test asserting its
+ * `calculate_quota` has no `d` parameter. This file's header already
+ * answers the substance: the IEC's operational report prints the
+ * four-term divisor, the statute does not, and with D = 0 the two
+ * reduce to each other (guarded above).
+ *
+ * What was NOT written down is the size of the disagreement, or the fact
+ * that a user can reach it. Both are below. Nothing shipped is wrong —
+ * no code path passes a non-zero D, and NW405 has none — but
+ * `SeatCalculatorPage.tsx` renders it as an editable field, so the
+ * divergence is one keystroke away from a figure a campaign would quote.
+ */
+describe('the D term where D is not zero', () => {
+  const partiesAt = (noPRListWardSeats: number) =>
+    allocateSeats({
+      totalValidVotes: A,
+      totalSeats: B,
+      independentWardSeats: 0,
+      noPRListWardSeats,
+      parties: PUBLISHED.map(({ id, name, votes }) => ({ id, name, votes, wardSeatsWon: 0 })),
+    });
+
+  it('moves the quota by 46 votes per two ward seats, on NW405 figures', () => {
+    // The whole dispute in two numbers, so that whoever reads Item 12
+    // next has them rather than having to derive them.
+    expect(partiesAt(0).quota).toBe(1_515); // ⌊101 439 / 67⌋ + 1 — statutory B − C
+    expect(partiesAt(2).quota).toBe(1_561); // ⌊101 439 / 65⌋ + 1 — the IEC report's B − C − D
+  });
+
+  it('raises the quota monotonically, so D can only ever cost small parties seats', () => {
+    // Worth stating plainly: the four-term version is not neutral. A
+    // higher quota is a higher price per seat, and the parties that stop
+    // affording one are the small ones.
+    const quotas = [0, 1, 2, 3, 4].map((d) => partiesAt(d).quota);
+    for (let i = 1; i < quotas.length; i += 1) {
+      expect(quotas[i]).toBeGreaterThan(quotas[i - 1]);
+    }
+  });
+});

@@ -3962,5 +3962,244 @@ yet.
 
 ---
 
+## §37 — "App Code Build Stack", a Python seat calculator, a PL/pgSQL function, and an intake screen
+
+Session 38. Four artefacts, reviewed together because the first one frames
+the other three.
+
+### 37.1 The architecture document
+
+*"Campaign OS — App Code Build Stack: Ensuring Every Business & Marketing
+Promise Corresponds to a Functioning Feature."* Its §11 claims **"Every
+single feature … is directly mapped to a concrete element in the code
+stack described above."**
+
+It is a *proposal*, not a map. It describes Node + Express + Prisma +
+PostgreSQL + Redis + BullMQ + Kubernetes on AWS. This build is React +
+Firestore + Cloud Functions on `africa-south1` (§28). Nothing in §3's
+"Code Component" column exists; those are components that would have to
+be written. The document reads as a traceability matrix and functions as
+a wish list, which is the more dangerous of the two because it invites a
+reader to tick things off.
+
+Five things in it are not merely a different stack — they are wrong, and
+three of them are wrong about the law.
+
+### 37.2 The Gatherings Act is a notice regime, not a permit regime
+
+The document models it as a permit: `PermitStatus: NA → PENDING →
+APPROVED`, `POST /api/events/:id/permits`, a `PermitWorkflow` component,
+and a nightly job for *"events within 7 days with permit status !=
+APPROVED."*
+
+`GatheringsAdvisoryPage.tsx` in this build, from the primary source:
+
+> Section 3(2) requires the convener to give written notice to the
+> responsible officer … **not later than seven days** before the
+> gathering. … This is a **notice** regime, not a permit regime — the
+> convener notifies; the responsible officer may impose conditions or
+> prohibit. … In *Mlungwana and Others v S* [2018] ZACC 45, the
+> Constitutional Court confirmed that section 12(1)(a), which
+> criminalised convening a gathering of more than 15 people without
+> notice, is unconstitutional and invalid.
+
+**There is no APPROVED state to wait for.** A product that shows a
+campaign "PENDING — awaiting approval" is telling them they may not hold
+a rally until somebody says yes, which is the opposite of the statute and
+a chill on a constitutional right. The Constitutional Court struck down
+the criminalisation of exactly that assumption.
+
+The alert timing is wrong in the same direction: notice must be **given
+by** seven days out, so an alert that fires *at* seven days fires on the
+day the deadline passes. Under 48 hours the officer may prohibit — that
+is the cliff, and the document does not model it.
+
+### 37.3 R100,000 is a superseded PPFA threshold
+
+Quoted twice — §3.7 *"IEC threshold tracking (R100,000)"* and §7
+*"Nightly check for donations exceeding R100,000."*
+
+`ppfaDefaults.ts` carries **R200,000** disclosure and **R30,000,000**
+annual donor cap, citing gazette **53182**, and `ppfaDefaults.test.ts`
+contains, verbatim:
+
+```ts
+it('never equals a superseded threshold value', () => {
+  expect(config.disclosureThresholdZAR).not.toBe(100_000_00);
+  expect(config.annualDonorCapZAR).not.toBe(15_000_000_00);
+});
+```
+
+That guard exists because **the ecos-v2 fork failed in exactly this way**
+(§4d of `ecos-v2-fork-review.md`): correct seed values, superseded
+figures in the prose an admin actually read. This document is the same
+failure in the same place. A compliance alert on the wrong threshold is
+worse than no alert — it tells a treasurer they are clear at R150,000
+when they are R50,000 past the line.
+
+### 37.4 Six roles and ten capabilities; this build has seven and twenty-six
+
+The document's `User.role` enum: PARTY_ADMIN, LET_MANAGER, WARD_COORD,
+FIELD_AGENT, FINANCE_OFFICER, COMPLIANCE_OFFICER.
+
+`seedRoles.ts`: party-hq-admin, municipal-team-lead, ward-lead,
+**vd-captain**, canvasser, compliance-officer, finance-officer —
+`SEED_ROLES` guarded at **7**, `ALL_CAPABILITIES` guarded at **26**.
+
+The missing role is the voting-district captain. A VD is the unit the IEC
+organises by and this build has `votingDistricts` as a first-class
+collection; a hierarchy that goes municipality → ward → agent has no
+place to put the person who runs one voting station.
+
+"10 capabilities" also implies the document's **permission bitmask**,
+which cannot express this build's model: role defaults with per-user
+grants *and revocations* (`capabilities.ts`). A bitmask has no way to say
+"this role grants it and this user does not have it."
+
+The `ecos-rbac-config` skill names role-count drift as a previously
+flagged defect class on this project. This document is plausibly where it
+comes from.
+
+### 37.5 Two smaller ones
+
+- **"last-write-wins with timestamps"** is per-*document* as written.
+  `syncMerge.ts` is per-*field*, and its header says why: *"Per-document
+  LWW means a canvasser who corrects a phone number also reverts the
+  sentiment a ward lead recorded ten minutes ago, because the whole
+  document loses."*
+- **`af-south-1`** is AWS's Cape Town region. GCP's is `africa-south1`.
+  The document writes *"AWS/GCP South Africa region (af-south-1)"*,
+  conflating two different identifiers for two different clouds — and
+  this build's §0 rule 1 pins `africa-south1`.
+
+### 37.6 One promise that this build deliberately does not make
+
+§3.5 maps a Volunteers module with shift scheduling and **hour tracking**.
+Rule 2 of the build discipline names volunteer hours specifically as data
+this build does not model, and three screens stay unbuilt because of it.
+Mapping it to a `Shift` table does not create the data; it creates a
+screen with nothing true to put on it.
+
+### 37.7 The Python seat calculator — run, not traced
+
+The author wrote: *"I can't execute pytest here … run this test first; if
+I miscounted, this fixture is wrong."* Run: **17 passed, 1 failed.**
+
+**The NW405 fixture reproduces exactly** — quota 1 515, ANC 33 · DA 17 ·
+VF+ 9 · EFF 6 · PA 2, total 67, A = 101 439, and all nine remainder ranks.
+A third independent implementation agreeing with ours and with the IEC.
+
+**The self-correction was wrong; the original test was right.** The author
+flagged `test_branch5` as having an arithmetic bug and said Y should be 18,
+not 17. Actual remainders at Q = 2001: X 1981, **Z 988**, Y 983. Z's
+remainder is higher than Y's, so the second leftover seat goes to Z, not
+Y. Y is entitled to 17. The trace dropped a digit from Z's remainder
+(written as 98). **Do not apply that fix** — it would turn a correct
+assertion into a wrong one.
+
+**The one real failure is a bug nobody predicted.** `has_excessive_seats`
+is `True` on NW405, where the test correctly asserts `False`:
+
+```
+BLF   wards 0  entitled 0  ->  0 >= 0 is True
+ABC   wards 0  entitled 0  ->  0 >= 0 is True
+ATM   wards 0  entitled 0  ->  0 >= 0 is True
+F4SD  wards 0  entitled 0  ->  0 >= 0 is True
+```
+
+`is_excessive = ward_wins >= entitled` classifies every party that won
+nothing and is entitled to nothing as having *excessive seats*. Item 16
+is about a party whose ward wins **exceed** its entitlement. Since almost
+every real municipality has a party polling below quota with no ward, the
+Item 16 overhang warning would be permanently lit and therefore ignored —
+the worst failure mode available to a compliance signal.
+
+`seatCalculator.ts` does not have this bug: `overhangSeats = Math.max(0,
+wardSeatsWon − entitlement)` is strictly greater-than, so 0 against 0 is
+0.
+
+### 37.8 The PL/pgSQL carries the same bug, which is the point
+
+`v_is_excessive := v_ward_wins >= v_entitled;` — identical condition, and
+it is **written to the table** as `is_excessive_seats`.
+
+The author proposes a cross-implementation test that ingests NW405
+through both paths and asserts the result sets are identical. **It would
+have passed while both were wrong**, because the defect is shared. Two
+implementations agreeing is not correctness; it is correlated authorship.
+
+A second divergence the proposed test *would* catch, available now
+without Docker: the function inserts `remainder_rank` as `NULL`
+("rank derived by UI/report query, not stored") while the Python computes
+it and `test_branch2_remainder_ranks_match_fixture` asserts it. The two
+are already not equivalent on a column the suite checks.
+
+### 37.9 The D term — already answered here, with two numbers added
+
+The Python states *"Item 12 has no D term"* and asserts `calculate_quota`
+has no `d` parameter. `seatCalculator.nw405-2021.test.ts`'s header
+already records this exact dispute and its resolution: the IEC's
+operational report prints the four-term divisor, the statute does not,
+and with D = 0 they reduce to each other — guarded by an existing test.
+
+What was missing is the size of it, now added:
+
+| D | quota |
+|---|---|
+| 0 | **1 515** — ⌊101 439 / 67⌋ + 1, statutory `B − C` |
+| 2 | **1 561** — ⌊101 439 / 65⌋ + 1, the IEC report's `B − C − D` |
+
+The term raises the quota monotonically, so it can only ever cost small
+parties seats. Nothing shipped passes a non-zero D — but
+`SeatCalculatorPage.tsx` renders it as an editable field, so it is one
+keystroke from a figure a campaign would quote. Both facts are now
+guarded.
+
+### 37.10 The intake screen
+
+`CanvassingIntake.tsx`. The palette is right (it is our tokens, as hex
+constants — `check-no-hex.mjs` would reject the file on sight). Three
+substantive issues:
+
+1. **The NLP training opt-in is not a POPIA s15 consent.** *"Allow
+   de-identified verbatim text to train Setswana language models"* —
+   consent has to be informed and specific, and "de-identified" is a
+   claim about processing that does not exist here. Verbatim doorstep
+   speech is also not reliably de-identifiable: *"Metsi a kgaoga gape ko
+   Ext 7"* plus a stand number is a person. §32's SPIKE·G5 guard says
+   sentiment renders observed counts only, never predictive language.
+2. **It does not persist anything.** `console.log` then
+   `alert("saved successfully!")` — the button says "Save Capture to
+   Outbox" and there is no outbox. On a phone at a gate, that is a
+   canvasser told their work was saved when it was discarded.
+3. **The ward is hardcoded** (`NW405-W12`) and there is no consent gate
+   on the sentiment capture itself — `popiaConsentGiven` is what
+   `firestore.rules` requires before a voter row may be written at all.
+
+### 37.11 Disposition
+
+**Take:** the Python's NW405 fixture as corroboration (recorded, no code
+change); the D-term divergence numbers (added as tests); the intake
+screen's *field list* — dwelling type, addressing mode, informal
+descriptor — which is a genuinely good observation about how addresses
+work in a township and is worth a schema conversation.
+
+**Do not take:** the architecture document's stack, role model,
+capability count, permit workflow, R100,000 threshold, or Volunteers
+module; the PL/pgSQL; the intake screen as code.
+
+**Fix before anything else, in whoever's repository holds them:**
+`ward_wins >= entitled` → `ward_wins > entitled`, in both the Python and
+the PL/pgSQL.
+
+**On the question asked** — a cross-implementation test is the right
+instinct and the wrong next step. It compares two things that share an
+author and a bug. The next step is a fixture with C > 0 and a real
+independent ward winner, run against the *published* IEC result for a
+municipality that had one, which is an external check rather than a
+mirror.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
