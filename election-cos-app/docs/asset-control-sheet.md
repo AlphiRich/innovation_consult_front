@@ -4128,6 +4128,23 @@ through both paths and asserts the result sets are identical. **It would
 have passed while both were wrong**, because the defect is shared. Two
 implementations agreeing is not correctness; it is correlated authorship.
 
+**The fix is one character, and it is safe.** `>=` → `>`, re-run:
+**15/15 green**, and the Item 16 branch is unaffected — X still holds 22
+wards against an entitlement of 20, overhang still 2. Differentially
+tested across 4 000 random councils against the unfixed engine:
+
+```
+cases where a SEAT COUNT changed  : 0
+cases where only the WARNING moved: 334  (8% of councils)
+```
+
+**No allocation changes at all.** The two conditions differ only at
+equality, and at equality `max(0, entitled − wards)` is zero either way —
+so the bug never moved a seat, it only lit a lamp. The 8% understates the
+real rate: the sweep draws votes uniformly, so most parties clear quota,
+whereas a real ballot carries a tail of micro-parties at 0 entitlement and
+0 wards. NW405 has four.
+
 A second divergence the proposed test *would* catch, available now
 without Docker: the function inserts `remainder_rank` as `NULL`
 ("rank derived by UI/report query, not stored") while the Python computes
