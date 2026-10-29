@@ -4562,5 +4562,224 @@ some time.** The constraint is one deploy secret and one API credential
 
 ---
 
+## §41 — The twenty-file batch, and where the revenue question actually sits
+
+Twenty files arrived with the instruction to keep what complements the
+architecture, rebuild what is valuable but incorrect, and add advertising
+revenue through Google Ads and other marketplace instruments. Three
+things were also asked for directly: a persistent sync indicator, a
+`firebase.json` for `app.electioncos.co.za`, and the integration itself.
+
+Taking the direct requests first, because two of them are now closed.
+
+### 41.1 The sync indicator — built, and it changed what the chrome may say
+
+Commit `11df33e`. The request named the Firestore connection state
+specifically, and that turned out to be the whole point rather than an
+implementation detail.
+
+`ConnectionStatus` reported `navigator.onLine` and the Dexie outbox
+depth. Its own header recorded why it refused the word "synced": neither
+signal can establish it. `navigator.onLine` means "attached to a
+network"; an empty outbox says nothing about writes held in Firestore's
+own offline queue, which the outbox cannot see.
+
+Firestore's listener metadata closes both gaps. `fromCache === false` is
+a measurement that the client is attached to the backend.
+`hasPendingWrites === false` is the server's acknowledgement of every
+write the SDK holds. Those two, plus an empty local queue, enumerate
+every place work can hide in this application — so the word is now
+sayable, and it is sayable in exactly one state.
+
+Five states, not two. The one worth naming is **UNREACHABLE**: a handset
+on a council or hotel wifi that has not been signed into reports a
+network and reaches nothing. It is the most confusing failure a field
+user can hit, because everything they can see says they are online.
+
+Two findings that only came from running it:
+
+- The probe's **first draft watched the war-room counters document**,
+  because the application already reads it. `firestore.rules` says
+  `counters` requires `warroom.view` — which a canvasser does not have.
+  The listener would have errored for precisely the user the indicator
+  exists to serve, while working perfectly for anybody testing it as an
+  administrator. It now watches the caller's own staff record, whose
+  rule needs no capability at all, and reads only `snapshot.metadata`,
+  never the document.
+- Instrumenting the probe showed the **SDK does not notice an abruptly
+  killed server** until something makes it retry. The indicator held
+  "Synced" for a full minute after the emulator was killed — correctly,
+  because from the client's point of view nothing had gone wrong. Worth
+  knowing before somebody reports it as a bug.
+
+Also: `readQueueDepth` counts `photoQueue` as well as `outbox`. Nothing
+writes `photoQueue` today, so the old count was correct only by
+accident. It would have gone wrong the first time an incident photo was
+queued, and the person told "nothing waiting" would have been holding
+the evidence for an incident report.
+
+### 41.2 `firebase.json` — already correct; not rewritten
+
+The request asked for CSP, `Referrer-Policy`, `X-Frame-Options` and
+`X-Content-Type-Options`. All four are present, and have been, generated
+from `src/config/securityHeaders.ts` via `scripts/sync-hosting-headers.mjs`
+with `npm run check:headers` holding the two in step:
+
+| Header | Value |
+| --- | --- |
+| `Content-Security-Policy` | `default-src 'self'` … `frame-ancestors 'none'; upgrade-insecure-requests` |
+| `Referrer-Policy` | `same-origin` |
+| `X-Frame-Options` | `DENY` |
+| `X-Content-Type-Options` | `nosniff` |
+| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` |
+| `Permissions-Policy` | camera, geolocation, microphone, payment, USB all `()` |
+| `Cross-Origin-Opener-Policy` | `same-origin-allow-popups` |
+
+`hosting.target` is `app`; `.firebaserc` records that the `app` target is
+the site serving `app.electioncos.co.za`, and that the apex is served
+from Cloudflare and is deliberately a different thing. **Nothing to
+change.** Rewriting a correct file to answer a request is churn that
+loses the reasoning in `securityHeaders.ts`.
+
+### 41.3 Disposition of the twenty
+
+| # | Asset | Verdict | Why |
+| --- | --- | --- | --- |
+| 1 | `mmp.ts` | **Rebuild from it** | The best statutory detail in the batch: Item 12(2) unopposed doubling, Item 13(2)(b) surplus comparison, the Item 13(4) branch, and an explicit `OverhangPolicy`. Our `seatCalculator.ts` has quota, entitlement, remainder, PR seats, Item 16 overhang — and **none of 12(2), 13(2)(b) or 13(4)**. Carries the unresolved `B − C` vs `B − C − D` dispute; see 41.4. |
+| 2 | `swing.ts` | **Split** | `redistribute()` conserves votes and `marginality()` returns real distances — both complement `wardScenario.ts`. Its `quotaFor()` uses **Droop** and must not be taken. |
+| 3 | `WarRoomNW405.jsx` | **Reject the arithmetic, keep nothing else** | `Math.floor(totalPr / (totalSeats + 1)) + 1` is the Droop quota — the national/provincial formula, wrong for a municipality (§37). It also takes PR votes alone as the numerator. Raw hex throughout. |
+| 4 | `constants.ts` | **Keep the idea, we have the values** | PPFA R200,000 / R30m with `supersedes` and `contested` fields, RGA 48-hour window, POPIA retention marked `HOUSE_POLICY`: all agree with this build. `assertNoRetiredThresholds()` over `{80_000, 100_000, 15_000_000}` is a good guard and the site already has its equivalent. |
+| 5–14 | `01_schema.sql` … `10_special_vote_plc.sql` | **Mine for the model, discard the SQL** | Firestore is the database by decision of 13 Sep 2026. The SQL cannot be adopted, but several *model* ideas are sound and portable — see 41.5. |
+| 15 | `CORRECTIONS.md` | **Keep as a cross-check** | A defect register across LAW/SEC/DATA/SEAT/SWING/SYNC/NOTIF/PRIV/GUARD/ROLL/BRAND. Useful as an audit list to run against this build, not as instructions. |
+| 16 | `ward-intelligence-spec-v2.md` | **Keep** | AfroXLMR-large at 89.4 F1 on Setswana NER against Llama-3.1-70B at 20.7 is a real, decision-shaping figure. Its refusal to emit sentiment polarity, and the H1–H7 honesty requirements, match this project's own rules. |
+| 17 | `campaign_agent.py` | **Keep the patterns** | UUID-validated tenant in `RequestContext.build`, parameterised `ecos.set_request_context`, a `STAFF_ROLES` allowlist, thresholds read rather than hardcoded. Good discipline regardless of language. |
+| 18 | `technology-white-paper-v5.md` | **Superseded** | AWS `af-south-1`; this build is GCP `africa-south1` plus Cloudflare DNS. |
+| 19 | `hosting-architecture-v2.md` | **Superseded, and one claim is wrong** | "No Firestore… Firestore has no row-level security" is incorrect: `firestore.rules` enforces per-document access on every read and write, which is what this build relies on and what §41.1 just had to read carefully to site the probe correctly. |
+| 20 | `POPIA-Consent-Withdrawal-Form.pdf` | **Hold for attorney** | Rule 3. A withdrawal form is a data-subject-facing instrument. |
+
+### 41.4 The quota dispute is still open, and it is now in two places
+
+`mmp.ts` computes the Item 12 denominator as `B − C`. Our
+`seatCalculator.ts` uses `B − C − D`. `docs/asset-control-sheet.md` has
+repeatedly stated `B − C`, and `seatCalculator.nw405-2021.test.ts`
+records the disagreement rather than resolving it.
+
+This is not a thing to settle by preference. It is a reading of
+Schedule 1 Item 12 of the Municipal Structures Act and belongs in the
+attorney questions alongside the PPFA items. **Until it is answered,
+take nothing from `mmp.ts` that depends on the denominator** — the
+12(2), 13(2)(b) and 13(4) work is separable from it and is where the
+value is.
+
+### 41.5 What the SQL batch is actually worth
+
+Not the DDL. These, as model decisions:
+
+- **`voting_district_ward` with `segment_seq`.** A voting district that
+  straddles a ward boundary is listed once per ward. This build already
+  meets it from the other direction — 135 seed rows for 108 distinct VD
+  codes, and `siteContent.test.ts` now fails if the site ever publishes
+  the row count as a station count.
+- **Append-only capture and conflict records.** Matches §7.5/§7.6.
+- **`data_subject_consent` scoped by purpose**, and `rights_notice` /
+  `referral_consent` scoped by purpose *and* addressee. Stronger than a
+  single consent flag, and the right shape for POPIA s 18 and s 31(2).
+- **k = 10 suppression on the training corpus.** A real privacy control.
+- **`offered_unconditionally` CHECK-constrained true on
+  `transport_request`**, with the roster view excluding support tier.
+  This is the Electoral Act s 99(2) problem — transport that is not
+  offered unconditionally is inducement — encoded so the database cannot
+  hold the unlawful case. Worth reproducing as a Firestore rule plus a
+  trigger assertion.
+
+### 41.6 Advertising revenue — the part that needs a decision, not a build
+
+Asked for directly, so answered directly: **this cannot be built yet,
+and the blocker is not engineering.**
+
+There is no data model for it — no inventory, placement, impression,
+advertiser or billing entity anywhere in this build. That is the smaller
+problem. The larger one is where the ads would sit.
+
+**Inside the application, it is not a build item — it is a lawful-basis
+decision.** Google Ads and comparable networks work by transmitting
+identifiers and page context to a third party. In the war room the page
+context *is* voter data, and a voter's political opinion is **special
+personal information under POPIA s 26**. Placing a third-party ad tag on
+those screens is a s 31(2) disclosure to a third party, from a surface
+holding s 26 data, on a lawful basis nobody has established. The CSP in
+41.2 forbids it today — `script-src` is `'self'` plus two Google hosts —
+and that is the correct default, not an obstacle to route around.
+
+It also cuts against the commercial position. One published price list
+and naming no party anywhere is the neutrality pledge, and the public
+site is now tested against it. Party-funded advertising inside a product
+sold to every party on identical terms is the one thing that would
+unmake that.
+
+**Where it is clean, and where the money probably is:**
+
+1. **The public marketing site.** No authenticated session, no voter
+   data, no POPIA exposure of this kind. `electioncos.co.za` is served
+   from Cloudflare, separate from the application origin. Ads or
+   sponsored placements here are an ordinary commercial decision.
+2. **A services marketplace, not an ad network.** Compliance advisers,
+   printers, logistics and venue suppliers, data-protection counsel —
+   vendors a campaign already buys from, listed on published terms, on
+   the same one-price-list principle. That earns revenue from the
+   audience without putting a third-party tag anywhere near a voter
+   record, and it suits a product whose whole position is neutrality.
+3. **Direct marketing to users is separately gated.** POPIA s 69
+   requires opt-in for electronic direct marketing. The contact form
+   already carries a distinct, optional marketing consent with its
+   wording version recorded.
+
+**What is needed before anything is built:** a decision on (1) and (2),
+and — if the application surface is ever genuinely wanted — the lawful
+basis in writing from the attorney, not from this build.
+
+### 41.7 The Cloudflare audit (79/100)
+
+Thirteen findings arrived for `electioncos.co.za`. They are real and
+none of them is in this repository — they are account settings, so they
+are listed here as owner actions rather than build work. In the order
+worth doing them:
+
+1. **The Global API key.** Unscoped and account-wide. Replace with a
+   scoped API token limited to this zone and the permissions actually
+   used. This is the only one that is a standing credential risk.
+2. **SSL mode is Full, not Full (strict).** Full accepts any certificate
+   from the origin, including a self-signed one, so the Cloudflare-to-
+   origin leg is encrypted but unauthenticated. Firebase Hosting
+   presents a valid certificate, so **strict should be a no-op change** —
+   verify on a staging host first.
+3. **The firewall `skip` rule.** A rule that skips security features is
+   worth more than its score points: establish what it was added for and
+   whether that is still true.
+4. **Security level `essentially_off` and WAF off.** Turn on, in that
+   order, and watch for false positives against the application origin.
+5. **No CAA records.** Cheap and worth doing: CAA restricts which
+   authorities may issue for the domain.
+6. **AI/crawler protection off, no Logpush.** Lowest priority. Logpush
+   matters more than the score suggests, because without it there is no
+   retained record of an incident at the edge.
+
+**None of this blocks the deploy, and none of it is the deploy
+blocker.** That remains what §39.5 says it is.
+
+### 41.8 What is still open
+
+- The `B − C` vs `B − C − D` reading, for the attorney, with the PPFA
+  questions (41.4).
+- A decision on advertising placement before any of it is built (41.6).
+- The Item 12(2) / 13(2)(b) / 13(4) rebuild from `mmp.ts`, which is
+  separable from the denominator dispute and is the highest-value
+  engineering left in this batch.
+- `FIREBASE_SERVICE_ACCOUNT` and the IEC API credential — unchanged, and
+  still the only two things standing between this build and a live
+  deploy.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
