@@ -4470,5 +4470,97 @@ would export, not a new source.
 
 ---
 
+## §40 — The Stitch re-export work order (178 screens)
+
+Session 38. `stitch_export_manifest.csv`, dated **3 August 2026**: 178
+screens missing code, 121 with no preview either, across 12 module
+groups. The work order asks for each to be reopened in Stitch, regenerated
+and re-downloaded.
+
+Its own arithmetic checks out — the twelve group counts sum to 178 and
+the urgent counts to 121.
+
+### 40.1 It is already superseded
+
+`docs/screen-findings.md` is dated **9 August 2026** — six days *after*
+this manifest — and carries a screen-by-screen verdict across sessions 5,
+7 and 9. Several names on the work order appear in it by name and were
+already consumed or rejected:
+
+```
+lge_war_room_local_head            used (Wards, then War Room)
+ward_field_app_mobile              used (Field Diary)
+vd_captain_request_materials_modal used (Logistics)
+household_voter_logging            judged
+voter_profiling_service_delivery_intake  judged
+volunteer_permissions_management   judged
+```
+
+The triage this work order would feed has already happened. Re-exporting
+to redo it would be the most expensive way to arrive where the build is.
+
+### 40.2 178 names are not 178 screens
+
+Clustered on a three-word stem: **127 distinct families**, and **79 of
+the 178 names sit in 28 clusters**. The largest:
+
+| names | one screen, in states |
+|---|---|
+| 7 | `incident_report_export_*` — view, authorized_by, authorized_version, draft_watermark, indexed_barcoded, signature, timestamped |
+| 6 | `incident_report_pdf_*` — preview, download_triggered, export_success, confidential toggle, priority toggle, social_grant metrics |
+| 5 | `lge_war_room_*` |
+| 5 | `election_campaign_os_*` |
+| 4 | `constituency_audit_log_*` |
+
+Thirteen names for **one** incident-export screen in thirteen states.
+That is what a design tool emits; it is not thirteen screens to build,
+and `IncidentReportPage.tsx` already renders that screen with those
+states as state.
+
+### 40.3 A third are for things this build does not have
+
+| screens | bucket |
+|---|---|
+| 18 | **DevOps/infra admin** — `devops_edit_s3_bucket_*`, `aes_256_encryption_audit_state`, `let_encryption_vault_multi_factor_*`. The capability model has 26 entries and not one is a DevOps grant. This is an infrastructure console inside a campaign product; it is not a surface this build should have. |
+| 9 | **Volunteers / deployment** — rule 2 names volunteer hours as data this build does not model, and three screens already stay unbuilt for it. A screen does not create the data. |
+| 3 | **Ad-platform analytics** — `facebook_ads_deep_dive_analytics`, `google_search_deep_dive_analytics`, `digital_impact_social_monitoring`. No integration, no data, and §37.6's point exactly. |
+| 30 | **Demo tenants** — every `johannesburg_team_*`, `matlosana_team_*`, `city_of_johannesburg_*`. Not new screens: the same screens wearing another municipality's name. The product serves NW405. |
+
+Sixty of 178. Roughly thirty are surfaces that should not exist here, and
+roughly thirty are duplicates of screens that do.
+
+### 40.4 One thing it confirms
+
+`ward_sentiment_comparison_dashboard` is listed **"No preview either"** —
+neither code nor a usable image survives outside Stitch. That corroborates
+§34: the file this session was asked to rebuild genuinely was not
+recoverable from this repository or the uploads, and rebuilding it from
+the certified 2021 data rather than hunting for the original was the
+right call.
+
+### 40.5 Disposition
+
+**Do not run this work order**, and certainly not this week. Polling day
+is 4 November; a design-recovery exercise is the clearest example of work
+that cannot pay back before then.
+
+What survives of it, for after the election:
+
+- The **manifest itself** is worth keeping as an inventory — it is the
+  only record of what was in Stitch.
+- Of the 178, the recoverable set is **the families that map to a module
+  this build has and that `screen-findings.md` has not already judged** —
+  on the clustering above that is on the order of fifteen screens, not
+  178.
+- Re-export those **individually, on demand**, when a module is next
+  worked on. A screen is cheap to recover when somebody needs it and
+  expensive to recover in bulk against a list.
+
+**The design is not the constraint on this product and has not been for
+some time.** The constraint is one deploy secret and one API credential
+(§39.5).
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
