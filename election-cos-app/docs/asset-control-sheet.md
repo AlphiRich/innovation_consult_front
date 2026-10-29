@@ -4781,5 +4781,138 @@ blocker.** That remains what §39.5 says it is.
 
 ---
 
+## §42 — The sales strategy, and the advertising decision carried out
+
+The advertising question §41.6 left open came back answered: **consent-
+gated adverts on explainer pages only, with political and election
+advertising categories blocked.** That is the narrow placement, and it
+is built (`dea6aa2`). It arrived with a sales and marketing strategy,
+reconciled below.
+
+### 42.1 What was built, and what it guarantees
+
+Three controls. Two of them this repository enforces; the third it can
+only specify, and saying which is which is the point.
+
+| Control | Enforced where | Fails how |
+| --- | --- | --- |
+| Explainer pages only | `adPolicy.ts`, a literal allowlist checked before anything about the visitor | Closed. A consented reader on any other page is refused. |
+| Consent first | No script injected until a positive decision | Closed. A refusal and an unanswered banner are the same outcome. |
+| Political/election categories blocked | **Ad-network console, not code** | Specified in `REQUIRED_BLOCKED_CATEGORIES`; `AD_CLIENT_ID` is null and the policy refuses while it is. |
+
+The third one matters. Google's sensitive-category controls live in the
+publisher account, and no attribute on a script tag sets them. Any code
+claiming to would be decorative. So the build refuses to serve at all
+until somebody deliberately fills in `AD_CLIENT_ID` — and **that is the
+moment the console blocks must already be in place**, because a
+half-configured account is the one state in which the categories might
+not be blocked.
+
+**Owner action before `AD_CLIENT_ID` is ever set.** In the AdSense or
+Ad Manager console, block: Politics; Elections; Political advocacy and
+issue campaigns; Political fundraising and donation appeals; Government
+and public administration services; Religion and belief; Gambling and
+betting. The last three are not in the instruction — they are there
+because "political" alone does not reliably cover the adjacent
+inventory in a network taxonomy, and an explainer on party-funding law
+is exactly where that adjacency bites.
+
+Non-personalised ads are requested on every slot regardless of consent.
+Contextual advertising against an article is an ordinary transaction;
+building a behavioural profile of somebody reading about election law,
+on an elections vendor's site, is not something to do to a reader
+whatever the banner said.
+
+The hardest guarantee is the negative one: a source sweep fails if any
+ad identifier appears outside `src/site/ads/**`. The war room's page
+context *is* voter data, political opinion is special personal
+information under POPIA s 26, and this is what stops a later edit that
+means no harm from putting a third-party tag there.
+
+### 42.2 Three explainers, because the ad surface had to exist first
+
+"Explainer pages only" needs explainer pages. The nav had an
+"Explainers" item pointing at `/#pillars`, which is not a page.
+
+`/explainers` now carries three: the party-funding disclosure line and
+annual cap; how a municipal council is made up; POPIA and voter
+contact. Every statutory fact is one this repository already holds, and
+the tests compare the figures against the same source the application
+computes from rather than against a copy.
+
+They also serve the strategy's own inbound-search aim better than an
+advert does. Somebody searching "PPFA disclosure threshold" is the
+buyer this product wants, and an explainer that answers them is a
+better first contact than a bid.
+
+**The Item 12 quota formula is deliberately not explained.** Its
+denominator is the open reading from §41.4, and a public page is the
+last place to publish a formula two parts of this project disagree
+about. A test fails if it ever appears.
+
+### 42.3 The strategy reconciles with the build, except on two points
+
+Most of it already matches. The prices on the site are the strategy's
+prices — R1,800 a ward, R45,000 a cycle, R2,500 per ward a month, the
+PPFA add-on by consultation — the casework season opens 5 November
+2026 on both, and the neutrality guardrail is the pledge the site is
+already tested against. Nothing needed changing.
+
+**Point one: the domain.** The strategy names
+`www.electioncampaignos.co.za`. This build is on `electioncos.co.za`
+with the application at `app.electioncos.co.za` — in `.firebaserc`, in
+`publicDomain.ts`, in the CSP, in `siteContent.ts` and in the Cloudflare
+account the §41.7 audit covers. A second domain is not a find-and-
+replace: it is a second DNS zone, a second certificate, a second
+Cloudflare configuration, and a decision about which one the
+application's sign-in origin belongs to. **Left as it is, pending your
+call.** If the new domain is wanted, the cheap version is to point it at
+the same site rather than to move anything.
+
+**Point two, and this one needs an explicit answer.** Phase B of the
+strategy asks for "sponsored digital real estate within secure,
+consented municipal/ward communication portals… driving hyper-localized
+campaign advertising models for independent candidates and local
+branches."
+
+That is campaign advertising, sold to candidates, inside the product.
+It contradicts the same message's governing instruction — political and
+election advertising categories blocked — and it is the POPIA s 26
+exposure §41.6 set out, in its most direct form: a ward portal's
+context is who lives there and how they lean.
+
+It also meets the neutrality pledge head-on. "One published price list"
+and "no per-party switches" cannot survive a product that sells
+placement to candidates, because placement is a thing one candidate can
+buy more of than another.
+
+**Not built, and not quietly dropped either — it is written here so the
+choice stays visible.** The near version that does not have these
+problems is §41.6's services marketplace: compliance advisers,
+printers, logistics, venue suppliers, listed on published terms. That
+earns from the audience, suits the pledge rather than cutting against
+it, and needs no third-party tag anywhere near a voter record.
+
+### 42.4 Gates and dates now on the record
+
+- **G0b — 50 paid ward commitments for the Casework Tracker by
+  31 January 2027.** Outreach to winning ward councillors and caucus
+  offices from 5 November 2026. The site's casework season already
+  opens on that date.
+- Polling day 4 November 2026. Everything in §42.1–42.2 is public-site
+  work and touches nothing a campaign uses next week.
+
+### 42.5 Still open
+
+- The domain decision (42.3).
+- The Phase B campaign-advertising question (42.3) — the one item in
+  this batch deliberately not built.
+- The console category blocks, before `AD_CLIENT_ID` is set (42.1).
+- Unchanged from §41.8: the Item 12 reading, the `mmp.ts` Item 12(2) /
+  13(2)(b) / 13(4) rebuild, `FIREBASE_SERVICE_ACCOUNT`, and the IEC
+  credential.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
