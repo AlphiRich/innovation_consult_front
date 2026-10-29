@@ -22,6 +22,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preflight": "node scripts/deploy-preflight.mjs",
     "preview": "vite preview",
+    "rehearse": "vite-node scripts/rehearse-results-night.ts --",
     "test": "vitest run",
     "test:functions": "npm --prefix functions run test",
     "test:watch": "vitest",

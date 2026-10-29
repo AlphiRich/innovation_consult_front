@@ -92,7 +92,11 @@ const credential =
 
 if (!credential) {
   add('deploy credential', 'FAIL', 'neither GOOGLE_APPLICATION_CREDENTIALS nor FIREBASE_TOKEN is set',
-    'Add a service-account JSON path as GOOGLE_APPLICATION_CREDENTIALS, or a CI token as FIREBASE_TOKEN, ' +
+    'THIS IS THE ONE BLOCKER ON THE PATH THAT WORKS. The GitHub workflow needs repository secret ' +
+    'FIREBASE_SERVICE_ACCOUNT (the service-account JSON, whole) plus the six VITE_FIREBASE_* values as ' +
+    'Actions variables, then Actions -> Deploy Election Campaign OS -> Run workflow. Never paste a ' +
+    'service-account key into a chat. To deploy from this machine instead: ' +
+    'add a service-account JSON path as GOOGLE_APPLICATION_CREDENTIALS, or a CI token as FIREBASE_TOKEN, ' +
     'to the environment. Deployment cannot proceed without one.');
 } else if (credential === 'GOOGLE_APPLICATION_CREDENTIALS') {
   const file = process.env.GOOGLE_APPLICATION_CREDENTIALS;
@@ -153,9 +157,15 @@ if (missingWeb.length > 0) {
   })();
 
   if (readVar('VITE_FIREBASE_USE_EMULATORS') === 'true') {
+    // Local-only, and the remedy says so. `.env` is gitignored and
+    // `.github/workflows/deploy-ecos.yml` writes a fresh one that
+    // deliberately omits this variable, so the workflow can never hit
+    // this. Reporting it with the same words as a universal blocker made
+    // the deploy look two steps away when it was one — see §39.
     add('web app config', 'FAIL', 'VITE_FIREBASE_USE_EMULATORS is true in .env',
-      'This .env points the app at the local emulator suite. Unset it before deploying, or the build ' +
-      'you publish is a development build.');
+      'This .env points the app at the local emulator suite, so a deploy FROM THIS MACHINE would publish ' +
+      'a development build. It does not block the GitHub workflow, which writes its own .env without this ' +
+      'variable. Unset it to deploy from here.');
   } else if (deployProject && configProject !== deployProject) {
     add('web app config', 'FAIL', `config is for ${configProject}, deploying to ${deployProject}`,
       'The web config compiled into the bundle names a different project than the one being deployed to. ' +

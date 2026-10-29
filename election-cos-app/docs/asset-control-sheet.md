@@ -4375,5 +4375,100 @@ reliably the one that loads.
 
 ---
 
+## §39 — Six days out: the deploy, and a results-night rehearsal
+
+Session 38, acting on the recommendations in §38's close rather than
+reviewing another supplied artefact. Polling day is **4 November 2026**.
+
+### 39.1 There is one blocker, not two
+
+The preflight has reported two failures for several sessions and they
+have been quoted as equals. They are not:
+
+- **`VITE_FIREBASE_USE_EMULATORS=true` is local only.** `.env` is
+  gitignored, and `.github/workflows/deploy-ecos.yml` writes a fresh one
+  that *deliberately omits* the variable. The workflow cannot hit this.
+- **The deploy credential is the real one**, and only on the local path.
+  The workflow wants repository secret `FIREBASE_SERVICE_ACCOUNT`.
+
+So the deploy is: one secret, the six `VITE_FIREBASE_*` values as Actions
+**variables** (a Firebase web config is public by design — §10), then
+**Actions → Deploy Election Campaign OS → Run workflow**. It is
+`workflow_dispatch`, deliberately manual.
+
+The preflight now says which failure belongs to which path, in the
+remedy line rather than in a document nobody opens. Reporting a
+local-only condition in the same words as a universal blocker made the
+deploy look two steps away when it was one. Rule 5 again: present is not
+correct, and neither is *reported*.
+
+### 39.2 The rehearsal
+
+`npm run rehearse` — `scripts/rehearse-results-night.ts`.
+
+The pieces of the results path were each tested and the path had never
+been run in one go. The night of a count is the worst time to discover
+the ends do not meet, so it runs today against data whose answer is
+known. It drives the real modules — `ingestResultFile`, `MAPPINGS`,
+`allocateSeats` — not copies.
+
+```
+1 READ       363 bytes · sha256 3835845cb8282819…
+2 MAP+INGEST mapping iec-seat-calculation-detail · 9 of 9 rows · INGESTED
+3 VALIDATE   clean · provenance UNCONFIRMED
+4 ALLOCATE   quota 1 515 · council 67 (allocated 67, pending 0)
+             ANC 33 · DA 17 · VFP 9 · EFF 6 · PA 2
+5 RECONCILE  every figure matches.
+```
+
+On the night the only thing that changes is the input:
+
+```
+npm run rehearse -- --file <export.csv> --seats <B> --votes <A> \
+  --municipality <code> --expect none
+```
+
+A file with unfamiliar headings stops the run and **prints the headings
+it found**, which is the cue to add a mapping — not to edit the script.
+
+### 39.3 It was proved to refuse, and the first attempt proved nothing
+
+| Injected | Result |
+|---|---|
+| Unknown column headings | `NO_MAPPING`, headings printed, exit 1 |
+| One vote figure out by 100 (48 911 → 48 811) | `MISMATCH ANC: expected 33, got 32`, exit 1 |
+| Missing file | exit 1 |
+
+**A 100-vote transcription slip in one cell costs a seat.** That is the
+case the reconcile step exists for, and it is not visible by reading.
+
+The first run of those two tests **passed for the wrong reason**. The
+script joined `--file` to the repo root unconditionally, so an absolute
+path failed on "cannot read" — exit 1 either way, which is why an
+exit-code table looked healthy and said nothing. Fixed, and the refusals
+re-proved against the messages an operator would actually see. Third time
+in this register that a guard failed for a reason other than the one it
+was written for (§33.6, §36.4).
+
+### 39.4 The fixture
+
+`seed-data/sources/nw405-2021-seat-calculation-detail.csv` — the nine
+published party rows in the IEC "Seat Calculation Detail" column format
+(`Party Abbreviation | Party Name | Valid Votes | Ward Seats`), which is
+the format `mappings.ts` was written against and the only one this build
+has seen. The figures are the published ones already reconciled five ways
+(§34.4); the file is a transcription into the delimited form an operator
+would export, not a new source.
+
+### 39.5 What is still open, in order
+
+1. **An IEC API credential.** All 101 routes are 401 (§38.5b). Nothing
+   in the API half of either ingestion skill can run without one, and the
+   window to capture 4 November live is one night.
+2. **The deploy secret**, per §39.1.
+3. On the night: run §39.2 against the real export.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
