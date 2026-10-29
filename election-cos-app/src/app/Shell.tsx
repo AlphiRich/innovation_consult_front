@@ -36,7 +36,7 @@ import { useEntitlements } from '@/auth/useEntitlements';
 import { useQuery } from '@tanstack/react-query';
 import { dal } from '@/dal';
 import { Button, Card, DataLine, SectionLabel } from '@/components/ui';
-import { ConnectionStatus } from './ConnectionStatus';
+import { SyncStatus } from './SyncStatus';
 import { PRIMARY_NAV, navItemAccess } from './nav';
 
 export function Shell() {
@@ -132,7 +132,7 @@ export function Shell() {
 
   const navFooter = (
     <div className="mt-auto pt-6 border-t border-paper/10 space-y-1">
-      <ConnectionStatus />
+      <SyncStatus />
       <p className="text-body-md font-body text-paper/60 truncate">{user?.email}</p>
       <button
         type="button"
@@ -165,7 +165,7 @@ export function Shell() {
           )}
         </span>
         <div className="flex items-center gap-3">
-          <ConnectionStatus compact />
+          <SyncStatus compact />
           <button
             type="button"
             onClick={() => setDrawerOpen((open) => !open)}

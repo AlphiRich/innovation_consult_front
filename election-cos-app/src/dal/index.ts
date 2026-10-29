@@ -34,6 +34,7 @@ import { warRoomCountersRepository } from './adapters/firestore/warRoomCountersR
 import { municipalityProfileRepository } from './adapters/firestore/municipalityProfileRepository';
 import { fileStoreRepository } from './adapters/firestore/fileStoreRepository';
 import { entitlementsRepository } from './adapters/firestore/entitlementsRepository';
+import { connectivityProbe } from './adapters/firestore/connectivityProbe';
 
 const adapter = (import.meta.env.VITE_DAL_ADAPTER as string | undefined) ?? 'firestore';
 
@@ -76,6 +77,12 @@ export const dal = {
   // What the tenant bought, as opposed to what the user may do — see
   // src/auth/modules.ts. Read-only: provisioned server-side.
   entitlements: entitlementsRepository,
+  // Not a repository: no documents are read through it, only the
+  // listener metadata that says whether the client is talking to the
+  // backend at all. It is here because the rule in §2.2 is about the
+  // Firebase SDK, not about documents — the chrome may not import the
+  // SDK, so this is the seam it reaches the link state through.
+  connectivity: connectivityProbe,
 };
 
 export type { SessionContext, GeoScope, Page, PageRequest } from './ports/session';
