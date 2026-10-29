@@ -4288,6 +4288,21 @@ skill's *"or NPE equivalent endpoints"* has it the wrong way round: for a
 **municipal** product the LGE endpoint is the one that matters, and it is
 the one without the convenient form.
 
+### 38.5b The API cannot be called at all
+
+Checked after writing the above: **all 101 routes return 401**, including
+`api/FAQ`. There is no unauthenticated surface, and the Help page gives
+no route to a token.
+
+This is the finding that reorders the rest. Both skills describe polling
+the API portal as though it were available; neither mentions a
+credential. Any pipeline built to this description fails on its first
+call, and any report of a successful sync from it is false.
+
+(Also: the `api/v1/` family takes query parameters, not path segments, so
+a path-style v1 call returns 404 rather than 401 — a useful way to tell a
+wrong URL from a missing credential.)
+
 ### 38.6 What it leaves out, including the endpoint this project needs most
 
 ```

@@ -97,7 +97,25 @@ from a confirmed one six months later.
 read off the live page on 29 October 2026, not recalled. Parameter casing
 is strict PascalCase — `ElectoralEventID`, never `event_id`.
 
-### The ones worth calling
+### Every one of them needs a credential we do not have
+
+Checked 29 October 2026. **All 101 routes return 401** —
+`{"Message":"Authorization has been denied for this request."}` —
+including `api/FAQ`. There is no public surface on this API. The Help
+page documents the routes and says nothing about obtaining a token.
+
+So the table below is a map, not a capability. Until a credential exists
+the whole API portal is unreachable, and anything that claims to have
+synced from it has not. Acquisition today goes through the published
+CSV/XLSX exports on `results.elections.org.za`, which is how §18's NW405
+reconciliation was actually done.
+
+The `api/v1/` family takes **query parameters**, not path segments:
+`api/v1/LGESeatCalculationResults?ElectoralEventID={id}`. A path-style
+call to a v1 route returns 404 rather than 401, which is a useful way to
+tell a wrong URL from a missing credential.
+
+### The ones worth calling, once there is a credential
 
 | Route | What it gives |
 |---|---|
