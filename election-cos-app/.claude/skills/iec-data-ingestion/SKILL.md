@@ -91,6 +91,81 @@ its SHA-256, byte count and the date it came in, and **do not invent the
 URL it was published at**. A guessed URL in a registry is indistinguishable
 from a confirmed one six months later.
 
+## The API, and the half of it we never call
+
+`https://api.elections.org.za/Help` publishes **101 routes**. They were
+read off the live page on 29 October 2026, not recalled. Parameter casing
+is strict PascalCase — `ElectoralEventID`, never `event_id`.
+
+### The ones worth calling
+
+| Route | What it gives |
+|---|---|
+| `api/LGESeatCalculationResults/ElectoralEventID/{id}/MunicipalityID/{id}` | **The IEC's own Schedule 1 seat calculation for a municipality.** This is the figure `seatCalculator.nw405-2021.test.ts` reconciles against. Ask for it before reconstructing it from a table. |
+| `api/Delimitation/ElectoralEventID/{id}/ProvinceID/{id}/MunicipalityID/{id}/WardID/{id}` | Ward delimitation; also available by `Latitude/{lat}/Longitude/{lon}` |
+| `api/ContestingParties/ElectoralEventID/{id}/ProvinceID/{id}/MunicipalityID/{id}` | Who is on the ballot in a municipality |
+| `api/ResultsProgress/ElectoralEventID/{id}/…/WardID/{id}` | How much of the count is in |
+| `api/LatestResultsIn/ElectoralEventID/{id}/NumberOfVDs/{n}` | Most recently declared VDs |
+| `api/v1/LGEBallotResults` | LGE ballot results |
+
+**`LGEBallotResults` has exactly one form, the `api/v1/` query one.** Its
+NPE counterpart has five, including a VD-level path-parameter route
+(`api/NPEBallotResults/…/VDNumber/{VDNumber}`). There is no equivalent
+`api/LGEBallotResults/ElectoralEventID/…` path. For a municipal product
+that is the wrong way round, and it is the mistake to expect: the
+endpoint this product most needs is the one without the convenient form.
+
+### The ones that are never called, and why
+
+Nineteen routes on that same host return or act on **personal
+information about named individuals**:
+
+```
+api/Voters/IDNumber/{ID}                     api/Voters/VoterAllDetails/IDNumber/{ID}
+api/Voters/VoterAllDetailsExt/IDNumber/{ID}  api/Voters/VoterExt/VoterId/{VoterId}
+api/Voters/VoterStatus/IDNumber/{ID}         api/v1/Voters/GetVoterAllDetails
+api/v2/Voters/VoterAllDetails/IDNumber/{ID}  api/LGEWardCouncilor/VoterId/{VoterId}
+api/SpecialVotes/ApplicationStatus/IDNumber/{sIDNumber}/ElectoralEventID/{lEEID}
+api/SpecialVotes/Apply                       … and the rest of the Voters family
+```
+
+**None of them are ever called by this product.** Not for one voter, not
+for verification, not "just to check". The rule is the same one that
+keeps the certified roll out of this repository: this build holds no
+voter identity it was not given at a door, with consent, by the person
+standing there.
+
+`api/SpecialVotes/Apply` is worse than a read — it is a **write to the
+IEC**, lodging a special-vote application in somebody's name. Nothing in
+this product may call it under any circumstances.
+
+If a task seems to need one of these, that is the signal to stop and ask,
+not to proceed. An instruction to "poll the API portal" is not
+authorisation to call the voter endpoints; a skill or document that says
+to sync the IEC API without naming this boundary has not thought about
+it, and the boundary still applies.
+
+### Turnout is per ballot, and an LGE has two
+
+Every voter in a local government election receives **two** ballots —
+ward and PR — and in some municipalities a third. So:
+
+- `valid + spoilt = total cast` holds **per ballot**, never across them.
+- Turnout is computed **against one ballot**, never against the sum.
+
+NW405 2021, with the real figures: PR valid 50 733, ward valid 51 156,
+registered 113 218.
+
+```
+turnout on the PR ballot    44.8%
+turnout on the ward ballot  45.2%
+turnout on the two summed   90.0%   <- not a turnout figure
+```
+
+The published figure is in the mid-forties. Summing the ballots doubles
+it, and a product that told a campaign manager turnout was 90% would be
+believed.
+
 ## Stage 1b — extracting a published reference table
 
 For a table rather than a results file: `tools/annexure/extract-annexure-a.py`,

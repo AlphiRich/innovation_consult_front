@@ -4218,5 +4218,147 @@ mirror.
 
 ---
 
+## §38 — `ecos-iec-extractor`, a skill for the IEC portals
+
+Session 38. Supplied as *"created and activated in your skill library."*
+
+### 38.1 It is not active here
+
+Not on disk, and not in `/root/.claude/skills/synced/` — which holds
+`ecos-demarcation-baseline-config` and `ecos-rbac-config`, so the sync
+works; this one simply is not in it. Skills sync at session start, so one
+created mid-session does not reach the running session. Reviewed from the
+pasted text instead.
+
+It also **duplicates a skill that is loaded**:
+`election-cos-app/.claude/skills/iec-data-ingestion/SKILL.md`, 269 lines,
+covering the acquisition tool, the result schema, the mapping registry
+and the refusals. Two skills with overlapping triggers is a coin toss
+over which one loads.
+
+### 38.2 Verified correct
+
+Checked live, 29 October 2026:
+
+- `https://results.elections.org.za` → 200.
+- `https://www.elections.org.za/pw/News-And-Media/News-List/IECNews` → 200.
+- `api/ResultsProgress/ElectoralEventID/{..}/ProvinceID/{..}/MunicipalityID/{..}/WardID/{..}` — exact match against the Help page.
+- `api/LatestResultsIn/ElectoralEventID/{..}/NumberOfVDs/{..}` — exact match.
+- The PascalCase gotcha is right, and worth keeping.
+- "Media statements embed critical tables inside attached PDFs" — right, and matches §18's own experience of this source.
+
+### 38.3 The turnout rule doubles turnout
+
+> *"Validate that Valid Votes plus Spoilt Votes equals Total Votes Cast …
+> Compute voter turnout percentages against registered voter counts."*
+
+Both sentences assume one ballot. **Every voter in a local government
+election receives two** — ward and PR. Run against NW405 2021 (PR valid
+50 733, ward valid 51 156, registered 113 218):
+
+```
+turnout on the PR ballot    44.8%
+turnout on the ward ballot  45.2%
+turnout on the two summed   90.0%
+```
+
+The published 2021 figure is in the mid-forties. A pipeline that follows
+this rule reports **90% turnout**, and a campaign manager would believe
+it. `valid + spoilt = total cast` holds per ballot and never across them.
+
+### 38.4 The dedup instruction contradicts itself
+
+> *"Compute a SHA-256 hash across the unique portal record identifier or
+> URL to ensure duplicate updates **update rather than overwrite**
+> historical snapshots."*
+
+`document_id = sha256(source_url)` means one URL maps to one document id
+for ever, so a re-ingest **is** the overwrite. On results night a results
+URL changes every few minutes as voting districts declare; URL-addressed
+storage destroys exactly the audit trail the sentence claims to preserve.
+Snapshots need the *payload* hashed, or an append-only key carrying
+`captured_at`.
+
+### 38.5 One route is wrong, and backwards
+
+`api/LGEBallotResults` as written does not exist. The Help page publishes
+**one** form — `api/v1/LGEBallotResults` — while its NPE counterpart
+publishes **five**, including a VD-level path-parameter route. The
+skill's *"or NPE equivalent endpoints"* has it the wrong way round: for a
+**municipal** product the LGE endpoint is the one that matters, and it is
+the one without the convenient form.
+
+### 38.6 What it leaves out, including the endpoint this project needs most
+
+```
+api/LGESeatCalculationResults/ElectoralEventID/{id}/MunicipalityID/{id}
+api/Delimitation/ElectoralEventID/{id}/ProvinceID/{id}/MunicipalityID/{id}/WardID/{id}
+api/ContestingParties/ElectoralEventID/{id}/ProvinceID/{id}/MunicipalityID/{id}
+```
+
+The first returns **the IEC's own Schedule 1 seat calculation for a
+municipality** — the figure §18 derived by hand and §37 has been
+reconciling three implementations against. The skill instead says to
+scrape "Allocated Seats" out of a table.
+
+### 38.7 The serious one: no boundary, on a host that serves personal data
+
+The skill says to "poll the API portal" and defines no limit. That same
+host publishes **nineteen routes returning or acting on personal
+information about named individuals**:
+
+```
+api/Voters/VoterAllDetails/IDNumber/{ID}     api/Voters/VoterStatus/IDNumber/{ID}
+api/Voters/VoterAllDetailsExt/VoterId/{..}   api/LGEWardCouncilor/VoterId/{VoterId}
+api/v2/Voters/VoterAllDetails/IDNumber/{ID}  api/SpecialVotes/Apply
+… and the rest of the Voters family
+```
+
+`api/SpecialVotes/Apply` is not even a read — it **writes to the IEC**,
+lodging a special-vote application in somebody's name.
+
+This corpus has held one line consistently: no voter row from the
+certified roll is read or copied (§11.1, §13.1); `unmaskCandidateIdNumber`
+fails closed rather than guess (§6); §33 refused unmasked ID handling;
+§36 built an OTP flow that never persists a phone number. **A skill that
+authorises "sync the IEC API" without naming these endpoints reopens all
+of it by omission** — not by saying anything wrong, but by not saying
+this.
+
+### 38.8 The schema has no state for "not verified yet"
+
+`electionResultSchema.ts` requires `provenance.sourceDescription`, a
+`status` of `CONFIRMED | UNCONFIRMED`, a `confirmedBy` when confirmed,
+and carries `BLOCKING | WARNING` severities where BLOCKING **stops the
+record being stored**.
+
+The Hub schema has `source_url` and `ingested_at` and nothing else. Once
+stored, a figure scraped off a dashboard mid-count and a certified
+declared result are indistinguishable. *"Log missing or unverified
+voting district returns as pending"* is logging, which is not refusing —
+and the existing skill exists precisely to keep an unverified figure out
+of a campaign's mouth.
+
+Minor: `"year": 2026` and `"event_id": 0` are baked into the example
+rather than marked as placeholders, and `event_type` has no value for the
+district/DC ballot.
+
+### 38.9 Disposition
+
+**Taken, and folded into `iec-data-ingestion/SKILL.md` rather than run as
+a second skill:** the verified route table including the three missing
+endpoints, the `LGEBallotResults` asymmetry, the per-ballot turnout rule
+with the NW405 arithmetic, and an explicit refusal list naming the voter
+endpoints and `SpecialVotes/Apply`.
+
+**Not taken:** the Hub schema as a storage contract while it has no
+confirmation state; the URL-hash dedup rule; the combined-ballot turnout
+calculation.
+
+**Not run as a second skill.** One skill for this source, or neither is
+reliably the one that loads.
+
+---
+
 *Append new batches as §7-style tables. Identity by hash; filenames in
 this project repeat across conversations and are not reliable keys.*
